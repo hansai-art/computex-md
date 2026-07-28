@@ -14,23 +14,19 @@ import { resolve, join, relative } from 'node:path';
 import { LANGUAGES } from '../../src/config/languages.mjs';
 
 const DIST = resolve(process.cwd(), 'dist');
-const MIN_TOTAL_PAGES = 300;
-const MIN_ARTICLES_PER_CATEGORY = 3;
-const CATEGORIES = [
-  'history',
-  'geography',
-  'culture',
-  'food',
-  'art',
-  'music',
-  'technology',
-  'nature',
-  'people',
-  'politics',
-  'society',
-  'economy',
-  'lifestyle',
-];
+// 下限的用意是抓「整組頁面消失」，不是「內容要夠多」。母體 863 篇所以設 300 / 100 /
+// 每類 3 篇；COMPUTEX.md 出生時只有 1 篇，沿用母體數字會讓這道防線永遠紅 —
+// 永遠紅的防線等於沒有防線。內容長大時把這三個數字一起往上調。
+const MIN_TOTAL_PAGES = 20;
+const MIN_ARTICLES_PER_CATEGORY = 0;
+// 分類不再硬編（母體硬編 13 個台灣分類，fork 後整組失效）。
+// 這支是 .mjs 不能 import .ts 的 SSOT，所以改成從 knowledge/ 實際目錄推導 —
+// 推導比複製好：它永遠跟真相一致，不會漂移。
+const CATEGORIES = (
+  await readdir(resolve(process.cwd(), 'knowledge'), { withFileTypes: true })
+)
+  .filter((d) => d.isDirectory() && !/^(en|_)/.test(d.name))
+  .map((d) => d.name.toLowerCase());
 
 // i18n route smoke (audit 2026-06-10 D-8): REFLEXES #19 要求大型 refactor 後
 // 人工 smoke test 多語頁面 — 這段把它自動化進每次 CI。每語言驗：目錄存在、
@@ -115,7 +111,7 @@ for (const cat of CATEGORIES) {
 
 // ── 4. Spot-check: random article pages should have real content ──
 
-const SAMPLE_CATEGORIES = ['history', 'people', 'culture'];
+const SAMPLE_CATEGORIES = CATEGORIES.slice(0, 3);
 for (const cat of SAMPLE_CATEGORIES) {
   const catDir = join(DIST, cat);
   try {
@@ -142,9 +138,10 @@ for (const lang of LANG_ROUTES) {
   try {
     const langPages = await countHtml(langDir);
     const zhTotalProxy = totalPages; // includes all langs; use floor heuristic instead
-    if (langPages < 100) {
+    const LANG_COLLAPSE_FLOOR = 5;
+    if (langPages < LANG_COLLAPSE_FLOOR) {
       errors.push(
-        `/${lang}/ has only ${langPages} HTML pages (< 100 collapse floor) — getStaticPaths or sync likely broke for this language`,
+        `/${lang}/ has only ${langPages} HTML pages (< ${LANG_COLLAPSE_FLOOR} collapse floor) — getStaticPaths or sync likely broke for this language`,
       );
       continue;
     }

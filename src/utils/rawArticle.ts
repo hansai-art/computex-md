@@ -11,22 +11,10 @@
 import { readdir, readFile } from 'fs/promises';
 import { resolve, join, basename } from 'path';
 
-export const CATEGORY_TO_FOLDER: Record<string, string> = {
-  about: 'About',
-  history: 'History',
-  geography: 'Geography',
-  culture: 'Culture',
-  food: 'Food',
-  art: 'Art',
-  music: 'Music',
-  technology: 'Technology',
-  nature: 'Nature',
-  people: 'People',
-  politics: 'Politics',
-  society: 'Society',
-  economy: 'Economy',
-  lifestyle: 'Lifestyle',
-};
+import { CATEGORY_MAPPING } from '../config/categories';
+
+/** 分類 slug → knowledge/ 資料夾名。SSOT 在 src/config/categories.ts。 */
+export const CATEGORY_TO_FOLDER = CATEGORY_MAPPING;
 
 /** Root-relative dir for a given language: '' = zh-TW, 'en' / 'ja' / etc. */
 function langDir(lang: string): string {
@@ -76,7 +64,7 @@ export async function renderRawMarkdown(absPath: string, lang: string) {
   const content = await readFile(absPath, 'utf-8');
   const relFromKnowledge = absPath.split('/knowledge/')[1] ?? '';
   const sourceUrl = relFromKnowledge
-    ? `https://github.com/frank890417/taiwan-md/blob/main/knowledge/${relFromKnowledge}`
+    ? `https://github.com/hansai-art/computex-md/blob/main/knowledge/${relFromKnowledge}`
     : '';
 
   const header = [

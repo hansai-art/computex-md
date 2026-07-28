@@ -1,4 +1,5 @@
 ---
+import { CATEGORY_MAPPING } from '../config/categories';
 /**
  * article.template.astro — 統一 article page template (6 langs 共用)
  *
@@ -25,7 +26,6 @@ import Perspectives from '../components/Perspectives.astro';
 import SporeFootprint from '../components/SporeFootprint.astro';
 import DiaryTeaser from '../components/DiaryTeaser.astro';
 import NewsroomTrail from '../components/NewsroomTrail.astro';
-import RelatedDiaries from '../components/RelatedDiaries.astro';
 import { useTranslations } from '../i18n/utils';
 import {
   categoryList as categories,
@@ -105,25 +105,7 @@ const proseFontMap: Record<string, string> = {
 const proseFont = proseFontMap[lang] ?? proseFontMap['zh-TW'];
 
 // ── Category → folder mapping ─────────────────────────────────────────────────
-const categoryMapping: Record<string, string> = {
-  about: 'About',
-  history: 'History',
-  geography: 'Geography',
-  culture: 'Culture',
-  food: 'Food',
-  art: 'Art',
-  music: 'Music',
-  technology: 'Technology',
-  nature: 'Nature',
-  people: 'People',
-  society: 'Society',
-  economy: 'Economy',
-  lifestyle: 'Lifestyle',
-  // 2026-06-13 補：先前漏 politics → ~67 篇 politics 頁 render-time git 查找
-  // 靜默跳過、走 props fallback（輸出相同，但路徑不一致）。wrapper 的
-  // CATEGORY_MAPPING 一直有 politics，兩張表應同步。
-  politics: 'Politics',
-};
+const categoryMapping = CATEGORY_MAPPING;
 
 // ── Git info ─────────────────────────────────────────────────────────────────
 // buildGitInfoCache 在 utils/contributors.ts 內按 knowledgePath memoize：
@@ -439,13 +421,8 @@ const encodedTitle = encodeURIComponent(title);
                   lang={lang}
                 />
               )}
-              {frontmatter.relatedDiary &&
-              frontmatter.relatedDiary.length > 0 ? (
-                <RelatedDiaries
-                  relatedDiary={frontmatter.relatedDiary}
-                  lang={lang}
-                />
-              ) : frontmatter.diaryLink ? (
+              {/* RelatedDiaries 隨母體日記系統一起移除，公開日記在 Stage 8 重建 */}
+              {frontmatter.diaryLink ? (
                 <DiaryTeaser
                   diaryLink={frontmatter.diaryLink}
                   diaryExcerpt={frontmatter.diaryExcerpt}
@@ -464,13 +441,8 @@ const encodedTitle = encodeURIComponent(title);
             <>
               <div class="prose" set:html={processedContent} />
               {/* 無 SSODT split 的文章（多數 About / 短文）footer 也要能掛日記 */}
-              {frontmatter.relatedDiary &&
-              frontmatter.relatedDiary.length > 0 ? (
-                <RelatedDiaries
-                  relatedDiary={frontmatter.relatedDiary}
-                  lang={lang}
-                />
-              ) : frontmatter.diaryLink ? (
+              {/* RelatedDiaries 隨母體日記系統一起移除，公開日記在 Stage 8 重建 */}
+              {frontmatter.diaryLink ? (
                 <DiaryTeaser
                   diaryLink={frontmatter.diaryLink}
                   diaryExcerpt={frontmatter.diaryExcerpt}
@@ -645,7 +617,7 @@ const encodedTitle = encodeURIComponent(title);
             class="m-0 mt-[0.35rem] font-['Inter',system-ui,sans-serif] text-[0.72rem] leading-[1.5] text-[#9aa89e]"
           >
             <a
-              href={`https://github.com/frank890417/taiwan-md/edit/main/knowledge/${langPath}${categoryMapping[category as string]}/${slug}.md`}
+              href={`https://github.com/hansai-art/computex-md/edit/main/knowledge/${langPath}${categoryMapping[category as string]}/${slug}.md`}
               target="_blank"
               rel="noopener noreferrer"
               class="text-[#7a8b7e] underline decoration-[rgba(26,60,52,0.2)] underline-offset-2 transition-colors duration-200 hover:text-[#1a3c34]"
@@ -653,7 +625,7 @@ const encodedTitle = encodeURIComponent(title);
             >
             <span class="mx-[0.4rem] text-[rgba(26,60,52,0.25)]">·</span>
             <a
-              href={`https://github.com/frank890417/taiwan-md/issues/new?title=${encodeURIComponent(`Feedback: ${title}`)}`}
+              href={`https://github.com/hansai-art/computex-md/issues/new?title=${encodeURIComponent(`Feedback: ${title}`)}`}
               target="_blank"
               rel="noopener noreferrer"
               class="text-[#7a8b7e] underline decoration-[rgba(26,60,52,0.2)] underline-offset-2 transition-colors duration-200 hover:text-[#1a3c34]"

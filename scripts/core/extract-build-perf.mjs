@@ -58,7 +58,7 @@ function fetchRuns() {
   // workflow file path: .github/workflows/deploy.yml
   // gh api: /repos/:owner/:repo/actions/workflows/deploy.yml/runs
   const resp = ghApi(
-    `/repos/frank890417/taiwan-md/actions/workflows/deploy.yml/runs?per_page=${N_RUNS}&status=completed`,
+    `/repos/hansai-art/computex-md/actions/workflows/deploy.yml/runs?per_page=${N_RUNS}&status=completed`,
   );
   if (!resp || !resp.workflow_runs) {
     console.error('⚠️  無法抓 GitHub Actions runs（gh CLI 失敗或無 auth）');
@@ -71,7 +71,9 @@ function fetchRuns() {
 // 每個 run 有 build job + deploy job。我們只看 build。
 // 從 jobs API 拿到 build job 的 started_at / completed_at + step 細項。
 function fetchJobs(runId) {
-  const resp = ghApi(`/repos/frank890417/taiwan-md/actions/runs/${runId}/jobs`);
+  const resp = ghApi(
+    `/repos/hansai-art/computex-md/actions/runs/${runId}/jobs`,
+  );
   if (!resp || !resp.jobs) return null;
   return resp.jobs.find((j) => j.name === 'build') ?? null;
 }

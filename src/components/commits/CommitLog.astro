@@ -42,7 +42,7 @@ const {
   emptyDescription = lang === 'zh-TW'
     ? '目前沒有可顯示的 commit feed。'
     : 'There is no commit feed available right now.',
-  emptyLinkHref = 'https://github.com/frank890417/taiwan-md/commits/main',
+  emptyLinkHref = 'https://github.com/hansai-art/computex-md/commits/main',
   emptyLinkLabel = 'GitHub',
   relativeTimeLabels = lang === 'zh-TW'
     ? {
@@ -135,7 +135,7 @@ function formatDate(dateStr: string) {
                         })}
                       </span>
                       <a
-                        href={`https://github.com/frank890417/taiwan-md/commit/${commit.hash}`}
+                        href={`https://github.com/hansai-art/computex-md/commit/${commit.hash}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         class="font-['SFMono-Regular',Consolas,'Liberation_Mono',Menlo,monospace] font-semibold text-[#2563eb] no-underline hover:underline"
@@ -200,7 +200,7 @@ function formatDate(dateStr: string) {
                     })}
                   </span>
                   <a
-                    href={`https://github.com/frank890417/taiwan-md/commit/${commit.hash}`}
+                    href={`https://github.com/hansai-art/computex-md/commit/${commit.hash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     class="font-['SFMono-Regular',Consolas,'Liberation_Mono',Menlo,monospace] font-semibold text-[#2563eb] no-underline hover:underline"
@@ -227,7 +227,7 @@ function formatDate(dateStr: string) {
         <div class="flex flex-col gap-3">
           {commits.map((commit) => (
             <a
-              href={`https://github.com/frank890417/taiwan-md/commit/${commit.hash}`}
+              href={`https://github.com/hansai-art/computex-md/commit/${commit.hash}`}
               target="_blank"
               rel="noopener noreferrer"
               class="commit-log-item grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-start gap-3 rounded-[10px] border border-[#e2e8f0] bg-white px-4 py-3 text-inherit no-underline transition-all duration-200 hover:translate-x-1 hover:border-[#bfdbfe] hover:bg-[#f0f9ff] max-[768px]:grid-cols-[1.5rem_1fr]"

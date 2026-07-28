@@ -26,7 +26,7 @@ function fetchRepoStats() {
   return new Promise((resolve) => {
     const opts = {
       hostname: 'api.github.com',
-      path: '/repos/frank890417/taiwan-md',
+      path: '/repos/hansai-art/computex-md',
       headers: {
         'User-Agent': 'taiwan-md-dashboard/1.0',
         Accept: 'application/vnd.github+json',

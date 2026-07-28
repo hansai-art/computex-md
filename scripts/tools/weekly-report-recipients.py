@@ -23,7 +23,7 @@ summary that never contains a raw email address.
 
 Usage:
     python3 scripts/tools/weekly-report-recipients.py \\
-        [--window-days 90] [--repo frank890417/taiwan-md] \\
+        [--window-days 90] [--repo hansai-art/computex-md] \\
         [--json-out PATH] [--summary] [--quiet]
 
 Data sources (mailmap-aware git log + gh api, all read-only):
@@ -56,15 +56,15 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TOOL_TAG = "[weekly-report-recipients]"
 
-DEFAULT_REPO = "frank890417/taiwan-md"
+DEFAULT_REPO = "hansai-art/computex-md"
 CONFIG_DIR = Path.home() / ".config/taiwan-md/weekly-report"
 DEFAULT_JSON_OUT = CONFIG_DIR / "recipients-latest.json"
 LOCAL_OPTOUT_PATH = CONFIG_DIR / "optout-emails.txt"
 REPO_OPTOUT_PATH = REPO_ROOT / "docs/community/weekly-report-optout.json"
 
 # Owner (哲宇) is the report's To: recipient, never a bcc entry.
-OWNER_LOGIN = "frank890417"
-OWNER_EMAILS = {"cheyu.wu@monoame.com", "frank890417@gmail.com"}
+OWNER_LOGIN = "hansai-art"
+OWNER_EMAILS = {"hans@groupg.org"}
 OWNER_NAME = "Che-Yu Wu"
 
 # Resend 免費方案上限：一天 100 封（含 To + 每個 BCC）。一次週報廣播 = 收件人數封。

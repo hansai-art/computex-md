@@ -2,7 +2,7 @@
 
 # COMPUTEX.md Translation Contribution Script
 # 一行翻譯貢獻自動化系統
-# Usage: bash scripts/translate.sh OR bash <(curl -s https://raw.githubusercontent.com/frank890417/taiwan-md/main/scripts/translate.sh)
+# Usage: bash scripts/translate.sh OR bash <(curl -s https://raw.githubusercontent.com/hansai-art/computex-md/main/scripts/translate.sh)
 
 set -euo pipefail
 
@@ -24,7 +24,7 @@ ROCKET="🚀"
 MAGIC="✨"
 
 # GitHub repo URL
-REPO_URL="https://github.com/frank890417/taiwan-md"
+REPO_URL="https://github.com/hansai-art/computex-md"
 
 # Function to print colored messages
 print_info() {

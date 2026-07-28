@@ -427,7 +427,7 @@ def render(
     A("2. 完整 Read **§十 列出的所有 diary 檔案**（不是 grep 不是 head，是逐檔 Read 全文）+ 抽樣 5-10 個 memory")
     A("3. 用紀實散文文體寫週報到 `reports/weekly/YYYY-MM-DD.md`（**不是 dossier 子目錄**），文體規範看 §十二 + DIARY-PIPELINE")
     A("4. 跑 `python3 scripts/tools/article-health.py reports/weekly/YYYY-MM-DD.md --check=prose-health`（gate: hard=0）")
-    A("5. 寄信：`python3 scripts/tools/send-email-resend.py --to cheyu.wu@monoame.com --subject ... --markdown reports/weekly/YYYY-MM-DD.md`")
+    A("5. 寄信：`python3 scripts/tools/send-email-resend.py --to hans@groupg.org --subject ... --markdown reports/weekly/YYYY-MM-DD.md`")
     A("6. commit + push + PR")
     A("")
     A("---")

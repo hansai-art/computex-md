@@ -14,7 +14,7 @@
 #
 # 安全檢視：
 #   這個腳本的原始碼在：
-#   https://github.com/frank890417/taiwan-md/blob/main/public/start.sh
+#   https://github.com/hansai-art/computex-md/blob/main/public/start.sh
 #   如果你不信任 curl | bash，可以：
 #     curl -fsSL https://computex-md.pages.dev/start.sh -o start.sh
 #     less start.sh     # 看過內容
@@ -23,7 +23,7 @@
 
 set -euo pipefail
 
-readonly REPO_URL="https://github.com/frank890417/taiwan-md.git"
+readonly REPO_URL="https://github.com/hansai-art/computex-md.git"
 readonly DEFAULT_DEST="$HOME/Projects/taiwan-md"
 readonly MIN_NODE_MAJOR=20
 readonly CLAUDE_PKG="@anthropic-ai/claude-code"

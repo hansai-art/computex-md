@@ -89,6 +89,33 @@ def _parse_frontmatter_minimal(yaml_text: str) -> dict[str, Any]:
             continue
         key, val = m.group(1), m.group(2).strip()
         if not val:
+            # Block sequence（`key:` 換行後接 `  - item`）。
+            # 2026-07-29 補：母體這支 parser 只認單行 flow array，遇到 block sequence
+            # 會回傳空字串，於是 frontmatter-format 檢查判定「tags 不是 array」而 hard fail。
+            # 而 Prettier 會把長的 flow array 折成多行，同樣讀不到 —— 兩種合法寫法都被擋，
+            # 作者被逼著把 tags 縮短到一行塞得下。block sequence 是標準 YAML，補上支援。
+            seq: list[Any] = []
+            j = i
+            while j < len(lines):
+                peek = lines[j].rstrip()
+                if not peek:
+                    j += 1
+                    continue
+                item_m = re.match(r"^\s+-\s+(.*)$", peek)
+                if not item_m:
+                    break
+                item = item_m.group(1).strip()
+                if (item.startswith("'") and item.endswith("'")) or (
+                    item.startswith('"') and item.endswith('"')
+                ):
+                    item = item[1:-1]
+                seq.append(item)
+                j += 1
+            if seq:
+                out[key] = seq
+                i = j
+                continue
+
             # Empty top-level value — peek ahead for nested mapping (1 level)
             # or block scalar (`|`/`>`). For nested mapping: indented `child: value`.
             nested: dict[str, Any] = {}

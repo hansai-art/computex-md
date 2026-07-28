@@ -33,7 +33,7 @@ export const FEEDBACK_PROVIDERS = (
   .map((s) => s.trim())
   .filter(Boolean);
 
-export const GITHUB_REPO = 'frank890417/taiwan-md';
+export const GITHUB_REPO = 'hansai-art/computex-md';
 export const GITHUB_NEW_ISSUE_URL = `https://github.com/${GITHUB_REPO}/issues/new/choose`;
 
 /**

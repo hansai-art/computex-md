@@ -87,7 +87,7 @@ function renderTable(articles) {
         .join('');
       const articleUrl = `${langPrefix}/${a.category}/${a.slug}`;
       const catDir = a.category.charAt(0).toUpperCase() + a.category.slice(1);
-      const editUrl = `https://github.com/frank890417/taiwan-md/edit/main/knowledge/${catDir}/${a.slug}.md`;
+      const editUrl = `https://github.com/hansai-art/computex-md/edit/main/knowledge/${catDir}/${a.slug}.md`;
       return `<tr class="registry-row" data-url="${articleUrl}" title="${(typeof a.description === 'string' ? a.description : '').replace(/"/g, '&quot;')}">
           <td class="col-title"><a href="${articleUrl}">${a.title}</a>${a.featured ? ' ⭐' : ''}</td>
           <td><span class="cat-tag" style="background:${catColor}15;color:${catColor};border:1px solid ${catColor}30">${catLabel}</span></td>

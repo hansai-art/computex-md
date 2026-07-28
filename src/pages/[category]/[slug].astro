@@ -1,4 +1,5 @@
 ---
+import { CATEGORY_MAPPING as CATEGORY_MAPPING_SSOT } from '../../config/categories';
 /**
  * zh-TW article slug page — thin wrapper.
  *
@@ -46,22 +47,7 @@ function getGitInfo(filePath: string) {
 // Astro 限制：getStaticPaths 在獨立 context 跑，不能 access module-level consts。
 // 所以 CATEGORY_MAPPING 必須 inline 進 getStaticPaths body。
 export async function getStaticPaths() {
-  const CATEGORY_MAPPING: Record<string, string> = {
-    about: 'About',
-    history: 'History',
-    geography: 'Geography',
-    culture: 'Culture',
-    food: 'Food',
-    art: 'Art',
-    music: 'Music',
-    technology: 'Technology',
-    nature: 'Nature',
-    people: 'People',
-    society: 'Society',
-    economy: 'Economy',
-    lifestyle: 'Lifestyle',
-    politics: 'Politics',
-  };
+  const CATEGORY_MAPPING: Record<string, string> = CATEGORY_MAPPING_SSOT;
 
   const safeMatter = (fileContent: string) => {
     try {

@@ -124,8 +124,8 @@ PR_URL=$(gh pr create --title "🧬 [semiont] heal: lang-sync cron $(date +%Y%m%
     --body "Autonomous hourly routine output. See commit message for stats." 2>&1 | tail -1)
 PR_NUM=$(echo $PR_URL | grep -oE '[0-9]+$')
 sleep 5
-gh api -X PUT repos/frank890417/taiwan-md/pulls/$PR_NUM/merge -f merge_method=squash
-gh api -X DELETE "repos/frank890417/taiwan-md/git/refs/heads/$(git branch --show-current)" || true
+gh api -X PUT repos/hansai-art/computex-md/pulls/$PR_NUM/merge -f merge_method=squash
+gh api -X DELETE "repos/hansai-art/computex-md/git/refs/heads/$(git branch --show-current)" || true
 
 # P7. Notify
 echo "✅ Cron cycle complete. PR #$PR_NUM merged. Coverage now $(python3 scripts/tools/lang-sync/status.py --lang en --no-write | grep -oE '[0-9]+\\.[0-9]+%')"

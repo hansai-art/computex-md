@@ -1,1 +1,7 @@
-{ "forks": [], "note": "COMPUTEX.md 自己的譜系普查，起始為空" }
+{
+  "_meta": {
+    "last_census": null,
+    "note": "COMPUTEX.md 自己的譜系普查，尚未執行"
+  },
+  "forks": []
+}

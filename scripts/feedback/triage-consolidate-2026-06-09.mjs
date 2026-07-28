@@ -22,7 +22,7 @@ import { execFileSync } from 'node:child_process';
 import { buildIssue, triageNoteFor } from './lib/classify.mjs';
 import { buildArchiveRecord, archiveRelPath } from './lib/archive.mjs';
 
-const REPO = 'frank890417/taiwan-md';
+const REPO = 'hansai-art/computex-md';
 const COMMIT = process.argv.includes('--commit');
 const rows = JSON.parse(readFileSync('/tmp/feedback-new.json', 'utf8'));
 

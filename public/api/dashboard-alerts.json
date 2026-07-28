@@ -1,0 +1,48 @@
+{
+  "lastUpdated": "2026-07-28T17:27:46.470Z",
+  "generator": "scripts/core/generate-dashboard-alerts.mjs",
+  "note": "derived 警報層 — CONSCIOUSNESS §警報 的機械接管 (audit 2026-06-10 A-3)",
+  "count": 5,
+  "alerts": [
+    {
+      "id": "organ-heart",
+      "severity": "red",
+      "message": "🫀 心臟 器官分數 30 < 50，需要干預",
+      "source": "dashboard-organism.json",
+      "owner": "twmd-self-evolve-weekly",
+      "firstSeen": "2026-07-28"
+    },
+    {
+      "id": "organ-immune",
+      "severity": "red",
+      "message": "🛡️ 免疫系統 器官分數 30 < 50，需要干預",
+      "source": "dashboard-organism.json",
+      "owner": "twmd-self-evolve-weekly",
+      "firstSeen": "2026-07-28"
+    },
+    {
+      "id": "organ-reproduce",
+      "severity": "red",
+      "message": "🧫 繁殖系統 器官分數 18 < 50，需要干預",
+      "source": "dashboard-organism.json",
+      "owner": "twmd-self-evolve-weekly",
+      "firstSeen": "2026-07-28"
+    },
+    {
+      "id": "organ-translation",
+      "severity": "red",
+      "message": "🌐 語言器官 器官分數 0 < 50，需要干預",
+      "source": "dashboard-organism.json",
+      "owner": "twmd-self-evolve-weekly",
+      "firstSeen": "2026-07-28"
+    },
+    {
+      "id": "immune-status",
+      "severity": "red",
+      "message": "免疫 v3=30：🔴 危險 — 結構性免疫不足",
+      "source": "dashboard-immune.json",
+      "owner": "twmd-self-evolve-weekly",
+      "firstSeen": "2026-07-28"
+    }
+  ]
+}

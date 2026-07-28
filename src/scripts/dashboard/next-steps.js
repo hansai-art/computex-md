@@ -53,7 +53,7 @@ function renderNextSteps(articles, translations) {
   }
 
   const contributeUrl =
-    'https://github.com/frank890417/taiwan-md/blob/main/CONTRIBUTING.md';
+    'https://github.com/hansai-art/computex-md/blob/main/CONTRIBUTING.md';
 
   grid.innerHTML =
     '<div class="nextstep-card">' +

@@ -123,7 +123,7 @@ function resolveContributor(authorName, authorEmail) {
 // multi-contributor articles, where most co-authors have a single commit
 // anyway. Newest-first among co-authors is simple, robust, and matches prior
 // site behavior. Revisit only if magnitude ordering proves worth the risk.
-const DEFAULT_MAINTAINER = 'frank890417';
+const DEFAULT_MAINTAINER = 'hansai-art';
 
 function deriveMaintainerKeys() {
   let owner = '';

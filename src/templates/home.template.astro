@@ -1,4 +1,5 @@
 ---
+import { CATEGORY_MAPPING as CATEGORY_MAPPING_SSOT } from '../config/categories';
 /**
  * home.template.astro — 統一首頁 template (6 langs 共用)
  *
@@ -56,20 +57,7 @@ interface PickArticle {
   featured?: boolean;
 }
 
-const categoryFolders: Record<string, string> = {
-  history: 'History',
-  geography: 'Geography',
-  culture: 'Culture',
-  food: 'Food',
-  art: 'Art',
-  music: 'Music',
-  technology: 'Technology',
-  nature: 'Nature',
-  people: 'People',
-  society: 'Society',
-  economy: 'Economy',
-  lifestyle: 'Lifestyle',
-};
+const categoryFolders: Record<string, string> = CATEGORY_MAPPING_SSOT;
 
 const topPicks: Record<string, PickArticle[]> = {};
 
@@ -241,7 +229,7 @@ const readingPathFooterItems = [
             >{t('home.features.cta.graph')}</a
           >
           <a
-            href="https://github.com/frank890417/taiwan-md/tree/main/knowledge"
+            href="https://github.com/hansai-art/computex-md/tree/main/knowledge"
             target="_blank"
             rel="noopener noreferrer"
             data-ga-section="feature_cta"

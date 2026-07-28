@@ -1,7 +1,12 @@
 {
-  "total_zh": 0,
-  "total_en": 0,
-  "coverage_en": 0.0,
-  "categories": {},
+  "total_zh": 1,
+  "total_en": 1,
+  "coverage_en": 100.0,
+  "categories": {
+    "Editions": {
+      "zh": 1,
+      "en": 1
+    }
+  },
   "updated": "2026-07-29"
 }

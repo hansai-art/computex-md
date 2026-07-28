@@ -142,7 +142,7 @@ function getCommitsFromCache(limit = 100): Commit[] {
 async function getCommitsFromGitHub(limit = 100): Promise<Commit[]> {
   try {
     const res = await fetch(
-      `https://api.github.com/repos/frank890417/taiwan-md/commits?per_page=${Math.max(limit, 1)}`,
+      `https://api.github.com/repos/hansai-art/computex-md/commits?per_page=${Math.max(limit, 1)}`,
       {
         headers: {
           Accept: 'application/vnd.github+json',

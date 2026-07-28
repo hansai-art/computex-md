@@ -26,7 +26,7 @@ const row = {
   quote: '《臥虎藏龍》1990 年得獎',
   correct_info: '正確:2001。來源:https://oscars.org',
   triage_note: '已收到你的勘誤，已轉維護者查核。',
-  issue_url: 'https://github.com/frank890417/taiwan-md/issues/42',
+  issue_url: 'https://github.com/hansai-art/computex-md/issues/42',
   issue_number: 42,
 };
 

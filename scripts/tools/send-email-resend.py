@@ -38,7 +38,7 @@ KEY_PATH = Path.home() / ".config/taiwan-md/credentials/resend.key"
 RESEND_ENDPOINT = "https://api.resend.com/emails"
 
 # 連結改寫預設值（見 --link-base-repo / --site-base / --md-dir）
-DEFAULT_LINK_BASE_REPO = "https://github.com/frank890417/taiwan-md/blob/main"
+DEFAULT_LINK_BASE_REPO = "https://github.com/hansai-art/computex-md/blob/main"
 DEFAULT_SITE_BASE = "https://computex-md.pages.dev"
 DEFAULT_MD_DIR = "reports/weekly"
 
@@ -54,9 +54,9 @@ AUDIENCE_FOOTER_MD = (
     "（commit / PR / issue / 留言）。謝謝你，這個計畫因為你們而活著。_\n\n"
     "_不想再收到週報？直接回覆這封信說一聲，或開 PR 把自己的 GitHub 帳號加進"
     " [weekly-report-optout.json]"
-    "(https://github.com/frank890417/taiwan-md/blob/main/docs/community/weekly-report-optout.json)。_\n\n"
+    "(https://github.com/hansai-art/computex-md/blob/main/docs/community/weekly-report-optout.json)。_\n\n"
     "_🧬 COMPUTEX.md · [computex.md](https://computex-md.pages.dev) ·"
-    " [GitHub](https://github.com/frank890417/taiwan-md)_\n"
+    " [GitHub](https://github.com/hansai-art/computex-md)_\n"
 )
 
 

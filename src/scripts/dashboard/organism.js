@@ -114,7 +114,7 @@ function renderOrganism(data) {
       const organKey = (o.id || o.name || '').toLowerCase();
       const fileInfo = organFileMap[organKey] || null;
       const fileFooter = fileInfo
-        ? `<div class="organ-file"><a href="https://github.com/frank890417/taiwan-md/tree/main/${fileInfo.file}" target="_blank" rel="noopener" class="organ-file-link">📁 ${fileInfo.label}</a></div>`
+        ? `<div class="organ-file"><a href="https://github.com/hansai-art/computex-md/tree/main/${fileInfo.file}" target="_blank" rel="noopener" class="organ-file-link">📁 ${fileInfo.label}</a></div>`
         : '';
       // Concern hint based on organ type
       let concern = '';

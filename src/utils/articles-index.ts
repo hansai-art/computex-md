@@ -1,3 +1,4 @@
+import { CATEGORY_MAPPING } from '../config/categories';
 /**
  * articles-index.ts — Module-level shared frontmatter cache for all [slug].astro
  *
@@ -28,22 +29,7 @@ export interface ArticleSummary {
   footnotes?: number; // count of [^n]: footnote definitions (引用深度訊號)
 }
 
-const CATEGORY_MAPPING: Record<string, string> = {
-  about: 'About',
-  history: 'History',
-  geography: 'Geography',
-  culture: 'Culture',
-  food: 'Food',
-  art: 'Art',
-  music: 'Music',
-  technology: 'Technology',
-  nature: 'Nature',
-  people: 'People',
-  society: 'Society',
-  economy: 'Economy',
-  lifestyle: 'Lifestyle',
-  politics: 'Politics',
-};
+// 分類表已收斂到 src/config/categories.ts（SSOT），這裡只 import。
 
 function safeMatter(fileContent: string): {
   data: Record<string, any>;

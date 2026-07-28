@@ -1,4 +1,5 @@
 ---
+import { CATEGORY_MAPPING as CATEGORY_MAPPING_SSOT } from '../../config/categories';
 import Layout from '../../layouts/Layout.astro';
 import { readdir, readFile } from 'fs/promises';
 import { resolve, join } from 'path';
@@ -245,20 +246,7 @@ for (const [tag, articleIds] of Object.entries(tagMap)) {
 }
 
 // Parse Hub wikilinks to create Hub→article edges
-const categoryMapping: Record<string, string> = {
-  history: 'History',
-  geography: 'Geography',
-  culture: 'Culture',
-  food: 'Food',
-  art: 'Art',
-  music: 'Music',
-  technology: 'Technology',
-  nature: 'Nature',
-  people: 'People',
-  society: 'Society',
-  economy: 'Economy',
-  lifestyle: 'Lifestyle',
-};
+const categoryMapping: Record<string, string> = CATEGORY_MAPPING_SSOT;
 const nodeIds = new Set(nodes.map((n) => n.id));
 
 for (const [cat, folder] of Object.entries(categoryMapping)) {

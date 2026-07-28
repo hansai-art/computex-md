@@ -113,7 +113,7 @@ export const resourcesUI = {
 
     // CTA & Links
     'resources.projects.cta.html':
-      'Know a great project? <a href="https://github.com/frank890417/taiwan-md/issues" target="_blank" rel="noopener noreferrer">Submit a recommendation on GitHub</a>!',
+      'Know a great project? <a href="https://github.com/hansai-art/computex-md/issues" target="_blank" rel="noopener noreferrer">Submit a recommendation on GitHub</a>!',
     'resources.projects.github.link': 'GitHub',
     'resources.backToHome': '← Back to Home',
 
@@ -321,7 +321,7 @@ export const resourcesUI = {
     'resources.footer.lastUpdated': 'Last updated: March 2026',
     'resources.footer.report': 'Report broken links',
     'resources.footer.reportUrl':
-      'https://github.com/frank890417/taiwan-md/issues',
+      'https://github.com/hansai-art/computex-md/issues',
     'resources.footer.stats.total': '200+',
 
     // Site names
@@ -616,7 +616,7 @@ export const resourcesUI = {
 
     // CTA & Links
     'resources.projects.cta.html':
-      'おすすめのプロジェクトはありますか？ <a href="https://github.com/frank890417/taiwan-md/issues" target="_blank" rel="noopener noreferrer">GitHub Issue</a> で推薦を投稿してください！',
+      'おすすめのプロジェクトはありますか？ <a href="https://github.com/hansai-art/computex-md/issues" target="_blank" rel="noopener noreferrer">GitHub Issue</a> で推薦を投稿してください！',
     'resources.projects.github.link': 'GitHub',
     'resources.backToHome': '← ホームに戻る',
 
@@ -824,7 +824,7 @@ export const resourcesUI = {
     'resources.footer.lastUpdated': '最終更新：2026年3月',
     'resources.footer.report': 'リンク切れを報告',
     'resources.footer.reportUrl':
-      'https://github.com/frank890417/taiwan-md/issues',
+      'https://github.com/hansai-art/computex-md/issues',
     'resources.footer.stats.total': '200+',
 
     // Site names
@@ -1118,7 +1118,7 @@ export const resourcesUI = {
 
     // CTA & Links
     'resources.projects.cta.html':
-      '추천할 프로젝트가 있나요? <a href="https://github.com/frank890417/taiwan-md/issues" target="_blank" rel="noopener noreferrer">GitHub Issue</a>로 제출해 주세요!',
+      '추천할 프로젝트가 있나요? <a href="https://github.com/hansai-art/computex-md/issues" target="_blank" rel="noopener noreferrer">GitHub Issue</a>로 제출해 주세요!',
     'resources.projects.github.link': 'GitHub',
     'resources.backToHome': '← 홈으로 돌아가기',
 
@@ -1326,7 +1326,7 @@ export const resourcesUI = {
     'resources.footer.lastUpdated': '최종 업데이트: 2026년 3월',
     'resources.footer.report': '끊어진 링크 신고',
     'resources.footer.reportUrl':
-      'https://github.com/frank890417/taiwan-md/issues',
+      'https://github.com/hansai-art/computex-md/issues',
     'resources.footer.stats.total': '200+',
 
     // Site names
@@ -1634,7 +1634,7 @@ export const resourcesUI = {
 
     // CTA & Links
     'resources.projects.cta.html':
-      'Bạn có dự án muốn giới thiệu? Hãy gửi đề xuất qua <a href="https://github.com/frank890417/taiwan-md/issues" target="_blank" rel="noopener noreferrer">GitHub Issue</a>!',
+      'Bạn có dự án muốn giới thiệu? Hãy gửi đề xuất qua <a href="https://github.com/hansai-art/computex-md/issues" target="_blank" rel="noopener noreferrer">GitHub Issue</a>!',
     'resources.projects.github.link': 'GitHub',
     'resources.backToHome': '← Trở về trang chủ',
 
@@ -1846,7 +1846,7 @@ export const resourcesUI = {
     'resources.footer.lastUpdated': 'Cập nhật lần cuối: Tháng 3 năm 2026',
     'resources.footer.report': 'Báo cáo liên kết hỏng',
     'resources.footer.reportUrl':
-      'https://github.com/frank890417/taiwan-md/issues',
+      'https://github.com/hansai-art/computex-md/issues',
     'resources.footer.stats.total': '200+',
 
     // Site names
@@ -2158,7 +2158,7 @@ export const resourcesUI = {
 
     // CTA & Links
     'resources.projects.cta.html':
-      'Punya proyek yang ingin direkomendasikan? Silakan kirim rekomendasi melalui <a href="https://github.com/frank890417/taiwan-md/issues" target="_blank" rel="noopener noreferrer">GitHub Issue</a>!',
+      'Punya proyek yang ingin direkomendasikan? Silakan kirim rekomendasi melalui <a href="https://github.com/hansai-art/computex-md/issues" target="_blank" rel="noopener noreferrer">GitHub Issue</a>!',
     'resources.projects.github.link': 'GitHub',
     'resources.backToHome': '← Kembali ke Beranda',
 
@@ -2368,7 +2368,7 @@ export const resourcesUI = {
     'resources.footer.lastUpdated': 'Terakhir diperbarui: Maret 2026',
     'resources.footer.report': 'Laporkan tautan rusak',
     'resources.footer.reportUrl':
-      'https://github.com/frank890417/taiwan-md/issues',
+      'https://github.com/hansai-art/computex-md/issues',
     'resources.footer.stats.total': '200+',
 
     // Site names
@@ -2681,7 +2681,7 @@ export const resourcesUI = {
 
     // CTA & Links
     'resources.projects.cta.html':
-      'Conhece algum projeto para recomendar? Envie sua sugestão por meio de uma <a href="https://github.com/frank890417/taiwan-md/issues" target="_blank" rel="noopener noreferrer">GitHub Issue</a>!',
+      'Conhece algum projeto para recomendar? Envie sua sugestão por meio de uma <a href="https://github.com/hansai-art/computex-md/issues" target="_blank" rel="noopener noreferrer">GitHub Issue</a>!',
     'resources.projects.github.link': 'GitHub',
     'resources.backToHome': '← Voltar ao início',
 
@@ -2893,7 +2893,7 @@ export const resourcesUI = {
     'resources.footer.lastUpdated': 'Última atualização: março de 2026',
     'resources.footer.report': 'Informar link quebrado',
     'resources.footer.reportUrl':
-      'https://github.com/frank890417/taiwan-md/issues',
+      'https://github.com/hansai-art/computex-md/issues',
     'resources.footer.stats.total': '200+',
 
     // Site names
@@ -3210,7 +3210,7 @@ export const resourcesUI = {
 
     // CTA & Links
     'resources.projects.cta.html':
-      'क्या आपके पास सुझाने के लिए कोई परियोजना है? <a href="https://github.com/frank890417/taiwan-md/issues" target="_blank" rel="noopener noreferrer">GitHub Issue</a> के माध्यम से सुझाव भेजें!',
+      'क्या आपके पास सुझाने के लिए कोई परियोजना है? <a href="https://github.com/hansai-art/computex-md/issues" target="_blank" rel="noopener noreferrer">GitHub Issue</a> के माध्यम से सुझाव भेजें!',
     'resources.projects.github.link': 'GitHub',
     'resources.backToHome': '← मुखपृष्ठ पर वापस जाएं',
 
@@ -3418,7 +3418,7 @@ export const resourcesUI = {
     'resources.footer.lastUpdated': 'अंतिम अपडेट: मार्च 2026',
     'resources.footer.report': 'निष्क्रिय लिंक की सूचना दें',
     'resources.footer.reportUrl':
-      'https://github.com/frank890417/taiwan-md/issues',
+      'https://github.com/hansai-art/computex-md/issues',
     'resources.footer.stats.total': '200+',
 
     // Site names
@@ -3727,7 +3727,7 @@ export const resourcesUI = {
 
     // CTA & Links
     'resources.projects.cta.html':
-      'هل لديك مشروع موصى به؟ مرحبًا بكم في تقديم التوصيات عبر <a href="https://github.com/frank890417/taiwan-md/issues" target="_blank" rel="noopener noreferrer">مشكلة GitHub</a>!',
+      'هل لديك مشروع موصى به؟ مرحبًا بكم في تقديم التوصيات عبر <a href="https://github.com/hansai-art/computex-md/issues" target="_blank" rel="noopener noreferrer">مشكلة GitHub</a>!',
     'resources.projects.github.link': 'GitHub',
     'resources.backToHome': '← العودة إلى الرئيسية',
 
@@ -3936,7 +3936,7 @@ export const resourcesUI = {
     'resources.footer.lastUpdated': 'آخر تحديث: مارس 2026',
     'resources.footer.report': 'الإبلاغ عن رابط معطل',
     'resources.footer.reportUrl':
-      'https://github.com/frank890417/taiwan-md/issues',
+      'https://github.com/hansai-art/computex-md/issues',
     'resources.footer.stats.total': '200+',
 
     // Site names
@@ -4246,7 +4246,7 @@ export const resourcesUI = {
 
     // CTA & Links
     'resources.projects.cta.html':
-      'Есть рекомендуемые проекты? Добро пожаловать через <a href="https://github.com/frank890417/taiwan-md/issues" target="_blank" rel="noopener noreferrer">GitHub Issue</a> отправить рекомендацию!',
+      'Есть рекомендуемые проекты? Добро пожаловать через <a href="https://github.com/hansai-art/computex-md/issues" target="_blank" rel="noopener noreferrer">GitHub Issue</a> отправить рекомендацию!',
     'resources.projects.github.link': 'GitHub',
     'resources.backToHome': '← Вернуться на главную',
 
@@ -4457,7 +4457,7 @@ export const resourcesUI = {
     'resources.footer.lastUpdated': 'Последнее обновление: март 2026 г.',
     'resources.footer.report': 'Сообщить о неработающей ссылке',
     'resources.footer.reportUrl':
-      'https://github.com/frank890417/taiwan-md/issues',
+      'https://github.com/hansai-art/computex-md/issues',
     'resources.footer.stats.total': '200+',
 
     // Site names
@@ -4761,7 +4761,7 @@ export const resourcesUI = {
 
     // CTA & Links
     'resources.projects.cta.html':
-      '有推薦的專案嗎？歡迎透過 <a href="https://github.com/frank890417/taiwan-md/issues" target="_blank" rel="noopener noreferrer">GitHub Issue</a> 提交推薦！',
+      '有推薦的專案嗎？歡迎透過 <a href="https://github.com/hansai-art/computex-md/issues" target="_blank" rel="noopener noreferrer">GitHub Issue</a> 提交推薦！',
     'resources.projects.github.link': 'GitHub',
     'resources.backToHome': '← 返回首頁',
 
@@ -4968,7 +4968,7 @@ export const resourcesUI = {
     'resources.footer.lastUpdated': '最後更新：2026 年 3 月',
     'resources.footer.report': '回報失效連結',
     'resources.footer.reportUrl':
-      'https://github.com/frank890417/taiwan-md/issues',
+      'https://github.com/hansai-art/computex-md/issues',
     'resources.footer.stats.total': '200+',
 
     // Site names
@@ -5242,7 +5242,7 @@ export const resourcesUI = {
       'Fábricas ilegales en tierras agrícolas reportadas por ciudadanos — protegiendo la tierra agrícola de Taiwán',
     'resources.projects.civictech.disfactory.tech': 'Vue.js / Django',
     'resources.projects.cta.html':
-      '¿Conoces un gran proyecto? <a href="https://github.com/frank890417/taiwan-md/issues" target="_blank" rel="noopener noreferrer">¡Envía una recomendación en GitHub</a>!',
+      '¿Conoces un gran proyecto? <a href="https://github.com/hansai-art/computex-md/issues" target="_blank" rel="noopener noreferrer">¡Envía una recomendación en GitHub</a>!',
     'resources.projects.github.link': 'GitHub',
     'resources.backToHome': '← Volver al inicio',
     'resources.mindmap.root.label': '🇹🇼 Recursos de Taiwán',
@@ -5416,7 +5416,7 @@ export const resourcesUI = {
     'resources.footer.lastUpdated': 'Última actualización: marzo de 2026',
     'resources.footer.report': 'Reportar enlaces rotos',
     'resources.footer.reportUrl':
-      'https://github.com/frank890417/taiwan-md/issues',
+      'https://github.com/hansai-art/computex-md/issues',
     'resources.footer.stats.total': '200+',
     'resources.site.president': 'Oficina de la Presidencia',
     'resources.site.executiveYuan': 'Yuan Ejecutivo',
@@ -5675,7 +5675,7 @@ export const resourcesUI = {
       "Signalement citoyen d'usines illégales sur des terres agricoles — protection des terres agricoles de Taïwan",
     'resources.projects.civictech.disfactory.tech': 'Vue.js / Django',
     'resources.projects.cta.html':
-      'Vous connaissez un projet génial ? <a href="https://github.com/frank890417/taiwan-md/issues" target="_blank" rel="noopener noreferrer">Soumettez une recommandation sur GitHub</a> !',
+      'Vous connaissez un projet génial ? <a href="https://github.com/hansai-art/computex-md/issues" target="_blank" rel="noopener noreferrer">Soumettez une recommandation sur GitHub</a> !',
     'resources.projects.github.link': 'GitHub',
     'resources.backToHome': "← Retour à l'accueil",
     'resources.mindmap.root.label': '🇹🇼 Ressources de Taïwan',
@@ -5849,7 +5849,7 @@ export const resourcesUI = {
     'resources.footer.lastUpdated': 'Dernière mise à jour : mars 2026',
     'resources.footer.report': 'Signaler des liens brisés',
     'resources.footer.reportUrl':
-      'https://github.com/frank890417/taiwan-md/issues',
+      'https://github.com/hansai-art/computex-md/issues',
     'resources.footer.stats.total': '200+',
     'resources.site.president': 'Bureau de la Présidence',
     'resources.site.executiveYuan': 'Yuan exécutif',

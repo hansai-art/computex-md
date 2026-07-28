@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-07-28T17:27:46.726Z",
+  "routines": null,
+  "babel": null,
+  "incidents": [
+    {
+      "ts": "2026-07-28",
+      "level": "red",
+      "text": "🫀 心臟 器官分數 30 < 50，需要干預",
+      "source": "dashboard-organism.json"
+    },
+    {
+      "ts": "2026-07-28",
+      "level": "red",
+      "text": "🛡️ 免疫系統 器官分數 30 < 50，需要干預",
+      "source": "dashboard-organism.json"
+    },
+    {
+      "ts": "2026-07-28",
+      "level": "red",
+      "text": "🧫 繁殖系統 器官分數 18 < 50，需要干預",
+      "source": "dashboard-organism.json"
+    },
+    {
+      "ts": "2026-07-28",
+      "level": "red",
+      "text": "🌐 語言器官 器官分數 0 < 50，需要干預",
+      "source": "dashboard-organism.json"
+    },
+    {
+      "ts": "2026-07-28",
+      "level": "red",
+      "text": "免疫 v3=30：🔴 危險 — 結構性免疫不足",
+      "source": "dashboard-immune.json"
+    }
+  ],
+  "deploys": null
+}

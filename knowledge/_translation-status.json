@@ -1,16 +1,16 @@
 {
   "_meta": {
-    "lastUpdated": "2026-07-29T01:07:09+08:00",
-    "zhCommitHead": "",
-    "totalZh": 0,
+    "lastUpdated": "2026-07-29T01:27:41+08:00",
+    "zhCommitHead": "e2f08ac",
+    "totalZh": 1,
     "activeLanguages": ["en"],
     "summary": {
       "en": {
-        "total_zh": 0,
+        "total_zh": 1,
         "fresh": 0,
         "stale": 0,
         "metadata_stale": 0,
-        "missing": 0,
+        "missing": 1,
         "orphan": 0
       }
     },
@@ -18,5 +18,19 @@
       "en": []
     }
   },
-  "byArticle": {}
+  "byArticle": {
+    "Editions/COMPUTEX 2027.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:0d83f00b6ea51082",
+        "bodyHash": "sha256:01eec9bff8bdea8d"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    }
+  }
 }

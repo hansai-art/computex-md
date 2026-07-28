@@ -11,7 +11,7 @@ import { join } from 'path';
 const DEST_DIR = 'public/images/wiki';
 const MAX_WIDTH = 1024;
 const USER_AGENT =
-  'taiwan-md-bot/1.0 (https://github.com/frank890417/taiwan-md; open-source project)';
+  'computex-md-bot/1.0 (https://github.com/hansai-art/computex-md; open-source project)';
 
 // Hash filename → Wikimedia Commons File: title
 const IMAGE_MAP = [

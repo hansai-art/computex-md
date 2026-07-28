@@ -239,7 +239,7 @@ export const heroCategories: HeroCategory[] = [
     sites: [
       {
         nameKey: 'resources.site.github',
-        url: 'https://github.com/frank890417/taiwan-md',
+        url: 'https://github.com/hansai-art/computex-md',
         domain: 'github.com',
       },
       {
@@ -1174,7 +1174,7 @@ export const communityFood: ResourceSite[] = [
 export const taiwanmdLinks: ResourceSite[] = [
   {
     nameKey: 'resources.site.github',
-    url: 'https://github.com/frank890417/taiwan-md',
+    url: 'https://github.com/hansai-art/computex-md',
     domain: 'github.com',
   },
   {

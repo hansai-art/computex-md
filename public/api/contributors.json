@@ -1,0 +1,448 @@
+{
+  "lastUpdated": "2026-07-28T17:13:37.644Z",
+  "totals": {
+    "contributors": 0,
+    "activeWindow": "last 30d"
+  },
+  "leaderboard": [],
+  "allContributors": [
+    {
+      "login": "hansai-art",
+      "name": "hansai-art",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/4727572?v=4",
+      "profileUrl": "https://github.com/hansai-art",
+      "types": ["💻"]
+    },
+    {
+      "login": "idlccp1984",
+      "name": "idlccp1984",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/271929436?v=4",
+      "profileUrl": "https://github.com/idlccp1984",
+      "types": ["💻"]
+    },
+    {
+      "login": "Link1515",
+      "name": "Link1515",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/88765055?v=4",
+      "profileUrl": "https://github.com/Link1515",
+      "types": ["💻"]
+    },
+    {
+      "login": "dreamline2",
+      "name": "dreamline2",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/4657845?v=4",
+      "profileUrl": "https://github.com/dreamline2",
+      "types": ["💻"]
+    },
+    {
+      "login": "YenTingWu",
+      "name": "YenTingWu",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/57777349?v=4",
+      "profileUrl": "https://github.com/YenTingWu",
+      "types": ["💻"]
+    },
+    {
+      "login": "Zaious",
+      "name": "Zaious",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/128442444?v=4",
+      "profileUrl": "https://github.com/Zaious",
+      "types": ["💻"]
+    },
+    {
+      "login": "fredchu",
+      "name": "fredchu",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/1243384?v=4",
+      "profileUrl": "https://github.com/fredchu",
+      "types": ["💻"]
+    },
+    {
+      "login": "ellenlee",
+      "name": "ellenlee",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/13810570?v=4",
+      "profileUrl": "https://github.com/ellenlee",
+      "types": ["💻"]
+    },
+    {
+      "login": "hansai-art",
+      "name": "hansai-art",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/132933660?v=4",
+      "profileUrl": "https://github.com/hansai-art",
+      "types": ["💻", "🌍"]
+    },
+    {
+      "login": "AgendaLu",
+      "name": "AgendaLu",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/43836432?v=4",
+      "profileUrl": "https://github.com/AgendaLu",
+      "types": ["💻"]
+    },
+    {
+      "login": "eryet",
+      "name": "eryet",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/48248414?v=4",
+      "profileUrl": "https://github.com/eryet",
+      "types": ["💻"]
+    },
+    {
+      "login": "bugnimusic",
+      "name": "bugnimusic",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/260387338?v=4",
+      "profileUrl": "https://github.com/bugnimusic",
+      "types": ["💻"]
+    },
+    {
+      "login": "BrianHuang813",
+      "name": "BrianHuang813",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/66238110?v=4",
+      "profileUrl": "https://github.com/BrianHuang813",
+      "types": ["💻"]
+    },
+    {
+      "login": "stantheman0128",
+      "name": "stantheman0128",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/79733497?v=4",
+      "profileUrl": "https://github.com/stantheman0128",
+      "types": ["💻"]
+    },
+    {
+      "login": "weilinlai719",
+      "name": "weilinlai719",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/173038591?v=4",
+      "profileUrl": "https://github.com/weilinlai719",
+      "types": ["💻"]
+    },
+    {
+      "login": "p3nchan",
+      "name": "p3nchan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/5032148?v=4",
+      "profileUrl": "https://github.com/p3nchan",
+      "types": ["💻"]
+    },
+    {
+      "login": "iigmir",
+      "name": "iigmir",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/11061770?v=4",
+      "profileUrl": "https://github.com/iigmir",
+      "types": ["💻"]
+    },
+    {
+      "login": "tboydar",
+      "name": "tboydar",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/169805?v=4",
+      "profileUrl": "https://github.com/tboydar",
+      "types": ["💻"]
+    },
+    {
+      "login": "vaiskalivuan",
+      "name": "vaiskalivuan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/270533697?v=4",
+      "profileUrl": "https://github.com/vaiskalivuan",
+      "types": ["💻"]
+    },
+    {
+      "login": "ceruleanstring",
+      "name": "ceruleanstring",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/265435204?v=4",
+      "profileUrl": "https://github.com/ceruleanstring",
+      "types": ["💻"]
+    },
+    {
+      "login": "gn00295120",
+      "name": "gn00295120",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/30173341?v=4",
+      "profileUrl": "https://github.com/gn00295120",
+      "types": ["💻"]
+    },
+    {
+      "login": "r000tmnt",
+      "name": "r000tmnt",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/62630285?v=4",
+      "profileUrl": "https://github.com/r000tmnt",
+      "types": ["💻"]
+    },
+    {
+      "login": "Ray0907",
+      "name": "Ray0907",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/29456968?v=4",
+      "profileUrl": "https://github.com/Ray0907",
+      "types": ["💻"]
+    },
+    {
+      "login": "jessejs0202",
+      "name": "jessejs0202",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/247524286?v=4",
+      "profileUrl": "https://github.com/jessejs0202",
+      "types": ["💻"]
+    },
+    {
+      "login": "siansiansu",
+      "name": "siansiansu",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/33391637?v=4",
+      "profileUrl": "https://github.com/siansiansu",
+      "types": ["💻"]
+    },
+    {
+      "login": "Lisa123wang",
+      "name": "Lisa123wang",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/103297468?v=4",
+      "profileUrl": "https://github.com/Lisa123wang",
+      "types": ["💻"]
+    },
+    {
+      "login": "Johnwang860424",
+      "name": "Johnwang860424",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/43649946?v=4",
+      "profileUrl": "https://github.com/Johnwang860424",
+      "types": ["💻"]
+    },
+    {
+      "login": "jekyll530",
+      "name": "jekyll530",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/150101610?v=4",
+      "profileUrl": "https://github.com/jekyll530",
+      "types": ["💻"]
+    },
+    {
+      "login": "f312213213",
+      "name": "f312213213",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/71749524?v=4",
+      "profileUrl": "https://github.com/f312213213",
+      "types": ["💻"]
+    },
+    {
+      "login": "Yo0GuitarIT",
+      "name": "Yo0GuitarIT",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/118150842?v=4",
+      "profileUrl": "https://github.com/Yo0GuitarIT",
+      "types": ["💻"]
+    },
+    {
+      "login": "ycku",
+      "name": "ycku",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/20721473?v=4",
+      "profileUrl": "https://github.com/ycku",
+      "types": ["💻"]
+    },
+    {
+      "login": "expectingshadowland-maker",
+      "name": "expectingshadowland-maker",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/276374199?v=4",
+      "profileUrl": "https://github.com/expectingshadowland-maker",
+      "types": ["💻"]
+    },
+    {
+      "login": "jacky1822",
+      "name": "jacky1822",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/94786796?v=4",
+      "profileUrl": "https://github.com/jacky1822",
+      "types": ["💻"]
+    },
+    {
+      "login": "jinnshuchang",
+      "name": "jinnshuchang",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/231710471?v=4",
+      "profileUrl": "https://github.com/jinnshuchang",
+      "types": ["💻"]
+    },
+    {
+      "login": "k66inthesky",
+      "name": "k66inthesky",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/45890492?v=4",
+      "profileUrl": "https://github.com/k66inthesky",
+      "types": ["💻"]
+    },
+    {
+      "login": "kevinyay945",
+      "name": "kevinyay945",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/17717808?v=4",
+      "profileUrl": "https://github.com/kevinyay945",
+      "types": ["💻"]
+    },
+    {
+      "login": "littlecabin-co",
+      "name": "littlecabin-co",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/269660511?v=4",
+      "profileUrl": "https://github.com/littlecabin-co",
+      "types": ["💻"]
+    },
+    {
+      "login": "luofreddy",
+      "name": "luofreddy",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/85281073?v=4",
+      "profileUrl": "https://github.com/luofreddy",
+      "types": ["💻"]
+    },
+    {
+      "login": "number053",
+      "name": "number053",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/269151044?v=4",
+      "profileUrl": "https://github.com/number053",
+      "types": ["💻"]
+    },
+    {
+      "login": "ro9er117911",
+      "name": "ro9er117911",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/127029993?v=4",
+      "profileUrl": "https://github.com/ro9er117911",
+      "types": ["💻"]
+    },
+    {
+      "login": "sageotomo",
+      "name": "sageotomo",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/271172009?v=4",
+      "profileUrl": "https://github.com/sageotomo",
+      "types": ["💻"]
+    },
+    {
+      "login": "Rushyuheng",
+      "name": "Rushyuheng",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/15012940?v=4",
+      "profileUrl": "https://github.com/Rushyuheng",
+      "types": ["💻"]
+    },
+    {
+      "login": "yuweichen1008",
+      "name": "yuweichen1008",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/12914366?v=4",
+      "profileUrl": "https://github.com/yuweichen1008",
+      "types": ["💻"]
+    },
+    {
+      "login": "x1001000",
+      "name": "x1001000",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6036508?v=4",
+      "profileUrl": "https://github.com/x1001000",
+      "types": ["💻"]
+    },
+    {
+      "login": "simanglam",
+      "name": "simanglam",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/90334583?v=4",
+      "profileUrl": "https://github.com/simanglam",
+      "types": ["💻"]
+    },
+    {
+      "login": "assanges",
+      "name": "assanges",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/4113063?v=4",
+      "profileUrl": "https://github.com/assanges",
+      "types": ["💻"]
+    },
+    {
+      "login": "RayHsu1117",
+      "name": "RayHsu1117",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/105488123?v=4",
+      "profileUrl": "https://github.com/RayHsu1117",
+      "types": ["💻"]
+    },
+    {
+      "login": "TWjohnwang",
+      "name": "TWjohnwang",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/108091299?v=4",
+      "profileUrl": "https://github.com/TWjohnwang",
+      "types": ["💻"]
+    },
+    {
+      "login": "howieyoung",
+      "name": "howieyoung",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/12218074?v=4",
+      "profileUrl": "https://github.com/howieyoung",
+      "types": ["💻"]
+    },
+    {
+      "login": "XasonLai",
+      "name": "XasonLai",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/12758654?v=4",
+      "profileUrl": "https://github.com/XasonLai",
+      "types": ["💻"]
+    },
+    {
+      "login": "chenyi-wu",
+      "name": "chenyi-wu",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/66383520?v=4",
+      "profileUrl": "https://github.com/chenyi-wu",
+      "types": ["💻"]
+    },
+    {
+      "login": "joe32140",
+      "name": "joe32140",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6942982?v=4",
+      "profileUrl": "https://github.com/joe32140",
+      "types": ["💻"]
+    },
+    {
+      "login": "cwlin0131",
+      "name": "cwlin0131",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/101349007?v=4",
+      "profileUrl": "https://github.com/cwlin0131",
+      "types": ["💻"]
+    },
+    {
+      "login": "chipohao",
+      "name": "chipohao",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/61603468?v=4",
+      "profileUrl": "https://github.com/chipohao",
+      "types": ["💻"]
+    },
+    {
+      "login": "brianhu-tw",
+      "name": "brianhu-tw",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/9028425?v=4",
+      "profileUrl": "https://github.com/brianhu-tw",
+      "types": ["💻"]
+    },
+    {
+      "login": "AndyWang505",
+      "name": "AndyWang505",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/71600455?v=4",
+      "profileUrl": "https://github.com/AndyWang505",
+      "types": ["💻"]
+    },
+    {
+      "login": "Aaron2464",
+      "name": "Aaron2464",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/31269964?v=4",
+      "profileUrl": "https://github.com/Aaron2464",
+      "types": ["💻"]
+    }
+  ],
+  "topContent": [],
+  "topSystem": [],
+  "topTranslation": [
+    {
+      "login": "hansai-art",
+      "commits": 15,
+      "avatarUrl": "https://avatars.githubusercontent.com/u/132933660?v=4",
+      "profileUrl": "https://github.com/hansai-art",
+      "firstCommitAt": "2026-07-29 01:12:10 +0800",
+      "lastCommitAt": "2026-07-29 01:12:10 +0800",
+      "primaryArea": "translation",
+      "breakdown": {
+        "content": 0,
+        "system": 1,
+        "translation": 1
+      }
+    }
+  ],
+  "weeklyActive": 1,
+  "monthlyActive": 1,
+  "recentlyJoined": [
+    {
+      "login": "hansai-art",
+      "commits": 15,
+      "avatarUrl": "https://avatars.githubusercontent.com/u/132933660?v=4",
+      "profileUrl": "https://github.com/hansai-art",
+      "firstCommitAt": "2026-07-29 01:12:10 +0800",
+      "lastCommitAt": "2026-07-29 01:12:10 +0800",
+      "primaryArea": "translation",
+      "breakdown": {
+        "content": 0,
+        "system": 1,
+        "translation": 1
+      }
+    }
+  ],
+  "lastError": "HTTP 404: {\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/repos/repos#list-repository-contributors\",\"stat",
+  "lastErrorAt": "2026-07-28T17:27:44.266Z",
+  "_note": "COMPUTEX.md 尚未推上 GitHub，數字歸零。repo 建立後由 prebuild 自動填。"
+}

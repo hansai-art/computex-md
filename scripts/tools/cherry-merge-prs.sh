@@ -23,7 +23,7 @@ set -euo pipefail
 PRS=("$@")
 SUCCESS=()
 FAILED=()
-REPO="${GH_REPO:-frank890417/taiwan-md}"
+REPO="${GH_REPO:-hansai-art/computex-md}"
 REMOTE="${REMOTE:-origin}"
 BASE_BRANCH="${BASE_BRANCH:-main}"
 FALLBACK_CHERRY="${FALLBACK_CHERRY:-1}"

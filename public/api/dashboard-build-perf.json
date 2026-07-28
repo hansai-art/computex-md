@@ -1,0 +1,6 @@
+{
+  "generated_at": "2026-07-28T17:27:44.464Z",
+  "status": "unavailable",
+  "reason": "GitHub Actions API 無 auth 或暫不可用；gh CLI 是否 installed？",
+  "runs": []
+}

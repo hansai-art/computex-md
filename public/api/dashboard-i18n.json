@@ -1,6 +1,6 @@
 {
-  "generated": "2026-07-28T17:07:13Z",
-  "max_total": 2172,
+  "generated": "2026-07-28T17:27:44Z",
+  "max_total": 1544,
   "modules": [
     {
       "name": "home",
@@ -54,8 +54,8 @@
     {
       "name": "map",
       "langs": {
-        "zh-TW": 455,
-        "en": 455
+        "zh-TW": 0,
+        "en": 0
       }
     },
     {
@@ -75,20 +75,20 @@
     {
       "name": "taiwanShape",
       "langs": {
-        "zh-TW": 46,
-        "en": 46
+        "zh-TW": 0,
+        "en": 0
       }
     },
     {
       "name": "semiont",
       "langs": {
-        "zh-TW": 127,
-        "en": 127
+        "zh-TW": 0,
+        "en": 0
       }
     }
   ],
   "lang_totals": {
-    "zh-TW": { "keys": 2172, "coverage_pct": 100.0 },
-    "en": { "keys": 2172, "coverage_pct": 100.0 }
+    "zh-TW": { "keys": 1544, "coverage_pct": 100.0 },
+    "en": { "keys": 1544, "coverage_pct": 100.0 }
   }
 }

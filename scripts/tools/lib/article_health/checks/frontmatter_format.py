@@ -124,7 +124,14 @@ def _line_snippet(lines: list[str], line_no: int | None) -> str | None:
     return None
 
 
-def _tags_uses_flow_array(lines: list[str], tags_line_idx: int, raw: str) -> bool:
+def _tags_is_yaml_array(lines: list[str], tags_line_idx: int, raw: str) -> bool:
+    """tags 是不是合法的 YAML 陣列 —— flow（`[a, b]`）與 block（`- a`）都算。
+
+    2026-07-29 放寬：母體只認 flow array，因為它的 minimal parser 讀不懂 block
+    sequence。parser 已補上支援（loader.py），這條就沒有再限定寫法的理由了。
+    而且 Prettier 會把長的 flow array 折成多行，原本的規則等於逼作者把 tags
+    縮到一行塞得下 —— 那是讓工具反過來決定內容，方向錯了。
+    """
     value = _field_value(raw)
     if value.startswith("["):
         return True
@@ -136,7 +143,7 @@ def _tags_uses_flow_array(lines: list[str], tags_line_idx: int, raw: str) -> boo
         stripped = next_line.strip()
         if not stripped:
             continue
-        return stripped.startswith("[")
+        return stripped.startswith("[") or stripped.startswith("- ")
     return False
 
 
@@ -342,11 +349,11 @@ def check(target: FileTarget, config: dict[str, Any]) -> Iterator[Violation]:
     tags_line = _line_for_key(lines, "tags")
     if tags_line:
         line_no, raw = tags_line
-        if not _tags_uses_flow_array(lines, line_no - 1, raw):
+        if not _tags_is_yaml_array(lines, line_no - 1, raw):
             yield Violation(
                 check=CHECK_NAME,
                 severity=DEFAULT_SEVERITY,
-                message="frontmatter `tags` 應使用 flow array（可由 Prettier 換行）",
+                message="frontmatter `tags` 必須是 YAML 陣列（flow `[a, b]` 或 block `- a` 皆可）",
                 line=line_no,
                 snippet=raw,
                 fix_suggestion="tags: ['標籤一', '標籤二']",

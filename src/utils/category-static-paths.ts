@@ -19,23 +19,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { resolve, join, basename } from 'node:path';
 import matter from 'gray-matter';
 
-const CATEGORY_MAPPING: Record<string, string> = {
-  history: 'History',
-  geography: 'Geography',
-  culture: 'Culture',
-  food: 'Food',
-  art: 'Art',
-  music: 'Music',
-  technology: 'Technology',
-  nature: 'Nature',
-  people: 'People',
-  society: 'Society',
-  economy: 'Economy',
-  lifestyle: 'Lifestyle',
-  politics: 'Politics',
-};
-
-const CATEGORY_LIST = Object.keys(CATEGORY_MAPPING);
+import { CATEGORY_MAPPING, CATEGORY_LIST } from '../config/categories';
 
 interface ArticleSummary {
   slug: string;

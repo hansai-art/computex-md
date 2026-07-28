@@ -46,7 +46,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
 const OUTPUT_PATH = path.join(PROJECT_ROOT, 'public/api/contributors.json');
-const REPO = 'frank890417/taiwan-md';
+const REPO = 'hansai-art/computex-md';
 const GH_TOKEN = process.env.GH_TOKEN || process.env.GITHUB_TOKEN || '';
 
 // ─── Step 1: GitHub API contributors ─────────────────────────────────────────
@@ -177,14 +177,8 @@ function parseGitLog() {
  */
 const MANUAL_ALIASES = {
   // GitHub login → known email prefixes
-  frank890417: ['cheyu.wu', '117846+frank890417', 'frank890417'],
-  dreamline2: ['wilsonchen', 'wilson.chen.dev'],
-  ceruleanstring: ['chilan'],
-  AgendaLu: ['a9600125a'],
-  idlccp1984: ['idlccp64', 'idlccp1984'],
-  Link1515: ['terrylin1515', 'link1515'],
-  fredchu: ['iamfredchu', 'fredchu'],
-  Johnwang860424: ['ihatechina198964', 'johnwang860424'],
+  // 母體的貢獻者對照表已移除（那是 taiwan.md 的人）。本站自己的從這裡累積。
+  'hansai-art': ['hans', 'hans.groupg', 'hansai-art'],
 };
 
 function matchEmailToLogin(email, login) {

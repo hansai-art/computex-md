@@ -1,3 +1,4 @@
+import { CATEGORY_MAPPING as CATEGORY_MAPPING_SSOT } from '../config/categories';
 import { readdir, readFile } from 'fs/promises';
 import { resolve, join, basename } from 'path';
 import matter from 'gray-matter';
@@ -7,20 +8,7 @@ export async function GET() {
   const siteUrl = 'https://computex-md.pages.dev';
 
   // Category mapping to folder names
-  const categoryMapping: Record<string, string> = {
-    history: 'History',
-    geography: 'Geography',
-    culture: 'Culture',
-    food: 'Food',
-    art: 'Art',
-    music: 'Music',
-    technology: 'Technology',
-    nature: 'Nature',
-    people: 'People',
-    society: 'Society',
-    economy: 'Economy',
-    lifestyle: 'Lifestyle',
-  };
+  const categoryMapping: Record<string, string> = CATEGORY_MAPPING_SSOT;
 
   const allArticles: any[] = [];
 
