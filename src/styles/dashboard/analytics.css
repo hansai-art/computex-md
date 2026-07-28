@@ -1,0 +1,449 @@
+/* ── GA4 Analytics ── */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.analytics-totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.8rem;
+}
+.ga-stat-card {
+  background: var(--surface-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+}
+.ga-stat-icon {
+  font-size: 1.3rem;
+  margin-bottom: 0.3rem;
+}
+.ga-stat-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1.2;
+}
+.ga-stat-label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 0.2rem;
+}
+.analytics-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+.analytics-full {
+  grid-column: 1 / -1;
+}
+.ga-pages-list-2col {
+  display: flex;
+  gap: 1.5rem;
+}
+.ga-pages-list-col {
+  flex: 1;
+  min-width: 0;
+}
+@media (max-width: 720px) {
+  .analytics-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .ga-pages-list-2col {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+.analytics-pages,
+.analytics-countries,
+.analytics-sources {
+  background: var(--surface-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  padding: 1.2rem;
+  overflow: hidden;
+  min-width: 0;
+}
+.ga-source-row,
+.ga-country-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+  font-size: 0.85rem;
+}
+.ga-source-name,
+.ga-country-name {
+  width: 120px;
+  flex-shrink: 0;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ga-source-bar-track,
+.ga-country-bar-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.ga-source-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6, #6366f1);
+  border-radius: 4px;
+  transition: width 0.8s ease;
+}
+.ga-country-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #06b6d4, #3b82f6);
+  border-radius: 4px;
+  transition: width 0.8s ease;
+}
+.ga-source-count,
+.ga-country-count {
+  width: 60px;
+  text-align: right;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  flex-shrink: 0;
+}
+.ga-country-flag {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.ga-page-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+a.ga-page-row-link {
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.15s ease;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+  border-radius: 6px;
+}
+a.ga-page-row-link:hover {
+  background: rgba(139, 92, 246, 0.08);
+}
+a.ga-page-row-link:hover .ga-page-name {
+  color: #8b5cf6;
+}
+.ga-page-rank {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.ga-page-name {
+  flex: 1;
+  font-size: 0.85rem;
+  color: #1e293b;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ga-page-name:hover {
+  color: #8b5cf6;
+  text-decoration: underline;
+}
+.ga-page-pv {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  flex-shrink: 0;
+}
+.ga-callouts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.8rem;
+}
+.ga-callout {
+  padding: 0.95rem;
+  border-radius: 10px;
+  background: rgba(248, 250, 252, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+.ga-callout-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.35rem;
+}
+.ga-callout-body {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #334155;
+}
+.ga-callout-meta,
+.ga-subtle {
+  margin-top: 0.45rem;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+.ga-mini-list {
+  margin-top: 0.7rem;
+}
+.ga-mini-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+.ga-mini-label {
+  flex: 1;
+  font-size: 0.82rem;
+  color: #0f172a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ga-mini-meta,
+.ga-kpi-strip {
+  font-size: 0.76rem;
+  color: #64748b;
+  flex-shrink: 0;
+}
+.ga-kpi-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin: 0.45rem 0 0.75rem;
+  font-weight: 600;
+}
+.ga-block-title {
+  margin: 1rem 0 0.3rem;
+  font-size: 0.82rem;
+  color: #334155;
+}
+.ga-stale-hint {
+  display: inline-block;
+  color: #f59e0b;
+  font-size: 0.6rem;
+  vertical-align: middle;
+  margin-left: 0.3rem;
+  cursor: help;
+}
+/* Search Console word cloud — d3-cloud SVG layout, 16:9 max aspect.
+     Container provides the dashed-purple "cloud field" background; the SVG
+     inside is auto-sized to fit. */
+.sc-wordcloud-container {
+  margin-top: 0.4rem;
+  padding: 0.75rem;
+  background: rgba(99, 102, 241, 0.03);
+  border: 1px dashed rgba(99, 102, 241, 0.15);
+  border-radius: 12px;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  max-width: 100%;
+}
+.sc-wordcloud-container[aria-busy='true'] {
+  min-height: 320px;
+}
+.sc-wordcloud-loading,
+.sc-wordcloud-fallback {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+.sc-wordcloud-svg {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  display: block;
+}
+.sc-word {
+  cursor: default;
+  transition:
+    fill 0.15s ease,
+    opacity 0.15s ease;
+}
+.sc-word:hover {
+  fill: #4338ca !important;
+  opacity: 1;
+}
+.sc-wordcloud-svg:hover .sc-word:not(:hover) {
+  opacity: 0.5;
+}
+
+/* Search Console 7d — richer per-query row */
+/* Brand vs non-brand pills (2026-04-17 δ) */
+.sc-brand-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin: 0.6rem 0 0.4rem;
+}
+.sc-brand-pill {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+}
+.sc-brand-pill-brand {
+  border-color: color-mix(in srgb, #8b7355 25%, transparent);
+  background: color-mix(in srgb, #8b7355 6%, transparent);
+}
+.sc-brand-pill-nonbrand {
+  border-color: color-mix(in srgb, #4a8a5c 28%, transparent);
+  background: color-mix(in srgb, #4a8a5c 6%, transparent);
+}
+.sc-brand-label {
+  font-size: 0.8rem;
+  opacity: 0.75;
+  font-weight: 600;
+}
+.sc-brand-value {
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.sc-brand-ctr {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  font-variant-numeric: tabular-nums;
+}
+.sc-brand-note {
+  grid-column: 1 / -1;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  font-style: italic;
+  margin-top: 0.1rem;
+}
+@media (max-width: 540px) {
+  .sc-brand-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sc-queries-grid {
+  margin-top: 0.7rem;
+  display: flex;
+  gap: 1.5rem;
+}
+.sc-queries-col {
+  flex: 1;
+  min-width: 0;
+}
+@media (max-width: 720px) {
+  .sc-queries-grid {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+.sc-query-row {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto auto auto auto;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  font-size: 0.78rem;
+}
+.sc-query-rank {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.sc-query-label {
+  color: #0f172a;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.sc-query-clicks {
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.sc-query-impr,
+.sc-query-ctr,
+.sc-query-pos {
+  color: #64748b;
+  font-variant-numeric: tabular-nums;
+}
+.sc-query-pos {
+  color: #94a3b8;
+}
+@media (max-width: 768px) {
+  .analytics-totals {
+    /* minmax(0, 1fr) — bare 1fr has an implicit auto minimum equal to
+       the widest stat value's intrinsic width (e.g. "393,283"), which
+       forced this grid past its own container and got silently clipped
+       by main.dashboard's overflow-x:clip instead of wrapping/shrinking. */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .ga-mini-row {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .sc-query-row {
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+    row-gap: 0.15rem;
+  }
+  .sc-query-impr,
+  .sc-query-ctr,
+  .sc-query-pos {
+    display: none;
+  }
+  .ga-source-name,
+  .ga-country-name {
+    width: 90px;
+    font-size: 0.75rem;
+  }
+  .ga-source-count,
+  .ga-country-count {
+    width: 45px;
+    font-size: 0.7rem;
+  }
+  .ga-page-pv {
+    font-size: 0.7rem;
+  }
+  .ga-page-name {
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* 3 columns at this width leaves ~105px per stat card, too narrow for
+     6-7 digit values like "393,283" even after the minmax(0,1fr) fix
+     above — drop to 2 columns (3 rows) so numbers stay single-line. */
+  .analytics-totals {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

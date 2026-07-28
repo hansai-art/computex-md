@@ -1,0 +1,1960 @@
+---
+import Banner from './Banner.astro';
+import BrandMark from './BrandMark.astro';
+import {
+  useTranslations,
+  getLangFromUrl,
+  useTranslatedPath,
+} from '../i18n/utils';
+import { getLangSwitchPath } from '../utils/getLangSwitchPath';
+import { resolveStaticHref } from '../utils/staticRoutes';
+import {
+  ENABLED_LANGUAGE_CODES,
+  DEFAULT_LANGUAGE,
+  getLanguage,
+  type Lang,
+} from '../config/languages';
+
+const currentPath = Astro.url.pathname;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+// 2026-06-10 deploy-heal：nav / dropdown 一律用 existence-aware href。
+// translatePath 盲目加語言前綴，對該語言不存在的靜態頁（/semiont ja/ko/es/fr、
+// /bench es/fr…）每頁生死鏈；navHref 查 src/pages 樹，不存在就退回 zh 路徑。
+const navHref = (p: string) => resolveStaticHref(lang, p);
+
+const { langs } = await getLangSwitchPath(currentPath);
+
+// 2026-04-24 β3: Dynamic language list for dropdown UI.
+// 2026-07-24: switched from a hardcoded 6-entry array to iterating
+// ENABLED_LANGUAGE_CODES — the array was frozen at zh/en/ja/ko/fr/es, so
+// vi/id/pt/hi never appeared in the switcher despite having real translated
+// content (langs generic map added to getLangSwitchPath the same day).
+// nativeName uses each language's own self-name (so non-fluent visitors can
+// recognize their own language regardless of what locale they landed on).
+type LangOption = {
+  code: Lang;
+  nativeName: string;
+  short: string;
+  link: string;
+  has: boolean;
+  isActive: boolean;
+};
+const isLangActive = (prefix: string) => currentPath.startsWith(`/${prefix}`);
+const nonDefaultCodes = ENABLED_LANGUAGE_CODES.filter(
+  (c) => c !== DEFAULT_LANGUAGE.code,
+);
+const isZhActive = !nonDefaultCodes.some((c) => isLangActive(c));
+const langOptions: LangOption[] = ENABLED_LANGUAGE_CODES.map((code) => {
+  const isDefault = code === DEFAULT_LANGUAGE.code;
+  const entry = langs?.[code];
+  return {
+    code,
+    nativeName: getLanguage(code)?.displayName ?? code,
+    short: isDefault ? '中' : code.toUpperCase(),
+    link: entry?.link ?? (isDefault ? '/' : `/${code}`),
+    has: entry?.has ?? isDefault,
+    isActive: isDefault ? isZhActive : isLangActive(code),
+  };
+});
+const visibleLangOptions = langOptions.filter((l) => l.has);
+const currentLangOption =
+  visibleLangOptions.find((l) => l.isActive) || visibleLangOptions[0];
+
+const normalizedPath = currentPath.replace(/\/$/, '') || '/';
+const isHome = normalizedPath === '/' || normalizedPath === '/en';
+
+const navConfig = [
+  { path: '/about', label: t('nav.about') },
+  { path: '/explore', label: t('nav.explore') },
+  { path: '/map', label: t('nav.map') },
+  { path: '/data', label: t('nav.data') },
+  { path: '/soundscape', label: t('nav.soundscape') },
+  { path: '/resources', label: t('nav.resources') },
+  { path: '/semiont', label: t('nav.semiont') },
+  { path: '/contribute', label: t('nav.contribute') },
+].map((item) => {
+  const fullPath = navHref(item.path);
+  const pathWithoutHash = fullPath.replace(/#.*$/, '');
+  let active =
+    pathWithoutHash !== fullPath
+      ? false
+      : currentPath.startsWith(pathWithoutHash);
+  // Semiont covers both the cognitive layer and dashboard.
+  if (item.path === '/semiont') {
+    const semiontPath = navHref('/semiont');
+    const dashboardPath = navHref('/dashboard');
+    active =
+      currentPath.startsWith('/semiont') ||
+      currentPath.startsWith(semiontPath) ||
+      currentPath.startsWith('/dashboard') ||
+      currentPath.startsWith(dashboardPath);
+  }
+  // 2026-06-05: /elections moved under 探索 subnav, /mcp under 資源 subnav —
+  // keep the parent nav item highlighted when on those pages.
+  if (item.path === '/explore') {
+    active = active || currentPath.startsWith('/elections');
+  }
+  if (item.path === '/resources') {
+    const mcpPath = navHref('/mcp');
+    active =
+      active ||
+      currentPath.startsWith('/mcp') ||
+      currentPath.startsWith(mcpPath);
+  }
+  // 2026-06-10: /opendata（OpenData 策展）lives under 數據 subnav.
+  // 2026-06-23: /companies（企業地圖完整版）also lives under 數據 subnav.
+  if (item.path === '/data') {
+    const opendataPath = navHref('/opendata');
+    const companiesPath = navHref('/companies');
+    active =
+      active ||
+      currentPath.startsWith('/opendata') ||
+      currentPath.startsWith(opendataPath) ||
+      currentPath.startsWith('/companies') ||
+      currentPath.startsWith(companiesPath);
+  }
+  return {
+    ...item,
+    fullPath,
+    active,
+  };
+});
+
+// Mobile drawer sub-links per group（2026-07-24 mobile-nav redesign）：
+// data-driven，讓 drawer markup 收成單一 loop；emoji 統一放字首當視覺錨點。
+// 對應 desktop dropdown 的同一組目的地 — 兩邊改連結時要一起改。
+const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
+  '/explore': [
+    { href: navHref('/latest'), label: `🆕 ${t('nav.latest')}` },
+    { href: navHref('/timeline'), label: `⏳ ${t('nav.timeline')}` },
+    { href: navHref('/graph'), label: `🕸️ ${t('nav.graph-view')}` },
+    { href: navHref('/terminology'), label: `📖 ${t('nav.terminology')}` },
+    // nav.elections 的 i18n 字串已內含字首 🗳️，不重複加
+    { href: navHref('/elections/2026'), label: t('nav.elections') },
+  ],
+  '/map': [
+    { href: navHref('/taiwan-shape'), label: `🗺️ ${t('nav.data.shape')}` },
+  ],
+  '/data': [
+    { href: navHref('/opendata'), label: `🗂️ ${t('nav.data.curation')}` },
+    { href: navHref('/companies'), label: `🏢 ${t('nav.data.enterprise')}` },
+  ],
+  '/resources': [{ href: navHref('/mcp'), label: `🔌 ${t('nav.mcp')}` }],
+  '/semiont': [
+    // cognitive / newsroom 的 i18n 字串已內含字尾 emoji，不重複加
+    { href: navHref('/semiont'), label: t('nav.semiont.cognitive') },
+    { href: navHref('/semiont/newsroom'), label: t('nav.semiont.newsroom') },
+    { href: navHref('/dashboard'), label: `🔬 ${t('nav.dashboard')}` },
+  ],
+};
+
+const categoryList = [
+  {
+    path: navHref('/history'),
+    label: t('categoryConfig.history'),
+    emoji: '📜',
+  },
+  {
+    path: navHref('/geography'),
+    label: t('categoryConfig.geography'),
+    emoji: '🗺️',
+  },
+  {
+    path: navHref('/culture'),
+    label: t('categoryConfig.culture'),
+    emoji: '🎭',
+  },
+  {
+    path: navHref('/food'),
+    label: t('categoryConfig.food'),
+    emoji: '🍜',
+  },
+  {
+    path: navHref('/art'),
+    label: t('categoryConfig.art'),
+    emoji: '🎨',
+  },
+  {
+    path: navHref('/music'),
+    label: t('categoryConfig.music'),
+    emoji: '🎵',
+  },
+  {
+    path: navHref('/technology'),
+    label: t('categoryConfig.technology'),
+    emoji: '💻',
+  },
+  {
+    path: navHref('/nature'),
+    label: t('categoryConfig.nature'),
+    emoji: '🌿',
+  },
+  {
+    path: navHref('/people'),
+    label: t('categoryConfig.people'),
+    emoji: '👥',
+  },
+  {
+    path: navHref('/society'),
+    label: t('categoryConfig.society'),
+    emoji: '🏛️',
+  },
+  {
+    path: navHref('/economy'),
+    label: t('categoryConfig.economy'),
+    emoji: '📊',
+  },
+  {
+    path: navHref('/lifestyle'),
+    label: t('categoryConfig.lifestyle'),
+    emoji: '🏠',
+  },
+  {
+    path: navHref('/politics'),
+    label: t('categoryConfig.politics'),
+    emoji: '🗳️',
+  },
+];
+---
+
+<div id="header-container" class="fixed inset-x-0 top-0 z-[1001] w-full">
+  <div class="flex flex-col items-stretch">
+    <Banner />
+    <header
+      id="main-header"
+      role="banner"
+      data-hero={isHome ? '' : undefined}
+      class:list={[{ scrolled: !isHome }]}
+    >
+      <div class="header-inner">
+        <BrandMark
+          href={navHref('/')}
+          variant="auto"
+          ariaLabel={t('nav.aria-home')}
+        />
+
+        <nav class="nav-desktop" aria-label={t('nav.aria-main-navigation')}>
+          {
+            navConfig.map((item, index) => {
+              const showSep = index === 3 || index === 6;
+
+              if (item.path === '/about') {
+                return (
+                  <Fragment>
+                    {showSep && <span class="nav-sep" />}
+                    <div class="nav-dropdown">
+                      <a
+                        href={item.fullPath}
+                        class:list={['nav-link', { active: item.active }]}
+                      >
+                        {item.label} <span class="dropdown-arrow">▾</span>
+                      </a>
+                      <div class="dropdown-menu">
+                        <a
+                          href={navHref('/about')}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          {t('nav.about')}
+                        </a>
+                        <div class="dropdown-divider" />
+                        <a
+                          href={`${navHref('/about')}#story`}
+                          class="dropdown-item"
+                        >
+                          📖 {t('nav.about.story')}
+                        </a>
+                        <a
+                          href={`${navHref('/about')}#organism`}
+                          class="dropdown-item"
+                        >
+                          🧬 {t('nav.about.organism')}
+                        </a>
+                        <a
+                          href={`${navHref('/about')}#team`}
+                          class="dropdown-item"
+                        >
+                          👥 {t('nav.about.team')}
+                        </a>
+                        <a
+                          href={`${navHref('/about')}#faq`}
+                          class="dropdown-item"
+                        >
+                          ❓ {t('nav.about.faq')}
+                        </a>
+                        <a href={navHref('/changelog')} class="dropdown-item">
+                          📝 {t('nav.about.changelog')}
+                        </a>
+                      </div>
+                    </div>
+                  </Fragment>
+                );
+              }
+              if (item.path === '/explore') {
+                return (
+                  <Fragment>
+                    {showSep && <span class="nav-sep" />}
+                    <div class="nav-dropdown">
+                      <a
+                        href={item.fullPath}
+                        class:list={['nav-link', { active: item.active }]}
+                      >
+                        {item.label} <span class="dropdown-arrow">▾</span>
+                      </a>
+                      <div class="dropdown-menu">
+                        <a
+                          href={item.fullPath}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          {t('nav.explore')}
+                        </a>
+                        <a
+                          href={navHref('/latest')}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          🆕 {t('nav.latest')}
+                        </a>
+                        <a
+                          href={navHref('/timeline')}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          ⏳ {t('nav.timeline')}
+                        </a>
+                        <div class="dropdown-divider" />
+                        <a
+                          href={navHref('/graph')}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          {t('nav.graph-view')} 🕸️
+                        </a>
+                        <a
+                          href={navHref('/terminology')}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          {t('nav.terminology')} 📖
+                        </a>
+                        <a
+                          href={navHref('/bench')}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          {t('nav.bench')} 🧬
+                        </a>
+                        <a
+                          href={navHref('/elections/2026')}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          {t('nav.elections')}
+                        </a>
+                        <div class="dropdown-divider" />
+                        {categoryList.map((category) => (
+                          <a href={category.path} class="dropdown-item">
+                            {category.emoji} {category.label}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </Fragment>
+                );
+              }
+              if (item.path === '/map') {
+                return (
+                  <Fragment>
+                    {showSep && <span class="nav-sep" />}
+                    <div class="nav-dropdown">
+                      <a
+                        href={item.fullPath}
+                        class:list={['nav-link', { active: item.active }]}
+                      >
+                        {item.label} <span class="dropdown-arrow">▾</span>
+                      </a>
+                      <div class="dropdown-menu">
+                        <a
+                          href={navHref('/map')}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          📍 {t('nav.map.explore')}
+                        </a>
+                        <div class="dropdown-divider" />
+                        <a
+                          href={navHref('/taiwan-shape')}
+                          class="dropdown-item"
+                        >
+                          {t('nav.data.shape')} 🗺️
+                        </a>
+                      </div>
+                    </div>
+                  </Fragment>
+                );
+              }
+              if (item.path === '/data') {
+                return (
+                  <Fragment>
+                    {showSep && <span class="nav-sep" />}
+                    <div class="nav-dropdown">
+                      <a
+                        href={item.fullPath}
+                        class:list={['nav-link', { active: item.active }]}
+                      >
+                        {item.label} <span class="dropdown-arrow">▾</span>
+                      </a>
+                      <div class="dropdown-menu">
+                        <a
+                          href={navHref('/data')}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          {t('nav.data')}
+                        </a>
+                        <a
+                          href={navHref('/opendata')}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          🗂️ {t('nav.data.curation')}
+                        </a>
+                        <a
+                          href={navHref('/companies')}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          🏢 {t('nav.data.enterprise')}
+                        </a>
+                        <div class="dropdown-divider" />
+                        <a
+                          href={`${navHref('/data')}#global`}
+                          class="dropdown-item"
+                        >
+                          🌏 {t('nav.data.global')}
+                        </a>
+                        <a
+                          href={`${navHref('/data')}#democracy`}
+                          class="dropdown-item"
+                        >
+                          📡 {t('nav.data.democracy')}
+                        </a>
+                        <a
+                          href={`${navHref('/data')}#opendata`}
+                          class="dropdown-item"
+                        >
+                          📊 {t('nav.data.opendata')}
+                        </a>
+                      </div>
+                    </div>
+                  </Fragment>
+                );
+              }
+              if (item.path === '/resources') {
+                return (
+                  <Fragment>
+                    {showSep && <span class="nav-sep" />}
+                    <div class="nav-dropdown">
+                      <a
+                        href={item.fullPath}
+                        class:list={['nav-link', { active: item.active }]}
+                      >
+                        {item.label} <span class="dropdown-arrow">▾</span>
+                      </a>
+                      <div class="dropdown-menu">
+                        <a
+                          href={navHref('/resources')}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          {t('nav.resources')}
+                        </a>
+                        <div class="dropdown-divider" />
+                        <a href={navHref('/mcp')} class="dropdown-item">
+                          🔌 {t('nav.mcp')}
+                        </a>
+                      </div>
+                    </div>
+                  </Fragment>
+                );
+              }
+              if (item.path === '/semiont') {
+                return (
+                  <Fragment>
+                    {showSep && <span class="nav-sep" />}
+                    <div class="nav-dropdown">
+                      <a
+                        href={item.fullPath}
+                        class:list={['nav-link', { active: item.active }]}
+                      >
+                        {item.label} <span class="dropdown-arrow">▾</span>
+                      </a>
+                      <div class="dropdown-menu">
+                        <a
+                          href={navHref('/semiont')}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          {t('nav.semiont.cognitive')}
+                        </a>
+                        <a
+                          href={navHref('/semiont/newsroom')}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          {t('nav.semiont.newsroom')}
+                        </a>
+                        <a
+                          href={navHref('/dashboard')}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          {t('nav.dashboard')} 🔬
+                        </a>
+                      </div>
+                    </div>
+                  </Fragment>
+                );
+              }
+              if (item.path === '/contribute') {
+                return (
+                  <Fragment>
+                    {showSep && <span class="nav-sep" />}
+                    <div class="nav-dropdown">
+                      <a
+                        href={item.fullPath}
+                        class:list={['nav-link', { active: item.active }]}
+                      >
+                        {item.label} <span class="dropdown-arrow">▾</span>
+                      </a>
+                      <div class="dropdown-menu">
+                        <a
+                          href={navHref('/contribute')}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          {t('nav.contribute')}
+                        </a>
+                        <div class="dropdown-divider" />
+                        <a
+                          href={`${navHref('/contribute')}#form`}
+                          class="dropdown-item"
+                        >
+                          📝 {t('nav.contribute.submit')}
+                        </a>
+                        <a
+                          href={`${navHref('/contribute')}#token-donation`}
+                          class="dropdown-item"
+                        >
+                          🪙 {t('nav.contribute.tokens')}
+                        </a>
+                        <a
+                          href={`${navHref('/contribute')}#organism`}
+                          class="dropdown-item"
+                        >
+                          🧬 {t('nav.contribute.why')}
+                        </a>
+                        <a
+                          href={`${navHref('/contribute')}#cli`}
+                          class="dropdown-item"
+                        >
+                          🖥️ {t('nav.contribute.cli')}
+                        </a>
+                        <a
+                          href="https://github.com/frank890417/taiwan-md"
+                          target="_blank"
+                          class="dropdown-item"
+                        >
+                          🐙 GitHub
+                        </a>
+                      </div>
+                    </div>
+                  </Fragment>
+                );
+              }
+              return (
+                <Fragment>
+                  {showSep && <span class="nav-sep" />}
+                  <a
+                    href={item.fullPath}
+                    class:list={['nav-link', { active: item.active }]}
+                  >
+                    {item.label}
+                  </a>
+                </Fragment>
+              );
+            })
+          }
+        </nav>
+
+        <!-- Search -->
+        <button
+          class="search-toggle"
+          aria-label={t('nav.aria-search')}
+          onclick="document.getElementById('search-modal').classList.add('open');setTimeout(()=>document.getElementById('search-input').focus(),100)"
+        >
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            ><circle cx="11" cy="11" r="8"></circle><line
+              x1="21"
+              y1="21"
+              x2="16.65"
+              y2="16.65"></line></svg
+          >
+          <kbd>/</kbd>
+        </button>
+
+        <!-- GitHub -->
+        <a
+          href="https://github.com/frank890417/taiwan-md"
+          target="_blank"
+          class="gh-link"
+          aria-label="GitHub"
+        >
+          <svg viewBox="0 0 16 16" fill="currentColor"
+            ><path
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+            ></path></svg
+          >
+        </a>
+
+        <!-- Mobile hamburger — ☰↔✕ swap + aria-expanded inline so the close
+             affordance works even if the module script fails to load (#1142) -->
+        <button
+          class="menu-toggle"
+          aria-label={t('nav.aria-toggle-menu')}
+          aria-expanded="false"
+          aria-controls="primary-mobile-nav"
+          onclick="const n=document.querySelector('.nav-mobile');const o=n.classList.toggle('open');this.textContent=o?'✕':'☰';this.setAttribute('aria-expanded',String(o));"
+          >☰</button
+        >
+
+        <!-- Lang dropdown (2026-04-24 β3: replaces 4-button row to scale to 5+ langs)
+             native names + globe icon let any reader recognize their language. -->
+        <div
+          class="lang-dropdown"
+          role="group"
+          aria-label={t('nav.aria-language-selection')}
+        >
+          <button
+            class="lang-dropdown-toggle"
+            type="button"
+            aria-haspopup="menu"
+            aria-expanded="false"
+            aria-label={t('nav.aria-language-selection')}
+            data-lang-toggle
+          >
+            <span class="lang-globe" aria-hidden="true">🌐</span>
+            <span class="lang-current">{currentLangOption?.short ?? '中'}</span>
+            <span class="lang-caret" aria-hidden="true">▾</span>
+          </button>
+          <div class="lang-dropdown-menu" role="menu" data-lang-menu hidden>
+            {
+              visibleLangOptions.map((opt) => (
+                <a
+                  href={opt.link}
+                  class:list={['lang-dropdown-item', { active: opt.isActive }]}
+                  role="menuitem"
+                  aria-current={opt.isActive ? 'page' : undefined}
+                  lang={opt.code}
+                >
+                  <span class="lang-native">{opt.nativeName}</span>
+                  {opt.isActive && (
+                    <span class="lang-check" aria-hidden="true">
+                      ✓
+                    </span>
+                  )}
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Nav — 2026-07-24 redesign：
+           收合式 accordion（預設全收、一次只開一組、當前頁所屬組 server-render 先開）。
+           群組列 = label 連結（navigates）＋獨立 48×48 chevron 鍵（expands），
+           所有列 ≥48px 觸控目標；子選單用 grid-rows 0fr→1fr 動畫展開。
+           資料來源：frontmatter mobileSubLinks（跟 desktop dropdown 同一組目的地）。 -->
+      <nav
+        id="primary-mobile-nav"
+        class="nav-mobile"
+        aria-label={t('nav.aria-mobile-navigation')}
+      >
+        {
+          navConfig.map((item) => {
+            const sub = mobileSubLinks[item.path];
+            const subId = `mobile-sub-${item.path.replace(/\//g, '')}`;
+            // 當前頁所屬 group 預先展開，觀察者一打開就看到自己在哪
+            const isOpen = !!sub && item.active;
+            return (
+              <Fragment>
+                <div class:list={['mobile-nav-item', { 'has-sub': !!sub }]}>
+                  <a
+                    href={item.fullPath}
+                    class:list={['nav-link', { active: item.active }]}
+                    onclick="document.querySelector('.nav-mobile').classList.remove('open')"
+                  >
+                    {item.label}
+                  </a>
+                  {sub && (
+                    <button
+                      class:list={['mobile-sub-toggle', { open: isOpen }]}
+                      aria-expanded={isOpen ? 'true' : 'false'}
+                      aria-controls={subId}
+                      aria-label={t('nav.aria-expand-submenu')}
+                    >
+                      ▾
+                    </button>
+                  )}
+                </div>
+                {sub && (
+                  <div
+                    id={subId}
+                    class:list={['mobile-sub-links', { open: isOpen }]}
+                  >
+                    <div class="mobile-sub-links-inner">
+                      {sub.map((s) => (
+                        <a
+                          href={s.href}
+                          class="nav-link nav-sub-link"
+                          onclick="document.querySelector('.nav-mobile').classList.remove('open')"
+                        >
+                          {s.label}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </Fragment>
+            );
+          })
+        }
+        <a
+          href="https://github.com/frank890417/taiwan-md"
+          target="_blank"
+          class="nav-link"
+          onclick="document.querySelector('.nav-mobile').classList.remove('open')"
+          >GitHub</a
+        >
+      </nav>
+    </header>
+  </div>
+</div>
+
+<!--
+  Search Modal
+  ────────────
+  Hidden by default via `hidden`; JS toggles `.open` → adds `flex` via
+  the `[&.open]:flex` arbitrary variant. `.search-modal` class kept as a
+  CSS hook; the `search-*` class names on inner elements are also kept
+  because the search results (.search-item, .search-hint, etc.) are
+  rendered via innerHTML from the Layout.astro search script and rely on
+  :global() selectors still living in this component's <style> block.
+-->
+<div
+  id="search-modal"
+  class="search-modal fixed inset-0 z-[200] hidden items-start justify-center pt-[12vh] [&.open]:flex max-[768px]:pt-[8vh]"
+>
+  <div
+    class="fixed inset-0 bg-black/40 backdrop-blur-[4px]"
+    onclick="document.getElementById('search-modal').classList.remove('open')"
+  >
+  </div>
+  <div
+    class="relative w-[90%] max-w-[560px] overflow-hidden rounded-xl bg-white shadow-[0_20px_60px_rgba(0,0,0,0.2)] max-[768px]:w-[95%] max-[768px]:max-w-full"
+  >
+    <div
+      class="flex items-center gap-3 border-b border-[#e2e8f0] px-4 py-[0.9rem]"
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#94a3b8"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        ><circle cx="11" cy="11" r="8"></circle><line
+          x1="21"
+          y1="21"
+          x2="16.65"
+          y2="16.65"></line></svg
+      >
+      <input
+        id="search-input"
+        type="text"
+        class="flex-1 border-none bg-transparent text-base text-[#1a1a2e] outline-none placeholder:text-[#94a3b8]"
+        placeholder={`${t('nav.search-modal.input-placeholder')}...`}
+        autocomplete="off"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-controls="search-results"
+        aria-expanded="true"
+      />
+      <kbd
+        class="cursor-pointer rounded border border-[#e2e8f0] bg-[#f1f5f9] px-2 py-[0.2rem] font-[inherit] text-[0.7rem] text-[#64748b] [@media(hover:none)]:hidden"
+        onclick="document.getElementById('search-modal').classList.remove('open')"
+        >ESC</kbd
+      >
+    </div>
+    <div id="search-results" class="search-results" role="listbox">
+      <div class="search-hint">
+        {t('nav.search-modal.type-to-search')}
+      </div>
+      <div class="search-hot">
+        <span class="search-hot-label"
+          >🔥 {t('explore.hotSearches.label' as any)}</span
+        >
+        {
+          [1, 2, 3, 4, 5, 6].map((n) => {
+            const term = t(`explore.hotSearches.term${n}` as any);
+            return (
+              <button type="button" class="search-hot-chip" data-term={term}>
+                {term}
+              </button>
+            );
+          })
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const header = document.getElementById('main-header');
+  if (header) {
+    // Block transitions on initial load to prevent flash
+    header.style.transition = 'none';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        header.style.transition = '';
+      });
+    });
+
+    // Keep the header below the language banner on homepage only.
+    const isHero = header.hasAttribute('data-hero');
+    if (isHero) {
+      const banner = document.getElementById('lang-banner');
+      if (banner && banner.offsetHeight > 0) {
+        header.style.top = banner.offsetHeight + 'px';
+        // Anchor 捲動 offset 跟著 banner 高度長，不然 heading 會被
+        // fixed banner+header 蓋住（issue #1212 §B3/§11；基準 92px
+        // 定義在 global.css html{scroll-padding-top}）
+        document.documentElement.style.scrollPaddingTop =
+          92 + banner.offsetHeight + 'px';
+      }
+
+      const update = () =>
+        header.classList.toggle('scrolled', window.scrollY > 40);
+      window.addEventListener('scroll', update, { passive: true });
+      update();
+    }
+  }
+</script>
+
+<!--
+  Phase 5 shell migration #2: Header.astro (partial)
+  ──────────────────────────────────────────────────
+  Migrated to Tailwind (removed from <style>):
+    - #header-container, #header-inner-container (structural wrappers)
+    - .search-modal, .search-backdrop, .search-panel, .search-header,
+      .search-header input, .search-kbd (search modal — no scroll state)
+    - Mobile overrides for .search-modal / .search-panel
+
+  Intentionally kept in scoped <style>:
+    - The header-bar scroll-state CSS variable machine (--header-bg,
+      --nav-color, --dot-color, etc. × 2 states)
+    - All rules that cascade off the `.scrolled` modifier class
+    - The mobile drawer state rules (hero/scrolled color switch)
+    - :global(html[lang='en']) early-mobile-collapse rules
+    - :global(.search-item*) rules that style the JS-rendered search
+      results (rendered via innerHTML from Layout.astro's search script)
+
+  Rationale: converting the 20+ state-switching rules to
+  [.scrolled_&]: arbitrary variants would be more verbose than the
+  current CSS variable architecture. The variable system IS the
+  right abstraction for this component. See ADR-001 for the
+  broader refactor philosophy (scoped <style> is allowed when it
+  pays its way).
+-->
+<style>
+  /* =============================================
+     JADE PALETTE + GLASS TOKEN SYSTEM
+     Transparent state (top) → Scrolled state (white glass)
+  ============================================= */
+  header {
+    /* Palette */
+    --green-deep: #004d40;
+    --green-primary: #006352;
+    --green-mid: #007864;
+    --green-light: #00997d;
+    --green-accent: #4fd1b0;
+    --jade-soft: #e0f2ef;
+    /* Glass surface tokens */
+    --glass-border: rgba(0, 0, 0, 0.06);
+    --glass-shadow: rgba(0, 0, 0, 0.16);
+    --glass-inset: rgba(0, 0, 0, 0.02);
+    /* Glass tokens — default: white frosted glass (scrolled) */
+    --header-bg: rgba(255, 255, 255, 0.88);
+    --header-border: rgba(0, 0, 0, 0.06);
+    --header-blur: 20px;
+    --nav-color: #475569;
+    --nav-hover-color: #1a1a2e;
+    --nav-hover-bg: rgba(148, 163, 184, 0.1);
+    --sep-color: #e2e8f0;
+    --arrow-color: #94a3b8;
+    --logo-color: #1a1a2e;
+    --dot-color: var(--green-mid);
+    --search-border: rgba(0, 0, 0, 0.08);
+    --search-bg: transparent;
+    --search-color: #64748b;
+    --kbd-bg: #f1f5f9;
+    --kbd-color: #94a3b8;
+    --kbd-border: #e2e8f0;
+    --gh-color: #94a3b8;
+    --lang-bg: #f1f5f9;
+    --lang-border: rgba(0, 0, 0, 0.06);
+    --lang-color: #64748b;
+    --lang-active-bg: var(--green-mid);
+    --lang-active-color: white;
+    --burger-bg: #f8fafc;
+    --burger-border: #e2e8f0;
+    --burger-color: #334155;
+    box-shadow: 0 1px 20px rgba(0, 0, 0, 0.06);
+  }
+  /* Homepage transparent state — only when not scrolled */
+  header[data-hero]:not(.scrolled) {
+    --header-bg: transparent;
+    --header-border: transparent;
+    --header-blur: 0px;
+    --nav-color: #ffffff;
+    --nav-hover-color: #ffffff;
+    --nav-hover-bg: rgba(255, 255, 255, 0.15);
+    --sep-color: rgba(255, 255, 255, 0.25);
+    --arrow-color: rgba(255, 255, 255, 0.6);
+    --logo-color: #ffffff;
+    --dot-color: var(--green-accent);
+    --search-border: rgba(255, 255, 255, 0.2);
+    --search-bg: rgba(255, 255, 255, 0.08);
+    --search-color: rgba(255, 255, 255, 0.8);
+    --kbd-bg: rgba(255, 255, 255, 0.12);
+    --kbd-color: rgba(255, 255, 255, 0.6);
+    --kbd-border: rgba(255, 255, 255, 0.15);
+    --gh-color: rgba(255, 255, 255, 0.8);
+    --lang-bg: rgba(255, 255, 255, 0.1);
+    --lang-border: rgba(255, 255, 255, 0.15);
+    --lang-color: rgba(255, 255, 255, 0.8);
+    --lang-active-bg: var(--green-accent);
+    --lang-active-color: var(--green-deep);
+    --burger-bg: rgba(255, 255, 255, 0.1);
+    --burger-border: rgba(255, 255, 255, 0.2);
+    --burger-color: #ffffff;
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --glass-shadow: rgba(0, 0, 0, 0.5);
+    --glass-inset: rgba(255, 255, 255, 0.08);
+    box-shadow: none;
+  }
+
+  /* =============================================
+     HEADER — GLOBAL FIXED BAR
+  ============================================= */
+  header {
+    background: var(--header-bg);
+    backdrop-filter: blur(var(--header-blur));
+    -webkit-backdrop-filter: blur(var(--header-blur));
+    border-bottom: 1px solid var(--header-border);
+    transition:
+      background 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      backdrop-filter 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .header-inner {
+    max-width: var(--container-wide);
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 2vw, 2rem);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    height: 56px;
+  }
+
+  /* Logo */
+  .logo {
+    text-decoration: none;
+    font-size: 1.3rem;
+    font-weight: 700;
+    font-family: 'Noto Serif TC', serif;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition:
+      color 0.45s,
+      transform 0.3s;
+    color: var(--logo-color);
+  }
+  .logo:hover {
+    transform: translateY(-1px);
+  }
+  .logo-icon {
+    width: 1.4rem;
+    height: 1.4rem;
+    vertical-align: middle;
+  }
+  .logo-dot {
+    color: var(--dot-color);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 600;
+    transition: color 0.45s;
+  }
+
+  /* Nav Desktop */
+  .nav-desktop {
+    display: flex;
+    gap: 0.15rem;
+    /* auto margin on the inline-start side, so the nav still gets pushed away
+       from the brand instead of onto it when dir=rtl (ar). */
+    margin-inline-start: auto;
+    align-items: center;
+  }
+
+  /* Nav links */
+  .nav-link {
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--nav-color);
+    transition:
+      color 0.25s,
+      background-color 0.25s;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.4rem 0.55rem;
+    white-space: nowrap;
+    border-radius: 8px;
+    position: relative;
+    letter-spacing: -0.01em;
+  }
+  .nav-link:hover {
+    color: var(--nav-hover-color);
+    background: var(--nav-hover-bg);
+    text-decoration: none;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--green-accent);
+    border-radius: 1px;
+    transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateX(-50%);
+  }
+  .nav-link:hover::after {
+    width: 80%;
+  }
+  .nav-link.active {
+    color: var(--nav-hover-color);
+    font-weight: 600;
+    background: var(--nav-hover-bg);
+  }
+  .nav-link.active::after {
+    width: 80%;
+    background: var(--dot-color);
+  }
+
+  /* Nav separator */
+  .nav-sep {
+    width: 1px;
+    height: 16px;
+    background: var(--sep-color);
+    margin: 0 0.2rem;
+    flex-shrink: 0;
+    transition: background 0.45s;
+  }
+
+  /* Dropdown */
+  .nav-dropdown {
+    position: relative;
+  }
+  .dropdown-arrow {
+    font-size: 0.55em;
+    color: var(--arrow-color);
+    transition:
+      color 0.25s,
+      transform 0.25s;
+    margin-inline-start: 1px;
+  }
+  /* Dropdown — transparent state: dark glass */
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    opacity: 0;
+    visibility: hidden;
+    background: rgba(0, 32, 25, 0.92);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 0.5rem 0;
+    min-width: 180px;
+    box-shadow:
+      0 24px 60px var(--glass-shadow),
+      0 8px 20px var(--glass-shadow),
+      inset 0 1px 0 var(--glass-inset);
+    z-index: 1100;
+    /* #1259: tall menus (探索 + 12 分類) must scroll inside the panel on short viewports */
+    max-height: min(70vh, 520px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    transition:
+      opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* Dropdown — scrolled state: white glass */
+  .scrolled .dropdown-menu {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow:
+      0 24px 60px var(--glass-shadow),
+      0 8px 20px var(--glass-shadow),
+      inset 0 1px 0 var(--glass-inset);
+  }
+  .nav-dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+  .nav-dropdown:hover .dropdown-arrow {
+    transform: rotate(180deg);
+  }
+  .dropdown-item {
+    display: block;
+    padding: 0.5rem 1.1rem;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition:
+      background-color 0.15s,
+      color 0.15s;
+  }
+  .dropdown-item:hover {
+    background: rgba(79, 209, 176, 0.18);
+    color: #ffffff;
+  }
+  .scrolled .dropdown-item {
+    color: #334155;
+  }
+  .scrolled .dropdown-item:hover {
+    background: rgba(0, 120, 100, 0.06);
+    color: var(--green-deep);
+  }
+  .dropdown-section-header {
+    font-weight: 600;
+    color: var(--green-accent);
+    font-size: 0.88rem;
+  }
+  .scrolled .dropdown-section-header {
+    color: var(--green-deep);
+  }
+  .dropdown-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.15);
+    margin: 0.35rem 0.9rem;
+  }
+  .scrolled .dropdown-divider {
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  /* Search button */
+  .search-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--search-border);
+    background: var(--search-bg);
+    cursor: pointer;
+    transition:
+      color 0.35s,
+      border-color 0.35s,
+      background-color 0.35s;
+    flex-shrink: 0;
+    color: var(--search-color);
+    font-family: inherit;
+  }
+  .search-toggle:hover {
+    color: var(--nav-hover-color);
+    border-color: var(--nav-hover-bg);
+  }
+  .search-toggle kbd {
+    font-size: 0.6rem;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    font-family: inherit;
+    font-weight: 600;
+    background: var(--kbd-bg);
+    color: var(--kbd-color);
+    border: 1px solid var(--kbd-border);
+    line-height: 1.3;
+    transition:
+      background-color 0.35s,
+      color 0.35s,
+      border-color 0.35s;
+  }
+
+  /* GitHub icon link */
+  .gh-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem;
+    border-radius: 8px;
+    transition: transform 0.2s;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  .gh-link svg {
+    width: 20px;
+    height: 20px;
+    color: var(--gh-color);
+    transition: color 0.35s;
+  }
+  .gh-link:hover svg {
+    color: var(--nav-hover-color);
+  }
+  .gh-link:hover {
+    transform: scale(1.1);
+  }
+
+  /* Lang toggle */
+  .lang-toggle {
+    display: flex;
+    gap: 2px;
+    border-radius: 10px;
+    padding: 3px;
+    flex-shrink: 0;
+    transition:
+      background-color 0.35s,
+      border-color 0.35s;
+    background: var(--lang-bg);
+    border: 1px solid var(--lang-border);
+  }
+  .lang-btn {
+    padding: 0.3rem 0.6rem;
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--lang-color);
+    border-radius: 7px;
+    transition:
+      background-color 0.25s,
+      color 0.25s,
+      box-shadow 0.25s;
+    min-width: 36px;
+    text-align: center;
+  }
+  .lang-btn:hover {
+    background: var(--nav-hover-bg);
+    color: var(--nav-hover-color);
+  }
+  .lang-btn.active {
+    background: var(--lang-active-bg);
+    color: var(--lang-active-color);
+    box-shadow: 0 2px 8px rgba(79, 209, 176, 0.3);
+  }
+
+  /* 2026-04-24 β3: Lang dropdown — replaces button row to scale to 5+ langs.
+     Native names + globe icon let any reader recognize their language. */
+  .lang-dropdown {
+    position: relative;
+    flex-shrink: 0;
+  }
+  .lang-dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 10px;
+    background: var(--lang-bg);
+    border: 1px solid var(--lang-border);
+    color: var(--lang-color);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background-color 0.25s,
+      border-color 0.25s,
+      color 0.25s;
+  }
+  .lang-dropdown-toggle:hover,
+  .lang-dropdown-toggle[aria-expanded='true'] {
+    background: var(--nav-hover-bg);
+    color: var(--nav-hover-color);
+  }
+  .lang-globe {
+    font-size: 0.95rem;
+    line-height: 1;
+  }
+  .lang-current {
+    min-width: 1.5rem;
+    text-align: center;
+  }
+  .lang-caret {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    transition: transform 0.2s;
+  }
+  .lang-dropdown-toggle[aria-expanded='true'] .lang-caret {
+    transform: rotate(180deg);
+  }
+  .lang-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    /* Logical property (not `right: 0`) so the menu re-anchors to the
+       reading-direction end edge automatically under dir="rtl" (ar) instead
+       of staying pinned to the physical right — 2026-07-25 RTL audit. */
+    inset-inline-end: 0;
+    min-width: 11rem;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--lang-border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    padding: 0.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    z-index: 100;
+  }
+  .lang-dropdown-menu[hidden] {
+    display: none;
+  }
+  /* Menu panel is always white regardless of header state, so item colors are
+     pinned to dark-on-light — do NOT use --lang-color / --nav-hover-* here
+     (those flip to white in the transparent hero state → white-on-white bug). */
+  .lang-dropdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 7px;
+    text-decoration: none;
+    color: #334155;
+    font-size: 0.9rem;
+    transition:
+      background-color 0.15s,
+      color 0.15s;
+  }
+  .lang-dropdown-item:hover {
+    background: rgba(0, 120, 100, 0.06);
+    color: var(--green-deep);
+  }
+  .lang-dropdown-item.active {
+    background: var(--green-mid);
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .lang-native {
+    flex: 1 1 auto;
+  }
+  .lang-check {
+    font-size: 0.85rem;
+    opacity: 0.9;
+  }
+
+  /* Hamburger */
+  .menu-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    transition:
+      color 0.35s,
+      background-color 0.35s,
+      border-color 0.35s;
+    color: var(--burger-color);
+    background: var(--burger-bg);
+    border: 1px solid var(--burger-border);
+  }
+  .menu-toggle:hover {
+    color: var(--nav-hover-color);
+  }
+
+  /* Mobile nav — hidden by default.
+     2026-07-24 redesign：預設全收 accordion + ≥48px 觸控目標 + grid-rows 展開動畫。 */
+  .nav-mobile {
+    display: none;
+  }
+  .mobile-nav-item {
+    display: flex;
+    align-items: stretch;
+  }
+  .mobile-nav-item .nav-link,
+  .nav-mobile > .nav-link {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+  }
+  /* 獨立 chevron 觸控區：48×48、跟 label 之間細分隔線，避免誤觸 */
+  .mobile-sub-toggle {
+    background: none;
+    border: none;
+    border-inline-start: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.95rem;
+    width: 48px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+      transform 0.25s ease,
+      color 0.15s ease;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .mobile-sub-toggle:hover,
+  .mobile-sub-toggle.open {
+    color: rgba(255, 255, 255, 0.95);
+  }
+  .mobile-sub-toggle.open {
+    transform: rotate(180deg);
+  }
+  .scrolled .mobile-sub-toggle {
+    color: rgba(0, 0, 0, 0.4);
+    border-inline-start-color: rgba(0, 0, 0, 0.06);
+  }
+  .scrolled .mobile-sub-toggle:hover,
+  .scrolled .mobile-sub-toggle.open {
+    color: rgba(0, 0, 0, 0.75);
+  }
+  /* 子選單：grid 0fr→1fr 高度動畫（closed 時完全不佔位） */
+  .mobile-sub-links {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.28s ease;
+  }
+  .mobile-sub-links.open {
+    grid-template-rows: 1fr;
+  }
+  .mobile-sub-links-inner {
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding-inline-start: 0.9rem;
+  }
+  /* 子連結：44px 觸控 + 行首導引線標示層級 */
+  .mobile-sub-links .nav-sub-link {
+    font-size: 0.88em;
+    opacity: 0.78;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding-block: 0;
+    padding-inline: 0.85rem 0;
+    border-inline-start: 2px solid rgba(255, 255, 255, 0.12);
+    border-bottom: none !important;
+  }
+  .scrolled .mobile-sub-links .nav-sub-link {
+    border-inline-start-color: rgba(0, 0, 0, 0.1);
+  }
+  .mobile-sub-links .nav-sub-link:last-child {
+    margin-bottom: 0.35rem;
+  }
+
+  /* =============================================
+     SEARCH RESULTS — :global() selectors are required because the
+     search results (.search-item, .search-hint, etc.) are rendered
+     via innerHTML from Layout.astro's search script, so Astro's
+     scoped-class hashing cannot reach them. Modal wrapper, backdrop,
+     panel, header, input, and kbd are now Tailwind utilities in the
+     markup above.
+  ============================================= */
+  :global(.search-results) {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 0.5rem;
+  }
+  :global(.search-hint) {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.9rem;
+  }
+  :global(.search-item) {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.7rem 0.75rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.15s;
+    border-bottom: none;
+  }
+  :global(.search-item:hover) {
+    background: #f1f5f9;
+  }
+  :global(.search-item-lang) {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    background: #e2e8f0;
+    color: #64748b;
+    margin-top: 0.15rem;
+  }
+  :global(.search-item-text) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+  :global(.search-item-title) {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a1a2e;
+  }
+  :global(.search-item-desc) {
+    font-size: 0.8rem;
+    color: #64748b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Empty-state hot chips + result-highlight + keyboard-nav styles.
+   * The modal panel is always light (bg-white) in both themes, so no
+   * dark variants needed. */
+  :global(.search-hot) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 1rem 0.9rem;
+  }
+  :global(.search-hot-label) {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+  }
+  :global(.search-hot-chip) {
+    cursor: pointer;
+    border: 1px solid #e2e8f0;
+    background: #f1f5f9;
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #475569;
+    transition:
+      background 0.15s,
+      border-color 0.15s,
+      color 0.15s;
+  }
+  :global(.search-hot-chip:hover) {
+    border-color: #10b981;
+    background: #ecfdf5;
+    color: #065f46;
+  }
+  :global(.search-item mark) {
+    background: rgba(16, 185, 129, 0.18);
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 0.05em;
+  }
+  :global(.search-item.kb-active) {
+    background: #f1f5f9;
+  }
+
+  /* =============================================
+     MEDIUM TIGHTEN (≤1200px)
+  ============================================= */
+  @media (max-width: 1320px) {
+    .header-inner {
+      gap: 0.5rem;
+    }
+    .nav-desktop {
+      gap: 0;
+    }
+    .nav-link {
+      font-size: 0.78rem;
+      padding: 0.3rem 0.35rem;
+    }
+    .nav-sep {
+      margin: 0 0.05rem;
+    }
+    .search-toggle kbd {
+      display: none;
+    }
+    .logo {
+      font-size: 1.15rem;
+    }
+    .gh-link svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  /* =============================================
+     TABLET / SMALL DESKTOP — collapse to mobile menu (≤1024px)
+
+     2026-04-25 β7：對應 issue #573（@assanges 報告），原本只有 EN
+     在 1024px collapse，其他語言（zh-TW / ja / ko / fr / es）在
+     768-1023px 會被裁切（dropdown UI + 5 lang switcher 加進來後尤甚）。
+     現在所有語言統一在 ≤1024px collapse 為 mobile menu。
+  ============================================= */
+  @media (max-width: 1024px) {
+    .nav-desktop {
+      display: none;
+    }
+    .gh-link {
+      display: none;
+    }
+    .menu-toggle {
+      display: flex;
+      order: 4;
+    }
+    :global(.brand-mark) {
+      margin-inline-end: auto;
+    }
+    .search-toggle {
+      order: 2;
+    }
+    .search-toggle kbd {
+      display: none;
+    }
+    .lang-toggle {
+      order: 3;
+    }
+    /* 2026-07-06: the live lang switcher (.lang-dropdown) had default order:0 and
+       was landing before search in this band. Pin it between search and hamburger
+       (matches the ≤768px rule). Element was already rendered here — this only
+       reorders, so the 768-1023px row width is unchanged (issue #573 guard). */
+    .lang-dropdown {
+      order: 3;
+    }
+    .nav-mobile {
+      position: absolute;
+      top: 100%;
+      inset-inline: 0.75rem;
+      margin-top: 0.35rem;
+      background: rgba(0, 28, 22, 1);
+      backdrop-filter: blur(40px) saturate(1.6);
+      -webkit-backdrop-filter: blur(40px) saturate(1.6);
+      flex-direction: column;
+      padding: 0.5rem 0.85rem 0.7rem;
+      gap: 0;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      box-shadow:
+        0 18px 42px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      /* #1142: cap drawer height + scroll internally so a fully-expanded menu
+         never runs off-screen (was 799px on a 812px viewport). */
+      max-height: calc(100vh - 5rem);
+      max-height: calc(100dvh - 5rem);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+    .scrolled .nav-mobile {
+      background: rgba(255, 255, 255, 0.995);
+      backdrop-filter: blur(32px);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 18px 42px rgba(15, 23, 42, 0.14);
+    }
+    .nav-mobile.open {
+      display: flex;
+    }
+    .nav-mobile .nav-link {
+      padding: 0.55rem 0.2rem;
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 0;
+      background: transparent;
+    }
+    .scrolled .nav-mobile .nav-link {
+      color: #334155;
+      border-bottom-color: #f1f5f9;
+    }
+    .nav-mobile .nav-link::after {
+      display: none;
+    }
+  }
+
+  /* =============================================
+     MOBILE (≤768px)
+  ============================================= */
+  @media (max-width: 768px) {
+    .header-inner {
+      padding: 0 1rem;
+      gap: 0.4rem;
+      height: 52px !important;
+    }
+    /* BrandMark renders `.brand-mark` (scoped to its own component), so we
+       reach it via :global(). margin-inline-end: auto is what pushes the search
+       + hamburger cluster to the trailing edge on mobile — the left edge when
+       dir=rtl (ar). */
+    :global(.brand-mark) {
+      --brand-size: 1.1rem;
+      margin-inline-end: auto;
+    }
+    .nav-desktop {
+      display: none;
+    }
+    .gh-link {
+      display: none;
+    }
+    .menu-toggle {
+      display: flex;
+      order: 4;
+    }
+    .search-toggle {
+      order: 2;
+    }
+    .search-toggle kbd {
+      display: none;
+    }
+    .lang-toggle {
+      display: none;
+    }
+    .lang-btn {
+      padding: 0.3rem 0.5rem;
+      font-size: 0.75rem;
+      min-width: unset;
+    }
+    /* 2026-07-06 design-audit §2.7-4: keep the language switcher in the mobile
+       header row (it was landing before search with default order:0). Slot it
+       between search (order:2) and hamburger (order:4) so language switching is
+       reachable without opening the drawer — critical for a 6-language site.
+       Reuses the SAME .lang-dropdown markup + toggle logic; no second menu. */
+    .lang-dropdown {
+      order: 3;
+    }
+    .lang-dropdown-toggle {
+      /* ≥40px tap target (was ~31px: 0.4rem padding + 0.85rem text). */
+      min-height: 40px;
+      padding: 0.4rem 0.55rem;
+      gap: 0.2rem;
+    }
+    .lang-dropdown-toggle .lang-globe {
+      font-size: 1rem;
+    }
+    /* Menu must stay inside a 375px viewport: end-anchored to the toggle
+       (inset-inline-end, not `right`, so it flips under dir="rtl" — 2026-07-25
+       RTL audit), capped width, and scroll if it ever grows past the header row. */
+    .lang-dropdown-menu {
+      inset-inline-end: 0;
+      min-width: 10rem;
+      max-width: calc(100vw - 1.5rem);
+      max-height: calc(100dvh - 5rem);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Mobile drawer — adapts to scroll state. Opacity bumped + stronger
+       blur so the hero wordmark / copy doesn't bleed through the panel. */
+    .nav-mobile {
+      position: absolute;
+      top: 100%;
+      inset-inline: 0.75rem;
+      margin-top: 0.35rem;
+      background: rgba(0, 28, 22, 1);
+      backdrop-filter: blur(40px) saturate(1.6);
+      -webkit-backdrop-filter: blur(40px) saturate(1.6);
+      flex-direction: column;
+      padding: 0.5rem 0.85rem 0.7rem;
+      gap: 0;
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      box-shadow:
+        0 24px 60px var(--glass-shadow),
+        0 8px 20px var(--glass-shadow),
+        inset 0 1px 0 var(--glass-inset);
+      transition:
+        background-color 0.35s,
+        border-color 0.35s,
+        box-shadow 0.35s;
+      /* #1142: cap drawer height + scroll internally (see ≤1024 block) */
+      max-height: calc(100vh - 4.5rem);
+      max-height: calc(100dvh - 4.5rem);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+    .scrolled .nav-mobile {
+      background: rgba(255, 255, 255, 0.995);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 18px 42px rgba(15, 23, 42, 0.14);
+    }
+    .nav-mobile.open {
+      display: flex;
+    }
+    .nav-mobile .nav-link {
+      padding: 0.55rem 0.2rem;
+      font-size: 0.88rem;
+      color: rgba(255, 255, 255, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 0;
+      background: transparent;
+    }
+    .scrolled .nav-mobile .nav-link {
+      color: #334155;
+      border-bottom-color: #f1f5f9;
+    }
+    .nav-mobile .nav-link:hover {
+      background: transparent;
+    }
+    .nav-mobile .nav-link::after {
+      display: none;
+    }
+    .nav-mobile .nav-link.active {
+      color: #ffffff;
+      font-weight: 600;
+      background: rgba(79, 209, 176, 0.15);
+      margin: 0 -1rem;
+      padding-inline: 1rem;
+      border-radius: 8px;
+    }
+    .scrolled .nav-mobile .nav-link.active {
+      color: #1a1a2e;
+      background: rgba(0, 120, 100, 0.05);
+    }
+  }
+</style>
+
+<script>
+  // Mobile accordion sub-menu toggle（2026-07-24 redesign：
+  // true accordion — 一次只開一組，開新組自動收舊組；aria-expanded 同步）
+  document.querySelectorAll('.mobile-sub-toggle').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const willOpen = !btn.classList.contains('open');
+      document.querySelectorAll('.mobile-sub-toggle.open').forEach((b) => {
+        b.classList.remove('open');
+        b.setAttribute('aria-expanded', 'false');
+      });
+      document
+        .querySelectorAll('.mobile-sub-links.open')
+        .forEach((p) => p.classList.remove('open'));
+      if (willOpen) {
+        btn.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+        const subLinks = btn.closest('.mobile-nav-item')?.nextElementSibling;
+        if (subLinks?.classList.contains('mobile-sub-links')) {
+          subLinks.classList.add('open');
+        }
+      }
+    });
+  });
+
+  // 點 drawer 外側關閉（跟 lang dropdown 同一套預期行為）
+  document.addEventListener('click', (e) => {
+    const nav = document.querySelector('.nav-mobile');
+    const toggle = document.querySelector('.menu-toggle');
+    if (
+      nav?.classList.contains('open') &&
+      !nav.contains(e.target as Node) &&
+      !toggle?.contains(e.target as Node)
+    ) {
+      nav.classList.remove('open');
+      if (toggle) {
+        toggle.textContent = '☰';
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    }
+  });
+
+  // 2026-04-24 β3: Lang dropdown toggle (desktop dropdown UI)
+  document.querySelectorAll('[data-lang-toggle]').forEach((toggle) => {
+    const wrapper = toggle.closest('.lang-dropdown');
+    const menu = wrapper?.querySelector('[data-lang-menu]');
+    if (!menu) return;
+
+    const close = () => {
+      menu.setAttribute('hidden', '');
+      toggle.setAttribute('aria-expanded', 'false');
+    };
+    const open = () => {
+      menu.removeAttribute('hidden');
+      toggle.setAttribute('aria-expanded', 'true');
+    };
+
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+      // Close other dropdowns first
+      document
+        .querySelectorAll('[data-lang-toggle][aria-expanded="true"]')
+        .forEach((other) => {
+          if (other !== toggle) {
+            other.setAttribute('aria-expanded', 'false');
+            other
+              .closest('.lang-dropdown')
+              ?.querySelector('[data-lang-menu]')
+              ?.setAttribute('hidden', '');
+          }
+        });
+      if (isOpen) close();
+      else open();
+    });
+
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+      if (!wrapper?.contains(e.target as Node)) close();
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') close();
+    });
+  });
+
+  // 2026-06-19 #1142: mobile nav close affordances — tap-outside + Escape.
+  // Reported by 白煮蛋 (Pixel 9 Pro XL, /terminology/): the drawer opened with no
+  // obvious way to dismiss it. The ☰↔✕ icon swap + aria-expanded is inline on the
+  // toggle (no-JS-safe); this adds the two standard escape hatches.
+  (() => {
+    const nav = document.querySelector('.nav-mobile');
+    const toggle = document.querySelector('.menu-toggle');
+    if (!nav || !toggle) return;
+    const closeNav = () => {
+      if (!nav.classList.contains('open')) return;
+      nav.classList.remove('open');
+      toggle.textContent = '☰';
+      toggle.setAttribute('aria-expanded', 'false');
+    };
+    document.addEventListener('click', (e) => {
+      if (!nav.classList.contains('open')) return;
+      const target = e.target as Node;
+      if (!nav.contains(target) && !toggle.contains(target)) closeNav();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeNav();
+    });
+  })();
+</script>

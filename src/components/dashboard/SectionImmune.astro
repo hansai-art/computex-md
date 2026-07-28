@@ -1,0 +1,65 @@
+---
+// SectionImmune — 🛡️ Immune System section (#immune): defense lines, citation
+// health, review queue. Ids/classes are a contract with
+// src/scripts/dashboard-client.js and src/styles/dashboard/ — do not rename.
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const isEn = lang === 'en';
+---
+
+<!-- Immune System -->
+<section class="section" id="immune">
+  <h2 class="section-title">
+    {t('dashboard.immune.title')}
+    <span class="section-timestamp" data-source="articles"></span>
+  </h2>
+  <p class="section-subtitle">{t('dashboard.immune.subtitle')}</p>
+
+  <div class="immune-overview" id="immune-overview"></div>
+
+  <h3 class="subsection-title">{t('dashboard.immune.defense.title')}</h3>
+  <div class="defense-lines">
+    <div class="defense-line">
+      <span class="defense-status active">🟢</span>
+      <strong>{t('dashboard.immune.defense.line1')}</strong>
+      <span class="defense-desc"
+        >{t('dashboard.immune.defense.line1.desc')}</span
+      >
+    </div>
+    <div class="defense-line">
+      <span class="defense-status active">🟢</span>
+      <strong>{t('dashboard.immune.defense.line2')}</strong>
+      <span class="defense-desc"
+        >{t('dashboard.immune.defense.line2.desc')}</span
+      >
+    </div>
+    <div class="defense-line">
+      <span class="defense-status manual">🟡</span>
+      <strong>{t('dashboard.immune.defense.line3')}</strong>
+      <span class="defense-desc"
+        >{t('dashboard.immune.defense.line3.desc')}</span
+      >
+    </div>
+    <div class="defense-line">
+      <span class="defense-status active">🟢</span>
+      <strong>{t('dashboard.immune.defense.line4')}</strong>
+      <span class="defense-desc"
+        >{t('dashboard.immune.defense.line4.desc')}</span
+      >
+    </div>
+  </div>
+
+  <h3 class="subsection-title">
+    {isEn ? '📋 Citation Health' : '📋 引用健康度'}
+  </h3>
+  <p class="queue-desc">
+    {isEn ? 'How verifiable is the knowledge?' : '知識的可驗證性'}
+  </p>
+  <div class="citation-health" id="citation-health"></div>
+
+  <h3 class="subsection-title">{t('dashboard.immune.queue.title')}</h3>
+  <p class="queue-desc">{t('dashboard.immune.queue.desc')}</p>
+  <div class="immune-queue" id="immune-queue"></div>
+</section>

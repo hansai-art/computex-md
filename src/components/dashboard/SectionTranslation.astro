@@ -1,0 +1,55 @@
+---
+// SectionTranslation — 🌐 Translation Coverage section (#translation): bars,
+// legend, matrix table. Ids/classes are a contract with
+// src/scripts/dashboard-client.js and src/styles/dashboard/ — do not rename.
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<!-- Translation Coverage -->
+<section class="section" id="translation">
+  <h2 class="section-title">
+    {t('dashboard.translation.title')}
+    <span class="section-timestamp" data-source="translations"></span>
+  </h2>
+  <p class="section-subtitle">{t('dashboard.translation.subtitle')}</p>
+  <div class="translation-bars" id="translation-bars"></div>
+
+  <!-- Legend: 圖說 (2026-05-09 added per observer feedback) -->
+  <div
+    class="translation-legend"
+    aria-label={t('dashboard.translation.legend.aria')}
+  >
+    <span class="legend-item">
+      <span class="legend-dot legend-dot-fresh">●</span>
+      <span class="legend-label">{t('dashboard.translation.legend.fresh')}</span
+      >
+    </span>
+    <span class="legend-item">
+      <span class="legend-dot legend-dot-stale">●</span>
+      <span class="legend-label">{t('dashboard.translation.legend.stale')}</span
+      >
+    </span>
+    <span class="legend-item">
+      <span class="legend-dot legend-dot-missing">●</span>
+      <span class="legend-label"
+        >{t('dashboard.translation.legend.missing')}</span
+      >
+    </span>
+    <span class="legend-item legend-item-divider">
+      <span class="legend-format">N/M</span>
+      <span class="legend-label"
+        >{t('dashboard.translation.legend.format')}</span
+      >
+    </span>
+  </div>
+
+  <div class="translation-matrix-wrapper">
+    <table class="translation-matrix" id="translation-matrix">
+      <thead id="translation-matrix-head"></thead>
+      <tbody id="translation-matrix-body"></tbody>
+    </table>
+  </div>
+</section>

@@ -1,0 +1,40 @@
+---
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const langSwitchHref = lang === 'zh-TW' ? '/en' : '/';
+---
+
+<!--
+  Phase 7.6 — LanguageStatement.astro (Tier 1 home component)
+  All scoped CSS inlined as Tailwind. Single-use section, no
+  repeating patterns. [&>h3] / [&>p] / [&>a] arbitrary child
+  variants handle the inner element styling so the structure
+  stays clean.
+-->
+<section
+  class="mx-auto mb-16 max-w-[800px] rounded-2xl border-l-4 border-[#d97706] bg-[linear-gradient(135deg,#fefce8,#fff7ed)] p-10 max-[768px]:mx-4"
+>
+  <div
+    class="[&>p>a]:text-[#2563eb] [&>p>a]:underline [&>p]:mb-3 [&>p]:text-base [&>p]:leading-[1.8] [&>p]:text-[#44403c]"
+  >
+    <h3
+      class="mb-4 font-['jf-lanyangming','Noto_Serif_TC','Source_Han_Serif_TC',serif] text-[1.3rem] font-light text-[#92400e]"
+    >
+      {t('home.lang.heading')}
+    </h3>
+    <p set:html={t('home.lang.p1')} />
+    <p>{t('home.lang.p2')}</p>
+    <p>
+      {t('home.lang.p3.prefix')}<a href={langSwitchHref}
+        >{t('home.lang.p3.linkText')}</a
+      >{t('home.lang.p3.suffix')}
+    </p>
+    <p
+      class="!mt-6 !border-t !border-[#e7e5e4] !pt-6 !text-[0.9rem] !leading-[1.7] !text-[#78716c]"
+    >
+      <em>{t('home.lang.en')}</em>
+    </p>
+  </div>
+</section>

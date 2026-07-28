@@ -1,0 +1,78 @@
+---
+/**
+ * TimelineDayNav — 共用左側日期跳轉欄（月 → 日 + 數量），sticky、桌機 only。
+ *
+ * 2026-06-10 從 changelog.template 的 date-nav + latest.template v2 抽出。
+ * 日期格式由呼叫端先做好（changelog 用 "06-10"、latest 用 "6/10"），本元件
+ * 只管結構與主題色。
+ *
+ * Consumer 腳本 hooks（兩頁的 filter sync / active 高亮都靠它們）：
+ * - `.timeline-nav-month` — 月 section（空月收合）
+ * - `.timeline-nav-link`  — 日連結（data-day / active class toggle）
+ * - `.timeline-nav-count` — 日數量（篩選後更新）
+ */
+interface NavDay {
+  key: string; // YYYY-MM-DD（data-day + 錨點）
+  label: string;
+  count: number;
+}
+interface NavMonth {
+  key: string; // YYYY-MM
+  label: string;
+  days: NavDay[];
+}
+interface Props {
+  months: NavMonth[];
+  /** 錨點前綴（latest-day- / day-），接 day.key */
+  anchorPrefix: string;
+  /** hover 主題色 */
+  accent?: 'emerald' | 'blue';
+  /** 沿用既有頁面腳本的 nav id（changelog: date-nav）*/
+  navId?: string;
+  /** sticky offset（兩頁 sticky 控制列高度不同）*/
+  top?: string;
+}
+
+const {
+  months,
+  anchorPrefix,
+  accent = 'emerald',
+  navId,
+  top = '132px',
+} = Astro.props;
+
+const hoverClass =
+  accent === 'emerald'
+    ? 'hover:bg-[#f0fdf4] hover:text-[#065f46]'
+    : 'hover:bg-[#f1f5f9] hover:text-[#1e293b]';
+---
+
+<nav
+  id={navId}
+  class="sticky max-h-[calc(100vh-10rem)] overflow-y-auto pr-2 max-lg:hidden"
+  style={`top:${top}; scrollbar-color: rgba(26,60,52,0.12) transparent; scrollbar-width: thin;`}
+>
+  {
+    months.map((month) => (
+      <div class="timeline-nav-month mb-5" data-month={month.key}>
+        <h3 class="mb-2 text-[0.7rem] font-bold uppercase tracking-wider text-[#94a3b8]">
+          {month.label}
+        </h3>
+        <div class="flex flex-col gap-0.5">
+          {month.days.map((day) => (
+            <a
+              href={`#${anchorPrefix}${day.key}`}
+              class={`timeline-nav-link flex items-center justify-between rounded-md px-2.5 py-1.5 text-[0.8rem] text-[#64748b] no-underline transition-colors ${hoverClass}`}
+              data-day={day.key}
+            >
+              <span>{day.label}</span>
+              <span class="timeline-nav-count text-[0.7rem] text-[#94a3b8]">
+                {day.count}
+              </span>
+            </a>
+          ))}
+        </div>
+      </div>
+    ))
+  }
+</nav>

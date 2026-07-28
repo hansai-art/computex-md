@@ -1,0 +1,60 @@
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .content-analysis-grid {
+    grid-template-columns: 1fr;
+  }
+  .spores-overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .spore-amp-row {
+    grid-template-columns: 90px 1fr 110px;
+  }
+  .dashboard {
+    padding: 1rem;
+  }
+  /* .hero-title / .hero-stats / .hero-stat-value orphan responsive
+       overrides removed in Phase 7.6 font hotfix — hero is inline
+       Tailwind now (max-md:text-[1.5rem] etc. on the h1 directly). */
+  .vitals-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .registry-controls {
+    flex-direction: column;
+  }
+  .registry-filters {
+    flex-wrap: wrap;
+  }
+  .organ-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .nextsteps-grid {
+    grid-template-columns: 1fr;
+  }
+  .defense-line {
+    flex-wrap: wrap;
+  }
+  .defense-desc {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .vitals-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+  }
+  .vital-value {
+    font-size: 1.8rem;
+  }
+  .organ-grid {
+    grid-template-columns: 1fr;
+  }
+  .donut-row {
+    gap: 1rem;
+  }
+  .donut-chart {
+    width: 80px;
+    height: 80px;
+  }
+}

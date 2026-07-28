@@ -1,0 +1,104 @@
+/* ── Activity Feed ── */
+.activity-feed {
+  position: relative;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  position: relative;
+  font-size: 0.85rem;
+}
+.activity-dot {
+  position: absolute;
+  left: -1.75rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  border: 2px solid #fafbfc;
+}
+.activity-emoji {
+  flex-shrink: 0;
+}
+.activity-title {
+  color: inherit;
+  text-decoration: none;
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.activity-title:hover {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+.activity-cat {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+}
+.activity-date {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  opacity: 0.4;
+  font-variant-numeric: tabular-nums;
+}
+/* ── Activity Feed (new style) ── */
+.feed-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+.feed-emoji {
+  flex-shrink: 0;
+}
+.feed-title {
+  flex: 1;
+  color: #1e293b;
+  text-decoration: none;
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.feed-title:hover {
+  color: #8b5cf6;
+  text-decoration: underline;
+}
+.feed-date {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.feed-badge {
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #334155;
+  color: #cbd5e1;
+  flex-shrink: 0;
+}
+.feed-badge-rewrite {
+  background: #7c3aed22;
+  color: #a78bfa;
+}
+.feed-badge-fix {
+  background: #f59e0b22;
+  color: #fbbf24;
+}
+.feed-badge-translate {
+  background: #06b6d422;
+  color: #22d3ee;
+}
+.feed-badge-feat {
+  background: #10b98122;
+  color: #34d399;
+}

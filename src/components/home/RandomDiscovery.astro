@@ -1,0 +1,205 @@
+---
+import { useTranslations, getLangFromUrl } from '../../i18n/utils';
+import { LANGUAGES, DEFAULT_LANGUAGE } from '../../config/languages';
+import { categoryList } from '../../utils/categoryConfig';
+
+interface Props {
+  articlesJson?: string;
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const { articlesJson } = Astro.props;
+const isEn = lang === 'en';
+
+// 2026-04-25 β7 Phase 1：fix B6（i18n-evolution-roadmap audit）
+// 從 LANGUAGES_REGISTRY 動態 derive 非預設語言 prefix，
+// 並包含 'zh-tw' lowercase（給散落 knowledge/zh-TW/ stray files 抓 stray 路徑）
+const langPrefixes = [
+  ...LANGUAGES.filter((l) => l.enabled && l.code !== DEFAULT_LANGUAGE.code).map(
+    (l) => l.code,
+  ),
+  'zh-tw',
+];
+
+// Routed article categories (SSOT, lowercase). The random pool must only
+// land on pages with a /[category]/[slug] route — this excludes resources/*
+// (data for the standalone /resources page) and categoryless strays like
+// /en/taiwan-semiconductor-industry that otherwise 404 when rolled.
+const routedCats = categoryList;
+---
+
+<!--
+  Phase 7.6 — RandomDiscovery.astro (Tier 1 home component)
+  Scoped <style> removed. `@keyframes dice-roll` moved to
+  global.css (alongside marquee-* and float*). The button's
+  shimmer ::before pseudo is expressed via `[&::before]:` and
+  `hover:[&::before]:left-full` arbitrary variants. The
+  `.random-text` / `.random-subtitle` classes kept as JS hooks
+  (the script uses `querySelector('.random-text')` to swap text).
+  Background noise pattern stays as inline style="" because
+  data URLs with commas/apostrophes don't round-trip cleanly
+  through Tailwind arbitrary values.
+-->
+<section
+  class="relative mx-auto my-16 max-w-[600px] overflow-hidden rounded-3xl border border-[rgba(245,158,11,0.2)] bg-[linear-gradient(135deg,#fffbeb_0%,#fef3c7_50%,#fed7aa_100%)] px-8 py-12 text-center max-[480px]:mx-4 max-[480px]:my-12 max-[480px]:px-4 max-[480px]:py-8"
+>
+  <div
+    class="pointer-events-none absolute inset-0 opacity-60"
+    style="background-image: url(&quot;data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f59e0b' fill-opacity='0.03' fill-rule='evenodd'%3E%3Cpath d='M15 0L20 10L30 15L20 20L15 30L10 20L0 15L10 10Z'/%3E%3C/g%3E%3C/svg%3E&quot;);"
+    aria-hidden="true"
+  >
+  </div>
+  <div class="relative z-[2]">
+    <button
+      id="random-discovery-btn"
+      data-ga-section="random_dice"
+      data-ga-label="roll"
+      class="relative mb-6 min-w-[280px] cursor-pointer overflow-hidden rounded-[20px] border-none bg-[image:var(--cta-amber)] px-12 py-6 font-['jf-jinxuanlatte','Noto_Sans_TC','Source_Han_Sans_TC',sans-serif] text-[1.3rem] font-bold text-white shadow-[0_8px_25px_rgba(245,158,11,0.3)] transition-all duration-300 hover:-translate-y-1 hover:bg-[linear-gradient(135deg,#d97706,#b45309)] hover:shadow-[0_12px_30px_rgba(245,158,11,0.4)] active:scale-95 [&::before]:content-[''] [&::before]:absolute [&::before]:left-[-100%] [&::before]:top-0 [&::before]:h-full [&::before]:w-full [&::before]:bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)] [&::before]:transition-[left] [&::before]:duration-500 hover:[&::before]:left-full max-[480px]:min-w-[250px] max-[480px]:px-8 max-[480px]:py-[1.2rem] max-[480px]:text-[1.1rem]"
+    >
+      <span
+        class="mr-2 inline-block text-[1.8rem] [animation:dice-roll_2s_ease-in-out_infinite]"
+        >🎲</span
+      >
+      <span
+        class="random-text mb-[0.3rem] block text-[1.3rem] leading-tight max-[480px]:text-[1.1rem]"
+        >{t('home.random.button')}</span
+      >
+      <span
+        class="random-subtitle block text-[0.9rem] font-medium leading-none opacity-90 max-[480px]:text-[0.85rem]"
+        >{t('home.random.subtitle')}</span
+      >
+    </button>
+    <p class="m-0 text-base font-semibold leading-[1.6] text-[#92400e]">
+      {t('home.random.description')}
+    </p>
+  </div>
+</section>
+
+<script
+  is:inline
+  define:vars={{ articlesJson, isEn, lang, langPrefixes, routedCats }}
+>
+  document.addEventListener('DOMContentLoaded', async function () {
+    const randomBtn = document.getElementById('random-discovery-btn');
+    let articles = [];
+
+    if (articlesJson) {
+      articles = JSON.parse(articlesJson);
+    } else {
+      // Fallback path — runs for ALL langs (home.template.astro renders
+      // <RandomDiscovery /> with no articlesJson prop). Fetch
+      // /api/articles.json and narrow to the current page's language.
+      // articles.json contains every language folder under knowledge/
+      // (including preview-mode fr/es whose routes are disabled), so the
+      // per-lang filter is required to prevent the random button from landing
+      // on /fr/… 404s or dropping the reader into the wrong locale. Issue #575.
+      var catLabels = {
+        history: '📜 歷史',
+        geography: '🗺️ 地理',
+        culture: '🎭 文化',
+        food: '🍜 美食',
+        art: '🎨 藝術',
+        music: '🎵 音樂',
+        technology: '💻 科技',
+        nature: '🌿 自然',
+        people: '👤 人物',
+        society: '⚖️ 社會',
+        economy: '📈 經濟',
+        lifestyle: '🏮 生活',
+      };
+      // langPrefixes is injected via define:vars from LANGUAGES_REGISTRY
+      // (2026-04-25 β7 fix: was hardcoded ['en','ja','ko','es','fr','zh-tw'])
+      try {
+        const res = await fetch('/api/articles.json');
+        if (res.ok) {
+          const raw = await res.json();
+          articles = raw
+            .filter(function (a) {
+              var cat = (a.category || '').toLowerCase();
+              if (lang === 'zh-TW') {
+                // zh-TW = default locale, URL has no language prefix.
+                // Exclude articles whose category IS a language code.
+                if (langPrefixes.indexOf(cat) !== -1) return false;
+              } else if (cat !== lang) {
+                // Non-default locale: category must equal current lang.
+                return false;
+              }
+              // Routed-category gate: the URL's category segment
+              // (second-to-last) must be a real routed category. Excludes
+              // resources/* + categoryless strays that 404. See verify note.
+              var s = a.url
+                .replace('https://computex-md.pages.dev', '')
+                .split('/');
+              var urlCat = s.length >= 2 ? s[s.length - 2].toLowerCase() : '';
+              return routedCats.indexOf(urlCat) !== -1;
+            })
+            .map(function (a) {
+              // Lowercase the CATEGORY segment (always second-to-last:
+              // `[/lang]/Category/slug`). Routes are emitted lowercase, so a
+              // PascalCase category 404s on case-sensitive prod (Cloudflare).
+              // The old code lowercased only the FIRST segment — which for
+              // non-default langs is the lang code, leaving `/en/Politics/...`
+              // 404ing (the reported "surprise me" bug). generate-api.js now
+              // emits canonical URLs; this stays as defense in depth for the
+              // CDN cache-transition window after deploy. See Issue #575.
+              var segs = a.url
+                .replace('https://computex-md.pages.dev', '')
+                .split('/');
+              if (segs.length >= 2) {
+                segs[segs.length - 2] = segs[segs.length - 2].toLowerCase();
+              }
+              return {
+                title: a.title,
+                url: segs.join('/'),
+                category: catLabels[a.category.toLowerCase()] || a.category,
+              };
+            });
+        }
+      } catch (e) {
+        articles = [];
+      }
+    }
+
+    if (randomBtn && articles.length > 0) {
+      let shuffled = [...articles];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      let currentIndex = 0;
+
+      randomBtn.addEventListener('click', function () {
+        if (currentIndex >= shuffled.length) {
+          currentIndex = 0;
+          for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+          }
+        }
+        const randomArticle = shuffled[currentIndex++];
+        const textEl = randomBtn.querySelector('.random-text');
+        const subtitleEl = randomBtn.querySelector('.random-subtitle');
+        const originalText = textEl.textContent;
+        randomBtn.style.pointerEvents = 'none';
+        let ticks = 0;
+        const totalTicks = 8;
+        const interval = setInterval(function () {
+          const temp = articles[Math.floor(Math.random() * articles.length)];
+          textEl.textContent = temp.title;
+          if (subtitleEl) subtitleEl.textContent = temp.category || '';
+          ticks++;
+          if (ticks >= totalTicks) {
+            clearInterval(interval);
+            textEl.textContent = randomArticle.title;
+            if (subtitleEl)
+              subtitleEl.textContent = randomArticle.category || '';
+            setTimeout(function () {
+              window.location.href = randomArticle.url;
+            }, 600);
+          }
+        }, 100);
+      });
+    }
+  });
+</script>

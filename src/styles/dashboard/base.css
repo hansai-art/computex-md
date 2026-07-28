@@ -1,0 +1,181 @@
+/* dashboard.css — /dashboard 全站 global 樣式
+   2026-06-13 refactor session 從 dashboard.template.astro <style is:global>
+   抽出（1,976 行）。is:global = 無 scoping，搬成 vite CSS import 語意等價；
+   import 順序在 Layout 樣式之後（template frontmatter import 晚於 Layout import），
+   cascade 順序與原 inline <style> 相同。內容 1:1 verbatim。 */
+
+/* ── Base ── */
+.dashboard {
+  /* 2026-07-24 widened from a hardcoded 1200px to the site's established
+     "data-heavy page" container token (data/companies/explore templates all
+     use this) so the dashboard stops wasting space on large screens. */
+  max-width: var(--container-wide);
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  color: #1e293b;
+  background: #fafbfc;
+}
+
+/* ── Section quick-nav (left sidebar) ── */
+.dashboard-body {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: start;
+}
+.dashboard-toc {
+  position: sticky;
+  top: 6rem;
+  max-height: calc(100vh - 8rem);
+  overflow-y: auto;
+  padding-bottom: 1rem;
+  scrollbar-width: thin;
+}
+.dashboard-toc-heading {
+  margin: 0 0 0.6rem 0.6rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  opacity: 0.45;
+}
+.dashboard-toc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dashboard-toc-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-left: 2px solid transparent;
+  border-radius: 8px;
+  color: inherit;
+  font-size: 0.8rem;
+  text-decoration: none;
+  white-space: nowrap;
+  opacity: 0.65;
+  transition:
+    background-color 0.15s,
+    opacity 0.15s,
+    border-color 0.15s;
+}
+.dashboard-toc-link:hover {
+  background: rgba(0, 0, 0, 0.04);
+  opacity: 1;
+}
+.dashboard-toc-link.active {
+  border-left-color: #006d77;
+  background: rgba(0, 109, 119, 0.06);
+  color: #006d77;
+  opacity: 1;
+}
+.dashboard-toc-emoji {
+  flex-shrink: 0;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-body {
+    /* minmax(0, 1fr), not bare 1fr — a bare 1fr track has an implicit
+       auto minimum equal to its content's intrinsic width, so the
+       non-wrapping toc chip row / feed rows below force the whole
+       track (and everything in it) past the viewport instead of
+       shrinking to let their own overflow-x:auto do the scrolling. */
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dashboard-toc {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    margin-bottom: 1.5rem;
+  }
+  .dashboard-toc-list {
+    flex-direction: row;
+    gap: 0.4rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  .dashboard-toc-link {
+    border-left: none;
+    border-bottom: 2px solid transparent;
+  }
+  .dashboard-toc-link.active {
+    border-left-color: transparent;
+    border-bottom-color: #006d77;
+  }
+}
+
+/* EKG animation kept scoped — the animation name can't be
+     referenced from a Tailwind arbitrary utility without moving
+     the @keyframes to global.css. Too small a win to justify. */
+.ekg-line {
+  stroke-dasharray: 800;
+  stroke-dashoffset: 800;
+  animation: ekgDraw 3s ease-in-out infinite;
+}
+@keyframes ekgDraw {
+  0% {
+    stroke-dashoffset: 800;
+    opacity: 0.3;
+  }
+  50% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: -800;
+    opacity: 0.3;
+  }
+}
+
+.section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+.section-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.section-timestamp {
+  font-size: 0.7rem;
+  font-weight: normal;
+  opacity: 0.45;
+  color: inherit;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.section-timestamp:empty {
+  display: none;
+}
+.section-timestamp[data-source='analytics'] {
+  /* 感知層（live fetched）稍微醒目 */
+  opacity: 0.6;
+}
+.section-subtitle {
+  opacity: 0.6;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+.subsection-title {
+  font-size: 1.1rem;
+  margin: 1.5rem 0 0.8rem;
+}
+
+/* ── Footer ── */
+.dashboard-footer {
+  text-align: center;
+  padding: 2rem 0 0;
+  font-size: 0.8rem;
+  opacity: 0.35;
+}

@@ -1,0 +1,182 @@
+---
+/**
+ * ArticleHero — Premium hero with cover photo, dark overlay gradient,
+ * breadcrumb, large title + subtitle, TTS button.
+ * Fully i18n-aware: breadcrumb labels and URLs adapt to lang.
+ */
+import TextToSpeech from './TextToSpeech.astro';
+
+import { useTranslations, useTranslatedPath } from '../i18n/utils';
+import type { Locale } from '../i18n/ui';
+
+interface Props {
+  title: string;
+  description?: string;
+  category: string;
+  categoryName: string;
+  categoryColor: string;
+  subcategory?: string;
+  status?: string;
+  coverImage?: string;
+  slug: string;
+  lang?: Locale;
+}
+
+const {
+  title,
+  description,
+  category,
+  categoryName,
+  categoryColor,
+  subcategory,
+  status,
+  coverImage,
+  lang = 'zh-TW',
+} = Astro.props;
+
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+const homeLabel = t('article.home');
+const homeUrl = translatePath('/');
+const categoryUrl = translatePath(`/${category}`);
+---
+
+<!--
+  Phase 4 leaf migration #9: ArticleHero.astro
+  ────────────────────────────────────────────
+  - Scoped <style> block removed entirely
+  - All classes → Tailwind atomic utilities
+  - The tricky bit: the TTS button needs dark-themed styling when
+    embedded in this hero (white text, translucent bg, backdrop-blur).
+    Previously done via `:global(.btn-ghost)` scoped styles. Now done
+    via arbitrary child selectors targeting the TTS button IDs:
+      [&_#tts-play]:... [&_#tts-stop]:...
+    These apply ONLY to elements inside .hero-tts-wrap, not to TTS
+    buttons anywhere else on the site.
+  - The --hero-bg CSS variable is still passed via inline style so
+    the cover image URL works per-article.
+-->
+<section
+  class="relative flex min-h-[52vh] items-end bg-[#1a3c34] bg-cover bg-[center_30%] [background-image:var(--hero-bg,none)]"
+  style={coverImage ? `--hero-bg: url('${coverImage}')` : ''}
+>
+  <!-- Dark gradient overlay -->
+  <div
+    class="absolute inset-0 bg-[image:var(--hero-overlay-dark)]"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div
+    class="relative z-10 mx-auto w-full max-w-[900px] px-8 pb-14 pt-20 max-[640px]:px-5 max-[640px]:pb-10 max-[640px]:pt-14"
+  >
+    <!-- Breadcrumb: home › category › [subcategory] › title -->
+    <nav
+      class="mb-7 flex flex-wrap items-center gap-[0.35rem]"
+      aria-label="Breadcrumb"
+    >
+      <a
+        href={homeUrl}
+        class="whitespace-nowrap font-['Inter','Satoshi',system-ui,sans-serif] text-[0.78rem] text-[rgba(248,241,233,0.65)] no-underline transition-colors duration-200 hover:text-[#f8f1e9]"
+        >{homeLabel}</a
+      >
+      <svg
+        class="flex-shrink-0 text-[rgba(248,241,233,0.3)]"
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        aria-hidden="true"
+      >
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+      <a
+        href={categoryUrl}
+        class="whitespace-nowrap font-['Inter','Satoshi',system-ui,sans-serif] text-[0.78rem] font-semibold no-underline transition-colors duration-200 hover:opacity-70"
+        style={`color:${categoryColor};`}>{categoryName}</a
+      >
+      {
+        subcategory && (
+          <>
+            <svg
+              class="flex-shrink-0 text-[rgba(248,241,233,0.3)]"
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              aria-hidden="true"
+            >
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+            <span class="whitespace-nowrap font-['Inter','Satoshi',system-ui,sans-serif] text-[0.78rem] text-[rgba(248,241,233,0.75)]">
+              {subcategory}
+            </span>
+          </>
+        )
+      }
+      <svg
+        class="flex-shrink-0 text-[rgba(248,241,233,0.3)]"
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        aria-hidden="true"
+      >
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+      <span
+        class="max-w-[24ch] overflow-hidden text-ellipsis whitespace-nowrap font-['Inter','Satoshi',system-ui,sans-serif] text-[0.78rem] text-[rgba(248,241,233,0.85)]"
+        aria-current="page">{title}</span
+      >
+    </nav>
+
+    {
+      status && (
+        <div
+          class="mb-4 inline-block rounded-full px-[0.85rem] py-[0.3rem] font-['Inter',system-ui,sans-serif] text-[0.7rem] font-semibold uppercase tracking-[0.18em] backdrop-blur-md"
+          style={`background:${categoryColor}25; color:${categoryColor};`}
+        >
+          {status}
+        </div>
+      )
+    }
+
+    <!-- Title — `.hero-title` class kept as hook: justfont's `h1` rule
+         in Layout.astro injects `font-family: jf-lanyanghei` (extraheavy)
+         site-wide. (Was rixingsong-semibold until 2026-05-04, when
+         justfont's CDN started serving a malformed woff for that face;
+         see Layout.astro for full context.) No inline font-family here
+         so the injection wins. -->
+    <h1
+      class="hero-title mb-4 max-w-[820px] text-[clamp(2rem,5vw,3.4rem)] font-bold leading-[1.2] tracking-[0.01em] text-[#f8f1e9] max-[640px]:text-[1.85rem]"
+    >
+      {title}
+    </h1>
+
+    {
+      description && (
+        <p class="mb-7 max-w-[680px] font-['Noto_Serif_TC',serif] text-[clamp(0.95rem,2.2vw,1.1rem)] leading-[1.75] text-[rgba(248,241,233,0.75)]">
+          {description}
+        </p>
+      )
+    }
+
+    <!--
+      TTS wrapper — arbitrary child variants style the embedded
+      TextToSpeech button specifically for the dark hero context.
+      This replaces the old `:global(.btn-ghost)` scoped style.
+    -->
+    <div
+      class="[&_#tts-play]:rounded-full [&_#tts-play]:border [&_#tts-play]:border-white/20 [&_#tts-play]:bg-white/10 [&_#tts-play]:px-[1.1rem] [&_#tts-play]:py-[0.45rem] [&_#tts-play]:font-['Inter',system-ui,sans-serif] [&_#tts-play]:text-[0.82rem] [&_#tts-play]:text-[rgba(248,241,233,0.8)] [&_#tts-play]:backdrop-blur-[4px] [&_#tts-play:hover]:bg-white/20 [&_#tts-play:hover]:text-[#f8f1e9] [&_#tts-stop]:rounded-full [&_#tts-stop]:border [&_#tts-stop]:border-white/20 [&_#tts-stop]:bg-white/10 [&_#tts-stop]:px-[1.1rem] [&_#tts-stop]:py-[0.45rem] [&_#tts-stop]:font-['Inter',system-ui,sans-serif] [&_#tts-stop]:text-[0.82rem] [&_#tts-stop]:text-[rgba(248,241,233,0.8)] [&_#tts-stop]:backdrop-blur-[4px] [&_#tts-stop:hover]:bg-white/20 [&_#tts-stop:hover]:text-[#f8f1e9]"
+    >
+      <TextToSpeech lang={lang as any} />
+    </div>
+  </div>
+</section>

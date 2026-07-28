@@ -1,0 +1,217 @@
+---
+/**
+ * zh-TW article slug page — thin wrapper.
+ *
+ * Per about/dashboard pattern, this page only handles getStaticPaths (per-lang
+ * fs scan to enumerate which articles exist) and delegates all rendering to
+ * src/templates/article.template.astro.
+ *
+ * 2026-05-03 sleepy-colden Tier 2.5 Phase B：unified template extraction，
+ * 中文 SSOT canonical 版本，其他 5 langs 對齊到這份 wrapper 結構。
+ *
+ * 2026-07-25 article-alias：本路由同時發兩種 path——
+ *   (a) 真實中文文章    `/culture/中元節/`            → ArticleTemplate
+ *   (b) 英文別名側門    `/culture/ghost-festival-zhongyuan/` → 0 秒轉址殼
+ * 別名清單的 SSOT 是 `config/article-aliases.json`（append-only registry，
+ * 產生器 scripts/core/generate-article-aliases.mjs）。為什麼別名要存在、為什麼
+ * 只增不改，完整理由寫在產生器頭部。
+ *
+ * 別名走同一個 route file 是 Astro 的結構限制也是正解：`[category]/[slug].astro`
+ * 這個 pattern 只能有一個檔案，另開會 route 衝突。同檔多發 path + 一個 prop
+ * 分流，比事後往 dist/ 塞 HTML 好——dev server 也走得通，check-url-contract
+ * 掃 build 產物時它們是一等公民。
+ *
+ * ⚠️ 別名永不對外公告：不進 sitemap（過濾在 astro.config.mjs 的 serialize()）、
+ * 不進 hreflang、不做站內連結、canonical 永遠指回中文網址。2026-07-17 那次
+ * 15% 404 率的根因就是站體公告了 13,014 條自己沒有的 URL。
+ */
+import { readdir, readFile } from 'fs/promises';
+import { resolve, join, basename } from 'path';
+import matter from 'gray-matter';
+import ArticleTemplate from '../../templates/article.template.astro';
+import {
+  buildGitInfoCache,
+  emptyGitInfo,
+  type GitInfo,
+} from '../../utils/contributors';
+
+// ── Git helpers (module-level cache) ─────────────────────────────────────────
+let _gitCache: Map<string, GitInfo> | null = null;
+function getGitInfo(filePath: string) {
+  if (!_gitCache) _gitCache = buildGitInfoCache('knowledge/');
+  return _gitCache.get(filePath) || emptyGitInfo();
+}
+
+// ── getStaticPaths ───────────────────────────────────────────────────────────
+// Astro 限制：getStaticPaths 在獨立 context 跑，不能 access module-level consts。
+// 所以 CATEGORY_MAPPING 必須 inline 進 getStaticPaths body。
+export async function getStaticPaths() {
+  const CATEGORY_MAPPING: Record<string, string> = {
+    about: 'About',
+    history: 'History',
+    geography: 'Geography',
+    culture: 'Culture',
+    food: 'Food',
+    art: 'Art',
+    music: 'Music',
+    technology: 'Technology',
+    nature: 'Nature',
+    people: 'People',
+    society: 'Society',
+    economy: 'Economy',
+    lifestyle: 'Lifestyle',
+    politics: 'Politics',
+  };
+
+  const safeMatter = (fileContent: string) => {
+    try {
+      return matter(fileContent);
+    } catch {
+      const stripped = fileContent.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
+      return { data: {}, content: stripped };
+    }
+  };
+
+  const paths: any[] = [];
+  for (const [categorySlug, folderName] of Object.entries(CATEGORY_MAPPING)) {
+    try {
+      const folderPath = resolve(process.cwd(), 'knowledge', folderName);
+      const files = await readdir(folderPath);
+      for (const file of files.filter(
+        (f) => f.endsWith('.md') && !f.startsWith('_'),
+      )) {
+        const filePath = join(folderPath, file).normalize('NFC');
+        const fileContent = await readFile(filePath, 'utf-8');
+        const { data: frontmatter, content } = safeMatter(fileContent);
+        const slug = basename(file, '.md');
+        let gitInfo = emptyGitInfo();
+        try {
+          gitInfo = getGitInfo(filePath);
+        } catch {}
+        paths.push({
+          params: { category: categorySlug, slug },
+          props: {
+            title: frontmatter.title || slug,
+            description: frontmatter.description || '',
+            content,
+            frontmatter,
+            lang: 'zh-TW',
+            contributors: gitInfo.contributors,
+            lastModified: gitInfo.lastModified,
+          },
+        });
+      }
+    } catch (err) {
+      console.error(
+        `[zh getStaticPaths] Error processing category "${categorySlug}":`,
+        (err as Error).message,
+      );
+    }
+  }
+  if (paths.length === 0) {
+    throw new Error(
+      '[zh getStaticPaths] Generated 0 paths — all categories failed.',
+    );
+  }
+
+  // ── 英文別名側門 ───────────────────────────────────────────────────────────
+  // registry key = "<category-slug>/<alias-slug>"，value = "<Category>/<中文檔名>"。
+  // 只發「目標中文文章這次真的掃到了」的別名：文章被 quarantine 或改名時，
+  // 別名頁跟著消失，不會留一扇通往 404 的門（check-url-contract 會抓）。
+  const realPathKeys = new Set(
+    paths.map((p) => `${p.params.category}/${p.params.slug}`),
+  );
+  const zhArticleKeys = new Set(
+    paths.map((p) => {
+      const folder = CATEGORY_MAPPING[p.params.category];
+      return `${folder}/${p.params.slug}`;
+    }),
+  );
+
+  let aliases: Record<string, string> = {};
+  try {
+    aliases = JSON.parse(
+      await readFile(
+        resolve(process.cwd(), 'config/article-aliases.json'),
+        'utf-8',
+      ),
+    );
+  } catch (err) {
+    // registry 不存在不該炸 build（新 clone / fork 還沒跑產生器），但要出聲。
+    console.warn(
+      '[zh getStaticPaths] article-aliases.json 讀不到，本次不發別名：',
+      (err as Error).message,
+    );
+  }
+
+  let aliasCount = 0;
+  for (const [aliasKey, target] of Object.entries(aliases)) {
+    const slashAt = aliasKey.indexOf('/');
+    if (slashAt < 0) continue;
+    const categorySlug = aliasKey.slice(0, slashAt);
+    const aliasSlug = aliasKey.slice(slashAt + 1);
+    if (!(categorySlug in CATEGORY_MAPPING)) continue;
+    if (!zhArticleKeys.has(target)) continue; // 目標文章這次不存在 → 不開門
+    if (realPathKeys.has(aliasKey)) continue; // 別名撞真實文章 → 真實的贏
+
+    const targetSlug = target.slice(target.indexOf('/') + 1);
+    const targetFolder = target.slice(0, target.indexOf('/'));
+    const targetCategorySlug = Object.keys(CATEGORY_MAPPING).find(
+      (k) => CATEGORY_MAPPING[k] === targetFolder,
+    );
+    if (!targetCategorySlug) continue;
+
+    realPathKeys.add(aliasKey);
+    aliasCount++;
+    paths.push({
+      params: { category: categorySlug, slug: aliasSlug },
+      props: { aliasTo: `/${targetCategorySlug}/${targetSlug}/` },
+    });
+  }
+  console.log(
+    `[zh getStaticPaths] ${paths.length - aliasCount} 篇文章 + ${aliasCount} 條英文別名`,
+  );
+
+  return paths;
+}
+
+const props = Astro.props as Record<string, any>;
+const { category, slug } = Astro.params;
+
+// 別名頁：0 秒轉址殼。刻意不用 Astro 內建的 `redirects` 設定——它產出的是
+// `content="2;url=..."`，白畫面停兩秒。一個我們主動請人拿去分享的網址，
+// 不該讓人先看兩秒的「Redirecting to」。
+const aliasTo: string | undefined = props.aliasTo;
+// SEO.astro 的 canonical 對 CJK slug 也是 encodeURI + trailing slash，這裡跟它
+// 對齊；兩邊算出不同形式的話，Google 眼中就是兩個 URL。
+const aliasTarget = aliasTo ? encodeURI(aliasTo) : '';
+---
+
+{
+  aliasTo ? (
+    <html lang="zh-Hant-TW">
+      <head>
+        <meta charset="utf-8" />
+        <title>{`Redirecting to: ${aliasTo}`}</title>
+        <meta http-equiv="refresh" content={`0;url=${aliasTarget}`} />
+        <meta name="robots" content="noindex, follow" />
+        <link
+          rel="canonical"
+          href={`https://computex-md.pages.dev${aliasTarget}`}
+        />
+        <script
+          is:inline
+          set:html={`location.replace(${JSON.stringify(aliasTarget)})`}
+        />
+      </head>
+      <body>
+        <a href={aliasTarget}>
+          Redirecting from <code>{`/${category}/${slug}/`}</code> to{' '}
+          <code>{aliasTo}</code>
+        </a>
+      </body>
+    </html>
+  ) : (
+    <ArticleTemplate {...props} category={category!} slug={slug!} />
+  )
+}

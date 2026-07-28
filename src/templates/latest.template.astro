@@ -1,0 +1,426 @@
+---
+/**
+ * /latest — the 時序主軸 destination (issue: 渤浚 reader feedback 2026-06-09).
+ *
+ * The site is architected around curation + topic (homepage halls, explore
+ * featured, category subcats, article related) — all deliberately recency-blind.
+ * That serves the "come discover Taiwan" reader but leaves the "what did the AI
+ * just write" reader with no home. /latest is that home: article-level, newest
+ * first by git ship time, with a category filter.
+ *
+ * v2 (2026-06-10): 大幅度進化 — 改成 changelog 式「左側時間軸」。每天一個
+ * timeline node（左欄：日期 dot + 連接線 + 日標題），ArticleCard density="detailed"
+ * 卡片掛在右欄；日期從卡片角落抽出統一到左軸。外層再加 changelog 式 sticky
+ * date-nav 跳轉欄（月 → 日 + 篇數 + IntersectionObserver active 追蹤）。
+ *
+ * v2.1 (同日): 時間軸骨架抽成共用元件 components/timeline/（TimelineDay +
+ * TimelineDayNav），/changelog 同步改用同一具骨架。卡片縮圖 frontmatter image
+ * 前 20 張 eager、其餘 native lazy（避免 240 張一次抓爆流量）。
+ *
+ * Server-rendered (static, single honest lastmod, indexable on purpose — this is
+ * the one canonical "latest" surface we WANT Google to crawl). The per-article
+ * rail (article.template) is client-side instead, to avoid 782×6 crawl churn.
+ *
+ * UI strings: src/i18n/latest.ts (latestUI, spread into ui.ts). Date formatting
+ * stays inline (locale logic, same pattern as changelog.template).
+ * Design: reports/latest-articles-discoverability-design-2026-06-09.md §WS2.
+ */
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import TimelineDay from '../components/timeline/TimelineDay.astro';
+import TimelineDayNav from '../components/timeline/TimelineDayNav.astro';
+import { getLatestArticles } from '../utils/articles-index';
+import { getCategoryConfigs } from '../utils/categoryConfig';
+import { useTranslations, getLangFromUrl } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const isZh = lang === 'zh-TW';
+const langPrefix = isZh ? '' : `/${lang}`;
+const cats = getCategoryConfigs(t) as Record<string, any>;
+
+const articles = await getLatestArticles(lang, 240);
+
+// Group by day (YYYY-MM-DD) — the timeline node unit. articles already
+// sorted newest-first, so days[] comes out newest-first too.
+const days: string[] = [];
+const dayMap = new Map<string, typeof articles>();
+for (const a of articles) {
+  const d = a.date.slice(0, 10);
+  if (!dayMap.has(d)) {
+    dayMap.set(d, []);
+    days.push(d);
+  }
+  dayMap.get(d)!.push(a);
+}
+
+// Group days by month — left date-nav rail (changelog pattern).
+const navMonths: string[] = [];
+const navMonthDays = new Map<string, string[]>();
+for (const d of days) {
+  const m = d.slice(0, 7);
+  if (!navMonthDays.has(m)) {
+    navMonthDays.set(m, []);
+    navMonths.push(m);
+  }
+  navMonthDays.get(m)!.push(d);
+}
+
+// 縮圖載入策略：全域時序前 20 張 eager（首屏），其餘 native lazy。
+const EAGER_THUMBS = 20;
+const orderIdx = new Map(
+  articles.map((a, i) => [`${a.category}/${a.slug}`, i]),
+);
+
+const CAT_ORDER = [
+  'history',
+  'geography',
+  'culture',
+  'food',
+  'art',
+  'music',
+  'technology',
+  'nature',
+  'people',
+  'society',
+  'economy',
+  'lifestyle',
+  'politics',
+];
+const presentCats = CAT_ORDER.filter((c) =>
+  articles.some((a) => a.category === c),
+);
+
+const localeFor = (l: string) =>
+  l === 'en' ? 'en-US' : l === 'zh-TW' ? 'zh-TW' : l;
+
+function hrefFor(a: { category: string; slug: string }) {
+  return `${langPrefix}/${a.category}/${encodeURIComponent(a.slug)}`;
+}
+// Compact MM/DD for the left date-nav rail.
+function fmtDayShort(d: string) {
+  const dt = new Date(d);
+  if (isZh) return `${dt.getMonth() + 1}/${dt.getDate()}`;
+  return dt.toLocaleDateString(localeFor(lang), {
+    month: 'short',
+    day: 'numeric',
+  });
+}
+// Full day header w/ weekday (timeline node title), changelog formatDate-style.
+function fmtDayFull(d: string) {
+  const dt = new Date(d);
+  const wd = dt.toLocaleDateString(localeFor(lang), { weekday: 'short' });
+  if (isZh) return `${dt.getMonth() + 1} 月 ${dt.getDate()} 日 ${wd}`;
+  return dt.toLocaleDateString(localeFor(lang), {
+    month: 'long',
+    day: 'numeric',
+    weekday: 'short',
+  });
+}
+function fmtMonth(m: string) {
+  const [y, mo] = m.split('-');
+  const n = parseInt(mo, 10);
+  if (isZh) return `${y} 年 ${n} 月`;
+  if (lang === 'ja') return `${y}年${n}月`;
+  if (lang === 'ko') return `${y}년 ${n}월`;
+  const names = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  return `${names[n - 1]} ${y}`;
+}
+
+// 左欄跳轉資料（共用 TimelineDayNav 的 shape）
+const navMonthsData = navMonths.map((m) => ({
+  key: m,
+  label: fmtMonth(m),
+  days: navMonthDays.get(m)!.map((d) => ({
+    key: d,
+    label: fmtDayShort(d),
+    count: dayMap.get(d)!.length,
+  })),
+}));
+---
+
+<Layout
+  lang={lang}
+  title={t('latest.meta.title')}
+  description={t('latest.meta.description')}
+  readerSettings
+>
+  <div class="latest-page">
+    <PageHero
+      bgVariant="solid"
+      bgColor="#1a3c34"
+      bgTone="dark"
+      titleVariant="inherit"
+      containerWidth="wide"
+      eyebrow={t('latest.eyebrow')}
+      title={t('latest.title')}
+      subtitle={t('latest.subtitle')}
+      accentColor="rgba(255,255,255,0.7)"
+    />
+
+    <div
+      class="mx-auto max-w-[var(--container-wide)] px-6 pb-24 max-[768px]:px-4"
+    >
+      {/* Category filter chips */}
+      <div
+        id="latest-filters"
+        class="sticky top-[64px] z-20 -mx-4 mb-6 flex flex-wrap gap-2 border-b border-[#e2e8f0] bg-white/95 px-4 py-3 backdrop-blur-sm max-[768px]:top-[56px] max-[768px]:flex-nowrap max-[768px]:overflow-x-auto"
+      >
+        <button
+          class="latest-chip whitespace-nowrap rounded-full border border-[#10b981] bg-[#10b981] px-3 py-1.5 text-xs font-semibold text-white transition-all"
+          data-cat="all"
+        >
+          {t('latest.filterAll')}<span class="ml-1 opacity-70"
+            >{articles.length}</span
+          >
+        </button>
+        {
+          presentCats.map((c) => {
+            const cfg = cats[c] || {};
+            const count = articles.filter((a) => a.category === c).length;
+            return (
+              <button
+                class="latest-chip whitespace-nowrap rounded-full border border-[#e2e8f0] bg-white px-3 py-1.5 text-xs font-semibold text-[#64748b] transition-all hover:border-[#94a3b8] hover:bg-[#f8fafc]"
+                data-cat={c}
+              >
+                {cfg.icon} {cfg.name}
+                <span class="ml-1 opacity-60">{count}</span>
+              </button>
+            );
+          })
+        }
+      </div>
+
+      {
+        articles.length === 0 && (
+          <p class="py-16 text-center text-[#94a3b8]">{t('latest.empty')}</p>
+        )
+      }
+
+      {
+        /* Two-column: left date-nav rail + right day-grouped timeline (共用 timeline 元件) */
+      }
+      <div
+        class="grid grid-cols-[170px_1fr] gap-8 max-lg:grid-cols-1 max-lg:gap-0"
+      >
+        <TimelineDayNav
+          months={navMonthsData}
+          anchorPrefix="latest-day-"
+          accent="emerald"
+          top="132px"
+        />
+
+        <div id="latest-timeline" data-today-label={t('latest.today')}>
+          {
+            days.map((day, dayIdx) => (
+              <Fragment>
+                {dayIdx > 0 &&
+                  day.slice(0, 7) !== days[dayIdx - 1].slice(0, 7) && (
+                    <div
+                      class="timeline-month-marker mb-5 mt-1 flex items-center gap-3 pl-[42px] max-[768px]:pl-[30px]"
+                      data-month={day.slice(0, 7)}
+                    >
+                      <span class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-[#94a3b8]">
+                        {fmtMonth(day.slice(0, 7))}
+                      </span>
+                      <span class="h-px flex-1 bg-[#e2e8f0]" />
+                    </div>
+                  )}
+                <TimelineDay
+                  id={`latest-day-${day}`}
+                  title={fmtDayFull(day)}
+                  badge={`${dayMap.get(day)!.length} ${t('latest.dayCount')}`}
+                  isLast={dayIdx === days.length - 1}
+                  accent="emerald"
+                  titleStyle="serif"
+                  dataAttrs={{ 'data-day': day }}
+                >
+                  {dayMap.get(day)!.map((a) => {
+                    const cfg = cats[a.category] || {};
+                    return (
+                      <ArticleCard
+                        density="detailed"
+                        href={hrefFor(a)}
+                        title={a.title}
+                        description={a.description}
+                        categoryLabel={cfg.name}
+                        categoryIcon={cfg.icon}
+                        categoryColor={cfg.color || '#64748b'}
+                        coverImage={a.image || undefined}
+                        imageLoading={
+                          (orderIdx.get(`${a.category}/${a.slug}`) ?? 999) <
+                          EAGER_THUMBS
+                            ? 'eager'
+                            : 'lazy'
+                        }
+                        readingTime={
+                          a.readingTime
+                            ? `${a.readingTime} ${t('latest.minRead')}`
+                            : undefined
+                        }
+                        footnotes={a.footnotes}
+                        tags={a.tags}
+                        openIn="same-tab"
+                        extraClass="latest-row [content-visibility:auto] [contain-intrinsic-size:auto_140px]"
+                        dataAttrs={{
+                          'data-cat': a.category,
+                          'data-ga-section': 'latest_page',
+                        }}
+                      />
+                    );
+                  })}
+                </TimelineDay>
+              </Fragment>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="mt-10 border-t border-[#f1f5f9] pt-6 text-center">
+        <a
+          href={`${langPrefix}/changelog`}
+          data-ga-section="latest_page"
+          data-ga-label="to_changelog"
+          class="text-[0.9rem] font-semibold text-[#10b981] no-underline hover:underline"
+        >
+          {t('latest.changelogCta')}
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script is:inline>
+  (function () {
+    var chips = document.querySelectorAll('.latest-chip');
+    var rows = document.querySelectorAll('.latest-row');
+    var dayGroups = document.querySelectorAll('.timeline-day');
+    var navLinks = document.querySelectorAll('.timeline-nav-link');
+    var navMonthEls = document.querySelectorAll('.timeline-nav-month');
+
+    // ── Category filter: toggle cards, then collapse empty day-groups +
+    //    sync the left date-nav rail (visibility + per-day counts). ──
+    function apply(cat) {
+      rows.forEach(function (r) {
+        r.style.display =
+          cat === 'all' || r.getAttribute('data-cat') === cat ? '' : 'none';
+      });
+      dayGroups.forEach(function (g) {
+        var visible = g.querySelectorAll(
+          '.latest-row:not([style*="display: none"])',
+        ).length;
+        g.style.display = visible ? '' : 'none';
+        var day = g.getAttribute('data-day');
+        var link = document.querySelector(
+          '.timeline-nav-link[data-day="' + day + '"]',
+        );
+        if (link) {
+          link.style.display = visible ? '' : 'none';
+          var count = link.querySelector('.timeline-nav-count');
+          if (count && visible) count.textContent = String(visible);
+        }
+      });
+      navMonthEls.forEach(function (m) {
+        var visibleLinks = m.querySelectorAll(
+          '.timeline-nav-link:not([style*="display: none"])',
+        ).length;
+        m.style.display = visibleLinks ? '' : 'none';
+      });
+      document
+        .querySelectorAll('.timeline-month-marker')
+        .forEach(function (mk) {
+          var month = mk.getAttribute('data-month');
+          var anyDay = document.querySelectorAll(
+            '.timeline-day[data-day^="' +
+              month +
+              '"]:not([style*="display: none"])',
+          ).length;
+          mk.style.display = anyDay ? '' : 'none';
+        });
+    }
+
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        chips.forEach(function (c) {
+          var active = c === chip;
+          c.classList.toggle('border-[#10b981]', active);
+          c.classList.toggle('bg-[#10b981]', active);
+          c.classList.toggle('text-white', active);
+          c.classList.toggle('border-[#e2e8f0]', !active);
+          c.classList.toggle('bg-white', !active);
+          c.classList.toggle('text-[#64748b]', !active);
+        });
+        apply(chip.getAttribute('data-cat'));
+      });
+    });
+
+    // ── 「今天」徽章：靜態頁的 build 時間不可信（cron 一天只 rebuild 兩次），
+    //    client 端比對本地日期，命中才掛章。──
+    var tl = document.getElementById('latest-timeline');
+    var todayLabel = tl ? tl.getAttribute('data-today-label') : '';
+    if (todayLabel) {
+      var now = new Date();
+      var todayKey =
+        now.getFullYear() +
+        '-' +
+        String(now.getMonth() + 1).padStart(2, '0') +
+        '-' +
+        String(now.getDate()).padStart(2, '0');
+      var todayH2 = document.querySelector(
+        '.timeline-day[data-day="' + todayKey + '"] h2',
+      );
+      if (todayH2) {
+        var chip = document.createElement('span');
+        chip.textContent = todayLabel;
+        chip.style.cssText =
+          'display:inline-block;margin-right:8px;background:#10b981;color:#fff;' +
+          'font-size:0.65rem;font-weight:700;letter-spacing:0.06em;' +
+          'padding:0.12rem 0.5rem;border-radius:9999px;vertical-align:0.18em;';
+        todayH2.insertBefore(chip, todayH2.firstChild);
+      }
+    }
+
+    // ── Active-day tracking: highlight the date-nav link for the day group
+    //    currently in view (changelog IntersectionObserver pattern). ──
+    if (
+      dayGroups.length &&
+      navLinks.length &&
+      'IntersectionObserver' in window
+    ) {
+      var observer = new IntersectionObserver(
+        function (entries) {
+          for (var i = 0; i < entries.length; i++) {
+            if (entries[i].isIntersecting) {
+              var day = entries[i].target.getAttribute('data-day');
+              navLinks.forEach(function (link) {
+                var active = link.getAttribute('data-day') === day;
+                link.classList.toggle('bg-[#f0fdf4]', active);
+                link.classList.toggle('text-[#065f46]', active);
+                link.classList.toggle('font-bold', active);
+              });
+              break;
+            }
+          }
+        },
+        { rootMargin: '-120px 0px -70% 0px', threshold: 0 },
+      );
+      dayGroups.forEach(function (g) {
+        observer.observe(g);
+      });
+    }
+  })();
+</script>

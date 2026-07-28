@@ -1,0 +1,1650 @@
+---
+/**
+ * article.template.astro — 統一 article page template (6 langs 共用)
+ *
+ * 為什麼: 之前 6 個 [slug].astro × 1100~1300 行 = ~7400 行高度重複；發現過 PR #758
+ * ship es/fr 帶 JA copy-paste bug (related articles 顯示日文 / es/fr getStaticPaths
+ * 用 zhToJa 過濾)。Template unification 一次性消除這類 class of bug。
+ *
+ * 對照 about/dashboard pattern：
+ *   src/pages/about.astro                → 5 行 <AboutTemplate />
+ *   src/templates/about.template.astro   → 全部 UI 邏輯
+ *
+ * 中文 zh-TW 是 SSOT canonical，本 template 從 src/pages/[category]/[slug].astro
+ * 複製過來，再 parameterize on lang prop。其他 5 langs 的差異全變 prop / data。
+ *
+ * 2026-05-03 sleepy-colden Tier 2.5 unified template extraction (Phase B)。
+ */
+import Layout from '../layouts/Layout.astro';
+import { renderArticleHtml } from '../utils/article-render';
+import ArticleHero from '../components/ArticleHero.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import ArticleSidebar from '../components/ArticleSidebar.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import Perspectives from '../components/Perspectives.astro';
+import SporeFootprint from '../components/SporeFootprint.astro';
+import DiaryTeaser from '../components/DiaryTeaser.astro';
+import NewsroomTrail from '../components/NewsroomTrail.astro';
+import RelatedDiaries from '../components/RelatedDiaries.astro';
+import { useTranslations } from '../i18n/utils';
+import {
+  categoryList as categories,
+  getCategoryConfigs,
+  type CategoryKey,
+} from '../utils/categoryConfig';
+import {
+  buildGitInfoCache,
+  emptyGitInfo,
+  type GitInfo,
+} from '../utils/contributors';
+import { getRelatedArticles, getAllArticles } from '../utils/articles-index';
+import { resolve, join } from 'path';
+import type { Lang } from '../config/languages';
+import contentDatesData from '../data/content-dates.json';
+
+interface Props {
+  title: string;
+  description: string;
+  content: string;
+  frontmatter: Record<string, any>;
+  lang: Lang;
+  contributors?: any[];
+  lastModified?: string;
+  category: string;
+  slug: string;
+}
+
+const {
+  title,
+  description,
+  content,
+  frontmatter,
+  lang,
+  contributors: propsContributors = [],
+  lastModified: propsLastModified = '',
+  category,
+  slug,
+} = Astro.props;
+
+// ── SEO freshness dates (reports/seo-optimization-plan-2026-06-07.md §1.1) ──
+// dateModified comes from content-dates.json (git last-meaningful-commit,
+// cosmetic-filtered) so EVOLVE'd articles signal real freshness instead of a
+// build-time "now". frontmatter.modified (set by EVOLVE) is the explicit
+// override; falls back to git date → publish date. Same source as the sitemap
+// <lastmod> so visible/structured dates stay consistent (a Google requirement).
+const _seoUrlPath =
+  lang === 'zh-TW' ? `/${category}/${slug}/` : `/${lang}/${category}/${slug}/`;
+const _toISO = (v: unknown): string | undefined =>
+  v instanceof Date ? v.toISOString() : typeof v === 'string' ? v : undefined;
+const seoDatePublished = _toISO(frontmatter.date);
+const seoDateModified =
+  _toISO(frontmatter.modified) ||
+  ((contentDatesData as { dates?: Record<string, string> }).dates || {})[
+    _seoUrlPath
+  ] ||
+  seoDatePublished;
+
+// ── Lang-derived helpers ─────────────────────────────────────────────────────
+// langPath: '' for zh-TW (SSOT root), else '{lang}/' for non-default langs.
+// Used for: knowledge folder path, github edit URL, computex.md article URL.
+const langPath = lang === 'zh-TW' ? '' : `${lang}/`;
+const langUrlPrefix = lang === 'zh-TW' ? '' : `/${lang}`;
+
+// Per-lang prose font (wired into <style define:vars> below as --prose-font).
+// zh-TW uses jf-jinxuanlatte (justfont 金萱拿鐵) to match site body cascade
+// — restored 2026-05-04 after Tailwind migration silently flipped it to
+// Noto Serif TC. en/es/fr use Inter; ja/ko use Noto Serif JP/KR.
+const proseFontMap: Record<string, string> = {
+  'zh-TW': "'jf-jinxuanlatte','Noto Sans TC','Source Han Sans TC',sans-serif",
+  en: "'Inter',system-ui,sans-serif",
+  ja: "'Noto Serif JP',serif",
+  ko: "'Noto Serif KR',serif",
+  es: "'Inter',system-ui,sans-serif",
+  fr: "'Inter',system-ui,sans-serif",
+};
+const proseFont = proseFontMap[lang] ?? proseFontMap['zh-TW'];
+
+// ── Category → folder mapping ─────────────────────────────────────────────────
+const categoryMapping: Record<string, string> = {
+  about: 'About',
+  history: 'History',
+  geography: 'Geography',
+  culture: 'Culture',
+  food: 'Food',
+  art: 'Art',
+  music: 'Music',
+  technology: 'Technology',
+  nature: 'Nature',
+  people: 'People',
+  society: 'Society',
+  economy: 'Economy',
+  lifestyle: 'Lifestyle',
+  // 2026-06-13 補：先前漏 politics → ~67 篇 politics 頁 render-time git 查找
+  // 靜默跳過、走 props fallback（輸出相同，但路徑不一致）。wrapper 的
+  // CATEGORY_MAPPING 一直有 politics，兩張表應同步。
+  politics: 'Politics',
+};
+
+// ── Git info ─────────────────────────────────────────────────────────────────
+// buildGitInfoCache 在 utils/contributors.ts 內按 knowledgePath memoize：
+// 整個 build 每語言只跑一次 git log。cache 不能放這裡 — frontmatter 是
+// per-render scope，放這裡 = 每頁重跑 git log 子程序（2026-06-13 修掉的 bug）。
+function getGitInfoForLang(lang: Lang, filePath: string): GitInfo {
+  const knowledgeBase = lang === 'zh-TW' ? 'knowledge/' : `knowledge/${lang}/`;
+  return buildGitInfoCache(knowledgeBase).get(filePath) || emptyGitInfo();
+}
+
+// Compute git info at render time (not from props) so it's always fresh
+const _renderFilePath = (() => {
+  const folderName = categoryMapping[category as string];
+  if (!folderName) return '';
+  const knowledgeRoot =
+    lang === 'zh-TW'
+      ? resolve(process.cwd(), 'knowledge', folderName)
+      : resolve(process.cwd(), 'knowledge', lang, folderName);
+  return join(knowledgeRoot, slug + '.md').normalize('NFC');
+})();
+const _renderGitInfo = _renderFilePath
+  ? getGitInfoForLang(lang, _renderFilePath)
+  : { contributors: [], lastModified: '', commitHash: '', revisionCount: 0 };
+const contributors = _renderGitInfo.contributors.length
+  ? _renderGitInfo.contributors
+  : propsContributors;
+const lastModified = _renderGitInfo.lastModified || propsLastModified;
+const commitHash = _renderGitInfo.commitHash;
+const revisionCount = _renderGitInfo.revisionCount;
+
+const t = useTranslations(lang);
+const categoryConfigs = getCategoryConfigs(t);
+const categoryInfo = categoryConfigs[category as CategoryKey];
+if (!categoryInfo) throw new Error(`Unknown category: ${category}`);
+
+// ── Related articles (semantic neighbours) ───────────────────────────────────
+// 2026-06-14 RAG Phase 1：getRelatedArticles 改讀 bge-m3 語意鄰居（跨 category、
+// 依意思而非同類）— src/data/related/{lang}.json 離線預算、烘進 HTML、零瀏覽器
+// 模型；語意索引缺檔時自動 fallback 回同 category。Tier 1.4 shared cache 不變。
+// 預抓 8 篇當備用（資料層 TOP_K=8）；前端響應式呈現 4/3/3（桌機/平板/手機）。
+let relatedArticles: any[] = [];
+try {
+  relatedArticles = await getRelatedArticles(
+    lang,
+    category as string,
+    slug as string,
+    8,
+  );
+} catch {}
+
+// ── Random explore ───────────────────────────────────────────────────────────
+// 2026-06-10 build audit §5.1: 原本把整語言文章清單 define:vars 內嵌進每一頁
+// （~50KB × 4,895 頁 ≈ dist +250MB）。改為按鈕 click 時 lazy fetch per-lang
+// 共用 pool（build-latest.mjs 產 /api/random-index-{lang}.json），frontmatter
+// 只留「有沒有得跳」的布林。pool href 自帶 lang prefix（順手修譯文頁隨機
+// 跳轉漏 /en 前綴的 latent bug）。
+let hasRandomPool = false;
+try {
+  hasRandomPool = (await getAllArticles(lang, category as string)).length > 0;
+} catch {}
+const randomIndexUrl = `/api/random-index-${lang}.json`;
+
+// ── Other categories (for "Explore more") ────────────────────────────────────
+const otherCategories = categories
+  .filter((cat) => cat !== category)
+  .slice(0, 3)
+  .map((cat) => ({ key: cat, ...categoryConfigs[cat as CategoryKey] }));
+
+// Localized category meta (name/color/icon) for the client-side 站上最新 rail —
+// fills the cloned ArticleCard (premium) slots (badge / cover icon / colours)
+// per latest item, without a per-item server render (keeps freshness).
+const latestCatMeta = Object.fromEntries(
+  categories.map((c) => {
+    const cfg = categoryConfigs[c as CategoryKey];
+    return [
+      c,
+      {
+        name: cfg?.name ?? c,
+        color: cfg?.color ?? '#475569',
+        icon: cfg?.icon ?? '📄',
+      },
+    ];
+  }),
+);
+
+// ── 首圖來源字串 ─────────────────────────────────────────────────────────────
+// 同一份來源資訊有兩個出口：樣板自己那張首圖的 <figcaption>（下方 JSX），以及
+// 正文自己放了同一張圖時掛到它底下的那行（renderArticleHtml 內處理）。後者要的是
+// HTML 字串，所以在這裡組一次，i18n 與 escape 都留在樣板層。
+const _esc = (v: unknown) =>
+  String(v)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+const heroCreditHtml = [
+  frontmatter.imageCredit &&
+    `${_esc(t('article.imageCredit') || '圖片')}：${_esc(frontmatter.imageCredit)}`,
+  frontmatter.imageLicense && _esc(frontmatter.imageLicense),
+  frontmatter.imageSource &&
+    `<a href="${_esc(frontmatter.imageSource)}" target="_blank" rel="noopener noreferrer">${_esc(t('article.imageSource') || '原始來源')}</a>`,
+]
+  .filter(Boolean)
+  .join(' · ');
+
+// ── Markdown → HTML ─────────────────────────────────────────────────────────
+// Pipeline 本體（17 tw-* 模組 renderer / 腳註 / wikilink / 延伸閱讀 split）住在
+// src/utils/article-render.ts — module scope，整個 build 只配置一次（.astro
+// frontmatter 是 per-render scope，不放可共享的邏輯與 cache）。
+// 第四個參數是首圖去重：正文自己放了同一張圖時回報 heroImageInBody，下方頂端那張
+// 就不再放（規則與理由見 article-render.ts §首圖去重）。
+const { fullHtml, splitIndex, heroImageInBody } = renderArticleHtml(
+  title,
+  content,
+  lang,
+  { src: frontmatter.image, creditHtml: heroCreditHtml },
+);
+
+const hasSSoDT =
+  frontmatter.perspectives?.length > 0 ||
+  frontmatter.sporeLinks?.length > 0 ||
+  frontmatter.diaryLink;
+const contentBeforeReading =
+  splitIndex !== -1 && hasSSoDT ? fullHtml.slice(0, splitIndex) : fullHtml;
+const contentAfterReading =
+  splitIndex !== -1 && hasSSoDT ? fullHtml.slice(splitIndex) : '';
+const processedContent = fullHtml;
+
+// ── Estimate reading time if not in frontmatter ────────────────────────────────
+const estimatedReadingTime =
+  frontmatter.readingTime ||
+  Math.max(1, Math.round(content.replace(/\s+/g, ' ').length / 500));
+
+const articleUrl = `https://computex-md.pages.dev${langUrlPrefix}/${category}/${slug}`;
+const encodedUrl = encodeURIComponent(articleUrl);
+const encodedTitle = encodeURIComponent(title);
+
+// ── Screenshot mode (?shot=1) — toggled client-side ────────────────────────
+// Astro static build strips search params at prerender; so a tiny inline
+// script toggles `data-shot="1"` on <main> at runtime. Used by
+// scripts/tools/generate-spore-image.mjs for spore image generation.
+---
+
+<Layout
+  lang={lang}
+  title={title}
+  description={description}
+  type="article"
+  datePublished={seoDatePublished}
+  dateModified={seoDateModified}
+  content={content}
+  tags={frontmatter.tags}
+  category={categoryInfo.name}
+  slug={slug}
+  categorySlug={category}
+  readerSettings
+  feedback
+>
+  <!-- Reading progress bar -->
+  <div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
+
+  <!--
+    Phase 6 partial migration — [category]/[slug].astro (zh-TW)
+    ───────────────────────────────────────────────────────────
+    Same migration strategy as en/ja/ko [category]/[slug]:
+    wrappers → inline Tailwind; .prose :global(*) + .reading-progress
+    stay scoped. Prose font is 'Noto Serif TC' instead of 'Inter'.
+
+    NOTE (issue #1059 · 2026-07-06): the old content-start category /
+    subcategory meta chip that duplicated the ArticleHero breadcrumb was
+    removed in the 2026-06-13 template refactor (66e7db0ed). Category +
+    subcategory now live only in the hero breadcrumb — do not re-add a
+    content-start chip.
+  -->
+  <!-- Shot-mode watermark 已移至 src/layouts/Layout.astro 共用（2026-04-22 β）。
+       JS toggle + CSS 同樣搬走，四語言 article page 統一支援 ?shot=1 模式。 -->
+
+  <main class="article-page min-h-screen bg-[#f8f1e9]" lang={lang}>
+    <!-- ── Hero ─────────────────────────────────────────────────── -->
+    <ArticleHero
+      title={title}
+      description={description}
+      category={category}
+      categoryName={categoryInfo.name}
+      categoryColor={categoryInfo.color}
+      subcategory={frontmatter.subcategory}
+      status={frontmatter.status}
+      coverImage={frontmatter.image ? '' : categoryInfo.cover}
+      slug={slug}
+      lang={lang}
+    />
+
+    <!-- ── Three-column body ───────────────────────────────────────
+         2026-04-27 fix: removed `items-start` from grid parent + made
+         TOC/sidebar wrapper divs `h-full`. Reason: `items-start` makes
+         each grid cell shrink to content height; the TOC's wrapper div
+         was therefore the same height as the TOC nav itself, leaving
+         no scroll-room for `position: sticky` to engage. Now grid cells
+         stretch to row height (= tall article body) and sticky works
+         inside the tall wrapper.
+    -->
+    <div
+      class="mx-auto grid max-w-[var(--container-article)] grid-cols-[260px_1fr_250px] [grid-template-areas:'toc_body_sidebar'] gap-12 px-8 pb-20 pt-16 max-xl:grid-cols-[240px_1fr_230px] max-lg:grid-cols-1 max-lg:[grid-template-areas:'body'_'sidebar'] max-lg:gap-8 max-lg:px-6 max-lg:pb-16 max-lg:pt-10 max-[640px]:px-4 max-[640px]:pb-12 max-[640px]:pt-6"
+    >
+      <!-- Left: Table of Contents (h-full lets the wrapper inherit grid row height,
+           giving the inner sticky nav room to scroll within) -->
+      <div class="h-full [grid-area:toc] max-lg:hidden">
+        <TableOfContents content={processedContent} />
+      </div>
+
+      <!-- Center: Article content -->
+      <article class="min-w-0 [grid-area:body]" data-pagefind-body>
+        <!-- LifeTree CTA banner (experimental feature, links to standalone page) -->
+        {
+          frontmatter.lifeTree && (
+            <a
+              href={`/lifetree/${slug}`}
+              class="lifetree-cta group mb-8 flex items-center justify-between gap-4 rounded-xl border border-dashed border-[rgba(139,92,246,0.4)] bg-gradient-to-r from-[rgba(139,92,246,0.06)] to-[rgba(236,72,153,0.04)] px-5 py-4 no-underline transition-all duration-200 hover:border-solid hover:border-[#8B5CF6] hover:shadow-md"
+              data-experimental
+            >
+              <div class="flex items-center gap-3">
+                <span class="text-2xl" aria-hidden="true">
+                  🌳
+                </span>
+                <div>
+                  <p class="m-0 font-['Inter',system-ui,sans-serif] text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-[#8B5CF6]">
+                    Experimental · {t('article.lifeTree.experimental')}
+                  </p>
+                  <p class="m-0 mt-0.5 font-['Noto_Serif_TC',serif] text-[0.95rem] font-medium text-[#1a3c34]">
+                    {t('article.lifeTree.protagonistTree')
+                      .replace('{name}', frontmatter.lifeTree.protagonist)
+                      .replace(
+                        '{n}',
+                        String(frontmatter.lifeTree.nodes?.length || 0),
+                      )}
+                  </p>
+                </div>
+              </div>
+              <span class="flex items-center gap-1 font-['Inter',system-ui,sans-serif] text-[0.85rem] font-medium text-[#8B5CF6] transition-transform duration-200 group-hover:translate-x-1">
+                {t('article.lifeTree.viewTree')}
+              </span>
+            </a>
+          )
+        }
+
+        <!-- Hero image (if frontmatter declares one) — moved out of the
+             ArticleHero background and into the article body so its
+             credit/license info has visible context. Hero section above
+             becomes solid color when frontmatter.image is set; articles
+             without an explicit image still get the category default cover
+             behind the hero. 2026-05-04.
+
+             2026-07-27：正文自己已經放了同一張圖時（476 篇譯文含 80 篇中文
+             源文都是這樣寫的）這裡讓位，畫面上只留作者自己擺的那張——判斷在
+             renderArticleHtml，資料層一個字都不動。 -->
+        {
+          frontmatter.image && !heroImageInBody && (
+            <figure class="mb-10 max-[640px]:-mx-2">
+              <img
+                src={frontmatter.image}
+                alt={frontmatter.imageAlt || title}
+                loading="eager"
+                class="aspect-[16/9] w-full rounded-2xl object-cover"
+              />
+              {(frontmatter.imageCredit ||
+                frontmatter.imageLicense ||
+                frontmatter.imageSource) && (
+                <figcaption class="mt-3 px-1 font-['Inter',system-ui,sans-serif] text-[0.78rem] leading-relaxed text-[rgba(26,60,52,0.6)]">
+                  {frontmatter.imageCredit && (
+                    <span>
+                      {t('article.imageCredit') || '圖片'}：
+                      {frontmatter.imageCredit}
+                    </span>
+                  )}
+                  {frontmatter.imageLicense && (
+                    <span> · {frontmatter.imageLicense}</span>
+                  )}
+                  {frontmatter.imageSource && (
+                    <span>
+                      {' '}
+                      ·{' '}
+                      <a
+                        href={frontmatter.imageSource}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {t('article.imageSource') || '原始來源'}
+                      </a>
+                    </span>
+                  )}
+                </figcaption>
+              )}
+            </figure>
+          )
+        }
+
+        <!-- Prose body (split at 延伸閱讀 if SSODT sections present) -->
+        {
+          hasSSoDT && splitIndex !== -1 ? (
+            <>
+              <div class="prose" set:html={contentBeforeReading} />
+              {/* ── SSODT sections between article body and 延伸閱讀 ── */}
+              {frontmatter.perspectives &&
+                frontmatter.perspectives.length > 0 && (
+                  <Perspectives
+                    perspectives={frontmatter.perspectives}
+                    lang={lang}
+                  />
+                )}
+              {frontmatter.sporeLinks && frontmatter.sporeLinks.length > 0 && (
+                <SporeFootprint
+                  sporeLinks={frontmatter.sporeLinks}
+                  lang={lang}
+                />
+              )}
+              {frontmatter.relatedDiary &&
+              frontmatter.relatedDiary.length > 0 ? (
+                <RelatedDiaries
+                  relatedDiary={frontmatter.relatedDiary}
+                  lang={lang}
+                />
+              ) : frontmatter.diaryLink ? (
+                <DiaryTeaser
+                  diaryLink={frontmatter.diaryLink}
+                  diaryExcerpt={frontmatter.diaryExcerpt}
+                  lang={lang}
+                />
+              ) : null}
+              <NewsroomTrail
+                slug={slug}
+                category={category}
+                frontmatter={frontmatter}
+                lang={lang}
+              />
+              <div class="prose" set:html={contentAfterReading} />
+            </>
+          ) : (
+            <>
+              <div class="prose" set:html={processedContent} />
+              {/* 無 SSODT split 的文章（多數 About / 短文）footer 也要能掛日記 */}
+              {frontmatter.relatedDiary &&
+              frontmatter.relatedDiary.length > 0 ? (
+                <RelatedDiaries
+                  relatedDiary={frontmatter.relatedDiary}
+                  lang={lang}
+                />
+              ) : frontmatter.diaryLink ? (
+                <DiaryTeaser
+                  diaryLink={frontmatter.diaryLink}
+                  diaryExcerpt={frontmatter.diaryExcerpt}
+                  lang={lang}
+                />
+              ) : null}
+              <NewsroomTrail
+                slug={slug}
+                category={category}
+                frontmatter={frontmatter}
+                lang={lang}
+              />
+            </>
+          )
+        }
+
+        <!-- Sources -->
+        {
+          frontmatter.source && frontmatter.source.length > 0 && (
+            <div class="my-12 rounded-2xl border border-[rgba(26,60,52,0.08)] bg-[rgba(26,60,52,0.03)] p-8">
+              <h3 class="mb-4 font-['Inter',system-ui,sans-serif] text-[0.85rem] font-semibold uppercase tracking-[0.1em] text-[#1a3c34]">
+                {t('article.sources')}
+              </h3>
+              <ul class="m-0 flex list-none flex-col gap-2 p-0">
+                {frontmatter.source.map((url: string) => (
+                  <li>
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="break-all text-[0.82rem] text-[#006d77] no-underline hover:underline"
+                    >
+                      {url}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+
+        <!-- AI Disclaimer -->
+        <div
+          class="my-12 mb-8 flex items-start gap-4 rounded-xl border border-[rgba(193,125,94,0.18)] bg-[rgba(193,125,94,0.06)] px-6 py-5"
+        >
+          <div
+            class="mt-[0.15rem] flex-shrink-0 text-[#c17d5e]"
+            aria-hidden="true"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              ><circle cx="12" cy="12" r="10"></circle><line
+                x1="12"
+                y1="8"
+                x2="12"
+                y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"
+              ></line></svg
+            >
+          </div>
+          <div
+            class="font-['Inter',system-ui,sans-serif] text-[0.83rem] leading-[1.6] text-[#5a4a42] [&>strong]:mb-[0.3rem] [&>strong]:block [&>strong]:text-[0.8rem] [&>strong]:font-semibold [&>strong]:uppercase [&>strong]:tracking-[0.08em] [&>strong]:text-[#c17d5e]"
+          >
+            <strong>{t('article.disclaimer.title')}</strong>
+            {t('article.disclaimer.body')}
+          </div>
+        </div>
+
+        {
+          /* Article-end signature — neutral three-option CTA.
+            設計原則（林啟維 via Muse 2026-07-16）：當簽名檔／備註不當正文、
+            中性語氣不賣慘、三選項並列給讀者自由選、低調非橫幅不跟 LifeTree 打架。
+            設計報告：reports/support-cta-signature-design-2026-07-16.md */
+        }
+        <aside
+          data-ga-view="article_signature"
+          class="my-8 rounded-xl border border-[rgba(26,60,52,0.1)] bg-[rgba(26,60,52,0.02)] px-5 py-[1.1rem]"
+          aria-label={t('article.signature.intro')}
+        >
+          <p
+            class="m-0 font-['Inter',system-ui,sans-serif] text-[0.82rem] leading-[1.6] text-[#5a6b60]"
+          >
+            {t('article.signature.intro')}
+          </p>
+          <div class="mt-3 flex flex-wrap items-center gap-2.5">
+            <button
+              type="button"
+              class="signature-share-btn inline-flex cursor-pointer items-center gap-[0.4rem] rounded-full border border-[rgba(26,60,52,0.2)] bg-transparent px-[0.9rem] py-[0.45rem] font-['Inter',system-ui,sans-serif] text-[0.8rem] font-medium text-[#1a3c34] no-underline transition-all duration-200 hover:bg-[rgba(26,60,52,0.06)]"
+              data-share-label={t('article.signature.share')}
+              data-copied-label={t('article.signature.copied')}
+              data-ga-section="article_signature"
+              data-ga-label="share"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+                ><circle cx="18" cy="5" r="3"></circle><circle
+                  cx="6"
+                  cy="12"
+                  r="3"></circle><circle cx="18" cy="19" r="3"></circle><line
+                  x1="8.59"
+                  y1="13.51"
+                  x2="15.42"
+                  y2="17.49"></line><line
+                  x1="15.41"
+                  y1="6.51"
+                  x2="8.59"
+                  y2="10.49"></line></svg
+              >
+              <span class="signature-share-label">
+                {t('article.signature.share')}
+              </span>
+            </button>
+            <a
+              href={lang === 'zh-TW' ? '/contribute' : `/${lang}/contribute`}
+              data-ga-section="article_signature"
+              data-ga-label="contribute"
+              class="inline-flex items-center gap-[0.4rem] rounded-full border border-[rgba(26,60,52,0.2)] bg-transparent px-[0.9rem] py-[0.45rem] font-['Inter',system-ui,sans-serif] text-[0.8rem] font-medium text-[#1a3c34] no-underline transition-all duration-200 hover:bg-[rgba(26,60,52,0.06)]"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+                ><path
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                ></path></svg
+              >
+              {t('article.signature.contribute')}
+            </a>
+            <a
+              href="https://portaly.cc/taiwanmd/support?utm_source=computex.md&utm_medium=article_signature&utm_campaign=support"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-ga-section="article_signature"
+              data-ga-label="sponsor"
+              class="inline-flex items-center gap-[0.4rem] rounded-full border border-[rgba(26,60,52,0.2)] bg-transparent px-[0.9rem] py-[0.45rem] font-['Inter',system-ui,sans-serif] text-[0.8rem] font-medium text-[#1a3c34] no-underline transition-all duration-200 hover:bg-[rgba(26,60,52,0.06)]"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+                ><path
+                  d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"
+                ></path></svg
+              >
+              {t('article.signature.support')}
+            </a>
+          </div>
+          <p
+            class="m-0 mt-[0.9rem] font-['Inter',system-ui,sans-serif] text-[0.75rem] leading-[1.6] text-[#9aa89e]"
+          >
+            {t('article.signature.note')}
+          </p>
+          <p
+            class="m-0 mt-[0.35rem] font-['Inter',system-ui,sans-serif] text-[0.72rem] leading-[1.5] text-[#9aa89e]"
+          >
+            <a
+              href={`https://github.com/frank890417/taiwan-md/edit/main/knowledge/${langPath}${categoryMapping[category as string]}/${slug}.md`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-[#7a8b7e] underline decoration-[rgba(26,60,52,0.2)] underline-offset-2 transition-colors duration-200 hover:text-[#1a3c34]"
+              >{t('article.editPage')}</a
+            >
+            <span class="mx-[0.4rem] text-[rgba(26,60,52,0.25)]">·</span>
+            <a
+              href={`https://github.com/frank890417/taiwan-md/issues/new?title=${encodeURIComponent(`Feedback: ${title}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-[#7a8b7e] underline decoration-[rgba(26,60,52,0.2)] underline-offset-2 transition-colors duration-200 hover:text-[#1a3c34]"
+              >{t('article.reportIssue')}</a
+            >
+          </p>
+        </aside>
+
+        <!-- Keywords + bottom share row（關鍵詞只留文末，側欄不重複） -->
+        <div
+          class="my-12 mb-8 flex flex-wrap items-center justify-between gap-4 border-t border-[rgba(26,60,52,0.08)] pt-8 max-[640px]:flex-col max-[640px]:items-start"
+        >
+          {
+            frontmatter.tags && frontmatter.tags.length > 0 && (
+              <div class="flex min-w-0 flex-1 flex-col gap-2">
+                <span class="font-['Inter',system-ui,sans-serif] text-[0.67rem] font-bold uppercase tracking-[0.2em] text-[#9aa89e]">
+                  {t('article.sidebar.keywordsLabel')}
+                </span>
+                <div class="flex flex-wrap gap-[0.4rem]">
+                  {frontmatter.tags.map((tag: string) => (
+                    <span
+                      class="rounded-full border px-[0.7rem] py-1 font-['Inter',system-ui,sans-serif] text-[0.75rem] font-medium"
+                      style={`color:${categoryInfo.color}; background:${categoryInfo.colorLight}; border-color:${categoryInfo.color}28;`}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+
+          <div class="flex items-center gap-[0.4rem]">
+            <span
+              class="me-1 font-['Inter',system-ui,sans-serif] text-[0.78rem] text-[#7a8b7e]"
+              >{t('article.share')}</span
+            >
+            <a
+              href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="no-external-icon inline-flex h-[34px] w-[34px] cursor-pointer items-center justify-center rounded-full border-none bg-[rgba(26,60,52,0.06)] text-[#1a3c34] no-underline transition-[background,color] duration-200 hover:bg-[#1a3c34] hover:text-[#f8f1e9]"
+              aria-label={t('article.sidebar.shareX')}
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                ><path
+                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.256 5.636L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+                ></path></svg
+              >
+            </a>
+            <a
+              href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="no-external-icon inline-flex h-[34px] w-[34px] cursor-pointer items-center justify-center rounded-full border-none bg-[rgba(26,60,52,0.06)] text-[#1a3c34] no-underline transition-[background,color] duration-200 hover:bg-[#1a3c34] hover:text-[#f8f1e9]"
+              aria-label={t('article.sidebar.shareFacebook')}
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                ><path
+                  d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"
+                ></path></svg
+              >
+            </a>
+            <a
+              href={`https://social-plugins.line.me/lineit/share?url=${encodedUrl}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="no-external-icon inline-flex h-[34px] w-[34px] cursor-pointer items-center justify-center rounded-full border-none bg-[rgba(26,60,52,0.06)] text-[#1a3c34] no-underline transition-[background,color] duration-200 hover:bg-[#1a3c34] hover:text-[#f8f1e9]"
+              aria-label={t('article.sidebar.shareLine')}
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                ><path
+                  d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.630 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61V9.863h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"
+                ></path></svg
+              >
+            </a>
+            <button
+              class="copy-btn-bottom inline-flex h-[34px] w-[34px] cursor-pointer items-center justify-center rounded-full border-none bg-[rgba(26,60,52,0.06)] text-[#1a3c34] no-underline transition-[background,color] duration-200 hover:bg-[#1a3c34] hover:text-[#f8f1e9]"
+              type="button"
+              aria-label={t('article.copyLink')}
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                ><path
+                  d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"
+                ></path><path
+                  d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"
+                ></path></svg
+              >
+            </button>
+          </div>
+        </div>
+
+        <!-- Return navigation -->
+        <div class="my-10 mb-4 flex flex-wrap gap-3 max-[640px]:flex-col">
+          <a
+            href={`/${category}`}
+            class="inline-flex items-center justify-center gap-[0.45rem] rounded-full px-5 py-[0.55rem] font-['Inter',system-ui,sans-serif] text-[0.82rem] font-medium text-[#f8f1e9] no-underline transition-all duration-200 hover:opacity-[0.88]"
+            style={`background:${categoryInfo.color};`}
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              aria-hidden="true"
+              ><polyline points="15 18 9 12 15 6"></polyline></svg
+            >
+            {t('article.backToCategory')}
+          </a>
+          <a
+            href="/"
+            class="inline-flex items-center justify-center gap-[0.45rem] rounded-full border border-[rgba(26,60,52,0.2)] bg-transparent px-5 py-[0.55rem] font-['Inter',system-ui,sans-serif] text-[0.82rem] font-medium text-[#1a3c34] no-underline transition-all duration-200 hover:bg-[rgba(26,60,52,0.06)]"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              aria-hidden="true"
+              ><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+              ></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg
+            >
+            {t('article.backToHome')}
+          </a>
+        </div>
+      </article>
+
+      <!-- Right: Sidebar
+           h-full + [grid-area:sidebar] for the same reason as TOC wrapper —
+           need wrapper to fill grid row height so the inner sticky aside
+           has scroll room.
+      -->
+      <div class="h-full [grid-area:sidebar] max-lg:h-auto">
+        <ArticleSidebar
+          title={title}
+          tags={frontmatter.tags}
+          readingTime={estimatedReadingTime}
+          date={frontmatter.date}
+          lastModified={lastModified || frontmatter.modified}
+          commitHash={commitHash}
+          revisionCount={revisionCount}
+          contributors={contributors}
+          category={category}
+          categoryName={categoryInfo.name}
+          categoryColor={categoryInfo.color}
+          slug={slug}
+          lang={lang}
+        />
+      </div>
+    </div><!-- /article-shell -->
+
+    {/* SSODT sections moved inside article-shell, before AI Disclaimer */}
+
+    <!-- ── Related articles ───────────────────────────────────────── -->
+    {
+      relatedArticles.length > 0 && (
+        <section
+          data-ga-view="related_articles"
+          class="mt-8 bg-white px-8 py-20 max-[640px]:px-4 max-[640px]:py-14"
+        >
+          <div class="mx-auto max-w-[var(--container-article)]">
+            <div class="mb-12 text-center">
+              <p class="mb-[0.6rem] font-['Inter',system-ui,sans-serif] text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-[#9aa89e]">
+                {t('article.furtherReading')}
+              </p>
+              <h2 class="font-['Inter',serif] text-[clamp(1.5rem,3vw,2rem)] font-bold leading-[1.25] text-[#1a3c34]">
+                {t('article.relatedReads')}
+              </h2>
+            </div>
+            <div class="grid gap-6 grid-cols-1 min-[640px]:grid-cols-3 min-[1024px]:grid-cols-4 [&>*:nth-child(4)]:hidden min-[1024px]:[&>*:nth-child(4)]:flex">
+              {relatedArticles.slice(0, 4).map((article) => {
+                // Semantic neighbours can be cross-category — each card uses the
+                // RELATED article's own category for href + badge (else a nature
+                // neighbour gets a /history/ link → 404). Shared ArticleCard
+                // (premium) — same component the 站上最新 rail clones.
+                const relCat =
+                  categoryConfigs[article.category as CategoryKey] ??
+                  categoryInfo;
+                return (
+                  <ArticleCard
+                    density="premium"
+                    href={`${langUrlPrefix}/${article.category}/${encodeURIComponent(article.slug)}`}
+                    title={article.title}
+                    description={article.description}
+                    categoryLabel={relCat.name}
+                    categoryColor={relCat.color}
+                    categoryIcon={relCat.icon}
+                    coverImage={article.image || undefined}
+                    openIn="same-tab"
+                    dataAttrs={{ 'data-ga-section': 'article_related' }}
+                  />
+                );
+              })}
+            </div>
+            <div class="mt-10 text-center">
+              <a
+                href={`${langUrlPrefix}/${category}`}
+                data-ga-section="article_related"
+                data-ga-label="view_all_category"
+                class="inline-flex items-center gap-2 rounded-full border-[1.5px] px-6 py-[0.65rem] font-['Inter',system-ui,sans-serif] text-[0.88rem] font-medium no-underline transition-all duration-200 hover:bg-black/[0.04]"
+                style={`color:${categoryInfo.color}; border-color:${categoryInfo.color}30;`}
+              >
+                {t('article.viewAll')} {categoryInfo.name}
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  aria-hidden="true"
+                >
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    <!-- ── 站上最新 (時序主軸 rail) ─────────────────────────────────
+         CLIENT-SIDE on purpose: the cards are injected from /api/latest.json
+         after load, so the static HTML of every article page stays stable when
+         a new article ships (no crawl churn / 不重蹈 c1403e259 freshness 反模式).
+         Wrapped <aside data-nosnippet>. Design: WS3. ── -->
+    <aside
+      id="latest-rail"
+      data-nosnippet
+      data-ga-view="latest_rail"
+      data-lang={lang}
+      data-slug={slug}
+      data-cat-meta={JSON.stringify(latestCatMeta)}
+      data-min-label={t('latest.minRead')}
+      aria-label={t('latest.railHeading')}
+      hidden
+      class="border-t border-[rgba(26,60,52,0.08)] bg-white px-8 py-16 max-[640px]:px-4 max-[640px]:py-12"
+    >
+      <div class="mx-auto max-w-[var(--container-article)]">
+        <div class="mb-8 text-center">
+          <p
+            class="mb-[0.6rem] font-['Inter',system-ui,sans-serif] text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-[#9aa89e]"
+          >
+            {t('latest.eyebrow')}
+          </p>
+          <h2
+            class="font-['Inter',serif] text-[clamp(1.4rem,3vw,1.9rem)] font-bold leading-[1.25] text-[#1a3c34]"
+          >
+            {t('latest.railHeading')}
+          </h2>
+        </div>
+        {
+          /* Single source of the card markup: one server-rendered ArticleCard
+            (premium) the client clones + fills per latest item — reuses the real
+            component instead of hand-rolling, no :global string-building.
+            Placeholders force every premium slot to render so the clone has them. */
+        }
+        <template id="latest-card-tpl">
+          <ArticleCard
+            density="premium"
+            href="#"
+            title="·"
+            description="·"
+            categoryLabel="·"
+            categoryColor="#475569"
+            categoryIcon="·"
+            date="·"
+            readingTime="·"
+            openIn="same-tab"
+          />
+        </template>
+        <div
+          id="latest-rail-cards"
+          class="grid gap-6 grid-cols-1 min-[640px]:grid-cols-3 min-[1024px]:grid-cols-4 [&>*:nth-child(4)]:hidden min-[1024px]:[&>*:nth-child(4)]:flex"
+        >
+        </div>
+        <div class="mt-8 text-center">
+          <a
+            href={lang === 'zh-TW' ? '/latest' : `/${lang}/latest`}
+            data-ga-section="article_latest_rail"
+            data-ga-label="view_all"
+            class="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#10b981]/40 px-6 py-[0.6rem] font-['Inter',system-ui,sans-serif] text-[0.88rem] font-semibold text-[#065f46] no-underline transition-all hover:bg-[#ecfdf5]"
+          >
+            {t('latest.railViewAll')}{' '}
+            →
+          </a>
+        </div>
+      </div>
+    </aside>
+    <script is:inline>
+      (function () {
+        var rail = document.getElementById('latest-rail');
+        if (!rail) return;
+        var lang = rail.getAttribute('data-lang') || 'zh-TW';
+        var slug = rail.getAttribute('data-slug') || '';
+        var box = document.getElementById('latest-rail-cards');
+        var tpl = document.getElementById('latest-card-tpl');
+        if (!box || !tpl) return;
+        // Localized category meta (name/color/icon) injected server-side; each
+        // card is a CLONE of the server-rendered <ArticleCard> template below
+        // (reuses the real component — no hand-rolled markup, no :global strings).
+        var META = {};
+        try {
+          META = JSON.parse(rail.getAttribute('data-cat-meta') || '{}');
+        } catch (_) {}
+        var MIN = rail.getAttribute('data-min-label') || 'min';
+        var encSlug = encodeURIComponent(slug);
+        fetch('/api/latest.json')
+          .then(function (r) {
+            return r.ok ? r.json() : null;
+          })
+          .then(function (data) {
+            if (!data || !data.byLang) return;
+            var list = (data.byLang[lang] || [])
+              .filter(function (a) {
+                return a.href.split('/').pop() !== encSlug;
+              })
+              .slice(0, 4);
+            if (!list.length) return;
+            var frag = document.createDocumentFragment();
+            list.forEach(function (a) {
+              var m = META[a.category] || {
+                name: a.category,
+                color: '#475569',
+                icon: '📄',
+              };
+              var col = m.color || '#475569';
+              var dt = new Date(a.date);
+              var day = dt.getMonth() + 1 + '/' + dt.getDate();
+              // clone the server-rendered ArticleCard (premium) + fill the slots
+              var card = tpl.content.firstElementChild.cloneNode(true);
+              card.setAttribute('href', a.href);
+              card.setAttribute('aria-label', a.title);
+              card.setAttribute('data-ga-section', 'article_latest_rail');
+              var hero = card.querySelector('.article-card-hero');
+              var icon = card.querySelector('.article-card-hero-icon');
+              if (a.image) {
+                hero.style.background = '';
+                hero.style.backgroundImage = "url('" + a.image + "')";
+                if (icon) icon.remove();
+                var ov = document.createElement('span');
+                ov.className = 'article-card-hero-overlay';
+                hero.appendChild(ov);
+              } else {
+                hero.style.background =
+                  'linear-gradient(135deg,' + col + '22,' + col + '44)';
+                if (icon) {
+                  icon.textContent = m.icon || '📄';
+                  icon.style.color = col;
+                }
+              }
+              var badge = card.querySelector('.article-card-badge');
+              if (badge) {
+                badge.textContent = m.name;
+                badge.style.color = col;
+                badge.style.background = col + '14';
+                badge.style.borderColor = col + '28';
+              }
+              var pdate = card.querySelector('.article-card-premdate');
+              if (pdate) pdate.textContent = day;
+              var title = card.querySelector('.article-card-title');
+              if (title) title.textContent = a.title;
+              var desc = card.querySelector('.article-card-desc');
+              if (desc) {
+                if (a.desc) desc.textContent = a.desc;
+                else desc.remove();
+              }
+              var cta = card.querySelector('.article-card-cta');
+              if (cta) cta.style.color = col;
+              var ctaLabel = card.querySelector('.article-card-cta-label');
+              if (ctaLabel)
+                ctaLabel.textContent = a.readingTime
+                  ? a.readingTime + ' ' + MIN
+                  : '閱讀全文';
+              frag.appendChild(card);
+            });
+            box.appendChild(frag);
+            rail.hidden = false;
+          })
+          .catch(function () {});
+      })();
+    </script>
+
+    <!-- ── Random explore ────────────────────────────────────────── -->
+    {
+      hasRandomPool && (
+        <div class="flex justify-center bg-[#f8f1e9] px-8 py-10">
+          <button
+            class="inline-flex cursor-pointer items-center gap-[0.6rem] rounded-full border-[1.5px] border-[rgba(26,60,52,0.2)] bg-white px-7 py-3 font-['Inter',system-ui,sans-serif] text-[0.88rem] font-medium text-[#1a3c34] transition-all duration-200 hover:border-[#1a3c34] hover:bg-[#1a3c34] hover:text-[#f8f1e9]"
+            id="randomBtn"
+            type="button"
+            data-ga-section="article_random"
+            data-ga-label="random_explore"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <>
+                <polyline points="16 3 21 3 21 8" />
+                <line x1="4" y1="20" x2="21" y2="3" />
+                <polyline points="21 16 21 21 16 21" />
+                <line x1="15" y1="15" x2="21" y2="21" />
+              </>
+            </svg>
+            {t('article.randomExplore')}
+          </button>
+        </div>
+      )
+    }
+
+    <!-- ── Explore other categories ──────────────────────────────── -->
+    <section
+      data-ga-view="explore_categories"
+      class="bg-[#f8f1e9] px-8 py-20 max-[640px]:px-4 max-[640px]:py-14"
+    >
+      <div class="mx-auto max-w-[var(--container-article)]">
+        <div class="mb-12 text-center">
+          <p
+            class="mb-[0.6rem] font-['Inter',system-ui,sans-serif] text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-[#9aa89e]"
+          >
+            {t('article.exploreTaiwan')}
+          </p>
+          <h2
+            class="font-['Inter',serif] text-[clamp(1.5rem,3vw,2rem)] font-bold leading-[1.25] text-[#1a3c34]"
+          >
+            {t('article.moreAspects')}
+          </h2>
+        </div>
+        <div class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-5">
+          {
+            otherCategories.map((cat) => (
+              <a
+                href={`/${cat.key}`}
+                class="flex overflow-hidden rounded-2xl border border-[rgba(26,60,52,0.06)] bg-white no-underline shadow-[0_2px_8px_rgba(26,60,52,0.05)] transition-[transform,box-shadow] duration-[250ms] hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(26,60,52,0.12)]"
+              >
+                <div
+                  class="w-[5px] flex-shrink-0"
+                  style={`background:${cat.color};`}
+                  aria-hidden="true"
+                />
+                <div class="flex flex-col gap-[0.4rem] px-6 py-[1.4rem]">
+                  <span
+                    class="font-['Inter',system-ui,sans-serif] text-[0.92rem] font-bold -tracking-[0.01em]"
+                    style={`color:${cat.color};`}
+                  >
+                    {cat.name}
+                  </span>
+                  <p class="m-0 font-['Inter',system-ui,sans-serif] text-[0.82rem] leading-[1.55] text-[#6a7d72]">
+                    {cat.description}
+                  </p>
+                  <span
+                    class="mt-[0.35rem] inline-flex items-center gap-[0.3rem] font-['Inter',system-ui,sans-serif] text-[0.78rem] font-semibold"
+                    style={`color:${cat.color};`}
+                  >
+                    {t('article.startExplore')}
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      aria-hidden="true"
+                    >
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </span>
+                </div>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+  </main>
+
+  {
+    /* Tag the markdown-rendered footnote section as a tracked landmark so the
+      site-wide EventTracker (mounted in Layout) observes it — lets us see how
+      far readers get, esp. 延伸閱讀 / footnotes. */
+  }
+  <script is:inline>
+    (function () {
+      var fn = document.querySelector('.prose .footnotes');
+      if (fn && !fn.hasAttribute('data-ga-view'))
+        fn.setAttribute('data-ga-view', 'footnotes');
+    })();
+  </script>
+</Layout>
+
+<!-- Screenshot mode (?shot=1) 的 JS toggle + CSS 已搬到 src/layouts/Layout.astro
+     + src/styles/shot-mode.css（2026-04-22 β），四語言 article page 共用。 -->
+
+<script>
+  // Reading progress bar
+  function updateProgress() {
+    const body = document.querySelector('.prose') as HTMLElement;
+    if (!body) return;
+    const scrolled = window.scrollY;
+    const top = body.offsetTop;
+    const height = body.offsetHeight;
+    const winH = window.innerHeight;
+    const progress = Math.min(
+      Math.max(((scrolled - top + winH * 0.3) / height) * 100, 0),
+      100,
+    );
+    const bar = document.getElementById('reading-progress');
+    if (bar) bar.style.width = progress + '%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  window.addEventListener('resize', updateProgress, { passive: true });
+  updateProgress();
+
+  // Bottom copy button
+  const copyBtnBottom =
+    document.querySelector<HTMLButtonElement>('.copy-btn-bottom');
+  if (copyBtnBottom) {
+    copyBtnBottom.addEventListener('click', () => {
+      navigator.clipboard
+        .writeText(window.location.href)
+        .then(() => {
+          copyBtnBottom.style.color = '#006D77';
+          setTimeout(() => {
+            copyBtnBottom.style.color = '';
+          }, 2200);
+        })
+        .catch(() => {
+          const ta = document.createElement('textarea');
+          ta.value = window.location.href;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        });
+    });
+  }
+
+  // Article-end signature: one-tap share (Web Share API on mobile,
+  // clipboard-copy fallback on desktop — the icon row above still offers
+  // per-platform share).
+  const shareBtn = document.querySelector<HTMLButtonElement>(
+    '.signature-share-btn',
+  );
+  if (shareBtn) {
+    const labelEl = shareBtn.querySelector<HTMLElement>(
+      '.signature-share-label',
+    );
+    const shareLabel = shareBtn.dataset.shareLabel || '';
+    const copiedLabel = shareBtn.dataset.copiedLabel || '';
+    shareBtn.addEventListener('click', async () => {
+      const url = window.location.href;
+      const shareTitle = document.title;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: shareTitle, url });
+        } catch {
+          /* user cancelled or share failed — do nothing */
+        }
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      if (labelEl && copiedLabel) {
+        labelEl.textContent = copiedLabel;
+        setTimeout(() => {
+          labelEl.textContent = shareLabel;
+        }, 2200);
+      }
+    });
+  }
+</script>
+
+<script define:vars={{ randomIndexUrl, category }}>
+  const btn = document.getElementById('randomBtn');
+  if (btn) {
+    let poolPromise = null;
+    const loadPool = () => {
+      poolPromise ??= fetch(randomIndexUrl)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (!data?.byCat) return [];
+          // 維持原行為：隨機池排除當前分類
+          return Object.entries(data.byCat)
+            .filter(([cat]) => cat !== category)
+            .flatMap(([, hrefs]) => hrefs);
+        })
+        .catch(() => []);
+      return poolPromise;
+    };
+    // hover/touch 預熱，click 時通常已就緒
+    btn.addEventListener('mouseenter', loadPool, { once: true });
+    btn.addEventListener('touchstart', loadPool, { once: true, passive: true });
+    btn.addEventListener('click', async () => {
+      const pool = await loadPool();
+      if (pool.length) {
+        window.location.href = pool[Math.floor(Math.random() * pool.length)];
+      }
+    });
+  }
+</script>
+
+<style
+  define:vars={{
+    catColor: categoryInfo.color,
+    catColorLight: categoryInfo.colorLight,
+    proseFont,
+  }}
+>
+  /* ── Screenshot mode (?shot=1) global overrides moved to <style is:global>
+     above the main <style> block — Astro scoped CSS doesn't cross
+     component boundaries (ArticleHero section, Layout header/footer).
+     ──────────────────────────────────────────────────────────────────── */
+
+  /* ── Reading progress ──────────────────────────────────────────────────── */
+  /* ── Reading progress (JS animates width via requestAnimationFrame,
+     `var(--catColor)` comes from the `define:vars` block above) ─ */
+  .reading-progress {
+    position: fixed;
+    top: 0;
+    /* inset-inline-start, not left: in RTL (ar) the bar has to grow from the
+       right edge, otherwise progress reads backwards against the text flow. */
+    inset-inline-start: 0;
+    width: 0%;
+    height: 3px;
+    background: var(--catColor);
+    z-index: 9999;
+    transition: width 0.1s linear;
+  }
+
+  /* ── Prose (article body rendered via `set:html={processedContent}`
+     — these `:global()` rules are essential because the markdown
+     elements can't be reached by Tailwind classes) ─────────────── */
+  .prose {
+    font-family: var(--proseFont);
+    font-size: 1.05rem;
+    line-height: 1.72;
+    color: #2c2c2c;
+  }
+
+  .prose :global(h1) {
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+    font-weight: 700;
+    color: #1a3c34;
+    margin: 2.5rem 0 1rem;
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+  }
+  .prose :global(h2) {
+    font-size: clamp(1.3rem, 2.5vw, 1.65rem);
+    font-weight: 700;
+    color: #1a3c34;
+    margin: 2.5rem 0 0.85rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1.5px solid rgba(26, 60, 52, 0.12);
+    line-height: 1.3;
+  }
+  .prose :global(h3) {
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    font-weight: 600;
+    color: #1a3c34;
+    margin: 1.75rem 0 0.65rem;
+    padding-inline-start: 0.85rem;
+    border-inline-start: 3px solid var(--catColor);
+    line-height: 1.35;
+  }
+  .prose :global(h4) {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #3a4f44;
+    margin: 1.25rem 0 0.5rem;
+  }
+
+  .prose :global(p) {
+    margin-bottom: 1.1rem;
+    color: #2c2c2c;
+  }
+
+  .prose :global(a) {
+    color: #006d77;
+    text-decoration: underline;
+    text-decoration-color: rgba(0, 109, 119, 0.35);
+    text-underline-offset: 3px;
+    /* Cancel global.css's `main a:not(...)` border-bottom — that rule lives
+       inside `@layer base` so unlayered rules (this one) win for declared
+       properties only. Without explicitly nulling border-bottom, BOTH the
+       layered border AND this layer's text-decoration render → visible
+       double underline (reported 2026-05-04). */
+    border-bottom: none;
+    padding-bottom: 0;
+    transition: text-decoration-color 0.2s;
+  }
+  .prose :global(a:hover) {
+    text-decoration-color: #006d77;
+  }
+
+  /* padding-inline-start, not padding-left: the UA/preflight list indent is
+     already logical, so a physical override left RTL (ar) lists indented on
+     *both* sides — measured 28.32px left + 37.76px right on /ar/. */
+  .prose :global(ul) {
+    list-style: disc;
+    padding-inline-start: 1.5rem;
+    margin-bottom: 1.1rem;
+  }
+  .prose :global(ol) {
+    list-style: decimal;
+    padding-inline-start: 1.5rem;
+    margin-bottom: 1.1rem;
+  }
+  .prose :global(li) {
+    margin-bottom: 0.3rem;
+    line-height: 1.65;
+  }
+
+  /* :not(.tw-quote-text) — tw-quote 模組的 blockquote 有自己的 pull-quote 樣式，
+     不吃一般文章引用的灰底框（cascade leak 修復 2026-06-12） */
+  .prose :global(blockquote:not(.tw-quote-text)) {
+    border-inline-start: 4px solid var(--catColor);
+    background: linear-gradient(to right, rgba(26, 60, 52, 0.04), transparent);
+    margin: 2.5rem 0;
+    padding: 1.5rem 1.75rem;
+    /* Logical corners so the flat side stays glued to the rail: in RTL (ar)
+       start-start/end-start resolve to the right-hand corners. */
+    border-start-start-radius: 0;
+    border-start-end-radius: 12px;
+    border-end-end-radius: 12px;
+    border-end-start-radius: 0;
+    font-style: italic;
+    color: #3a4f44;
+    font-size: 1.05rem;
+  }
+  /* linear-gradient() takes no logical direction keyword, so the tint side is
+     the one thing RTL has to be told explicitly — it must fade away from the
+     rail, not into it. */
+  :global([dir='rtl']) .prose :global(blockquote:not(.tw-quote-text)) {
+    background: linear-gradient(to left, rgba(26, 60, 52, 0.04), transparent);
+  }
+  .prose :global(blockquote p) {
+    margin-bottom: 0;
+  }
+
+  .prose :global(strong) {
+    font-weight: 700;
+    color: #1a3c34;
+  }
+
+  .prose :global(code) {
+    font-family: 'Courier New', monospace;
+    font-size: 0.88em;
+    background: rgba(26, 60, 52, 0.06);
+    color: #1a3c34;
+    padding: 0.15em 0.45em;
+    border-radius: 4px;
+  }
+
+  .prose :global(pre) {
+    background: #1a3c34;
+    color: #f8f1e9;
+    padding: 1.5rem;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 2rem 0;
+    font-size: 0.875rem;
+  }
+  .prose :global(pre code) {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  /* Image wrapper */
+  .prose :global(p:has(img)) {
+    margin: 2.5rem 0;
+    text-align: center;
+  }
+  .prose :global(img) {
+    width: 100%;
+    max-height: 480px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin: 0;
+    box-shadow: 0 4px 24px rgba(26, 60, 52, 0.1);
+  }
+  /* Hide the <br> between img and em */
+  .prose :global(p:has(img) br) {
+    display: none;
+  }
+  /* Caption style */
+  .prose :global(p:has(img) em) {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    color: #6a7d72;
+    font-style: italic;
+    text-align: center;
+  }
+  .prose :global(img.img-broken) {
+    min-height: 120px;
+    background: rgba(26, 60, 52, 0.04);
+    border: 2px dashed rgba(26, 60, 52, 0.15);
+    border-radius: 12px;
+  }
+
+  /* :not(.tw-heatmap-table) — tw-heatmap 是視覺模組自帶配色，不吃一般文章表格樣式
+     （cascade leak 修復 2026-06-12：之前 td color 蓋掉熱力圖字色，深色格變不可讀） */
+  .prose :global(table:not(.tw-heatmap-table)) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0;
+    font-size: 0.9rem;
+  }
+  .prose :global(table:not(.tw-heatmap-table) th) {
+    background: rgba(26, 60, 52, 0.05);
+    color: #1a3c34;
+    font-weight: 600;
+    text-align: start;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid rgba(26, 60, 52, 0.12);
+  }
+  .prose :global(table:not(.tw-heatmap-table) td) {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid rgba(26, 60, 52, 0.06);
+    color: #3a4f44;
+  }
+  .prose :global(table:not(.tw-heatmap-table) tr:hover td) {
+    background: rgba(26, 60, 52, 0.02);
+  }
+
+  .prose :global(hr) {
+    border: none;
+    border-top: 1px solid rgba(26, 60, 52, 0.1);
+    margin: 3rem 0;
+  }
+
+  /* ── Footnotes ──────────────────────────────────────────────────────────── */
+
+  /* Footnote section (文末 section.footnotes) */
+  .prose :global(.footnotes) {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: #6b7280;
+  }
+
+  .prose :global(.footnotes ol) {
+    padding-inline-start: 1.5rem;
+    margin: 0;
+  }
+
+  .prose :global(.footnotes li) {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+  }
+
+  .prose :global(.footnotes li p) {
+    display: inline;
+    margin: 0;
+    color: #6b7280;
+  }
+
+  .prose :global(.footnotes a) {
+    color: #6b7280;
+    text-decoration: underline;
+    text-decoration-color: rgba(107, 114, 128, 0.4);
+    text-underline-offset: 2px;
+  }
+  .prose :global(.footnotes a:hover) {
+    color: #374151;
+    text-decoration-color: #6b7280;
+  }
+
+  /* Inline superscript footnote reference */
+  .prose :global(sup) {
+    line-height: 0; /* don't affect line-height */
+    font-size: 0.75em;
+    vertical-align: super;
+  }
+
+  .prose :global(.footnote-ref) {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: none;
+    padding: 0 0.05em;
+    transition:
+      color 0.15s,
+      text-decoration-color 0.15s;
+  }
+  .prose :global(.footnote-ref:hover) {
+    color: #1d4ed8;
+    text-decoration: underline;
+    text-decoration-color: #2563eb;
+  }
+
+  /* Back-arrow (↩) */
+  .prose :global(.footnote-backref) {
+    margin-inline-start: 0.35em;
+    color: #9ca3af;
+    font-size: 0.9em;
+    text-decoration: none;
+    border-bottom: none;
+    transition: color 0.15s;
+  }
+  .prose :global(.footnote-backref:hover) {
+    color: #6b7280;
+    text-decoration: none;
+  }
+
+  /* Footnote jump-target highlight (issue #1212 §1.2): clicking [n] or ↩
+   * must show WHERE the reader landed. Dark variants in dark-polish.css. */
+  .prose :global(.footnotes li:target) {
+    background: rgba(37, 99, 235, 0.08);
+    outline: 2px solid rgba(37, 99, 235, 0.35);
+    outline-offset: 4px;
+    border-radius: 4px;
+    animation: fn-target-flash 1.6s ease-out;
+  }
+  .prose :global(sup:target),
+  .prose :global(a.footnote-ref:target) {
+    background: rgba(37, 99, 235, 0.12);
+    border-radius: 4px;
+    animation: fn-target-flash 1.6s ease-out;
+  }
+  @keyframes fn-target-flash {
+    from {
+      background: rgba(37, 99, 235, 0.28);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .prose :global(.footnotes li:target),
+    .prose :global(sup:target),
+    .prose :global(a.footnote-ref:target) {
+      animation: none;
+    }
+  }
+
+  /* Mobile: bigger tap targets */
+  @media (max-width: 768px) {
+    .prose :global(.footnote-ref) {
+      padding: 0.5rem 0.3rem;
+      margin: -0.5rem -0.3rem;
+    }
+    .prose :global(.footnote-backref) {
+      padding: 0.5rem 0.4rem;
+      margin: -0.5rem -0.4rem;
+      display: inline-block;
+      min-width: 44px;
+      min-height: 44px;
+      line-height: 44px;
+      text-align: center;
+    }
+    .prose :global(.footnotes) {
+      margin-inline: -0.25rem;
+    }
+  }
+</style>

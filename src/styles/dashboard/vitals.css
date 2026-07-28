@@ -1,0 +1,57 @@
+/* ── Vital Signs ── */
+.vitals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.8rem;
+}
+.vital-card {
+  background: var(--surface-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  text-align: center;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  border-left: 4px solid transparent;
+}
+.vital-card[data-vital='heartbeat'] {
+  border-left-color: var(--status-vital-heartbeat);
+}
+.vital-card[data-vital='cells'] {
+  border-left-color: var(--status-vital-cells);
+}
+.vital-card[data-vital='immunity'] {
+  border-left-color: var(--status-vital-immunity);
+}
+.vital-card[data-vital='dna'] {
+  border-left-color: var(--status-vital-dna);
+}
+.vital-card[data-vital='revision'] {
+  border-left-color: var(--status-vital-revision);
+}
+.vital-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+.vital-emoji {
+  font-size: 1.5rem;
+  margin-bottom: 0.2rem;
+}
+.vital-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.vital-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 0.2rem;
+}
+.vital-desc {
+  font-size: 0.75rem;
+  opacity: 0.5;
+  margin-top: 0.2rem;
+}

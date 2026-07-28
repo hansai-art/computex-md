@@ -1,0 +1,222 @@
+/* ── Spore Section (Reproduction System) ── */
+.spores-overview {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin: 1rem 0 1.5rem;
+}
+.spore-tile {
+  background: var(--bg-elevated, #fafafa);
+  border: 1px solid var(--border-subtle, #eee);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  text-align: center;
+}
+.spore-tile-warn {
+  border-color: #e66;
+  background: #fff5f5;
+}
+.spore-tile-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary, #222);
+  line-height: 1.2;
+}
+.spore-tile-label {
+  font-size: 0.75rem;
+  color: var(--text-muted, #666);
+  margin-top: 0.35rem;
+  letter-spacing: 0.02em;
+}
+.spore-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+.spore-table th,
+.spore-table td {
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid var(--border-subtle, #eee);
+  text-align: left;
+}
+.spore-table th {
+  background: var(--bg-elevated, #fafafa);
+  font-weight: 600;
+  font-size: 0.78rem;
+  color: var(--text-muted, #666);
+  letter-spacing: 0.04em;
+}
+.spore-table td.num,
+.spore-table th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 640px) {
+  /* #spores-top's 6-col leaderboard (badge/title text + 4 numeric cols) has
+     no room at phone widths; the badge and title cells (free text, no
+     natural break points once <table> squeezes them) were wrapping one
+     CJK character per line instead of truncating. */
+  #spores-top,
+  #spores-platforms {
+    /* #spores-top: even after truncating text columns + dropping one
+       numeric column, the remaining 5 can still run ~50-60px past the
+       viewport on the narrowest phones. #spores-platforms' zh headers
+       (平均觸及 etc.) wrap tolerably at any character, but its en headers
+       ("Avg Views" / "Max Rate") only wrap between the two words and still
+       ran past the viewport. Both were silently clipped by
+       main.dashboard's overflow-x:clip — scroll instead. */
+    overflow-x: auto;
+  }
+  #spores-top .spore-table {
+    font-size: 0.8rem;
+  }
+  #spores-top .spore-table th,
+  #spores-top .spore-table td {
+    padding: 0.4rem 0.3rem;
+  }
+  #spores-top .spore-table td.spore-badge,
+  #spores-top .spore-table td:nth-child(2) {
+    max-width: 30vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* engagements — lowest-priority column; Views + Rate already carry the signal */
+  #spores-top .spore-table th:nth-child(6),
+  #spores-top .spore-table td:nth-child(6) {
+    display: none;
+  }
+}
+.spore-badge {
+  font-weight: 600;
+}
+/* Clickable performer rows → open the spore post in a new tab */
+.spore-table tr.spore-row-link {
+  transition: background 0.14s;
+}
+.spore-table tr.spore-row-link:hover {
+  background: var(--bg-elevated, #f6faf7);
+}
+.spore-table tr.spore-row-link td a {
+  color: inherit;
+  text-decoration: none;
+}
+.spore-table tr.spore-row-link:hover td a {
+  text-decoration: underline;
+}
+.platform-threads {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: #111;
+  color: #fff;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+.platform-x {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: #0ea5e9;
+  color: #fff;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+.platform-other {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: #aaa;
+  color: #fff;
+  font-size: 0.72rem;
+}
+.spore-amp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+.spore-amp-row {
+  display: grid;
+  grid-template-columns: 150px 1fr 160px;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+}
+.spore-amp-name {
+  color: var(--text-primary, #222);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.spore-amp-bar {
+  height: 14px;
+  background: var(--border-subtle, #eee);
+  border-radius: 7px;
+  overflow: hidden;
+}
+.spore-amp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  transition: width 400ms ease-out;
+}
+.spore-amp-value {
+  color: var(--text-muted, #666);
+  font-size: 0.8rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.spore-backfill-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+.spore-backfill-list li {
+  padding: 0.4rem 0;
+  border-bottom: 1px dashed var(--border-subtle, #eee);
+  font-size: 0.88rem;
+}
+.spore-weekly {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.4rem;
+  height: 90px;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+}
+.spore-week {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.spore-week-bar-wrap {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+.spore-week-bar {
+  width: 100%;
+  background: linear-gradient(180deg, #6366f1, #4338ca);
+  border-radius: 3px 3px 0 0;
+  min-height: 5%;
+}
+.spore-week-count {
+  font-size: 0.75rem;
+  color: var(--text-primary, #222);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.spore-week-label {
+  font-size: 0.7rem;
+  color: var(--text-muted, #666);
+  letter-spacing: 0.02em;
+}
+.muted {
+  color: var(--text-muted, #666);
+  font-size: 0.88rem;
+}

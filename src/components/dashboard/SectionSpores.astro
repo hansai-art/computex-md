@@ -1,0 +1,65 @@
+---
+// SectionSpores — 🌱 Reproduction — Spores & Reach section (#spores). Ids/classes
+// are a contract with src/scripts/dashboard-client.js and src/styles/dashboard/
+// — do not rename.
+import { getLangFromUrl } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const isEn = lang === 'en';
+---
+
+<!-- Reproduction System — Spores & Amplification (2026-04-18 δ-late) -->
+<section class="section" id="spores">
+  <h2 class="section-title">
+    {isEn ? '🌱 Reproduction — Spores & Reach' : '🌱 繁殖系統 — 孢子與成效'}
+    <span class="section-timestamp" data-source="spores"></span>
+  </h2>
+  <p class="section-subtitle">
+    {
+      isEn
+        ? 'How COMPUTEX.md content travels beyond the website'
+        : '孢子怎麼把 COMPUTEX.md 的內容散出去'
+    }
+  </p>
+
+  <div class="spores-overview" id="spores-overview"></div>
+
+  <h3 class="subsection-title">
+    {isEn ? '🔥 Top Performers' : '🔥 成效排行'}
+  </h3>
+  <div class="spores-top" id="spores-top"></div>
+
+  <h3 class="subsection-title">
+    {isEn ? '📈 GA Amplification' : '📈 GA 放大倍數'}
+  </h3>
+  <p class="queue-desc">
+    {
+      isEn
+        ? 'How much did spores boost article traffic vs baseline?'
+        : '孢子讓文章流量相對基線放大多少倍？'
+    }
+  </p>
+  <div class="spores-amplification" id="spores-amplification"></div>
+
+  <h3 class="subsection-title">
+    {isEn ? '🆚 Platform Comparison' : '🆚 平台對比'}
+  </h3>
+  <div class="spores-platforms" id="spores-platforms"></div>
+
+  <h3 class="subsection-title">
+    {isEn ? '🚨 Backfill Status' : '🚨 回填狀態'}
+  </h3>
+  <p class="queue-desc">
+    {
+      isEn
+        ? 'Spores published ≥7 days ago without metrics = OVERDUE'
+        : '發布 ≥7 天沒回填指標 = OVERDUE，下一則孢子不准發'
+    }
+  </p>
+  <div class="spores-backfill" id="spores-backfill"></div>
+
+  <h3 class="subsection-title">
+    {isEn ? '📅 Weekly Pulse' : '📅 週節律'}
+  </h3>
+  <div class="spores-weekly" id="spores-weekly"></div>
+</section>

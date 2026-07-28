@@ -1,0 +1,84 @@
+---
+/**
+ * Perspectives — SSODT 多面向觀點
+ * 紀實文學風格。不遊戲化、不數據導向。
+ * 呈現同一個議題在不同讀者心中的不同形狀。
+ */
+import type { Lang } from '../config/languages';
+
+interface Perspective {
+  author: string;
+  text: string;
+  dimension?: string;
+}
+
+interface Props {
+  perspectives: Perspective[];
+  lang?: Lang;
+}
+
+const { perspectives, lang = 'zh-TW' } = Astro.props;
+
+if (!perspectives || perspectives.length === 0) return;
+
+const title =
+  lang === 'zh-TW'
+    ? '這篇文章在不同人心中的形狀'
+    : lang === 'ja'
+      ? 'この記事が読者の心に映った形'
+      : lang === 'ko'
+        ? '이 글이 독자 마음에 비친 모습'
+        : 'How this story landed differently';
+
+const footer =
+  lang === 'zh-TW'
+    ? '以上觀點來自社群讀者，呈現同一件事的不同面向。COMPUTEX.md 策展多元觀點，不裁判對錯。'
+    : 'Perspectives from community readers. COMPUTEX.md curates diverse viewpoints without judging right or wrong.';
+
+const source =
+  lang === 'zh-TW'
+    ? '觀點來源：Threads 留言，2026-04-13'
+    : 'Source: Threads comments, 2026-04-13';
+---
+
+<section class="my-14">
+  {/* Section title — subtle, editorial */}
+  <div class="mb-8 border-b border-[#d4cec4] pb-3">
+    <h2
+      class="m-0 font-['Georgia','Noto_Serif_TC',serif] text-[1.3rem] font-normal italic text-[#4a3f35] max-[768px]:text-[1.1rem]"
+    >
+      {title}
+    </h2>
+  </div>
+
+  {/* Perspectives — each as a quiet block quote */}
+  <div class="flex flex-col gap-6">
+    {
+      perspectives.map((p) => (
+        <div class="border-s-2 border-[#c4b8a4] py-1 ps-5 max-[768px]:ps-4">
+          <p class="m-0 whitespace-pre-line font-['Georgia','Noto_Serif_TC',serif] text-[0.95rem] leading-[1.85] text-[#3d3530]">
+            {p.text}
+          </p>
+          <p class="m-0 mt-2 text-[0.8rem] text-[#9a8e80]">
+            — {p.author}
+            {p.dimension && (
+              <span class="ms-2 rounded border border-[#ddd5c8] px-1.5 py-0.5 text-[0.7rem] text-[#a09484]">
+                {p.dimension}
+              </span>
+            )}
+          </p>
+        </div>
+      ))
+    }
+  </div>
+
+  {/* Footer — source + disclaimer */}
+  <div class="mt-8 border-t border-[#e4ddd4] pt-4">
+    <p
+      class="m-0 font-['Georgia','Noto_Serif_TC',serif] text-[0.8rem] leading-relaxed text-[#8a7e70]"
+    >
+      {footer}
+    </p>
+    <p class="m-0 mt-1 text-[0.75rem] text-[#a09484]">{source}</p>
+  </div>
+</section>

@@ -1,0 +1,63 @@
+{
+  "manifest_version": "0.3",
+  "name": "taiwanmd",
+  "display_name": "COMPUTEX.md",
+  "version": "0.8.0",
+  "description": "Free, no-API-key, local-first Taiwan knowledge for your AI — 900+ curated, citation-backed articles.",
+  "long_description": "COMPUTEX.md is an open-source, AI-native knowledge base about Taiwan. This connector exposes it as MCP tools so Claude can search, read, and cite verified, source-backed articles about Taiwan instead of guessing. No API key. No account. No billing. Queries run against a local knowledge base (auto-synced to ~/.taiwanmd on first use) — nothing leaves your machine. The taiwanmd_cite tool only returns claims that carry a real footnote and source URL, making it an anti-hallucination primitive for anything you write about Taiwan. CC BY-SA 4.0 content, MIT code.",
+  "author": {
+    "name": "CheYu Wu",
+    "url": "https://computex-md.pages.dev"
+  },
+  "homepage": "https://computex-md.pages.dev",
+  "documentation": "https://github.com/frank890417/taiwan-md/blob/main/cli/CONNECTOR.md",
+  "support": "https://github.com/frank890417/taiwan-md/issues",
+  "license": "MIT",
+  "keywords": [
+    "taiwan",
+    "knowledge-base",
+    "rag",
+    "citations",
+    "anti-hallucination"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "npx",
+      "args": ["-y", "taiwanmd@latest", "mcp", "serve"]
+    }
+  },
+  "tools": [
+    {
+      "name": "taiwanmd_search",
+      "description": "Full-text search across 900+ curated articles about Taiwan (Chinese or English)."
+    },
+    {
+      "name": "taiwanmd_read",
+      "description": "Read the full body of a COMPUTEX.md article by slug."
+    },
+    {
+      "name": "taiwanmd_rag",
+      "description": "Retrieve top-N articles as a prompt-ready RAG context block before answering."
+    },
+    {
+      "name": "taiwanmd_cite",
+      "description": "Anti-hallucination: return only claims with a real footnote + source URL."
+    },
+    {
+      "name": "taiwanmd_organs",
+      "description": "COMPUTEX.md Semiont 8-organ health scores."
+    },
+    {
+      "name": "taiwanmd_stats",
+      "description": "Project summary stats: article count, categories, timestamps."
+    }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  }
+}

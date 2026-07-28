@@ -1,0 +1,139 @@
+---
+import type { Lang } from '../config/languages';
+
+interface ReadingPathStep {
+  href: string;
+  title: string;
+  description: string;
+  time: string;
+}
+
+interface ReadingPathFooterItem {
+  icon: string;
+  label: string;
+}
+
+interface Props {
+  lang?: Lang;
+  title: string;
+  subtitle: string;
+  steps: ReadingPathStep[];
+  footerItems: ReadingPathFooterItem[];
+  continueHref: string;
+  continueLabel: string;
+}
+
+const {
+  lang = 'zh-TW',
+  title,
+  subtitle,
+  steps,
+  footerItems,
+  continueHref,
+  continueLabel,
+} = Astro.props;
+
+const isEn = lang === 'en';
+---
+
+<!--
+  Phase 4 leaf migration #6: ReadingPath.astro
+  ────────────────────────────────────────────
+  - Scoped <style> block removed entirely
+  - All classes → Tailwind atomic utilities
+
+  Tricky bits:
+  1. The section's SVG pattern overlay (::before) is preserved via
+     the arbitrary [&::before]: variant with the exact data-URL
+  2. The vertical connector line through numbered markers (also a
+     ::before) uses a second arbitrary [&::before]: on reading-path-list
+     with the same calc()-based left position and 180deg gradient
+  3. The gradient backgrounds on container, number marker, and continue
+     button all use arbitrary bg-[linear-gradient(...)]
+  4. EN vs ZH heading weight/spacing branches on the `isEn` boolean
+
+  The 3-column grid layout (marker / content / time) with centered
+  alignment uses [grid-template-columns:...] arbitrary property because
+  Tailwind's grid-cols-N scale doesn't map to rem columns.
+-->
+<section
+  class:list={[
+    'relative mx-auto my-24 max-w-[900px] overflow-hidden rounded-[20px] border border-[rgba(34,197,94,0.1)] bg-[image:var(--scene-nature-bg)] px-8 py-12',
+    "before:absolute before:inset-0 before:content-[''] before:opacity-40 before:[background:url(\"data:image/svg+xml,%3Csvg_width='40'_height='40'_viewBox='0_0_40_40'_xmlns='http://www.w3.org/2000/svg'%3E%3Cg_fill='%2322c55e'_fill-opacity='0.03'_fill-rule='evenodd'%3E%3Cpath_d='m0_40_40-40h-40z'/%3E%3Cpath_d='m0_40_40-40h-40z'_transform='scale(.5)_translate(40_0)'/%3E%3C/g%3E%3C/svg%3E\")]",
+    'max-[768px]:mx-4 max-[768px]:my-16 max-[768px]:px-4 max-[768px]:py-8',
+  ]}
+>
+  <div class="relative z-[2] mb-12 text-center">
+    <h2
+      class:list={[
+        "mb-4 font-['jf-lanyangming','Noto_Serif_TC','Source_Han_Serif_TC',serif] text-[2.2rem] font-light text-[#166534] max-[768px]:text-[1.8rem]",
+        { 'font-extrabold tracking-[0.05em]': isEn },
+      ]}
+    >
+      {title}
+    </h2>
+    <p
+      class="text-[1.2rem] font-semibold leading-relaxed text-[#16a34a] max-[768px]:text-base"
+    >
+      {subtitle}
+    </p>
+  </div>
+
+  <div
+    class="relative z-[2] [--step-marker-column:4.5rem] [--step-content-column:28rem] [--step-time-column:6rem] [--step-column-gap:1.5rem] [--step-layout-width:calc(var(--step-marker-column)+var(--step-content-column)+var(--step-time-column)+(var(--step-column-gap)*2))] before:absolute before:left-[calc(50%-(var(--step-layout-width)/2)+(var(--step-marker-column)/2))] before:top-16 before:bottom-16 before:z-[1] before:w-[3px] before:rounded-[2px] before:bg-[image:var(--scene-nature-step-line)] before:content-[''] max-[768px]:before:hidden"
+  >
+    {
+      steps.map((step, index) => (
+        <a
+          href={step.href}
+          data-ga-section="reading_path"
+          data-ga-label={`step_${index + 1}`}
+          class="group relative z-[2] mb-4 grid items-center justify-center rounded-2xl border-2 border-[rgba(34,197,94,0.1)] bg-white p-6 text-inherit no-underline shadow-[0_2px_8px_rgba(22,163,74,0.08)] transition-all duration-300 [grid-template-columns:var(--step-marker-column)_var(--step-content-column)_var(--step-time-column)] [gap:var(--step-column-gap)] hover:-translate-y-1 hover:border-[rgba(34,197,94,0.25)] hover:bg-[rgba(240,253,244,0.6)] hover:shadow-[0_8px_25px_rgba(22,163,74,0.15)] max-[768px]:flex max-[768px]:flex-col max-[768px]:gap-4 max-[768px]:text-center"
+        >
+          <span class="flex h-12 w-12 flex-shrink-0 items-center justify-center justify-self-center rounded-full bg-[image:var(--cta-nature)] text-[1.3rem] font-extrabold text-white shadow-[0_4px_12px_rgba(34,197,94,0.3)]">
+            {index + 1}
+          </span>
+          <div class="grid w-full content-center items-center gap-1 text-center">
+            <h3 class="m-0 font-['jf-jinxuanlatte','Noto_Sans_TC','Source_Han_Sans_TC',sans-serif] text-[1.3rem] font-bold leading-tight text-[#166534] max-[768px]:text-[1.1rem]">
+              {step.title}
+            </h3>
+            <p class="m-0 text-base font-medium leading-[1.35] text-[#16a34a] max-[768px]:text-[0.9rem]">
+              {step.description}
+            </p>
+          </div>
+          <span class="min-w-[4.5rem] flex-shrink-0 whitespace-nowrap justify-self-center rounded-[20px] border border-[rgba(34,197,94,0.2)] bg-[rgba(22,163,74,0.1)] px-4 py-2 text-center text-[0.9rem] font-semibold text-[#166534]">
+            {step.time}
+          </span>
+        </a>
+      ))
+    }
+  </div>
+
+  <div
+    class="relative z-[2] mt-12 border-t border-[rgba(34,197,94,0.2)] pt-8 text-center"
+  >
+    <p class="mb-6 text-[1.1rem] font-medium leading-relaxed text-[#166534]">
+      {
+        footerItems.map((item, index) => (
+          <span>
+            {index > 0 && (
+              <span class="text-[#16a34a]" aria-hidden="true">
+                {' '}
+                |{' '}
+              </span>
+            )}
+            {item.icon} <strong>{item.label}</strong>
+          </span>
+        ))
+      }
+    </p>
+    <a
+      href={continueHref}
+      data-ga-section="reading_path"
+      data-ga-label="continue"
+      class="inline-block rounded-full bg-[image:var(--cta-nature)] px-8 py-4 text-[1.1rem] font-bold !text-white no-underline shadow-[0_4px_12px_rgba(34,197,94,0.25)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(34,197,94,0.35)]"
+    >
+      {continueLabel}
+    </a>
+  </div>
+</section>

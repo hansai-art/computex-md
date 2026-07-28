@@ -1,0 +1,279 @@
+/* ── Screenshot mode (?shot=1) global overrides ────────────────────────
+ * 共用於 spore-image 與 OG 圖片產生器（scripts/tools/generate-spore-image.mjs
+ * 與 scripts/core/generate-og-images.mjs）。四種語言的 article page 都適用。
+ *
+ * 2026-04-23 重構（β session）：Spore 與 OG 需求不同，用 [data-og='1']
+ * 屬性分離兩套 override：
+ *   - Spore（`?shot=1`）：justfont rixingsong-semibold 品牌字體 + 4.5rem
+ *     大字號 + 18vh 錨點位置（單張手產、品牌感優先）
+ *   - OG（`?shot=1&og=1`）：Noto Serif TC 穩定字體 + 3.75rem 略縮 +
+ *     12vh 緊湊位置 + line-clamp（批次產圖穩定、長標題完整顯示）
+ *
+ * Base 層保留原本的 Spore 樣式（2026-04-20 ε 調校過的 poster 氣勢），
+ * OG 走 `[data-og='1']` override 子集。
+ * ──────────────────────────────────────────────────────────────────── */
+
+/* ═══ Base: Spore 模式（?shot=1 預設）═══════════════════════════════ */
+
+html[data-shot='1'],
+html[data-shot='1'] body {
+  background: #1a3c34 !important;
+}
+
+html[data-shot='1'] #header-container,
+html[data-shot='1'] body > footer,
+html[data-shot='1'] #md-btn,
+html[data-shot='1'] #search-modal,
+html[data-shot='1'] astro-dev-toolbar,
+html[data-shot='1'] .reading-progress,
+html[data-shot='1'] main.article-page > *:not(section:first-of-type) {
+  display: none !important;
+}
+
+html[data-shot='1'] main.article-page {
+  min-height: 100vh !important;
+  background: #1a3c34 !important;
+  position: relative !important;
+}
+
+/* Hero anchored to top-third, poster-style — Spore 原本的黃金比例錨點 */
+html[data-shot='1'] main.article-page > section:first-of-type {
+  min-height: 100vh !important;
+  align-items: flex-start !important;
+  padding-top: 18vh !important;
+  padding-bottom: 8vh !important;
+}
+
+/* Inner container tight padding */
+html[data-shot='1'] main.article-page > section > div:nth-child(2) {
+  max-width: none !important;
+  width: 100% !important;
+  padding: 0 6vw !important;
+}
+
+/* Hide category badge + TTS 朗讀 wrapper */
+html[data-shot='1']
+  main.article-page
+  > section
+  > div:nth-child(2)
+  > div:first-of-type,
+html[data-shot='1']
+  main.article-page
+  > section
+  > div:nth-child(2)
+  > div:last-of-type {
+  display: none !important;
+}
+
+/* H1 — Spore 不 force 字體，讓 global.css `.jf-history h1, .hero-title` 的
+ * justfont rixingsong-semibold 規則接管（單張手產圖不會觸發 rate limit）。
+ * 字號 4.5rem poster 氣勢，無 line-clamp（原始 Spore 設計）。
+ *
+ * 2026-07-15：撤 7/14 台北吸菸室 ship 加的 `@media (max-width: 1200px)` 縮字
+ * （square 1080 一定踩到 → 標題 72→60px）。孤行改由版面／字級產品判斷，
+ * 不預設把所有 square 標題變小。 */
+html[data-shot='1'] main.article-page .hero-title {
+  font-size: 4.5rem !important; /* 72px */
+  line-height: 1.22 !important;
+  margin-bottom: 1.5rem !important;
+  max-width: none !important;
+}
+
+/* Description — Spore 寬版；2026-07-15 略放大（1.35→1.5rem）提升 square 可讀 */
+html[data-shot='1'] main.article-page > section > div:nth-child(2) > p {
+  font-size: 1.5rem !important; /* 24px */
+  max-width: min(900px, 100%) !important;
+  line-height: 1.7 !important;
+}
+
+/* Breadcrumb */
+html[data-shot='1'] main.article-page > section > div:nth-child(2) > nav {
+  margin-bottom: 1.6rem !important;
+}
+html[data-shot='1'] main.article-page > section > div:nth-child(2) > nav a,
+html[data-shot='1'] main.article-page > section > div:nth-child(2) > nav span {
+  font-size: 0.95rem !important;
+}
+
+/* Shot-mode watermark — BrandMark (light) fixed bottom-right */
+.shot-watermark {
+  display: none;
+}
+html[data-shot='1'] .shot-watermark {
+  display: block;
+  position: fixed;
+  right: 48px;
+  bottom: 40px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Neutralise fixed-header reserved top offset */
+html[data-shot='1'] body > main {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* ═══ OG 模式 override（?shot=1&og=1）═══════════════════════════════
+ * 給批次 OG 圖產生器用：
+ *   - 強制 Noto Serif TC（Google Fonts Layout 已預載）— 避 justfont rate limit
+ *   - 字號略縮 3.75rem，容納更多文字
+ *   - 12vh / 6vh padding，緊湊排版
+ *   - line-clamp 2/3，避免長標題溢出或壓 watermark
+ *   - description max-width 75% + line-clamp 3，避開右下 watermark
+ * ──────────────────────────────────────────────────────────────────── */
+
+html[data-shot='1'][data-og='1'] main.article-page > section:first-of-type {
+  padding-top: 12vh !important;
+  padding-bottom: 6vh !important;
+}
+
+html[data-shot='1'][data-og='1'] main.article-page .hero-title {
+  font-family: 'Noto Serif TC', 'Source Han Serif TC', serif !important;
+  font-weight: 900 !important;
+  font-size: 3.75rem !important; /* 60px */
+  line-height: 1.2 !important;
+  margin-bottom: 1.25rem !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+html[data-shot='1'][data-og='1']
+  main.article-page
+  > section
+  > div:nth-child(2)
+  > p {
+  font-family: 'Noto Serif TC', serif !important;
+  font-size: 1.2rem !important; /* 19.2px */
+  max-width: min(860px, 75%) !important;
+  line-height: 1.65 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 4 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+/* ═══ Diary 模式（?shot=1[&og=1]，URL = /semiont/diary/...）═══════
+ * 2026-05-01 γ-late 新增：日記頁也走 OG 管線。背景套深色 semiont 主題
+ * （#03080a），章節 chrome 與 article 同樣隱藏（#header-container /
+ * footer / md-btn / search-modal 等已被 base data-shot 規則覆蓋）。
+ * 額外：隱藏 breadcrumb / EKG / TOC / DiaryNav / Back-to-index，
+ * 只 surface header（date+session badge + 標題 + 觸發/跨度 metadata）
+ * 與第一段 prose 作為 OG hero。
+ *
+ * 字體選擇：OG 模式（&og=1）走 Noto Serif TC 穩定字體（避 justfont
+ * rate limit + 視覺與 article OG 對齊）；非 OG（純 ?shot=1）保留
+ * rixingsong-semibold 維持 diary identity。
+ * ──────────────────────────────────────────────────────────────────── */
+
+html[data-shot='1'][data-diary='1'],
+html[data-shot='1'][data-diary='1'] body {
+  background: #03080a !important;
+}
+
+html[data-shot='1'][data-diary='1'] .diary-entry-page {
+  background: #03080a !important;
+  background-image: linear-gradient(
+    to bottom,
+    #03080a 0%,
+    #0a1612 100%
+  ) !important;
+  min-height: 100vh !important;
+  position: relative !important;
+}
+
+/* 隱藏 diary 頁面 chrome：breadcrumb / EKG / TOC / 主文 / DiaryNav /
+ * back-to-index 連結。只留 .diary-entry-hero 作為 OG hero */
+html[data-shot='1'][data-diary='1'] .diary-entry-page nav,
+html[data-shot='1'][data-diary='1'] .diary-entry-page .diary-entry-inner > nav,
+html[data-shot='1'][data-diary='1'] .diary-entry-page article.semiont-prose,
+html[data-shot='1'][data-diary='1'] .diary-entry-page aside,
+html[data-shot='1'][data-diary='1']
+  .diary-entry-page
+  .diary-entry-inner
+  > div.relative
+  > article,
+html[data-shot='1'][data-diary='1']
+  .diary-entry-page
+  .diary-entry-inner
+  > div:last-of-type {
+  display: none !important;
+}
+
+/* EKG 分隔線（標題與內文之間）也隱掉 */
+html[data-shot='1'][data-diary='1']
+  .diary-entry-page
+  .diary-entry-inner
+  > div.mb-10:has(svg) {
+  display: none !important;
+}
+
+/* 容器：頂端錨點 18vh，與 Spore poster 對齊 */
+html[data-shot='1'][data-diary='1'] .diary-entry-page .diary-entry-inner {
+  max-width: none !important;
+  padding: 18vh 6vw 8vh !important;
+}
+
+/* Hero header — 標題大字、深色配 #f4f0ea / accent #4fd1b0 */
+html[data-shot='1'][data-diary='1'] .diary-entry-hero {
+  margin-bottom: 0 !important;
+}
+
+html[data-shot='1'][data-diary='1'] .diary-entry-hero h1 {
+  font-family: 'rixingsong-semibold', 'Noto Serif TC', serif !important;
+  font-size: 4rem !important; /* 64px — 比 article OG 的 3.75rem 略大，
+                                  日記文字密度通常較低 */
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  color: #f4f0ea !important;
+  margin-bottom: 1.5rem !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+/* OG 模式（批次產圖）強制走 Noto Serif TC 避 justfont rate limit */
+html[data-shot='1'][data-diary='1'][data-og='1'] .diary-entry-hero h1 {
+  font-family: 'Noto Serif TC', 'Source Han Serif TC', serif !important;
+  font-weight: 900 !important;
+  font-size: 3.5rem !important; /* 56px — 略縮容納 line-clamp 3 */
+}
+
+/* Date + session badge 行 */
+html[data-shot='1'][data-diary='1'] .diary-entry-hero > div:first-child {
+  margin-bottom: 1.25rem !important;
+}
+
+html[data-shot='1'][data-diary='1'] .diary-entry-hero time {
+  font-size: 1.05rem !important;
+  color: rgba(79, 209, 176, 0.85) !important;
+}
+
+html[data-shot='1'][data-diary='1'] .diary-entry-hero > div:first-child span {
+  font-size: 0.9rem !important;
+  height: auto !important;
+  padding: 0.25rem 0.85rem !important;
+  background: rgba(79, 209, 176, 0.15) !important;
+  color: rgba(79, 209, 176, 0.85) !important;
+}
+
+/* Metadata block（觸發 / Session 跨度 / 字數）— line-clamp 2 避溢出 */
+html[data-shot='1'][data-diary='1'] .diary-entry-hero > div:last-child {
+  font-size: 1rem !important;
+  color: rgba(244, 240, 234, 0.65) !important;
+  border-color: rgba(79, 209, 176, 0.4) !important;
+  max-width: min(900px, 80%) !important;
+}
+
+html[data-shot='1'][data-diary='1'] .diary-entry-hero > div:last-child p {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+/* Diary 也用 BrandMark 浮水印（已由 base data-shot 規則控制 .shot-watermark
+ * 顯示位置；diary 深色背景需要用 light variant，與 spore/og article 一致）*/

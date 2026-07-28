@@ -1,0 +1,452 @@
+---
+/**
+ * ArticleSidebar — Right sidebar: meta → contributors → share.
+ * Keywords live only at article footer (avoid duplicate chrome).
+ * Meta strings and dates follow `lang` via ui.ts + Intl.
+ */
+import { useTranslatedPath, useTranslations } from '../i18n/utils';
+import { languages, type Locale } from '../i18n/ui';
+
+type Contributor = string | { name: string; login: string };
+
+interface Props {
+  title: string;
+  /** @deprecated Keywords removed from sidebar; kept optional for call-site compat */
+  tags?: string[];
+  readingTime?: number;
+  date?: string;
+  lastModified?: string;
+  commitHash?: string;
+  revisionCount?: number;
+  contributors?: Contributor[];
+  category: string;
+  categoryName?: string;
+  /** @deprecated Was only used for keyword chips in sidebar */
+  categoryColor?: string;
+  slug: string;
+  lang?: Locale;
+}
+
+const {
+  title,
+  readingTime,
+  date,
+  lastModified,
+  commitHash = '',
+  revisionCount = 0,
+  contributors = [],
+  category,
+  slug,
+  lang = 'zh-TW',
+} = Astro.props;
+
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+const langPrefix = translatePath(lang);
+const articleUrl = `https://computex-md.pages.dev${langPrefix}/${category}/${slug}`;
+const encodedUrl = encodeURIComponent(articleUrl);
+const encodedTitle = encodeURIComponent(title);
+
+function intlDateLocaleFor(locale: Locale): string {
+  switch (locale) {
+    case 'zh-TW':
+      return 'zh-TW';
+    case 'en':
+      return 'en-US';
+    case 'ja':
+      return 'ja';
+    case 'ko':
+      return 'ko';
+    default:
+      return 'en-US';
+  }
+}
+
+const dateLocale = intlDateLocaleFor(lang);
+const dateOpts: Intl.DateTimeFormatOptions = {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+};
+
+const displayDate = date
+  ? new Date(date).toLocaleDateString(dateLocale, dateOpts)
+  : null;
+const displayModified = lastModified
+  ? new Date(lastModified).toLocaleDateString(dateLocale, dateOpts)
+  : null;
+
+const readingTimeLabel =
+  readingTime != null
+    ? t('article.sidebar.readingTimeTemplate').replace(
+        '{n}',
+        String(readingTime),
+      )
+    : '';
+
+const updatedLabel = t('article.sidebar.updatedLabel');
+const shareLabel = t('article.share');
+const copyLinkLabel = t('article.copyLink');
+const copiedLabel = t('article.copied');
+const contributorsHeading = t('article.contributors');
+
+const revisionLabel =
+  revisionCount === 1
+    ? t('article.sidebar.revisionOne')
+    : t('article.sidebar.revisionMany').replace('{n}', String(revisionCount));
+
+const shortHash = commitHash ? commitHash.substring(0, 7) : '';
+const hashLabel = commitHash
+  ? t('article.sidebar.commitTemplate').replace('{hash}', shortHash)
+  : '';
+
+const shareXLabel = t('article.sidebar.shareX');
+const shareFBLabel = t('article.sidebar.shareFacebook');
+const shareLINELabel = t('article.sidebar.shareLine');
+
+const contentLanguageName = languages[lang] ?? String(lang);
+
+function isGitHubLogin(value: string): boolean {
+  return /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/.test(value);
+}
+
+const normalizedContributors = contributors.map((contributor) => {
+  const normalized =
+    typeof contributor === 'string'
+      ? { name: contributor, login: contributor }
+      : contributor;
+  return {
+    ...normalized,
+    profileUrl: isGitHubLogin(normalized.login)
+      ? `https://github.com/${normalized.login}`
+      : '',
+  };
+});
+---
+
+<!--
+  Phase 4 leaf migration #12: ArticleSidebar.astro
+  ────────────────────────────────────────────────
+  - Scoped <style> block removed entirely (~130 lines)
+  - Class name patterns as const strings in frontmatter for reuse
+    (sidebarBlock, metaRow, shareRow, etc.)
+  - .copy-link-btn class retained (the script queries it by class)
+  - .copy-link-text class retained (the script updates its textContent)
+--><!--
+  max-h + overflow (issue #1059 fix #2): the fixed bottom-right floating
+  cluster (back-to-top + "Aa" + .md, 48px chips stacked from bottom:2rem)
+  occupies the bottom ~210px of the viewport corner. A sticky aside with
+  no height cap grows to content height, so its last interactive rows
+  (Share links) landed inside that band at 1024–1600px and got covered —
+  bottom padding alone couldn't fix it because the aside isn't
+  viewport-bounded. Capping at calc(100dvh - 6rem top offset - 210px
+  cluster reserve) with internal scroll (same pattern as TableOfContents)
+  keeps every interactive row geometrically outside the cluster zone,
+  independent of content length. Mobile (max-lg, single column) drops the
+  cap — the cluster sits below the flowed sidebar there, so no overlap.
+  210px reserve now sourced from --floating-cluster-reserve (tokens.css)
+  instead of a literal, so the two stay in sync by construction.
+-->
+<aside
+  class="sticky top-24 flex max-h-[calc(100dvh-6rem-var(--floating-cluster-reserve))] flex-col overflow-y-auto pb-6 max-lg:max-h-none max-lg:overflow-visible max-lg:pb-0"
+>
+  <!-- Reading meta -->
+  <div
+    class="border-b border-[rgba(26,60,52,0.08)] pb-5 [&_.meta-row]:mb-2 [&_.meta-row]:flex [&_.meta-row]:items-center [&_.meta-row]:gap-[0.55rem] [&_.meta-row]:font-['Inter',system-ui,sans-serif] [&_.meta-row]:text-[0.82rem] [&_.meta-row]:text-[#4a5e52] [&_.meta-row_svg]:flex-shrink-0 [&_.meta-row_svg]:text-[#7a8b7e] [&_.meta-row--subtle]:text-[#7a8b7e]"
+  >
+    {
+      readingTime && (
+        <div class="meta-row">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <>
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </>
+          </svg>
+          <span>{readingTimeLabel}</span>
+        </div>
+      )
+    }
+    {
+      displayDate && (
+        <div class="meta-row">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <>
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </>
+          </svg>
+          <span>{displayDate}</span>
+        </div>
+      )
+    }
+    {
+      displayModified && displayModified !== displayDate && (
+        <div class="meta-row meta-row--subtle">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <>
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+            </>
+          </svg>
+          <span>
+            {updatedLabel} {displayModified}
+          </span>
+        </div>
+      )
+    }
+    {
+      revisionCount > 0 && (
+        <div class="meta-row meta-row--subtle">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <>
+              <circle cx="18" cy="18" r="3" />
+              <circle cx="6" cy="6" r="3" />
+              <path d="M6 9v12" />
+              <path d="M18 15V9a6 6 0 0 0-6-6" />
+            </>
+          </svg>
+          <span>{revisionLabel}</span>
+        </div>
+      )
+    }
+    {
+      commitHash && (
+        <div class="meta-row meta-row--subtle">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <>
+              <circle cx="12" cy="12" r="3" />
+              <line x1="3" y1="12" x2="9" y2="12" />
+              <line x1="15" y1="12" x2="21" y2="12" />
+            </>
+          </svg>
+          <a
+            href={`https://github.com/frank890417/taiwan-md/commit/${commitHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-inherit no-underline transition-colors duration-150 hover:text-[#1a3c34] hover:underline"
+          >
+            {hashLabel}
+          </a>
+        </div>
+      )
+    }
+    <div class="meta-row meta-row--subtle">
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="10"></circle><line
+          x1="2"
+          y1="12"
+          x2="22"
+          y2="12"></line><path
+          d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"
+        ></path>
+      </svg>
+      <span>{contentLanguageName}</span>
+    </div>
+  </div>
+
+  <!-- Contributors (before share) -->
+  {
+    normalizedContributors.length > 0 && (
+      <div class="border-b border-[rgba(26,60,52,0.08)] py-5">
+        <p class="mb-[0.85rem] font-['Inter',system-ui,sans-serif] text-[0.67rem] font-bold uppercase tracking-[0.2em] text-[#9aa89e]">
+          {contributorsHeading}
+        </p>
+        <div class="flex flex-wrap gap-[0.4rem]">
+          {normalizedContributors.map((contributor) =>
+            contributor.profileUrl ? (
+              <a
+                href={contributor.profileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="rounded-full border border-[rgba(0,109,119,0.15)] bg-[rgba(0,109,119,0.07)] px-[0.6rem] py-[0.22rem] font-['Inter',system-ui,sans-serif] text-[0.75rem] text-[#006d77] no-underline transition-colors duration-150 hover:bg-[rgba(0,109,119,0.14)]"
+              >
+                {contributor.name}
+              </a>
+            ) : (
+              <span class="rounded-full border border-[rgba(0,109,119,0.15)] bg-[rgba(0,109,119,0.07)] px-[0.6rem] py-[0.22rem] font-['Inter',system-ui,sans-serif] text-[0.75rem] text-[#006d77]">
+                {contributor.name}
+              </span>
+            ),
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  <!-- Share (after contributors; nowrap labels avoid Facebook mid-word wrap) -->
+  <div class="border-b border-[rgba(26,60,52,0.08)] py-5 last:border-b-0">
+    <p
+      class="mb-[0.85rem] font-['Inter',system-ui,sans-serif] text-[0.67rem] font-bold uppercase tracking-[0.2em] text-[#9aa89e]"
+    >
+      {shareLabel}
+    </p>
+    <div
+      class="flex flex-col gap-[0.1rem] [&_.share-row]:flex [&_.share-row]:w-full [&_.share-row]:cursor-pointer [&_.share-row]:items-center [&_.share-row]:gap-[0.65rem] [&_.share-row]:rounded-md [&_.share-row]:border-none [&_.share-row]:bg-transparent [&_.share-row]:px-2 [&_.share-row]:py-[0.45rem] [&_.share-row]:text-start [&_.share-row]:font-['Inter',system-ui,sans-serif] [&_.share-row]:text-[0.82rem] [&_.share-row]:leading-snug [&_.share-row]:text-[#4a5e52] [&_.share-row]:no-underline [&_.share-row]:transition-colors [&_.share-row]:duration-150 [&_.share-row_span]:min-w-0 [&_.share-row_span]:whitespace-nowrap [&_.share-row_svg]:flex-shrink-0 [&_.share-row_svg]:text-[#7a8b7e] [&_.share-row:hover]:bg-[rgba(26,60,52,0.05)] [&_.share-row:hover]:text-[#1a3c34] [&_.share-row:hover_svg]:text-[#1a3c34]"
+    >
+      <a
+        href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="share-row"
+        aria-label={shareXLabel}
+      >
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+          ><path
+            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.256 5.636L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+          ></path></svg
+        >
+        <span class="whitespace-nowrap">{shareXLabel}</span>
+      </a>
+      <a
+        href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="share-row"
+        aria-label={shareFBLabel}
+      >
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+          ><path
+            d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"
+          ></path></svg
+        >
+        <span class="whitespace-nowrap">{shareFBLabel}</span>
+      </a>
+      <a
+        href={`https://social-plugins.line.me/lineit/share?url=${encodedUrl}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="share-row"
+        aria-label={shareLINELabel}
+      >
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+          ><path
+            d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"
+          ></path></svg
+        >
+        <span class="whitespace-nowrap">{shareLINELabel}</span>
+      </a>
+      <button
+        class="share-row copy-link-btn"
+        type="button"
+        aria-label={copyLinkLabel}
+        data-copy-default={copyLinkLabel}
+        data-copy-copied={copiedLabel}
+      >
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+          ><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+          ></path><path
+            d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+          ></path></svg
+        >
+        <span class="copy-link-text whitespace-nowrap">{copyLinkLabel}</span>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<script>
+  (function () {
+    const btn = document.querySelector<HTMLButtonElement>('.copy-link-btn');
+    if (!btn) return;
+    const textEl = btn.querySelector<HTMLSpanElement>('.copy-link-text');
+    const defaultLabel = btn.dataset.copyDefault ?? 'Copy link';
+    const copiedLabel = btn.dataset.copyCopied ?? 'Copied!';
+    btn.addEventListener('click', () => {
+      navigator.clipboard
+        .writeText(window.location.href)
+        .then(() => {
+          if (textEl) textEl.textContent = copiedLabel;
+          btn.style.color = '#006D77';
+          setTimeout(() => {
+            if (textEl) textEl.textContent = defaultLabel;
+            btn.style.color = '';
+          }, 2200);
+        })
+        .catch(() => {
+          const ta = document.createElement('textarea');
+          ta.value = window.location.href;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          if (textEl) textEl.textContent = copiedLabel;
+          setTimeout(() => {
+            if (textEl) textEl.textContent = defaultLabel;
+          }, 2200);
+        });
+    });
+  })();
+</script>

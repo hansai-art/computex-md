@@ -1,0 +1,45 @@
+/* ── Growth Area Chart ── */
+.growth-chart {
+  overflow-x: auto;
+}
+.growth-area-wrapper {
+  position: relative;
+}
+.growth-svg {
+  display: block;
+}
+.growth-svg-label {
+  font-size: 11px;
+  fill: rgba(0, 0, 0, 0.4);
+  font-family: inherit;
+}
+.growth-dot {
+  transition: r 0.15s;
+}
+.growth-dot-hover:hover + .growth-dot,
+.growth-dot-hover:hover ~ .growth-dot {
+  r: 5;
+}
+.growth-dot-hover {
+  cursor: pointer;
+}
+.growth-milestone-label {
+  font-size: 0.65rem;
+  fill: #6d28d9;
+  font-weight: 600;
+  font-family: inherit;
+}
+.growth-tooltip {
+  position: absolute;
+  background: rgba(30, 41, 59, 0.92);
+  color: #fff;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  pointer-events: none;
+  z-index: 10;
+  white-space: nowrap;
+  max-width: calc(100% - 24px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}

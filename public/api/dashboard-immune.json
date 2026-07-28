@@ -1,0 +1,255 @@
+{
+  "lastUpdated": "2026-07-29T01:07:13.563405",
+  "schemaVersion": "v2-2026-05-16",
+  "featureFlag": "IMMUNE_V2",
+  "immuneScore": 24,
+  "status": "🔴 危險 — 結構性免疫不足",
+  "components": {
+    "review_coverage": 0,
+    "plugin_pass_rate": 0,
+    "plugin_health": 100.0,
+    "citation_density": 0,
+    "tool_freshness": 40,
+    "drift_velocity": 100,
+    "external_rulers": 0.0
+  },
+  "componentWeights": {
+    "review_coverage": 0.25,
+    "plugin_pass_rate": 0.2,
+    "plugin_health": 0.15,
+    "citation_density": 0.15,
+    "tool_freshness": 0.1,
+    "drift_velocity": 0.05,
+    "external_rulers": 0.1
+  },
+  "tierBreakdown": {
+    "T1": {
+      "total": 0,
+      "reviewed": 0,
+      "pct": 0,
+      "weight": 3.0
+    },
+    "T2": {
+      "total": 0,
+      "reviewed": 0,
+      "pct": 0,
+      "weight": 1.5
+    },
+    "T3": {
+      "total": 0,
+      "reviewed": 0,
+      "pct": 0,
+      "weight": 0.5
+    }
+  },
+  "pluginPassDetail": {
+    "total_files": 0,
+    "hard_pass": 0,
+    "warn_pass": 0
+  },
+  "citationDetail": {
+    "grades": {
+      "A": 0,
+      "B": 0,
+      "C": 0,
+      "D": 0,
+      "F": 0
+    },
+    "files_with_grade": 0
+  },
+  "freshnessDetail": {
+    "editorial_days_old": 999,
+    "avg_plugin_days_old": 999,
+    "plugin_count": 27,
+    "source": "git log %ai (not fs mtime — worktree-safe)"
+  },
+  "driftDetail": {
+    "new_articles_7d": 0,
+    "rate_per_article": 0.0
+  },
+  "pluginHealthDetail": {
+    "schema": "v2-loadable-2026-07-10",
+    "plugin_count": 27,
+    "healthy_count": 27,
+    "unhealthy_count": 0,
+    "editorial_age_days": 999,
+    "age_watch_days": 30,
+    "plugins": [
+      {
+        "plugin": "ai_residue",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "attribution_vague",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "chronicle_lead",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "cjk_punct",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "correction_meta",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "cross_reference",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "footnote_density",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "footnote_format",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "footnote_url",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "format_structure",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "frontmatter_format",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "frontmatter_title",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "image_alt",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "image_health",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "link_target",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "link_url_mangle",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "media_richness",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "paragraph_rhythm",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "prose_health",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "quote_fidelity",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "rationale_presence",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "seo_meta",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "spore_writing",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "terminology",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "viz_health",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "wikilink_target",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      },
+      {
+        "plugin": "word_count",
+        "plugin_age_days": 999,
+        "healthy": true,
+        "age_watch": true
+      }
+    ],
+    "note": "v2 score = loadable+registered ratio（orphan / import crash / 介面缺欄才算病）。age_watch 為資訊欄不進分數。v1 drift 定義的診斷與拍板紀錄：LESSONS immune-chronic entry §一頁診斷 2026-07-10。"
+  },
+  "externalRulersDetail": {
+    "ruledArticles": 0,
+    "totalArticles": 0,
+    "rulerSources": {
+      "factcheckReports": true,
+      "readerErrataCommits90d": true,
+      "lastVerifiedExcluded": "99.6% saturated backfill (2026-06-10)"
+    },
+    "windowDays": 90
+  },
+  "designReport": "reports/immune-score-redesign-2026-05-16.md",
+  "v3Note": "external_rulers added 2026-06-10 (audit D-4): % articles touched by an independent external ruler in 90d (factcheck full-mode report OR reader-errata commit). Baseline ~3% is honest — the dimension exists to make external verification growth visible."
+}

@@ -1,0 +1,50 @@
+---
+// SectionI18nCoverage — 🔤 UI Translation Coverage section (#i18n-ui-coverage):
+// UI string (src/i18n/) key coverage per language. Ids/classes are a contract
+// with src/scripts/dashboard-client.js and src/styles/dashboard/ — do not rename.
+import { getLangFromUrl } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const isEn = lang === 'en';
+---
+
+<!--
+  i18n UI keys coverage（2026-04-25 β7 Phase 3 任務 #9）
+  不同於上方 translation section（文章層面翻譯），這裡顯示
+  UI 字串（src/i18n/{module}.ts）的各語言 key 覆蓋率。
+  Source: /api/dashboard-i18n.json (由 scripts/tools/i18n-coverage-audit.sh 生成)
+  Roadmap: reports/i18n-evolution-roadmap-2026-04-25.md Phase 3 #9
+-->
+<section class="section" id="i18n-ui-coverage">
+  <h2 class="section-title">
+    {isEn ? '🔤 UI Translation Coverage' : '🔤 介面字串翻譯覆蓋率'}
+    <span class="section-timestamp" data-source="i18n"></span>
+  </h2>
+  <p class="section-subtitle">
+    {
+      isEn
+        ? 'How many UI strings (src/i18n/) each language has translated. Differs from article-level translation above.'
+        : '各語言在 src/i18n/ 12 module × 介面字串的翻譯覆蓋率。與上方文章層級翻譯不同。'
+    }
+  </p>
+  <div class="translation-bars" id="i18n-bars"></div>
+  <div class="translation-matrix-wrapper">
+    <table class="translation-matrix" id="i18n-matrix">
+      <thead id="i18n-matrix-head"></thead>
+      <tbody id="i18n-matrix-body"></tbody>
+    </table>
+  </div>
+  <p class="text-xs text-gray-500" style="margin-top: 1rem;">
+    🟢 = full / 🟡 = partial / 🔴 = missing (FALLBACK_CHAIN active) / — = no
+    such module · Re-generate:
+    <code
+      >bash scripts/tools/i18n-coverage-audit.sh --json-out
+      public/api/dashboard-i18n.json</code
+    >
+    · Roadmap:
+    <a
+      href="https://github.com/frank890417/taiwan-md/blob/main/reports/i18n-evolution-roadmap-2026-04-25.md"
+      >reports/i18n-evolution-roadmap-2026-04-25.md</a
+    >
+  </p>
+</section>

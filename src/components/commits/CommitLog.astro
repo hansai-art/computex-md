@@ -1,0 +1,286 @@
+---
+import TimelineDay from '../timeline/TimelineDay.astro';
+import { commitIcon, commitType, timeAgo } from '../../lib/commits';
+import type { Commit } from '../../lib/commits';
+import type { Lang } from '../../types';
+
+interface RelativeTimeLabels {
+  justNow: string;
+  minutesAgo: string;
+  hoursAgo: string;
+  daysAgo: string;
+}
+
+interface Props {
+  commits: Commit[];
+  lang: Lang;
+  variant?: 'timeline' | 'cards' | 'compact';
+  locale?: string;
+  dayUpdatesLabel?: string;
+  emptyTitle?: string;
+  emptyDescription?: string;
+  emptyLinkHref?: string;
+  emptyLinkLabel?: string;
+  relativeTimeLabels?: RelativeTimeLabels;
+}
+
+const {
+  commits,
+  lang,
+  variant = 'timeline',
+  locale = lang === 'zh-TW'
+    ? 'zh-TW'
+    : lang === 'ja'
+      ? 'ja-JP'
+      : lang === 'ko'
+        ? 'ko-KR'
+        : 'en-US',
+  dayUpdatesLabel = lang === 'zh-TW' ? '筆更新' : 'updates',
+  emptyTitle = lang === 'zh-TW'
+    ? '目前暫時抓不到更新紀錄'
+    : 'Update history is temporarily unavailable',
+  emptyDescription = lang === 'zh-TW'
+    ? '目前沒有可顯示的 commit feed。'
+    : 'There is no commit feed available right now.',
+  emptyLinkHref = 'https://github.com/frank890417/taiwan-md/commits/main',
+  emptyLinkLabel = 'GitHub',
+  relativeTimeLabels = lang === 'zh-TW'
+    ? {
+        justNow: '剛剛',
+        minutesAgo: '分鐘前',
+        hoursAgo: '小時前',
+        daysAgo: '天前',
+      }
+    : {
+        justNow: 'just now',
+        minutesAgo: 'minutes ago',
+        hoursAgo: 'hours ago',
+        daysAgo: 'days ago',
+      },
+} = Astro.props;
+
+const grouped: Record<string, Commit[]> = {};
+if (variant === 'timeline') {
+  for (const commit of commits) {
+    const day = commit.date.slice(0, 10);
+    if (!grouped[day]) grouped[day] = [];
+    grouped[day].push(commit);
+  }
+}
+const sortedDays = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+
+function formatDate(dateStr: string) {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString(locale, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'short',
+  });
+}
+---
+
+<!--
+  Phase 4 leaf migration #11: CommitLog.astro
+  ───────────────────────────────────────────
+  - Scoped <style> block removed entirely
+  - Three variants (timeline / cards / compact) all migrated to
+    Tailwind utility classes
+  - Class names retained: commit-log-time[data-date] (used by the
+    inline updateRelativeTimes script to find elements), commit-log-item
+    (no longer used for styling but kept as semantic hook)
+
+  Common class strings are assigned to const variables in the
+  frontmatter to keep the JSX readable and avoid duplication across
+  the three variants.
+-->
+<div class="commit-log">
+  {
+    variant === 'timeline' ? (
+      sortedDays.length ? (
+        <div class="flex flex-col">
+          {sortedDays.map((day, dayIdx) => (
+            <TimelineDay
+              id={`day-${day}`}
+              title={formatDate(day)}
+              badge={`${grouped[day].length} ${dayUpdatesLabel}`}
+              isLast={dayIdx === sortedDays.length - 1}
+              accent="blue"
+              titleStyle="sans"
+              extraClass="changelog-day-group"
+            >
+              {grouped[day].map((commit) => (
+                <article
+                  data-type={commitType(commit.message)}
+                  class="commit-log-item grid grid-cols-[32px_1fr] gap-4 rounded-[10px] border border-[#e2e8f0] bg-white px-5 py-4 shadow-[0_1px_3px_rgba(15,23,42,0.04)] transition-all duration-200 [content-visibility:auto] [contain-intrinsic-size:auto_88px] max-[768px]:grid-cols-[24px_1fr] max-[768px]:gap-3 max-[768px]:px-4 max-[768px]:py-[0.9rem]"
+                >
+                  <span class="text-center text-base leading-normal">
+                    {commitIcon(commit.message)}
+                  </span>
+                  <div class="min-w-0">
+                    <p class="m-0 break-words text-[0.95rem] font-semibold leading-normal text-[#1f2937]">
+                      {commit.message}
+                    </p>
+                    <div class="mt-2 flex flex-wrap items-center gap-3 text-[0.82rem] text-[#64748b]">
+                      {commit.author && (
+                        <span class="font-semibold">{commit.author}</span>
+                      )}
+                      <span
+                        class="commit-log-time whitespace-nowrap font-medium text-[#94a3b8]"
+                        data-date={commit.date}
+                      >
+                        {new Date(commit.date).toLocaleTimeString(locale, {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                      <a
+                        href={`https://github.com/frank890417/taiwan-md/commit/${commit.hash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="font-['SFMono-Regular',Consolas,'Liberation_Mono',Menlo,monospace] font-semibold text-[#2563eb] no-underline hover:underline"
+                      >
+                        {commit.hash.slice(0, 7)}
+                      </a>
+                      {commit.articles &&
+                        commit.articles.length > 0 &&
+                        commit.articles.map((article) => (
+                          <a
+                            href={article.url}
+                            class="inline-flex items-center gap-1 rounded-md bg-[#0f766e]/10 px-2 py-0.5 font-medium text-[#0f766e] no-underline hover:bg-[#0f766e]/20 hover:underline"
+                            title={article.name}
+                          >
+                            📄 {article.name}
+                          </a>
+                        ))}
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </TimelineDay>
+          ))}
+        </div>
+      ) : (
+        <div class="rounded-2xl border border-[#e2e8f0] bg-[#fafbfc] p-6 text-center">
+          <h2 class="mb-3 mt-0 text-[1.2rem] text-[#1f2937]">{emptyTitle}</h2>
+          <p class="m-0 leading-relaxed text-[#64748b]">{emptyDescription}</p>
+          <a
+            href={emptyLinkHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="mt-4 inline-block font-semibold text-[#2563eb] no-underline hover:underline"
+          >
+            {emptyLinkLabel}
+          </a>
+        </div>
+      )
+    ) : commits.length ? (
+      variant === 'cards' ? (
+        <div class="flex flex-col gap-3">
+          {commits.map((commit) => (
+            <article class="commit-log-item grid grid-cols-[32px_1fr] gap-4 rounded-[10px] border border-[#e2e8f0] bg-white px-5 py-4 shadow-[0_1px_3px_rgba(15,23,42,0.04)] transition-all duration-200 hover:-translate-y-px hover:border-[#cbd5e1] hover:shadow-[0_10px_24px_rgba(15,23,42,0.08)] max-[768px]:grid-cols-[24px_1fr] max-[768px]:gap-3 max-[768px]:px-4 max-[768px]:py-[0.9rem]">
+              <span class="text-center text-base leading-normal">
+                {commitIcon(commit.message)}
+              </span>
+              <div class="min-w-0">
+                <p class="m-0 break-words text-[0.95rem] font-semibold leading-normal text-[#1f2937]">
+                  {commit.message}
+                </p>
+                <div class="mt-2 flex flex-wrap items-center gap-3 text-[0.82rem] text-[#64748b]">
+                  {commit.author && (
+                    <span class="font-semibold">{commit.author}</span>
+                  )}
+                  <span
+                    class="commit-log-time whitespace-nowrap font-medium text-[#94a3b8]"
+                    data-date={commit.date}
+                  >
+                    {new Date(commit.date).toLocaleTimeString(locale, {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                  <a
+                    href={`https://github.com/frank890417/taiwan-md/commit/${commit.hash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="font-['SFMono-Regular',Consolas,'Liberation_Mono',Menlo,monospace] font-semibold text-[#2563eb] no-underline hover:underline"
+                  >
+                    {commit.hash.slice(0, 7)}
+                  </a>
+                  {commit.articles &&
+                    commit.articles.length > 0 &&
+                    commit.articles.map((article) => (
+                      <a
+                        href={article.url}
+                        class="inline-flex items-center gap-1 rounded-md bg-[#0f766e]/10 px-2 py-0.5 font-medium text-[#0f766e] no-underline hover:bg-[#0f766e]/20 hover:underline"
+                        title={article.name}
+                      >
+                        📄 {article.name}
+                      </a>
+                    ))}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="flex flex-col gap-3">
+          {commits.map((commit) => (
+            <a
+              href={`https://github.com/frank890417/taiwan-md/commit/${commit.hash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="commit-log-item grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-start gap-3 rounded-[10px] border border-[#e2e8f0] bg-white px-4 py-3 text-inherit no-underline transition-all duration-200 hover:translate-x-1 hover:border-[#bfdbfe] hover:bg-[#f0f9ff] max-[768px]:grid-cols-[1.5rem_1fr]"
+              title={commit.message}
+            >
+              <span class="text-center text-base leading-normal">
+                {commitIcon(commit.message)}
+              </span>
+              <span class="m-0 min-w-0 whitespace-normal break-words text-[0.9rem] font-semibold leading-normal text-[#1f2937] max-[768px]:text-[0.85rem]">
+                {commit.message}
+              </span>
+              <span class="whitespace-nowrap pt-[0.05rem] text-[0.82rem] font-medium text-[#94a3b8] max-[768px]:col-start-2 max-[768px]:pt-0">
+                {timeAgo(commit.date, lang)}
+              </span>
+            </a>
+          ))}
+        </div>
+      )
+    ) : null
+  }
+</div>
+
+<script is:inline define:vars={{ relativeTimeLabels }}>
+  function updateRelativeTimes() {
+    const timeElements = document.querySelectorAll(
+      '.commit-log-time[data-date]',
+    );
+    const now = new Date();
+
+    timeElements.forEach((el) => {
+      const dateValue = el.getAttribute('data-date');
+      if (!dateValue) return;
+
+      const date = new Date(dateValue);
+      const diffInSeconds = Math.floor((now - date) / 1000);
+
+      let relativeTime = '';
+      if (diffInSeconds < 60) {
+        relativeTime = relativeTimeLabels.justNow;
+      } else if (diffInSeconds < 3600) {
+        relativeTime = `${Math.floor(diffInSeconds / 60)} ${relativeTimeLabels.minutesAgo}`;
+      } else if (diffInSeconds < 86400) {
+        relativeTime = `${Math.floor(diffInSeconds / 3600)} ${relativeTimeLabels.hoursAgo}`;
+      } else if (diffInSeconds < 2592000) {
+        relativeTime = `${Math.floor(diffInSeconds / 86400)} ${relativeTimeLabels.daysAgo}`;
+      } else {
+        relativeTime = date.toLocaleDateString();
+      }
+
+      el.textContent = relativeTime;
+    });
+  }
+
+  updateRelativeTimes();
+  setInterval(updateRelativeTimes, 60000);
+</script>

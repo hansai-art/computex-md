@@ -1,0 +1,48 @@
+---
+// SectionVitals — 💓 Vital Signs section (#vitals). Ids/classes are a contract
+// with src/scripts/dashboard-client.js and src/styles/dashboard/ — do not rename.
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<!-- Vital Signs -->
+<section class="section" id="vitals">
+  <h2 class="section-title">
+    {t('dashboard.vitals.title')}
+    <span class="section-timestamp" data-source="vitals"></span>
+  </h2>
+  <div class="vitals-grid" id="vitals-grid">
+    <div class="vital-card" data-vital="heartbeat">
+      <div class="vital-emoji">💓</div>
+      <div class="vital-value" id="vital-heartbeat">—</div>
+      <div class="vital-label">{t('dashboard.vitals.heartbeat')}</div>
+      <div class="vital-desc">{t('dashboard.vitals.heartbeat.desc')}</div>
+    </div>
+    <div class="vital-card" data-vital="cells">
+      <div class="vital-emoji">🧫</div>
+      <div class="vital-value" id="vital-cells">—</div>
+      <div class="vital-label">{t('dashboard.vitals.cells')}</div>
+      <div class="vital-desc">{t('dashboard.vitals.cells.desc')}</div>
+    </div>
+    <div class="vital-card" data-vital="immunity">
+      <div class="vital-emoji">🛡️</div>
+      <div class="vital-value" id="vital-immunity">—</div>
+      <div class="vital-label">{t('dashboard.vitals.immunity')}</div>
+      <div class="vital-desc">{t('dashboard.vitals.immunity.desc')}</div>
+    </div>
+    <div class="vital-card" data-vital="dna">
+      <div class="vital-emoji">🧬</div>
+      <div class="vital-value" id="vital-dna">—</div>
+      <div class="vital-label">{t('dashboard.vitals.dna')}</div>
+      <div class="vital-desc">{t('dashboard.vitals.dna.desc')}</div>
+    </div>
+    <div class="vital-card" data-vital="revision">
+      <div class="vital-emoji">📐</div>
+      <div class="vital-value" id="vital-revision">—</div>
+      <div class="vital-label">{t('dashboard.vitals.revision')}</div>
+      <div class="vital-desc">{t('dashboard.vitals.revision.desc')}</div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,2487 @@
+/**
+ * dark-polish.css — minimal dark-mode override layer for component-scoped surfaces.
+ *
+ * Why this file exists:
+ *   tokens.css flips the body bg/ink in one place via [data-theme='dark'].
+ *   But many component & page files (slug.astro × 6 langs, hero, sidebar,
+ *   cards, header) still carry hardcoded hex colors from before color
+ *   tokens existed. A full re-tokenization is a large refactor — this
+ *   file is the pragmatic v1 patch that keeps reading legible in dark
+ *   mode without rewriting every hex.
+ *
+ * Selector strategy:
+ *   We target the cross-file *class names* that hold the most visible
+ *   reading surfaces (.prose, .hero-title overrides, etc). All rules
+ *   are gated on :root[data-theme='dark'], so light mode is untouched.
+ *
+ * NOT in scope for v1:
+ *   - Header/Nav internals (Header.astro is 1,759 lines; needs its own pass)
+ *   - Category-specific hero gradients (each kept light by intent)
+ *   - SVG illustrations / data viz colors
+ *
+ * Born: Issue #615 / idlccp1984 reader options, 2026-05-01 γ-late.
+ */
+
+:root[data-theme='dark'] .prose {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .prose h1,
+:root[data-theme='dark'] .prose h2,
+:root[data-theme='dark'] .prose h3,
+:root[data-theme='dark'] .prose h4,
+:root[data-theme='dark'] .prose h5,
+:root[data-theme='dark'] .prose h6 {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .prose h2 {
+  /* The default --color-border (12% ink) sits at ~rgba(226,232,240,0.12)
+   * which all but vanishes against #050505. Lift the alpha for the
+   * structural lines (h2 underline, table cell borders) so they read
+   * as actual dividers instead of barely-there ghosts. */
+  border-bottom-color: color-mix(in srgb, var(--color-ink) 28%, transparent);
+}
+:root[data-theme='dark'] .prose p,
+:root[data-theme='dark'] .prose li {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .prose strong,
+:root[data-theme='dark'] .prose em,
+:root[data-theme='dark'] .prose b,
+:root[data-theme='dark'] .prose i {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .prose a {
+  color: var(--color-accent);
+  text-decoration-color: color-mix(
+    in srgb,
+    var(--color-accent) 50%,
+    transparent
+  );
+}
+:root[data-theme='dark'] .prose a:hover {
+  text-decoration-color: var(--color-accent);
+}
+:root[data-theme='dark'] .prose blockquote:not(.tw-quote-text) {
+  color: var(--color-ink-soft);
+  /* Logical, to stay paired with the base rule's `border-inline-start` in
+   * article.template.astro — a physical override here would have quietly
+   * stopped colouring the rail in *both* themes. */
+  border-inline-start-color: var(--color-accent);
+  /* The light-mode rule paints `rgba(26,60,52,0.04)` over cream — readable.
+   * On #050505 a 4% wash literally vanishes. Lift to ~6-8% ink with a
+   * subtle horizontal fade so the quote reads as a distinct surface. */
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-ink) 8%, transparent),
+    color-mix(in srgb, var(--color-ink) 2%, transparent)
+  );
+}
+/* Same reason as the light-mode rule: gradients take no logical direction.
+ * `dir` and `data-theme` both live on <html>, hence the compound selector. */
+:root[data-theme='dark'][dir='rtl'] .prose blockquote:not(.tw-quote-text) {
+  background: linear-gradient(
+    to left,
+    color-mix(in srgb, var(--color-ink) 8%, transparent),
+    color-mix(in srgb, var(--color-ink) 2%, transparent)
+  );
+}
+:root[data-theme='dark'] .prose code {
+  background-color: color-mix(in srgb, var(--color-ink) 8%, transparent);
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .prose pre {
+  background-color: color-mix(in srgb, var(--color-ink) 12%, transparent);
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .prose hr {
+  border-color: var(--color-border);
+}
+/* :not(.tw-heatmap-table …) — tw-heatmap 模組自帶配色（cascade leak 修復 2026-06-12） */
+:root[data-theme='dark'] .prose table:not(.tw-heatmap-table) {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .prose table:not(.tw-heatmap-table) th,
+:root[data-theme='dark'] .prose table:not(.tw-heatmap-table) td {
+  color: var(--color-ink);
+  /* Same reason as the h2 underline: 12% ink is invisible on near-black,
+   * lift to 28% for visible cell borders. */
+  border-color: color-mix(in srgb, var(--color-ink) 28%, transparent);
+}
+:root[data-theme='dark'] .prose table:not(.tw-heatmap-table) th {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+:root[data-theme='dark'] .prose table:not(.tw-heatmap-table) tr:hover td {
+  background: color-mix(in srgb, var(--color-ink) 3%, transparent);
+}
+
+/* Global "card" surfaces — many components use these class fragments.
+   Catch the visible-bg ones with a broad pattern. */
+:root[data-theme='dark']
+  [class*='card']:not([class*='category-card']):not([class*='supporter-card']) {
+  background-color: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  border-color: var(--color-border);
+}
+
+/* TableOfContents / sidebar containers */
+:root[data-theme='dark'] .table-of-contents,
+:root[data-theme='dark'] .article-sidebar,
+:root[data-theme='dark'] [class*='sidebar'] {
+  color: var(--color-ink);
+}
+
+/* Header + Hero: flatten to body bg in dark mode so the page reads as
+ * a single continuous surface. The default white-ish translucent header
+ * + dark-teal hero looked like three stacked stripes; user feedback
+ * (2026-05-03) was to unify them. */
+:root[data-theme='dark'] header#main-header,
+:root[data-theme='dark'] header[class*='global-header'],
+:root[data-theme='dark'] .site-header {
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Header design-token overrides. Header.astro defines its full palette
+ * via CSS vars on `header { ... }`; we re-declare the chrome-relevant
+ * ones here so nav text, separators, search, GitHub icon, kbd hint,
+ * language pill and burger all flip together without touching Header. */
+:root[data-theme='dark'] header {
+  --header-bg: var(--color-bg);
+  --header-border: var(--color-border);
+  --nav-color: var(--color-ink-soft);
+  --nav-hover-color: var(--color-ink);
+  --nav-hover-bg: color-mix(in srgb, var(--color-ink) 8%, transparent);
+  --sep-color: var(--color-border);
+  --arrow-color: var(--color-ink-soft);
+  --logo-color: var(--color-ink);
+  --search-border: var(--color-border);
+  --search-color: var(--color-ink-soft);
+  --kbd-bg: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  --kbd-color: var(--color-ink-soft);
+  --kbd-border: var(--color-border);
+  --gh-color: var(--color-ink-soft);
+  --lang-bg: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  --lang-border: var(--color-border);
+  --lang-color: var(--color-ink-soft);
+  --burger-bg: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  --burger-border: var(--color-border);
+  --burger-color: var(--color-ink);
+  --glass-border: var(--color-border);
+  --glass-shadow: rgba(0, 0, 0, 0.5);
+  --glass-inset: color-mix(in srgb, var(--color-ink) 4%, transparent);
+}
+
+/* Dropdowns: the header scopes `.dropdown-menu` and `.lang-dropdown-menu`
+ * via Astro hashing, but the rules use plain class selectors internally
+ * and CSS specificity is the same; we win via the extra
+ * `:root[data-theme='dark']` qualifier. */
+:root[data-theme='dark'] header .dropdown-menu,
+:root[data-theme='dark'] header.scrolled .dropdown-menu {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] header .dropdown-item,
+:root[data-theme='dark'] header.scrolled .dropdown-item {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] header .dropdown-item:hover,
+:root[data-theme='dark'] header.scrolled .dropdown-item:hover {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] header .dropdown-divider,
+:root[data-theme='dark'] header.scrolled .dropdown-divider {
+  background: var(--color-border);
+}
+:root[data-theme='dark'] header .dropdown-section-header,
+:root[data-theme='dark'] header.scrolled .dropdown-section-header {
+  color: var(--color-ink-soft);
+}
+
+/* Language switcher dropdown panel */
+:root[data-theme='dark'] header .lang-dropdown-menu {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] header .lang-dropdown-item {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] header .lang-dropdown-item:hover {
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] header .lang-dropdown-item.active {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+/* ArticleHero — `bg-[#1a3c34]` dark-teal hero band → body bg. */
+:root[data-theme='dark'] main.article-page section[class*='bg-[#1a3c34]'] {
+  background-color: var(--color-bg);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+ * Article template overrides (zh-TW + en + ja + ko + es + fr).
+ *
+ * src/templates/article.template.astro uses Tailwind arbitrary values
+ * (bg-[#f8f1e9] cream / text-[#1a3c34] dark teal / etc) extensively
+ * because tokenization predates the dark-mode work. Refactoring all
+ * occurrences across 6 language pages is a large change; instead we
+ * override at the class-attribute level so the template stays untouched.
+ *
+ * Selector strategy: `[class*="bg-[#f8f1e9]"]` matches the literal
+ * Tailwind class string. Quoted attribute values don't need the bracket
+ * escapes that bare class selectors would.
+ * ────────────────────────────────────────────────────────────────── */
+
+/* Cream backgrounds (main + explore section + random-explore strip) → body bg */
+:root[data-theme='dark'] main.article-page,
+:root[data-theme='dark'] main.article-page [class*='bg-[#f8f1e9]'] {
+  background-color: var(--color-bg);
+}
+
+/* "bg-white" cards (other-category cards, random button) → dark surface.
+ * Use ~= (whitespace-separated whole word) so variants like
+ * `[&_#tts-play]:bg-white/10` on the TTS wrapper don't accidentally
+ * paint a dark-grey rectangle behind the hero's audio button. */
+:root[data-theme='dark'] main.article-page [class~='bg-white'] {
+  background-color: var(--color-surface);
+}
+
+/* Dark-teal text (#1a3c34) inside article-page → light ink. Excludes
+ * elements that ALSO sit on a dark-teal background (the edit/share CTAs
+ * keep their cream-on-teal contrast). */
+:root[data-theme='dark']
+  main.article-page
+  [class*='text-[#1a3c34]']:not([class*='bg-[#1a3c34]']) {
+  color: var(--color-ink);
+}
+
+/* Muted greys used for chrome/labels → soft ink */
+:root[data-theme='dark'] main.article-page [class*='text-[#5a4a42]'],
+:root[data-theme='dark'] main.article-page [class*='text-[#6a7d72]'],
+:root[data-theme='dark'] main.article-page [class*='text-[#7a8b7e]'],
+:root[data-theme='dark'] main.article-page [class*='text-[#9aa89e]'],
+:root[data-theme='dark'] main.article-page [class*='text-[#b0bdb4]'],
+:root[data-theme='dark'] main.article-page [class*='text-[#b8c4be]'] {
+  color: var(--color-ink-soft);
+}
+
+/* TOC inactive titles + sidebar meta labels (#3a4f44 / #4a5e52 dark teal
+ * body text) → primary ink. These are the largest blocks of "invisible"
+ * text users hit first when reading on dark. */
+:root[data-theme='dark'] main.article-page [class*='text-[#3a4f44]'],
+:root[data-theme='dark'] main.article-page [class*='text-[#4a5e52]'] {
+  color: var(--color-ink);
+}
+
+/* ArticleSidebar uses Tailwind descendant variants
+ * `[&_.meta-row]:text-[#4a5e52]` etc, which compile to rules that
+ * target `.meta-row` directly — not the parent we matched above. We
+ * have to repeat the override at the leaf-class level. Mapped:
+ *   - .meta-row / .share-row (primary metadata) → ink-soft so it sits
+ *     visibly secondary to body prose without disappearing
+ *   - .meta-row--subtle / *_svg (icons + faded rows) → ink-soft too,
+ *     since the further-muted shade collapses into the bg on dark
+ *   - hover state → primary ink (the original light-mode rule darkened
+ *     on hover; in dark we brighten on hover instead) */
+:root[data-theme='dark'] main.article-page .meta-row,
+:root[data-theme='dark'] main.article-page .meta-row--subtle,
+:root[data-theme='dark'] main.article-page .meta-row svg,
+:root[data-theme='dark'] main.article-page .share-row,
+:root[data-theme='dark'] main.article-page .share-row svg {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] main.article-page .share-row:hover,
+:root[data-theme='dark'] main.article-page .share-row:hover svg {
+  color: var(--color-ink);
+}
+
+/* Cyan-teal accent (#006d77 — used for source links, TOC active state,
+ * "share", category accents) → use the dark accent token so links pop
+ * against the near-black background. */
+:root[data-theme='dark'] main.article-page [class*='text-[#006d77]'] {
+  color: var(--color-accent);
+}
+/* Matches the class *string*, so it had to follow TableOfContents.astro's
+ * `border-l-[#006d77]` → `border-s-[#006d77]` rename or it would silently
+ * stop matching anything. */
+:root[data-theme='dark'] main.article-page [class*='border-s-[#006d77]'] {
+  border-inline-start-color: var(--color-accent);
+}
+:root[data-theme='dark'] main.article-page [class*='bg-[rgba(0,109,119'] {
+  background-color: color-mix(in srgb, var(--color-accent) 15%, transparent);
+}
+
+/* Translucent dark-teal borders → token border */
+:root[data-theme='dark'] main.article-page [class*='border-[rgba(26,60,52'] {
+  border-color: var(--color-border);
+}
+
+/* Translucent dark-teal panel backgrounds (sources box, share-button hover
+ * surface, share-button rest state) → soft surface */
+:root[data-theme='dark'] main.article-page [class*='bg-[rgba(26,60,52'] {
+  background-color: color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+
+/* AI disclaimer warm-orange tint — keep semantic accent but desaturate
+ * panel + soften border so it doesn't glare on dark */
+:root[data-theme='dark'] main.article-page [class*='bg-[rgba(193,125,94'] {
+  background-color: color-mix(in srgb, #c17d5e 14%, transparent);
+}
+:root[data-theme='dark'] main.article-page [class*='border-[rgba(193,125,94'] {
+  border-color: color-mix(in srgb, #c17d5e 30%, transparent);
+}
+
+/* TOC active link / sticky sidebar internal text → ensure readable.
+ * TableOfContents.astro + SporeFootprint.astro + DiaryTeaser.astro
+ * inherit from the broader rules above; this is a safety net. */
+:root[data-theme='dark'] .table-of-contents a,
+:root[data-theme='dark'] .article-sidebar a {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .table-of-contents a:hover,
+:root[data-theme='dark'] .article-sidebar a:hover {
+  color: var(--color-ink);
+}
+
+/* TOC active state — TableOfContents.astro hard-codes light-mode teal
+ * (#006d77 border + rgba(0,109,119,0.06) bg + #006d77 text) in arbitrary
+ * Tailwind variants `[&.active]:...`. These wash out against the dark
+ * (#050505) page background — the active chapter becomes indistinguishable
+ * from inactive ones (issue #1059 §2: "暗黑模式位置指引修正").
+ *
+ * v2 (2026-07-06): the first pass (accent 14% bg + 2px border) was still
+ * too low-contrast to spot the current section at a glance. Strengthen:
+ *   - inline-start border → 3px, full accent (a clear rail marks position)
+ *   - background → accent 22% (a distinct-but-calm block, not a wash)
+ *   - text → accent + weight 600 so the label itself reads as "current"
+ * Light theme is untouched (this whole file is gated on data-theme=dark). */
+:root[data-theme='dark'] .toc-link.active {
+  /* Logical, paired with TableOfContents.astro's `border-s-2`. */
+  border-inline-start-width: 3px !important;
+  border-inline-start-color: var(--color-accent) !important;
+  background-color: color-mix(
+    in srgb,
+    var(--color-accent) 22%,
+    transparent
+  ) !important;
+  color: var(--color-accent) !important;
+}
+:root[data-theme='dark'] .toc-link.active span {
+  color: var(--color-accent) !important;
+  font-weight: 600 !important;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+ * 分類卡在暗色降飽和（OBSERVER-QUEUE #12 (b) 2026-07-25 到期預設）。
+ *
+ * CategoryGrid 的卡片頭部背景是元件自帶的一組 pastel 漸層（硬寫在
+ * CategoryGrid.astro 的 data array，跟 tokens.css 的 --cat-*-gradient
+ * 是兩套不同調色盤，見該檔 line 50 的 token-convergence TODO）。那組
+ * 漸層是為亮底調的，整片貼到近黑頁面上會亮得跳出來，issue #1212 §4.3
+ * 說的就是這件事。
+ *
+ * 這裡不動任何顏色值——降飽和用 filter 蓋在整個漸層層上，一行、可逆、
+ * 不需要為 14 個分類各挑一次暗色。等 4-palette convergence 真的做了，
+ * 這條就可以整段拿掉。0.85 是佇列裡寫定的預設值。 */
+:root[data-theme='dark'] .category-card-gradient {
+  filter: saturate(0.85);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+ * Category hub overrides (main.category-page).
+ *
+ * Mirrors the article-page strategy above: the template
+ * (src/templates/category-hub.template.astro) uses Tailwind arbitrary
+ * values + scoped class selectors hard-wired to the slate palette
+ * (#1a1a2e / #334155 / #475569 / #64748b / #94a3b8 / #e2e8f0 / etc).
+ * Re-tokenizing the template is a large refactor; we patch at the
+ * class-attribute / leaf-class level instead so the hub template
+ * stays untouched.
+ *
+ * Born: 2026-05-04 zen-mendeleev — observer asked for reader settings
+ * (text-size + dark mode) on hub pages parallel to article pages.
+ * Layout.astro now exposes a `readerSettings` prop; hub opts in;
+ * this block is the per-surface dark polish that opt-in requires.
+ * ────────────────────────────────────────────────────────────────── */
+
+/* Page background — hub doesn't paint its own bg, it inherits from
+ * <body>, which tokens.css already flips. The header strip uses a
+ * category-color tint var and keeps its accent in dark (intentional;
+ * matches how the article-page hero band stays accent-tinted). */
+
+/* Slate-text Tailwind arbitrary classes throughout the hub chrome
+ * (breadcrumb, header meta, sidebar nav, subcategory nav, results
+ * count, etc) → primary ink */
+:root[data-theme='dark'] main.category-page [class*='text-[#1a1a2e]'],
+:root[data-theme='dark'] main.category-page [class*='text-[#1e293b]'],
+:root[data-theme='dark'] main.category-page [class*='text-[#334155]'] {
+  color: var(--color-ink);
+}
+
+/* Muted-slate utilities → ink-soft */
+:root[data-theme='dark'] main.category-page [class*='text-[#475569]'],
+:root[data-theme='dark'] main.category-page [class*='text-[#64748b]'],
+:root[data-theme='dark'] main.category-page [class*='text-[#6b7280]'],
+:root[data-theme='dark'] main.category-page [class*='text-[#94a3b8]'],
+:root[data-theme='dark'] main.category-page [class*='text-[#9ca3af]'] {
+  color: var(--color-ink-soft);
+}
+
+/* White / pale-slate panel backgrounds (hub essay card, mobile
+ * subcategory chips, article-count chip) → dark surface tokens */
+:root[data-theme='dark'] main.category-page [class~='bg-white'],
+:root[data-theme='dark'] main.category-page [class*='bg-[#f8fafc]'],
+:root[data-theme='dark'] main.category-page [class*='bg-[#f1f5f9]'] {
+  background-color: var(--color-surface);
+}
+
+/* Pale-slate borders → token border */
+:root[data-theme='dark'] main.category-page [class*='border-[#e2e8f0]'] {
+  border-color: var(--color-border);
+}
+
+/* Hub essay prose — scoped class survives Astro hashing because we
+ * use the leaf class name. Specificity wins over the scoped rule
+ * via the extra :root[data-theme='dark'] qualifier. */
+:root[data-theme='dark'] main.category-page .hub-prose,
+:root[data-theme='dark'] main.category-page .hub-prose p,
+:root[data-theme='dark'] main.category-page .hub-prose li,
+:root[data-theme='dark'] main.category-page .hub-prose strong,
+:root[data-theme='dark'] main.category-page .hub-prose em {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] main.category-page .hub-prose h2,
+:root[data-theme='dark'] main.category-page .hub-prose h3 {
+  color: var(--color-ink);
+  border-bottom-color: var(--color-border);
+}
+:root[data-theme='dark'] main.category-page .hub-prose a {
+  color: var(--color-ink);
+  border-bottom-color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] main.category-page .hub-prose a:hover {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+/* Topic-pill (wikilinks resolved to article links) — keep accent
+ * tint but rebuild on the dark bg so the chip stays a chip */
+:root[data-theme='dark'] main.category-page .hub-prose a.topic-pill {
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  color: var(--color-accent);
+}
+:root[data-theme='dark'] main.category-page .hub-prose a.topic-pill:hover {
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+:root[data-theme='dark'] main.category-page .hub-prose blockquote {
+  color: var(--color-ink-soft);
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-ink) 8%, transparent),
+    color-mix(in srgb, var(--color-ink) 2%, transparent)
+  );
+}
+:root[data-theme='dark'] main.category-page .hub-prose blockquote.pull-quote {
+  color: var(--color-ink);
+  background: none;
+}
+:root[data-theme='dark'] main.category-page .hub-prose code {
+  background: color-mix(in srgb, var(--color-ink) 8%, transparent);
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] main.category-page .hub-prose pre {
+  background: color-mix(in srgb, var(--color-ink) 12%, transparent);
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] main.category-page .hub-prose th,
+:root[data-theme='dark'] main.category-page .hub-prose td {
+  color: var(--color-ink);
+  border-color: color-mix(in srgb, var(--color-ink) 28%, transparent);
+}
+:root[data-theme='dark'] main.category-page .hub-prose th {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+:root[data-theme='dark'] main.category-page .hub-prose em:not(.topic-pill) {
+  color: var(--color-ink-soft);
+}
+
+/* Subcategory side-nav active state — uses var(--categoryColor) so
+ * the rgba(45,80,22,…) hardcoded fallback bleeds through on dark.
+ * Re-paint with a token-mix so the active chip reads as accent
+ * regardless of the per-category color. */
+:root[data-theme='dark'] main.category-page .subcat-nav-link.active {
+  background-color: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+/* Filter input — background/border/text used to be repainted here, but
+ * that trio is a byte-identical duplicate of the token-based
+ * `.hub-search input` rule already in category-hub.template.astro's own
+ * scoped <style> (var(--color-surface)/var(--color-border)/var(--color-ink)),
+ * which flips correctly in dark with zero patching. Removed 2026-07-11.
+ * ::placeholder has no template-side rule, so it still needs one here. */
+:root[data-theme='dark'] main.category-page input#articleFilter::placeholder {
+  color: var(--color-ink-soft);
+}
+
+/* Sort pills (hub-toolbar). .sort-btn's base state already reads
+ * bg/border/text from var(--color-surface)/var(--color-border)/
+ * var(--color-ink-soft) in the template's own scoped <style>, so it
+ * flips correctly with no patch needed. .sort-btn.active does not: it
+ * paints background from var(--categoryColorLight) and text from
+ * var(--categoryColor) — both per-category hex (e.g. history #92400e)
+ * that tokens.css deliberately keeps light-only (--cat-* convergence
+ * pending), so the active pill renders dark brown text on a barely-there
+ * tint on a near-black page. Re-paint with an ink-based mix instead of
+ * the raw category hex, keeping the category tint as an accent only. */
+:root[data-theme='dark'] main.category-page .sort-btn.active {
+  background: color-mix(
+    in srgb,
+    var(--categoryColor, #2d5016) 28%,
+    transparent
+  );
+  color: var(--color-ink);
+  border-color: color-mix(
+    in srgb,
+    var(--categoryColor, #2d5016) 55%,
+    var(--color-ink)
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════
+ * HOME PAGE overrides (.home-page).
+ *
+ * src/templates/home.template.astro + its child components
+ * (home/CoverStory, home/RandomDiscovery, home/ReaderDoors,
+ * ReadingPath, FeatureCards, CategoryGrid, home/RecentUpdates,
+ * home/LanguageStatement, home/ContributeSection) carry hardcoded
+ * light hex/rgba from before color tokens existed. Every rule below is
+ * scoped to `.home-page` (a wrapper the template adds around all its
+ * children inside the Layout slot) so nothing leaks to other pages, and
+ * gated on data-theme=dark so light mode is pixel-identical.
+ *
+ * Left dark by intent (already dark surfaces, verified): HeroSection
+ * (#0e2018→#1a3c34 gradient), OrganismPreview (dark teal card),
+ * CommunityFeedback (--surface-panel-dark), NewsletterSection
+ * (bg-[#2d5016] green band with white text).
+ *
+ * Born: 2026-07-06 dark-mode Tier 1 rollout (home + reading surfaces).
+ * ══════════════════════════════════════════════════════════════════ */
+
+/* --- Light section / card / panel backgrounds → dark surface --- */
+/* CoverStory off-white section; FeatureCards + ReaderDoors white cards;
+ * CategoryGrid near-white cards; RecentUpdates light-blue panel + inner
+ * white cards; ContributeSection light slate gradient panel. */
+:root[data-theme='dark'] .home-page [class*='bg-[#fafbfc]'],
+:root[data-theme='dark'] .home-page [class~='bg-white'],
+:root[data-theme='dark'] .home-page [class*='bg-white/[0.98]'],
+:root[data-theme='dark'] .home-page [class*='bg-white/70'] {
+  background-color: var(--color-surface);
+}
+/* Multi-stop light gradients (RandomDiscovery amber, ContributeSection
+ * + RecentUpdates slate/blue) → flat dark surface. */
+:root[data-theme='dark']
+  .home-page
+  [class*='bg-[linear-gradient(135deg,#fffbeb'],
+:root[data-theme='dark']
+  .home-page
+  [class*='bg-[linear-gradient(135deg,#f8fafc'] {
+  background-image: none !important;
+  background-color: var(--color-surface);
+}
+
+/* --- Light borders on those cards/panels → token border --- */
+:root[data-theme='dark'] .home-page [class*='border-[#f1f5f9]'],
+:root[data-theme='dark'] .home-page [class*='border-[#e2e8f0]'],
+:root[data-theme='dark'] .home-page [class*='border-[#e0f2fe]'],
+:root[data-theme='dark'] .home-page [class*='border-[#dbe9f3]'],
+:root[data-theme='dark'] .home-page [class*='border-[#d1d5db]'],
+:root[data-theme='dark'] .home-page [class*='border-[rgba(226,232,240'] {
+  border-color: var(--color-border);
+}
+
+/* --- Dark text that now sits on a dark surface → light ink --- */
+/* Primary ink: headings + card titles + blockquote + hall labels
+ * (#1f2937 grey, #1a1a2e ink, #1a3c34 teal, #1e293b slate, #1e3a5f blue,
+ * #14532d dark-green pick titles). */
+:root[data-theme='dark'] .home-page [class*='text-[#1f2937]'],
+:root[data-theme='dark'] .home-page [class*='text-[#1a1a2e]'],
+:root[data-theme='dark'] .home-page [class*='text-[#1e293b]'],
+:root[data-theme='dark'] .home-page [class*='text-[#1e3a5f]'],
+:root[data-theme='dark']
+  .home-page
+  [class*='text-[#1a3c34]']:not([class*='bg-[#1a3c34]']) {
+  color: var(--color-ink);
+}
+/* Secondary ink: lead / description / muted greys
+ * (#475569 slate, #44403c warm-grey, #4a6560 grey-green). */
+:root[data-theme='dark'] .home-page [class*='text-[#475569]'],
+:root[data-theme='dark'] .home-page [class*='text-[#44403c]'],
+:root[data-theme='dark'] .home-page [class*='text-[#4a6560]'] {
+  color: var(--color-ink-soft);
+}
+
+/* --- ReadingPath green scene text (#166534 heading / #16a34a subtitle).
+ * The section bg is var(--scene-nature-bg) which auto-flips dark; the
+ * green text then needs lifting so it doesn't sit near-invisible. Keep a
+ * green cast (accent) on headings, soft ink on body. --- */
+:root[data-theme='dark'] .home-page [class*='text-[#166534]'] {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .home-page [class*='text-[#16a34a]'] {
+  color: var(--color-accent);
+}
+
+/* --- RandomDiscovery body copy (#92400e brown on the now-dark amber
+ * card). Kept amber-tinted so the "random" section still reads warm. --- */
+:root[data-theme='dark'] .home-page [class*='text-[#92400e]'] {
+  color: #e0b080;
+}
+
+/* --- Exhibition halls: home.template.astro scopes these via :global()
+ * so they escape Astro hashing; we re-scope under .home-page and win on
+ * the extra data-theme qualifier. --- */
+:root[data-theme='dark'] .home-page .hall-label,
+:root[data-theme='dark'] .home-page .hall-body p,
+:root[data-theme='dark'] .home-page .hall-body a {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .home-page .hall-body a:hover {
+  color: var(--color-accent);
+}
+/* Topic pills + pick cards keep a green accent identity, rebuilt on the
+ * dark bg so the chip/card still reads as a distinct surface. */
+:root[data-theme='dark'] .home-page .hall-body a.topic-pill {
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  color: var(--color-accent);
+}
+:root[data-theme='dark'] .home-page .hall-body a.topic-pill:hover {
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+/* Logical, paired with home.template.astro's `border-inline-start`. */
+:root[data-theme='dark'] .home-page .pick-card {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  border-color: var(--color-border);
+  border-inline-start-color: color-mix(
+    in srgb,
+    var(--color-accent) 55%,
+    transparent
+  );
+}
+:root[data-theme='dark'] .home-page .pick-card:hover {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
+  border-inline-start-color: var(--color-accent);
+}
+:root[data-theme='dark'] .home-page .pick-title {
+  color: var(--color-ink);
+}
+/* .pick-fn / .pick-desc / .hall-bridge-text (#6b7280 / #4b5563) already
+ * read acceptably as muted-on-dark; nudge to soft ink for consistency. */
+:root[data-theme='dark'] .home-page .pick-desc,
+:root[data-theme='dark'] .home-page .pick-fn,
+:root[data-theme='dark'] .home-page .hall-bridge-text {
+  color: var(--color-ink-soft);
+}
+/* Hall divider / bridge lines use a green rgba that vanishes on dark. */
+:root[data-theme='dark'] .home-page .hall-line,
+:root[data-theme='dark'] .home-page .hall-bridge-line {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--color-ink) 20%, transparent),
+    transparent
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════
+ * EXPLORE PAGE overrides (.explore-page).
+ *
+ * src/templates/explore.template.astro uses Tailwind arbitrary values
+ * throughout (slate palette #1a1a2e / #64748b / #94a3b8 / #475569 on
+ * white / #f8fafc / #f1f5f9 / #e2e8f0 surfaces). The PageHero band is
+ * dark-teal already (verified). Scoped to `.explore-page` wrapper.
+ * Born: 2026-07-06 dark-mode Tier 1 rollout.
+ * ══════════════════════════════════════════════════════════════════ */
+
+/* Light surfaces (search box, "more ways" cards, hot chips, hover rows,
+ * CTA github button, CategoryGrid card base bg-white/[0.98]) → dark
+ * surface tokens. */
+:root[data-theme='dark'] .explore-page [class~='bg-white'],
+:root[data-theme='dark'] .explore-page [class*='bg-[#f8fafc]'],
+:root[data-theme='dark'] .explore-page [class*='bg-[#f1f5f9]'],
+:root[data-theme='dark'] .explore-page [class*='hover:bg-[#f8fafc]'] {
+  background-color: var(--color-surface);
+}
+/* CategoryGrid: card name (#1a3c34) + count (#a8634a) + desc (#4a6560) +
+ * card base (bg-white/[0.98]). CategoryGrid ships its own component
+ * stylesheet whose @layer utilities land AFTER dark-polish.css in the
+ * /explore bundle (order differs per route — on /home the same rules win
+ * unlayered). We force these few cross-component overrides with
+ * !important, mirroring the existing .toc-link.active precedent in this
+ * file. All still gated on data-theme=dark, so light mode is untouched.
+ * The per-category gradient overlay + #006d77 accents stay (read fine). */
+:root[data-theme='dark'] .explore-page [class*='bg-white/[0.98]'] {
+  background-color: var(--color-surface) !important;
+}
+:root[data-theme='dark']
+  .explore-page
+  [class*='text-[#1a3c34]']:not([class*='bg-[#1a3c34]']) {
+  color: var(--color-ink) !important;
+}
+:root[data-theme='dark'] .explore-page [class*='text-[#a8634a]'] {
+  color: #d99878 !important;
+}
+:root[data-theme='dark'] .explore-page [class*='text-[#4a6560]'] {
+  color: var(--color-ink-soft) !important;
+}
+/* CTA-footer light-green gradient panel → flat dark surface. */
+:root[data-theme='dark']
+  .explore-page
+  [class*='bg-[linear-gradient(135deg,#f0fdf4'] {
+  background-image: none !important;
+  background-color: var(--color-surface);
+}
+
+/* Pale slate borders → token border. */
+:root[data-theme='dark'] .explore-page [class*='border-[#e2e8f0]'],
+:root[data-theme='dark'] .explore-page [class*='border-[#cbd5e1]'],
+:root[data-theme='dark'] .explore-page [class*='hover:border-[#e2e8f0]'] {
+  border-color: var(--color-border);
+}
+
+/* Dark ink text (#1a1a2e headings, hero-title, "more" titles) → light ink.
+ * #065f46 (deep green cta heading) also needs lift on dark. */
+:root[data-theme='dark'] .explore-page [class*='text-[#1a1a2e]'],
+:root[data-theme='dark'] .explore-page [class*='text-[#065f46]'] {
+  color: var(--color-ink);
+}
+/* Muted slate (#64748b subtitles, #475569 chip label, #94a3b8 placeholder,
+ * #374151 cta body) → soft ink. */
+:root[data-theme='dark'] .explore-page [class*='text-[#64748b]'],
+:root[data-theme='dark'] .explore-page [class*='text-[#475569]'],
+:root[data-theme='dark'] .explore-page [class*='text-[#94a3b8]'],
+:root[data-theme='dark'] .explore-page [class*='text-[#374151]'] {
+  color: var(--color-ink-soft);
+}
+
+/* Hot-search chips: light mint tint (#f1f5f9 handled above); the search
+ * input placeholder inherits soft ink from the rule above. Keep the
+ * saturated CTA buttons (amber random / green contribute) untouched —
+ * they read fine on dark. */
+
+/* ══════════════════════════════════════════════════════════════════
+ * LATEST PAGE overrides (.latest-page).
+ *
+ * src/templates/latest.template.astro: filter chips, month markers,
+ * changelog footer, plus the shared TimelineDay / TimelineDayNav shells.
+ * PageHero band dark-teal already. Scoped to `.latest-page`.
+ * Born: 2026-07-06 dark-mode Tier 1 rollout.
+ * ══════════════════════════════════════════════════════════════════ */
+
+/* Filter chip bar + inactive chips (white bg, #e2e8f0 border) → dark. */
+:root[data-theme='dark'] .latest-page [class~='bg-white'],
+:root[data-theme='dark'] .latest-page [class*='bg-white/95'],
+:root[data-theme='dark'] .latest-page [class*='bg-[#f8fafc]'],
+:root[data-theme='dark'] .latest-page [class*='hover:bg-[#f8fafc]'] {
+  background-color: var(--color-surface);
+}
+:root[data-theme='dark'] .latest-page [class*='border-[#e2e8f0]'],
+:root[data-theme='dark'] .latest-page [class*='border-[#f1f5f9]'],
+:root[data-theme='dark'] .latest-page [class*='hover:border-[#94a3b8]'] {
+  border-color: var(--color-border);
+}
+/* Inactive chip text (#64748b) + empty state + month-marker labels
+ * (#94a3b8) → soft ink. The .active "all" chip keeps its emerald fill. */
+:root[data-theme='dark'] .latest-page [class*='text-[#64748b]'],
+:root[data-theme='dark'] .latest-page [class*='text-[#94a3b8]'] {
+  color: var(--color-ink-soft);
+}
+/* Month-marker divider line (#e2e8f0) as a bg utility. */
+:root[data-theme='dark'] .latest-page [class*='bg-[#e2e8f0]'] {
+  background-color: var(--color-border);
+}
+
+/* --- TimelineDay shell (共用元件；scoped under .latest-page) --- */
+/* Day-title serif #1a3c34 → ink (dark-on-dark otherwise). */
+:root[data-theme='dark'] .latest-page [class*='text-[#1a3c34]'],
+:root[data-theme='dark'] .latest-page [class*='text-[#1e293b]'] {
+  color: var(--color-ink);
+}
+/* Emerald day-count badge: light mint bg #f0fdf4 + #059669 green text.
+ * On dark the mint bg vanishes — rebuild as an accent tint chip. */
+:root[data-theme='dark'] .latest-page [class*='bg-[#f0fdf4]'] {
+  background-color: color-mix(in srgb, var(--color-accent) 16%, transparent);
+}
+:root[data-theme='dark'] .latest-page [class*='text-[#059669]'] {
+  color: var(--color-accent);
+}
+/* Timeline connector line + dot ring: #6ee7b7 / #ecfdf5 washes on dark.
+ * Keep the line accent-tinted; soften the ring to a subtle halo. */
+:root[data-theme='dark'] .latest-page [class*='bg-[#6ee7b7]'] {
+  background-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+}
+:root[data-theme='dark'] .latest-page [class*='ring-[#ecfdf5]'] {
+  --tw-ring-color: color-mix(in srgb, var(--color-accent) 18%, transparent);
+}
+/* TimelineDayNav hover tint (#f0fdf4). */
+:root[data-theme='dark'] .latest-page [class*='hover:bg-[#f0fdf4]'] {
+  background-color: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+ * SHARED: ArticleCard (.article-card, is:global) on explore + latest.
+ *
+ * ArticleCard.astro styles are global class selectors with hardcoded
+ * light hex (base white bg, #14532d / #1a3c34 titles, #64748b desc,
+ * #f8fafc thumb bg, #f1f5f9 foot border). Scope under each page wrapper
+ * so we win specificity via the extra data-theme qualifier without
+ * touching the component (used site-wide, including light-only pages).
+ * ══════════════════════════════════════════════════════════════════ */
+:root[data-theme='dark'] .explore-page .article-card,
+:root[data-theme='dark'] .latest-page .article-card,
+:root[data-theme='dark'] .timeline-page .article-card,
+:root[data-theme='dark'] .category-page .article-card {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .explore-page .article-card:hover,
+:root[data-theme='dark'] .latest-page .article-card:hover,
+:root[data-theme='dark'] .timeline-page .article-card:hover,
+:root[data-theme='dark'] .category-page .article-card:hover {
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+/* is-premium / is-row / is-detailed hover states also repaint bg:white. */
+:root[data-theme='dark'] .explore-page .article-card.is-premium:hover,
+:root[data-theme='dark'] .latest-page .article-card.is-premium:hover,
+:root[data-theme='dark'] .timeline-page .article-card.is-premium:hover,
+:root[data-theme='dark'] .category-page .article-card.is-premium:hover {
+  background: var(--color-surface);
+}
+:root[data-theme='dark'] .explore-page .article-card.is-row,
+:root[data-theme='dark'] .latest-page .article-card.is-row,
+:root[data-theme='dark'] .timeline-page .article-card.is-row,
+:root[data-theme='dark'] .category-page .article-card.is-row {
+  background: transparent;
+}
+:root[data-theme='dark'] .explore-page .article-card.is-row:hover,
+:root[data-theme='dark'] .latest-page .article-card.is-row:hover,
+:root[data-theme='dark'] .timeline-page .article-card.is-row:hover,
+:root[data-theme='dark'] .category-page .article-card.is-row:hover {
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  border-color: var(--color-border);
+}
+/* Titles (#14532d / #1a3c34) → ink; hover greens (#006d77 / #065f46)
+ * stay as accents (already legible on dark). */
+:root[data-theme='dark'] .explore-page .article-card-title,
+:root[data-theme='dark'] .latest-page .article-card-title,
+:root[data-theme='dark'] .timeline-page .article-card-title,
+:root[data-theme='dark'] .category-page .article-card-title {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .explore-page .article-card:hover .article-card-title,
+:root[data-theme='dark'] .latest-page .article-card:hover .article-card-title,
+:root[data-theme='dark'] .timeline-page .article-card:hover .article-card-title,
+:root[data-theme='dark']
+  .category-page
+  .article-card:hover
+  .article-card-title {
+  color: var(--color-accent);
+}
+/* Descriptions (#6b7280 / #7a8b7e / #64748b / #94a3b8), meta, dates,
+ * tags, stats → soft ink. */
+:root[data-theme='dark'] .explore-page .article-card-desc,
+:root[data-theme='dark'] .latest-page .article-card-desc,
+:root[data-theme='dark'] .timeline-page .article-card-desc,
+:root[data-theme='dark'] .category-page .article-card-desc,
+:root[data-theme='dark'] .explore-page .article-card-meta,
+:root[data-theme='dark'] .latest-page .article-card-meta,
+:root[data-theme='dark'] .timeline-page .article-card-meta,
+:root[data-theme='dark'] .category-page .article-card-meta,
+:root[data-theme='dark'] .explore-page .article-card-date,
+:root[data-theme='dark'] .latest-page .article-card-date,
+:root[data-theme='dark'] .timeline-page .article-card-date,
+:root[data-theme='dark'] .category-page .article-card-date,
+:root[data-theme='dark'] .explore-page .article-card-updated,
+:root[data-theme='dark'] .latest-page .article-card-updated,
+:root[data-theme='dark'] .timeline-page .article-card-updated,
+:root[data-theme='dark'] .category-page .article-card-updated,
+:root[data-theme='dark'] .explore-page .article-card-premdate,
+:root[data-theme='dark'] .latest-page .article-card-premdate,
+:root[data-theme='dark'] .timeline-page .article-card-premdate,
+:root[data-theme='dark'] .category-page .article-card-premdate,
+:root[data-theme='dark'] .explore-page .article-card-tag,
+:root[data-theme='dark'] .latest-page .article-card-tag,
+:root[data-theme='dark'] .timeline-page .article-card-tag,
+:root[data-theme='dark'] .category-page .article-card-tag,
+:root[data-theme='dark'] .explore-page .article-card-stat,
+:root[data-theme='dark'] .latest-page .article-card-stat,
+:root[data-theme='dark'] .timeline-page .article-card-stat,
+:root[data-theme='dark'] .category-page .article-card-stat {
+  color: var(--color-ink-soft);
+}
+/* Thumb placeholder bg (#f8fafc / #e8efec) + foot divider (#f1f5f9). */
+:root[data-theme='dark']
+  .explore-page
+  .article-card.is-detailed
+  .article-card-thumbwrap,
+:root[data-theme='dark']
+  .latest-page
+  .article-card.is-detailed
+  .article-card-thumbwrap,
+:root[data-theme='dark']
+  .timeline-page
+  .article-card.is-detailed
+  .article-card-thumbwrap,
+:root[data-theme='dark']
+  .category-page
+  .article-card.is-detailed
+  .article-card-thumbwrap,
+:root[data-theme='dark']
+  .explore-page
+  .article-card.is-premium
+  .article-card-hero,
+:root[data-theme='dark']
+  .latest-page
+  .article-card.is-premium
+  .article-card-hero,
+:root[data-theme='dark']
+  .timeline-page
+  .article-card.is-premium
+  .article-card-hero,
+:root[data-theme='dark']
+  .category-page
+  .article-card.is-premium
+  .article-card-hero {
+  background-color: color-mix(in srgb, var(--color-ink) 8%, transparent);
+}
+:root[data-theme='dark']
+  .explore-page
+  .article-card.is-detailed
+  .article-card-foot,
+:root[data-theme='dark']
+  .latest-page
+  .article-card.is-detailed
+  .article-card-foot,
+:root[data-theme='dark']
+  .timeline-page
+  .article-card.is-detailed
+  .article-card-foot,
+:root[data-theme='dark']
+  .category-page
+  .article-card.is-detailed
+  .article-card-foot {
+  border-top-color: var(--color-border);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+ * META PAGES (Tier 2) — about / contribute / changelog / resources /
+ * terminology (index + [id] + converter) / 404 / projects.
+ *
+ * Each page opts into readerSettings and carries a wrapper class
+ * (.about-page, .contribute-page, .changelog-page, .resources-page,
+ * .term-page, .term-detail-page, .converter-page, .error-page,
+ * .projects-page). These templates predate color tokens and use a mix
+ * of scoped-class hex + Tailwind arbitrary values. Every rule below is
+ * scoped to its page wrapper + gated on data-theme=dark, so light mode
+ * is pixel-identical. Leaf-class overrides win over Astro-scoped rules
+ * via the extra :root[data-theme='dark'] qualifier; inline hero colors
+ * (PageHero titleColor) need !important.
+ *
+ * Born: 2026-07-06 dark-mode Tier 2 rollout (meta pages).
+ * ══════════════════════════════════════════════════════════════════ */
+
+/* ── ABOUT (.about-page) ─────────────────────────────────────────── */
+/* PageHero title is inline color:#1a3c34 (bgVariant=none → body bg). */
+:root[data-theme='dark'] .about-page .page-hero .hero-title {
+  color: var(--color-ink) !important;
+}
+/* Section titles / subtitles (scoped #1a3c34 / #6b7280). */
+:root[data-theme='dark'] .about-page .section-title {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .about-page .section-subtitle {
+  color: var(--color-ink-soft);
+}
+/* The organism-section band stays dark-teal by intent → keep its
+ * white title + light-cyan subtitle (re-assert so the ink overrides
+ * above don't bleed onto the already-dark band). */
+:root[data-theme='dark'] .about-page .organism-section .section-title {
+  color: #ffffff;
+}
+/* Light section backgrounds (Tailwind arbitrary) → body bg. */
+:root[data-theme='dark'] .about-page [class*='bg-[#f9fafb]'],
+:root[data-theme='dark']
+  .about-page
+  [class*='bg-[linear-gradient(135deg,#fef9f0'],
+:root[data-theme='dark'] .about-page .site-guide-section {
+  background: var(--color-bg) !important;
+}
+/* Naming cards (#f8fafc bg / #e5e7eb border / #1f2937 h4 / #6b7280 p). */
+:root[data-theme='dark'] .about-page .naming-card {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .about-page .naming-card h4 {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .about-page .naming-card p {
+  color: var(--color-ink-soft);
+}
+/* Stats (numbers keep blue accent; labels → soft ink). */
+:root[data-theme='dark'] .about-page .stat-label {
+  color: var(--color-ink-soft);
+}
+/* Vision block (light gradient bg, #374151 body, #1f2937 emphasis). */
+:root[data-theme='dark'] .about-page .vision-block {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+:root[data-theme='dark'] .about-page .vision-block p {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .about-page .vision-emphasis {
+  color: var(--color-ink) !important;
+}
+/* Timeline (content h3 #1f2937, p/list #4b5563, press cards). Dates +
+ * markers keep the blue accent (reads fine on dark). */
+:root[data-theme='dark'] .about-page .timeline-content h3 {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .about-page .timeline-content p,
+:root[data-theme='dark'] .about-page .timeline-list {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .about-page .press-card-mini {
+  background: color-mix(in srgb, var(--color-ink) 8%, transparent);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .about-page .press-card-mini .press-title {
+  color: var(--color-ink);
+}
+/* Site-guide cards (#fff bg / #e5e7eb border / #1f2937 title / #4b5563). */
+:root[data-theme='dark'] .about-page .guide-card {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .about-page .guide-card-title {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .about-page .guide-card-desc {
+  color: var(--color-ink-soft);
+}
+/* Founder + team (white cards / #1f2937 headings / #4b5563 body).
+ * founder-quote keeps its blue/green accent tint. */
+:root[data-theme='dark'] .about-page .team-card,
+:root[data-theme='dark'] .about-page .contributors-in-team,
+:root[data-theme='dark'] .about-page .contact-card,
+:root[data-theme='dark'] .about-page .contact-cta,
+:root[data-theme='dark'] .about-page .founder-motivation {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .about-page .team-card h3,
+:root[data-theme='dark'] .about-page .founder-info h3,
+:root[data-theme='dark'] .about-page .contributors-in-team h3,
+:root[data-theme='dark'] .about-page .contact-card h4 {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .about-page .team-description p,
+:root[data-theme='dark'] .about-page .founder-bio p,
+:root[data-theme='dark'] .about-page .contact-cta p,
+:root[data-theme='dark'] .about-page .contributors-desc,
+:root[data-theme='dark'] .about-page .name-en {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .about-page .link-inline {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .about-page .link-inline .link-text {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .about-page .contributor-card:hover {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+:root[data-theme='dark'] .about-page .contributor-name {
+  color: var(--color-ink-soft);
+}
+/* Sponsors tier cards (white bg / #e2e8f0 border / #334155 / #64748b).
+ * tier-name accent colors kept (semantic). */
+:root[data-theme='dark'] .about-page .tier,
+:root[data-theme='dark'] .about-page .sponsor-cta {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .about-page .sponsors-desc,
+:root[data-theme='dark'] .about-page .tier-desc,
+:root[data-theme='dark'] .about-page .tier-perks,
+:root[data-theme='dark'] .about-page .sponsor-contribution,
+:root[data-theme='dark'] .about-page .sponsor-cta p,
+:root[data-theme='dark'] .about-page .portaly-label,
+:root[data-theme='dark'] .about-page .portaly-note {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .about-page .sponsor-contribution-title {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .about-page .logo-placeholder {
+  border-color: var(--color-border);
+  color: var(--color-ink-soft);
+}
+/* FAQ (details borders #e5e7eb / #1f2937 question / #4b5563 answer). */
+:root[data-theme='dark'] .about-page .faq-item {
+  border-bottom-color: var(--color-border);
+}
+:root[data-theme='dark'] .about-page .faq-question {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .about-page .faq-answer p {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .about-page .faq-answer strong {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .about-page .faq-answer code {
+  background: color-mix(in srgb, var(--color-ink) 10%, transparent);
+  color: var(--color-ink);
+}
+
+/* ── CONTRIBUTE (.contribute-page + 3 sibling sections outside it) ──
+ * Nature/green theme. The CLI section (#1a1a2e) + organism-brief
+ * (dark teal) are already dark by intent — left untouched. The 3
+ * bottom sections (.token-donation / .support-section) are outside the
+ * .contribute-page wrapper, so they're targeted by their own classes.
+ * The contribute template overrides `body { font-weight:600 }` and sets
+ * a green `a{color:#4a7c59}` — those read fine on dark. */
+
+/* PageHero here is bgTone=dark (green gradient) → already legible. */
+
+/* Light section backgrounds (green-tinted gradients / washes) → body bg.
+ * These are scoped-class backgrounds, matched by leaf class. */
+:root[data-theme='dark'] .contribute-page .how-it-works,
+:root[data-theme='dark'] .contribute-page .paths,
+:root[data-theme='dark'] .contribute-page .writing-guides,
+:root[data-theme='dark'] .contribute-page .form-section,
+:root[data-theme='dark'] .contribute-page .ideas,
+:root[data-theme='dark'] .token-donation,
+:root[data-theme='dark'] .support-section {
+  background: var(--color-bg) !important;
+}
+/* Section headings + descriptions (#2d5016 dark-green / #4a5d23). */
+:root[data-theme='dark'] .contribute-page .how-inner h2,
+:root[data-theme='dark'] .contribute-page .paths h2,
+:root[data-theme='dark'] .contribute-page .guides-inner h2,
+:root[data-theme='dark'] .contribute-page .form-inner h2,
+:root[data-theme='dark'] .contribute-page .ideas h2,
+:root[data-theme='dark'] .token-donation h2,
+:root[data-theme='dark'] .support-section h2 {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .contribute-page .guides-desc,
+:root[data-theme='dark'] .contribute-page .form-desc,
+:root[data-theme='dark'] .token-subtitle,
+:root[data-theme='dark'] .support-desc,
+:root[data-theme='dark'] .support-social-proof {
+  color: var(--color-ink-soft);
+}
+/* How / path / guide / idea cards (white-ish bg + #a7c4a0 border). */
+:root[data-theme='dark'] .contribute-page .how-card,
+:root[data-theme='dark'] .contribute-page .path-card,
+:root[data-theme='dark'] .contribute-page .guide-card,
+:root[data-theme='dark'] .contribute-page .idea,
+:root[data-theme='dark'] .contribute-page .success-msg,
+:root[data-theme='dark'] .token-donation .one-line-system,
+:root[data-theme='dark'] .support-card {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  border-color: var(--color-border);
+}
+/* Card titles (#2d5016) → ink; body copy (#4a5d23) → soft ink. */
+:root[data-theme='dark'] .contribute-page .how-card h3,
+:root[data-theme='dark'] .contribute-page .path-card h3,
+:root[data-theme='dark'] .contribute-page .guide-card h3,
+:root[data-theme='dark'] .contribute-page .success-msg h3,
+:root[data-theme='dark'] .token-donation .one-line-system h3,
+:root[data-theme='dark'] .support-card h3 {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .contribute-page .how-card p,
+:root[data-theme='dark'] .contribute-page .path-card p,
+:root[data-theme='dark'] .contribute-page .path-card li,
+:root[data-theme='dark'] .contribute-page .guide-content li,
+:root[data-theme='dark'] .contribute-page .idea,
+:root[data-theme='dark'] .contribute-page .success-msg p,
+:root[data-theme='dark'] .token-donation .one-line-system > p,
+:root[data-theme='dark'] .token-donation .one-line-features li,
+:root[data-theme='dark'] .support-card p {
+  color: var(--color-ink-soft);
+}
+/* Green heading inside guides (#4a7c59) reads ok; leave it. */
+/* Language tag chips (white bg + green text/border). */
+:root[data-theme='dark'] .token-donation .lang-tag {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .token-donation .token-languages h3,
+:root[data-theme='dark'] .token-donation .token-prompt-section h3 {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .token-donation .token-note {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+:root[data-theme='dark'] .token-donation .token-note p {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .token-donation .token-note strong {
+  color: var(--color-ink);
+}
+/* Form inputs (white bg / #a7c4a0 border) → dark field. */
+:root[data-theme='dark'] .contribute-page textarea,
+:root[data-theme='dark'] .contribute-page input,
+:root[data-theme='dark'] .contribute-page select {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .contribute-page .form-group label {
+  color: var(--color-ink);
+}
+/* Semiont concept detail body (#374151) on the indigo path card. */
+:root[data-theme='dark'] .contribute-page .semiont-concept p {
+  color: var(--color-ink-soft);
+}
+/* Support social-proof strong (#0f172a → ink). */
+:root[data-theme='dark'] .support-social-proof strong {
+  color: var(--color-ink);
+}
+
+/* ── CHANGELOG (.changelog-page) ─────────────────────────────────── */
+/* PageHero here has default light bgTone (no bg fill) → title is
+ * text-[#1a1a2e] on the now-dark body. Lift title + subtitle + meta. */
+:root[data-theme='dark'] .changelog-page .page-hero [class*='text-[#1a1a2e]'] {
+  color: var(--color-ink);
+}
+/* Sticky controls bar (bg-white/95 + #e2e8f0 border). */
+:root[data-theme='dark'] .changelog-page #changelog-controls {
+  background-color: color-mix(in srgb, var(--color-bg) 92%, transparent);
+  border-bottom-color: var(--color-border);
+}
+/* Search input (bg-white / #d1d5db border / #1f2937 text / #9ca3af ph). */
+:root[data-theme='dark'] .changelog-page #changelog-search {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .changelog-page #changelog-search::placeholder {
+  color: var(--color-ink-soft);
+}
+/* Inactive filter pills (bg-white / #e2e8f0 border / #64748b text). The
+ * active pill keeps its #3b82f6 blue fill (JS-toggled, reads on dark). */
+:root[data-theme='dark'] .changelog-page .filter-pill[class~='bg-white'] {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .changelog-page #filter-status {
+  color: var(--color-ink-soft);
+}
+/* Shared CommitLog rows (.commit-log-item: bg-white / #e2e8f0 border /
+ * #1f2937 title / #64748b meta / #94a3b8 time). Scoped under
+ * .changelog-page so the component stays untouched site-wide. */
+:root[data-theme='dark'] .changelog-page .commit-log-item {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .changelog-page .commit-log-item p,
+:root[data-theme='dark']
+  .changelog-page
+  .commit-log-item
+  span[class*='text-[#1f2937]'] {
+  color: var(--color-ink);
+}
+:root[data-theme='dark']
+  .changelog-page
+  .commit-log-item
+  [class*='text-[#64748b]'],
+:root[data-theme='dark']
+  .changelog-page
+  .commit-log-item
+  [class*='text-[#94a3b8]'] {
+  color: var(--color-ink-soft);
+}
+/* CommitLog empty-state panel (bg-[#fafbfc]). */
+:root[data-theme='dark'] .changelog-page [class*='bg-[#fafbfc]'] {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+}
+/* TimelineDayNav (.timeline-nav-*: #64748b link / #94a3b8 month+count).
+ * IntersectionObserver toggles bg-[#eff6ff]/text-[#1e40af] active — that
+ * light-blue active tint vanishes on dark, rebuild as accent tint. */
+:root[data-theme='dark'] .changelog-page .timeline-nav-link {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark']
+  .changelog-page
+  .timeline-nav-link[class~='bg-[#eff6ff]'] {
+  background-color: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+}
+:root[data-theme='dark'] .changelog-page .timeline-nav-count {
+  color: var(--color-ink-soft);
+}
+/* TimelineDay shell reuse (#1a3c34 day title, mint badge) — same as
+ * /latest handling. */
+:root[data-theme='dark'] .changelog-page [class*='text-[#1a3c34]'],
+:root[data-theme='dark'] .changelog-page [class*='text-[#1e293b]'] {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .changelog-page [class*='bg-[#f0fdf4]'] {
+  background-color: color-mix(in srgb, var(--color-accent) 16%, transparent);
+}
+:root[data-theme='dark'] .changelog-page [class*='text-[#059669]'] {
+  color: var(--color-accent);
+}
+/* Blue-accent day badge (bg-[#f1f5f9] pale slate) + connector line
+ * (bg-[#93c5fd]) used by the changelog's TimelineDay accent="blue". */
+:root[data-theme='dark'] .changelog-page [class*='bg-[#f1f5f9]'] {
+  background-color: color-mix(in srgb, var(--color-ink) 10%, transparent);
+}
+:root[data-theme='dark'] .changelog-page [class*='bg-[#93c5fd]'] {
+  background-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+
+/* ── RESOURCES (.resources-page) ─────────────────────────────────── */
+/* main bg-white → body bg. PageHero uses a green gradient title (stays,
+ * reads on dark). */
+:root[data-theme='dark'] .resources-page[class~='bg-white'],
+:root[data-theme='dark'] .resources-page {
+  background-color: var(--color-bg);
+}
+/* Reading-guide banner (#ecfdf5 mint bg / #d1fae5 border / #065f46 h2 /
+ * #047857 body). */
+:root[data-theme='dark'] .resources-page [class*='bg-[#ecfdf5]'] {
+  background-color: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+:root[data-theme='dark'] .resources-page [class*='text-[#065f46]'] {
+  color: var(--color-accent);
+}
+:root[data-theme='dark'] .resources-page [class*='text-[#047857]'],
+:root[data-theme='dark'] .resources-page [class*='text-[#64748b]'] {
+  color: var(--color-ink-soft);
+}
+/* Sticky chapter-nav (mint #ecfdf5 bg / #065f46 links). Active =
+ * #065f46 bg + white text (JS-toggled) — keep. */
+:root[data-theme='dark'] .resources-page .chapter-nav {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+:root[data-theme='dark'] .resources-page .chapter-link {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .resources-page .chapter-link:hover {
+  background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .resources-page .search-input {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-ink);
+}
+/* Chapter titles + story text (#065f46 / #475569). */
+:root[data-theme='dark'] .resources-page .chapter-title,
+:root[data-theme='dark'] .resources-page .subcategory-title,
+:root[data-theme='dark'] .resources-page .related-label {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .resources-page .story-text,
+:root[data-theme='dark'] .resources-page .subcategory-desc,
+:root[data-theme='dark'] .resources-page .curator-note p,
+:root[data-theme='dark'] .resources-page .insight-label,
+:root[data-theme='dark'] .resources-page .site-domain,
+:root[data-theme='dark'] .resources-page .featured-desc {
+  color: var(--color-ink-soft);
+}
+/* Curator note (#f0fdf4 wash / #059669 rail). Keep green rail. */
+:root[data-theme='dark'] .resources-page .curator-note,
+:root[data-theme='dark'] .resources-page .related-articles {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+/* Insight + site cards (white bg / #d1fae5 or #e5e7eb border). */
+:root[data-theme='dark'] .resources-page .insight-card,
+:root[data-theme='dark'] .resources-page .site-card {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  border-color: var(--color-border) !important;
+}
+:root[data-theme='dark'] .resources-page .insight-number,
+:root[data-theme='dark'] .resources-page .site-name {
+  color: var(--color-ink);
+}
+/* Featured cards (#f0fdf4 bg / #d1fae5 border / #059669 left rail). */
+:root[data-theme='dark'] .resources-page .featured-card {
+  background: color-mix(
+    in srgb,
+    var(--color-accent) 10%,
+    transparent
+  ) !important;
+  border-color: color-mix(
+    in srgb,
+    var(--color-accent) 30%,
+    transparent
+  ) !important;
+  border-left-color: var(--color-accent) !important;
+}
+:root[data-theme='dark'] .resources-page .featured-card .site-name {
+  color: var(--color-accent);
+}
+:root[data-theme='dark'] .resources-page .site-favicon {
+  background: color-mix(in srgb, var(--color-ink) 8%, transparent);
+  border-color: var(--color-border);
+}
+/* Section footer strip (#fafafa bg / #94a3b8 text). */
+:root[data-theme='dark'] .resources-page .section-footer {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .resources-page .report-link-separator {
+  color: var(--color-border);
+}
+/* Footer-stats border (#d1fae5) + labels handled by #64748b rule above. */
+:root[data-theme='dark'] .resources-page [class*='border-[#d1fae5]'] {
+  border-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+
+/* ── TERMINOLOGY INDEX (.term-page) ──────────────────────────────── */
+/* main bg-[#f8f8f8] → body bg. PageHero + footer are #1a1a2e (dark,
+ * kept). Filter bar + cards need flipping. */
+:root[data-theme='dark'] .term-page[class*='bg-[#f8f8f8]'] {
+  background-color: var(--color-bg);
+}
+/* Sticky filter bar (bg-white + #e5e5e5 border). */
+:root[data-theme='dark'] .term-page > div[class~='bg-white'] {
+  background-color: var(--color-bg);
+  border-bottom-color: var(--color-border);
+}
+:root[data-theme='dark'] .term-page [class*='border-[#e5e5e5]'] {
+  border-color: var(--color-border);
+}
+/* Filter + subcat buttons (white bg / #444 / #666). Active stays
+ * #1a1a2e / per-fork-color (JS-toggled). */
+:root[data-theme='dark'] .term-page .filter-btn,
+:root[data-theme='dark'] .term-page .subcat-btn {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .term-page .filter-btn.active,
+:root[data-theme='dark'] .term-page .subcat-btn.active {
+  color: #fff;
+}
+/* Search input + result count. */
+:root[data-theme='dark'] .term-page #term-search {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-ink);
+}
+/* Term cards (white bg / #eee border / #1a1a2e word / grey china/hk). */
+:root[data-theme='dark'] .term-page .term-card {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .term-page .term-card:hover,
+:root[data-theme='dark'] .term-page .term-card:focus {
+  border-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
+}
+:root[data-theme='dark'] .term-page .taiwan-word {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .term-page .card-notes-short,
+:root[data-theme='dark'] .term-page .expand-section p {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .term-page .fork-tree-btn {
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .term-page .fork-tree-btn:hover {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+:root[data-theme='dark'] .term-page .expand-content,
+:root[data-theme='dark'] .term-page .expand-english {
+  border-top-color: var(--color-border);
+}
+:root[data-theme='dark'] .term-page .expand-toggle:hover {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .term-page a.taiwan-word-link:hover {
+  color: var(--color-accent);
+}
+/* Fork-tree popup modal (bg-white / #1a1a2e title / #555 body). */
+:root[data-theme='dark'] .term-page #fork-popup > div[class~='bg-white'] {
+  background: var(--color-surface);
+}
+:root[data-theme='dark'] .term-page #fork-popup [class*='text-[#1a1a2e]'] {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .term-page #fork-popup [class*='text-[#555]'],
+:root[data-theme='dark'] .term-page #fork-popup [class*='text-[#333]'] {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .term-page .fork-popup-close {
+  background: color-mix(in srgb, var(--color-ink) 10%, transparent);
+  color: var(--color-ink);
+}
+
+/* ── TERMINOLOGY DETAIL (.term-detail-page) ──────────────────────── */
+/* main bg-[#f8f8f8] → body bg. PageHero #1a1a2e + CTA #1a1a2e stay. */
+:root[data-theme='dark'] .term-detail-page[class*='bg-[#f8f8f8]'] {
+  background-color: var(--color-bg);
+}
+/* White content cards (mapping / etymology / faq / related / usage). */
+:root[data-theme='dark'] .term-detail-page [class~='bg-white'] {
+  background-color: color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+/* Borders (#e5e5e5 / #eee). */
+:root[data-theme='dark'] .term-detail-page [class*='border-[#e5e5e5]'],
+:root[data-theme='dark'] .term-detail-page [class*='border-[#eee]'] {
+  border-color: var(--color-border);
+}
+/* Ink text (#1a1a2e headings/words, #333 lead, #444 body). */
+:root[data-theme='dark'] .term-detail-page [class*='text-[#1a1a2e]'],
+:root[data-theme='dark'] .term-detail-page [class*='text-[#333]'],
+:root[data-theme='dark'] .term-detail-page [class*='text-[#444]'] {
+  color: var(--color-ink);
+}
+/* Muted text (#555 / #64748b / #94a3b8 / #cbd5e1). */
+:root[data-theme='dark'] .term-detail-page [class*='text-[#555]'],
+:root[data-theme='dark'] .term-detail-page [class*='text-[#666]'],
+:root[data-theme='dark'] .term-detail-page [class*='text-[#64748b]'],
+:root[data-theme='dark'] .term-detail-page [class*='text-[#94a3b8]'] {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .term-detail-page [class*='text-[#cbd5e1]'] {
+  color: var(--color-border);
+}
+/* #27ae60 green (台灣用語 label) reads on dark; leave. Usage blockquote
+ * left rail stays green. */
+
+/* ── TERMINOLOGY CONVERTER (.converter-page) ─────────────────────── */
+/* Outer bg-[#f8f8f8] → body bg. PageHero #1a1a2e stays. */
+:root[data-theme='dark'] .converter-page[class*='bg-[#f8f8f8]'] {
+  background-color: var(--color-bg);
+}
+/* Editor labels (#555) + panel muted text. */
+:root[data-theme='dark'] .converter-page [class*='text-[#555]'],
+:root[data-theme='dark'] .converter-page [class*='text-[#888]'],
+:root[data-theme='dark'] .converter-page [class*='text-[#aaa]'] {
+  color: var(--color-ink-soft);
+}
+/* Input textarea + highlight overlay + output pane (bg-white/transparent
+ * + #ddd border + focus ring). */
+:root[data-theme='dark'] .converter-page #input-text,
+:root[data-theme='dark'] .converter-page #output-text {
+  border-color: var(--color-border);
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .converter-page #output-text[class~='bg-white'] {
+  background-color: var(--color-surface);
+}
+:root[data-theme='dark'] .converter-page #input-text:focus {
+  border-color: var(--color-accent);
+}
+/* Action + example buttons (bg-white / #ccc / #ddd border / #333 / #555). */
+:root[data-theme='dark'] .converter-page [class~='bg-white'] {
+  background-color: var(--color-surface);
+}
+:root[data-theme='dark'] .converter-page [class*='text-[#333]'] {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .converter-page [class*='border-[#ddd]'],
+:root[data-theme='dark'] .converter-page [class*='border-[#ccc]'],
+:root[data-theme='dark'] .converter-page [class*='border-[#e0e0e0]'] {
+  border-color: var(--color-border);
+}
+/* Analysis box (bg-white / #e0e0e0 border / #1a1a2e title / #f0f0f0 rule). */
+:root[data-theme='dark'] .converter-page #analysis {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .converter-page [class*='text-[#1a1a2e]'] {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .converter-page [class*='border-[#f0f0f0]'] {
+  border-color: var(--color-border);
+}
+/* Change-list rows (#fafafa bg) — JS-injected, use leaf class. */
+:root[data-theme='dark'] .converter-page .change-item {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+/* source/target chips keep their red/green semantic tints (readable). */
+:root[data-theme='dark'] .converter-page .change-source {
+  background: color-mix(in srgb, #c0392b 22%, transparent);
+  color: #f0a89e;
+}
+:root[data-theme='dark'] .converter-page .change-target {
+  background: color-mix(in srgb, #27ae60 20%, transparent);
+  color: #86e0a8;
+}
+/* FAQ (#e0e0e0 border / #fafafa summary bg / #333 h2 / #444 p). The
+ * .conv-faq <section> sits OUTSIDE the .converter-page wrapper (it's a
+ * direct Layout child), and .conv-faq is converter-only, so target it
+ * directly. Its colors come from Tailwind [&_summary]:… arbitrary
+ * variants → need !important to override. */
+:root[data-theme='dark'] .conv-faq details {
+  border-color: var(--color-border) !important;
+}
+:root[data-theme='dark'] .conv-faq summary {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent) !important;
+  color: var(--color-ink) !important;
+}
+:root[data-theme='dark'] .conv-faq h2 {
+  color: var(--color-ink) !important;
+}
+:root[data-theme='dark'] .conv-faq details p {
+  color: var(--color-ink-soft) !important;
+}
+:root[data-theme='dark'] .conv-faq summary::before {
+  color: var(--color-ink-soft) !important;
+}
+/* Replaced-word / sample marks: keep the amber highlight but darken the
+ * text so it reads on the pale mark (mark bg is a light amber). */
+:root[data-theme='dark'] .converter-page mark.replaced-word,
+:root[data-theme='dark'] .converter-page mark.sample-mark {
+  background: #d9b44a;
+  color: #1a1a2e;
+}
+
+/* ── 404 (.error-page) ───────────────────────────────────────────── */
+/* Big faint "404" (#1a1a2e opacity 0.15) → light ink so it stays a
+ * ghost mark on dark, not invisible. Bump the emoji 📝 variant too. */
+:root[data-theme='dark'] .error-page [class*='text-[#1a1a2e]'] {
+  color: var(--color-ink);
+}
+/* Body copy greys (#666 desc, #888 prompts, #333 chip labels). */
+:root[data-theme='dark'] .error-page [class*='text-[#666]'],
+:root[data-theme='dark'] .error-page [class*='text-[#888]'] {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .error-page [class*='text-[#333]'] {
+  color: var(--color-ink);
+}
+/* Primary CTA + report btn (bg-[#1a1a2e] / bg-[#f59e0b]) keep. Secondary
+ * light button (bg-[#f0f0f0]) → surface. */
+:root[data-theme='dark'] .error-page [class*='bg-[#f0f0f0]'] {
+  background-color: var(--color-surface);
+}
+/* Category chips: the wrapper carries `[&_a]:bg-[#f5f5f5]` /
+ * `[&_a]:text-[#333]` arbitrary-child variants, which Tailwind v4 emits
+ * as a NATIVE-NESTED rule inside `@layer utilities`:
+ *   .[&_a]:bg-[#f5f5f5] { & a { background-color: #f5f5f5 } }
+ * To beat a layered declaration reliably (source-order within the same
+ * layer + winning specificity), we re-declare inside `@layer utilities`
+ * AFTER Tailwind's import, using the same `& a` nesting shape so the
+ * cascade context matches. Keep the accent hover. */
+@layer utilities {
+  :root[data-theme='dark'] .error-page #category-chips,
+  :root[data-theme='dark'] .error-page #category-chips-2 {
+    & a {
+      background-color: var(--color-surface);
+      color: var(--color-ink);
+    }
+    & a:hover {
+      background-color: color-mix(
+        in srgb,
+        var(--color-accent) 22%,
+        transparent
+      );
+      color: var(--color-ink);
+    }
+  }
+}
+/* Search input (#e0e0e0 border). */
+:root[data-theme='dark'] .error-page [class*='border-[#e0e0e0]'] {
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .error-page input[type='text'] {
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+}
+/* Bug-report box (amber #fef3c7 bg / #fcd34d border) — keep the warm
+ * warn tint but desaturate for dark so it doesn't glare. */
+:root[data-theme='dark'] .error-page [class*='bg-[#fef3c7]'] {
+  background-color: color-mix(in srgb, #f59e0b 14%, transparent);
+  border-color: color-mix(in srgb, #f59e0b 30%, transparent);
+}
+/* Untranslated-notice box (blue #e3f2fd bg / #90caf9 border / #1565c0). */
+:root[data-theme='dark'] .error-page [class*='bg-[#e3f2fd]'] {
+  background-color: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+:root[data-theme='dark'] .error-page [class*='text-[#1565c0]'] {
+  color: var(--color-accent);
+}
+
+/* ── PROJECTS (.projects-page) ───────────────────────────────────── */
+/* Violet-gradient identity page. The gradient is on main.projects-page
+ * itself; flatten it to the dark body bg so text/cards stay legible.
+ * The violet clip-text H1 + accents below carry the theme identity. */
+:root[data-theme='dark'] .projects-page {
+  background-image: none !important;
+  background-color: var(--color-bg);
+}
+/* The gradient hero H1 (violet clip-text) reads on dark — keep. Lead
+ * copy (#64748b) + breadcrumb (#374151 / #94a3b8 / #64748b). */
+:root[data-theme='dark'] .projects-page [class*='text-[#64748b]'] {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .projects-page [class*='text-[#374151]'] {
+  color: var(--color-ink);
+}
+/* Project cards + CTA panel (bg-white / #e5e7eb border / #1e293b title /
+ * #64748b desc). Keep violet hover borders + tech-badge tints. */
+:root[data-theme='dark'] .projects-page [class~='bg-white'] {
+  background-color: color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+:root[data-theme='dark'] .projects-page [class*='border-[#e5e7eb]'] {
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .projects-page [class*='text-[#1e293b]'] {
+  color: var(--color-ink);
+}
+/* Tag chips (#f3f4f6 bg / #6b7280 text) + github icon btn (#f1f5f9 bg /
+ * #64748b). */
+:root[data-theme='dark'] .projects-page [class*='bg-[#f3f4f6]'],
+:root[data-theme='dark'] .projects-page [class*='bg-[#f1f5f9]'] {
+  background-color: color-mix(in srgb, var(--color-ink) 10%, transparent);
+}
+:root[data-theme='dark'] .projects-page [class*='text-[#6b7280]'] {
+  color: var(--color-ink-soft);
+}
+/* CTA "return home" outline button hover (#faf5ff light violet). */
+:root[data-theme='dark'] .projects-page [class*='hover:bg-[#faf5ff]']:hover {
+  background-color: color-mix(in srgb, #7c3aed 15%, transparent);
+}
+/* Card title links get their color from the parent h3's
+ * `[&_a]:text-[#1e293b]` child-variant, which Tailwind v4 emits as a
+ * native-nested rule in @layer utilities — unlayered CSS can't beat it
+ * (same case as the 404 chips). Re-declare in the utilities layer with
+ * winning specificity. Violet hover (#7c3aed) stays. */
+/* Card title links: color comes from the parent h3's
+ * `[&_a]:text-[#1e293b]` child-variant (a native-nested Tailwind rule in
+ * @layer utilities). Re-declare inside @layer utilities (appended after
+ * Tailwind's import → wins on source order) targeting the h3's literal
+ * class-attribute substring so specificity clears (0,2,0). Violet hover
+ * kept. Same recipe that fixed the 404 category chips. */
+@layer utilities {
+  :root[data-theme='dark'] .projects-page h3[class*='[&_a]:text-[#1e293b]'] {
+    & a {
+      color: var(--color-ink);
+    }
+    & a:hover {
+      color: #a855f7;
+    }
+  }
+}
+
+/* =====================================================================
+ * Dashboard (main.dashboard) — Tier 3a dark rollout.
+ *
+ * dashboard.css was already largely tokenized: the glass vital/nextstep
+ * cards read `var(--surface-glass)` (now a faint-on-dark 5% white in the
+ * tokens dark block) and vital borders use --status-vital-*, so those
+ * surfaces AUTO-FLIP once the page opts into data-theme=dark. What did
+ * NOT flip are the hardcoded hex leftovers:
+ *   - `.dashboard { color:#1e293b; background:#fafbfc }` — the base sets a
+ *     near-white page bg + dark-slate ink that cascades INTO every card,
+ *     leaving auto-flipped glass cards with dark-on-dark text. Fixing the
+ *     base surface + ink is the single highest-impact override.
+ *   - a handful of literal light card bgs (#fff nextstep, #fff5f5 spore
+ *     warn, rgba(248,250,252) ga-callout) and pale-bg legend chips.
+ *   - dark-ink slate text families (#1e293b / #334155 / #0f172a / #64748b).
+ * Saturated accent text (blues #3b82f6, greens #22c55e, cyans #22d3ee) is
+ * left untouched — legible on near-black by design.
+ * ===================================================================== */
+:root[data-theme='dark'] .dashboard {
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+/* Dark-ink slate text families → light ink / soft ink. The saturated
+ * accent colors are excluded by only listing the ink hexes. */
+:root[data-theme='dark'] .dashboard .ga-page-name,
+:root[data-theme='dark'] .dashboard .ga-callout-title,
+:root[data-theme='dark'] .dashboard .ga-mini-label {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .dashboard .ga-page-pv,
+:root[data-theme='dark'] .dashboard .ga-callout-body,
+:root[data-theme='dark'] .dashboard .ga-callout-meta,
+:root[data-theme='dark'] .dashboard .ga-subtle,
+:root[data-theme='dark'] .dashboard .ga-mini-meta,
+:root[data-theme='dark'] .dashboard .ga-kpi-strip,
+:root[data-theme='dark'] .dashboard .ga-block-title {
+  color: var(--color-ink-soft);
+}
+/* Literal light card backgrounds → faint glass lift, matching how the
+ * already-tokenized vital cards render. */
+:root[data-theme='dark'] .dashboard .nextstep-card,
+:root[data-theme='dark'] .dashboard .ga-callout {
+  background: var(--surface-glass);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .dashboard .spore-tile {
+  background: var(--surface-glass);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .dashboard .spore-tile-warn {
+  background: color-mix(in srgb, #ef4444 14%, transparent);
+  border-color: color-mix(in srgb, #ef4444 40%, transparent);
+}
+/* Contributor-area legend chips: pale-bg + saturated-dark-text pairs.
+ * Keep the hue, invert the value — tint the bg dark, lift the text. */
+:root[data-theme='dark'] .dashboard .contributors-area {
+  background: color-mix(in srgb, var(--color-ink) 12%, transparent);
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .dashboard .contributors-area-content {
+  background: color-mix(in srgb, #f59e0b 18%, transparent);
+  color: #fbbf24;
+}
+:root[data-theme='dark'] .dashboard .contributors-area-system {
+  background: color-mix(in srgb, #3b82f6 18%, transparent);
+  color: #93c5fd;
+}
+:root[data-theme='dark'] .dashboard .contributors-area-translation {
+  background: color-mix(in srgb, #22c55e 18%, transparent);
+  color: #86efac;
+}
+:root[data-theme='dark'] .dashboard .contributors-area-other {
+  background: color-mix(in srgb, var(--color-ink) 12%, transparent);
+  color: var(--color-ink-soft);
+}
+/* SupporterGrid (shared component, scoped here so about-page is untouched):
+ * .supporter-timeline (white section) + .supporter-stat (#f8fafc tiles). */
+:root[data-theme='dark'] .dashboard .supporter-timeline {
+  background: var(--surface-glass);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .dashboard .supporter-stat {
+  background: var(--surface-glass);
+  border-color: var(--color-border);
+}
+
+/* =====================================================================
+ * Taiwan-shape (main.taiwan-shape-page) — Tier 3a dark rollout.
+ *
+ * A genuinely light page (base `text-[#1a1a1a]`, white cards). The scoped
+ * <style> block hardcodes dark-ink headings/body + a stack of light card
+ * surfaces. Deliberately KEPT light (they display SVG map assets that
+ * need a light plate to be visible, or are already-dark by design):
+ *   - .svg-preview / .comparison-item .svg-container (white map plates)
+ *   - .code-block (#1e1e1e — already dark)
+ *   - the red brand accent #c73e3a (.btn-primary / .btn-outline / links /
+ *     .codes-table code) and the comparison red/green (#e74c3c/#27ae60).
+ * ===================================================================== */
+:root[data-theme='dark'] .taiwan-shape-page {
+  color: var(--color-ink);
+}
+/* PageHero title is an inline color:#111 (titleColor prop) on the <h1>
+ * → needs !important to beat the inline style, same recipe as .about-page
+ * (this PageHero variant emits <h1> rather than a .hero-title element). */
+:root[data-theme='dark'] .taiwan-shape-page .page-hero h1 {
+  color: var(--color-ink) !important;
+}
+/* The scoped <style> block rules (.taiwan-shape-page h2/h3/p) carry an
+ * astro-cid attribute → out-specificity them with an extra qualifier. */
+:root[data-theme='dark'] main.taiwan-shape-page h2,
+:root[data-theme='dark'] .taiwan-shape-page section h2 {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] main.taiwan-shape-page h3,
+:root[data-theme='dark'] .taiwan-shape-page section h3 {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] main.taiwan-shape-page p,
+:root[data-theme='dark'] .taiwan-shape-page section p {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .taiwan-shape-page .section-description {
+  color: var(--color-ink-soft);
+}
+/* SVG cards: keep the white map preview plate, darken the info body. */
+:root[data-theme='dark'] .taiwan-shape-page .svg-card {
+  background: var(--surface-glass);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .taiwan-shape-page .svg-info h3 {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .taiwan-shape-page .svg-desc {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .taiwan-shape-page .svg-meta {
+  color: var(--color-ink-soft);
+}
+/* Usage box (light-grey panel) → faint glass. code-block stays dark. */
+:root[data-theme='dark'] .taiwan-shape-page .usage-box {
+  background: var(--surface-glass);
+}
+:root[data-theme='dark'] .taiwan-shape-page .license-note {
+  color: var(--color-ink-soft);
+}
+/* Format-compare boxes: keep the blue/green hue, invert value (dark tint
+ * + lifted text). Plain .format-box → neutral glass. */
+:root[data-theme='dark'] .taiwan-shape-page .format-box {
+  background: var(--surface-glass);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .taiwan-shape-page .format-box.topo {
+  background: color-mix(in srgb, #4a90e2 14%, transparent);
+  border-color: color-mix(in srgb, #4a90e2 45%, transparent);
+}
+:root[data-theme='dark'] .taiwan-shape-page .format-box.geo {
+  background: color-mix(in srgb, #27ae60 14%, transparent);
+  border-color: color-mix(in srgb, #27ae60 45%, transparent);
+}
+:root[data-theme='dark'] .taiwan-shape-page .format-box.topo .format-label {
+  color: #8fbcf5;
+}
+:root[data-theme='dark'] .taiwan-shape-page .format-box.geo .format-label {
+  color: #6ee7a3;
+}
+:root[data-theme='dark'] .taiwan-shape-page .format-box p {
+  color: var(--color-ink-soft);
+}
+/* Geo download cards (pale-blue panels) → dark blue tint. */
+:root[data-theme='dark'] .taiwan-shape-page .geo-download-card {
+  background: color-mix(in srgb, #4a90e2 14%, transparent);
+  border-color: color-mix(in srgb, #4a90e2 45%, transparent);
+}
+:root[data-theme='dark'] .taiwan-shape-page .geo-file-name code {
+  color: #8fbcf5;
+}
+:root[data-theme='dark'] .taiwan-shape-page .geo-file-meta,
+:root[data-theme='dark'] .taiwan-shape-page .geo-note {
+  color: var(--color-ink-soft);
+}
+/* Codes table: darken the chrome, keep the red-accent <code> pills. */
+:root[data-theme='dark'] .taiwan-shape-page .codes-table-wrap {
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .taiwan-shape-page .codes-table th,
+:root[data-theme='dark'] .taiwan-shape-page .codes-table td {
+  border-bottom-color: var(--color-border);
+}
+:root[data-theme='dark'] .taiwan-shape-page .codes-table th {
+  background: var(--surface-glass);
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .taiwan-shape-page .codes-table tbody tr:hover {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+:root[data-theme='dark'] .taiwan-shape-page .codes-table code {
+  background: color-mix(in srgb, #c73e3a 20%, transparent);
+  color: #f0a09c;
+}
+
+/* =====================================================================
+ * Soundscape (.soundscape-page) — Tier 3a dark rollout.
+ *
+ * Well-tokenized Tailwind-arbitrary page. Section <h2> already inherit
+ * light ink (no fix). What breaks: the PageHero title (inline #1a3c34),
+ * the audio cards (bg-[#f8fafc] — bright rectangles on near-black), the
+ * empty-state box, and the slate-ink text families (#334155 / #475569 /
+ * #64748b). The green eyebrow + blue accent links/chips stay (legible on
+ * dark). Native <audio> controls keep the browser default skin.
+ * ===================================================================== */
+:root[data-theme='dark'] .soundscape-page .page-hero h1 {
+  color: var(--color-ink) !important;
+}
+/* Audio cards + empty-state box: light plate → faint glass. */
+:root[data-theme='dark'] .soundscape-page [class*='bg-[#f8fafc]'] {
+  background: var(--surface-glass);
+}
+:root[data-theme='dark'] .soundscape-page [class*='border-[#cbd5e1]'] {
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .soundscape-page [class*='border-[#94a3b8]'] {
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .soundscape-page [class*='border-[#e2e8f0]'] {
+  border-color: var(--color-border);
+}
+/* Slate-ink text families → light / soft ink. */
+:root[data-theme='dark'] .soundscape-page [class*='text-[#334155]'] {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .soundscape-page [class*='text-[#475569]'],
+:root[data-theme='dark'] .soundscape-page [class*='text-[#64748b]'] {
+  color: var(--color-ink-soft);
+}
+
+/* =====================================================================
+ * Assets (main.assets-page) — Tier 3a dark rollout.
+ *
+ * Mostly a .prose page (title/headings/body already handled by the global
+ * .prose dark rules). The only breakage is the 4 SVG asset cards, which
+ * live OUTSIDE .prose: bg-white card shell + #333/#555/#999 text. The
+ * inner image plate (bg-[#f8faf5]) is KEPT light — the SVG map needs a
+ * light plate to be visible. code-block (#1e1e1e) already dark.
+ * ===================================================================== */
+:root[data-theme='dark'] .assets-page [class*='bg-white'] {
+  background: var(--surface-glass);
+  border: 1px solid var(--color-border);
+}
+:root[data-theme='dark'] .assets-page [class*='text-[#333]'] {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .assets-page [class*='text-[#555]'] {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .assets-page [class*='text-[#999]'] {
+  color: var(--color-ink-soft);
+}
+
+/* =====================================================================
+ * Map (.map-page) — Tier 3b dark rollout (viz-heavy).
+ *
+ * A genuinely light page. The Taiwan SVG map itself is the DATA-INK:
+ * the county fills use a region palette (yellow/orange/mint/green/violet
+ * gradients) and sit on a light-blue "sea" canvas. We KEEP the map plate
+ * light — a map has to read as a map, same call as taiwan-shape/assets.
+ * All rules below darken only the PAGE CHROME around it: the article
+ * sidebar, filter buttons, route pills, tooltips, and the dynamically
+ * innerHTML-injected county/deep-article cards (:global, no astro-cid —
+ * still reachable as .map-page descendants). PageHero band is dark-teal
+ * already. Gated on data-theme=dark → light mode pixel-identical.
+ * ===================================================================== */
+
+/* Sidebar panel shell (white bg / #e5e7eb border) → dark surface. */
+:root[data-theme='dark'] .map-page .sidebar-panel {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+/* Sidebar headings + hints (#2d5016 green / #6b7280 grey). */
+:root[data-theme='dark'] .map-page .sidebar-header h3,
+:root[data-theme='dark'] .map-page .sidebar-route h3 {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .map-page .sidebar-hint,
+:root[data-theme='dark'] .map-page .sidebar-route .route-desc,
+:root[data-theme='dark'] .map-page .no-articles,
+:root[data-theme='dark'] .map-page .clear-selection-btn,
+:root[data-theme='dark'] .map-page .back-btn {
+  color: var(--color-ink-soft);
+}
+/* County article count keeps its green accent (reads on dark). */
+
+/* Filter buttons (white bg / #d1d5db border / #374151 text). Active
+ * stays #16a34a green fill (JS-toggled) — legible on dark. */
+:root[data-theme='dark'] .map-page .filter-btn {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .map-page .filter-btn:hover {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
+}
+
+/* Route bar (white strip + #e5e7eb border) + route pills (white). Active
+ * pill keeps its per-route color fill. */
+:root[data-theme='dark'] .map-page .route-bar {
+  background: var(--color-bg);
+  border-bottom-color: var(--color-border);
+}
+:root[data-theme='dark'] .map-page .route-pill {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .map-page .route-pill:hover {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+/* Zoom buttons (white bg / #e5e7eb border / #374151) — sit on the light
+ * map plate, so a light chip actually reads better here; keep them light
+ * but firm up the border so they don't melt into the plate. Left as-is
+ * (light) intentionally — they overlay the light-blue map canvas. */
+
+/* Collapsible filters (white bg; [open] → #fafdf6). */
+:root[data-theme='dark'] .map-page .sidebar-filters {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .map-page .sidebar-filters[open] {
+  background: color-mix(in srgb, var(--color-ink) 4%, transparent);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .map-page .sidebar-filters-summary:hover {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+:root[data-theme='dark'] .map-page .sidebar-filters-label {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .map-page .sidebar-filters-row-label {
+  color: var(--color-ink-soft);
+}
+/* filters-state chip: light mint #dcfce7 bg + #16a34a green text vanishes
+ * on dark (and inherits lifted ink otherwise). Rebuild as accent tint. */
+:root[data-theme='dark'] .map-page .sidebar-filters-state {
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  color: var(--color-accent);
+}
+
+/* Category group headers (#e5e7eb divider / #374151 title / #6b7280
+ * count on #f3f4f6 chip). */
+:root[data-theme='dark'] .map-page .category-group-header {
+  border-bottom-color: var(--color-border);
+}
+:root[data-theme='dark'] .map-page .category-group-title {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .map-page .category-group-count {
+  background: color-mix(in srgb, var(--color-ink) 10%, transparent);
+  color: var(--color-ink-soft);
+}
+
+/* Article list rows (#1a1a1a title / #666 desc / #888 meta). */
+:root[data-theme='dark'] .map-page .article-title {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .map-page .article-desc,
+:root[data-theme='dark'] .map-page .article-meta {
+  color: var(--color-ink-soft);
+}
+
+/* Marker tooltip (white bubble / #1a1a1a title / #666 body). The #tooltip
+ * for counties is already near-black (keep). */
+:root[data-theme='dark'] .map-page .marker-tooltip {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .map-page .marker-tooltip h4 {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .map-page .marker-tooltip p {
+  color: var(--color-ink-soft);
+}
+/* marker-tooltip .tooltip-meta keeps green accent. */
+
+/* Legacy sidebar article fallback (white bg). */
+:root[data-theme='dark'] .map-page .sidebar-article-item:not(.article-card) {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+/* --- Dynamically innerHTML-injected cards (:global in the template, no
+ * astro-cid, but rendered inside .map-page so still reachable) --- */
+
+/* 22-county deep-article card (light-green gradient panel + border). Keep
+ * a faint green identity, rebuild on the dark bg. */
+:root[data-theme='dark'] .map-page .deep-article-card {
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+:root[data-theme='dark'] .map-page .deep-card-title {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .map-page .deep-card-contradiction {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .map-page .deep-card-read {
+  color: var(--color-ink-soft);
+}
+/* deep-card-badge (#dcfce7 mint chip) + deep-card-cta keep green. */
+:root[data-theme='dark'] .map-page .deep-card-badge {
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  color: var(--color-accent);
+}
+
+/* 22-county grid panel (#fafdf6 bg / #e5e7eb border). */
+:root[data-theme='dark'] .map-page .counties-22-panel {
+  background: color-mix(in srgb, var(--color-ink) 5%, transparent);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .map-page .counties-22-header h4 {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .map-page .counties-22-hint {
+  color: var(--color-ink-soft);
+}
+/* County grid cards (white bg / #d1fae5 border / #14532d name / #166534
+ * contradiction). */
+:root[data-theme='dark'] .map-page .county-grid-card {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .map-page .county-grid-card:hover {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
+}
+:root[data-theme='dark'] .map-page .county-grid-name {
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .map-page .county-grid-contradiction {
+  color: var(--color-ink-soft);
+}
+/* Filter chips (white bg / #d1d5db border / #4b5563 text). Active keeps
+ * green fill. */
+:root[data-theme='dark'] .map-page .filter-chip {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .map-page .filter-chip:hover {
+  border-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
+  color: var(--color-ink);
+}
+/* Single-article detail body text (#666 desc via .article-content p). */
+:root[data-theme='dark'] .map-page .article-content p {
+  color: var(--color-ink-soft);
+}
+/* Single-article detail category chip (#f0fdf4 mint bg / #16a34a text):
+ * rebuild as accent tint so it sits on the dark sidebar as a chip, not a
+ * bright mint rectangle. read-more-btn keeps its solid green fill. */
+:root[data-theme='dark'] .map-page .article-category {
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  color: var(--color-accent);
+}
+
+/* =====================================================================
+ * LifeTree — index (.lifetree-index) + detail (.lifetree-page) + the
+ * shared <LifeTree> component (.life-tree). Tier 3b dark rollout (viz).
+ *
+ * The tree/timeline visualization is a vertical timeline of decision
+ * nodes; the categorical THEME colors (per-node --theme-color dots,
+ * markers, tags, left rails) are the DATA-INK and stay saturated. We
+ * darken only the surrounding page + card chrome.
+ *
+ * Key detail: LifeTree.astro is already token-based BUT reads
+ * `var(--color-text, …)` / `var(--color-text-soft, …)` which are NOT
+ * defined in tokens.css — they always fall back to the light hex, so on
+ * dark every body/date/meta line renders dark-on-dark. Rather than
+ * rewrite ~20 leaf classes, we locally alias those two vars to the ink
+ * tokens on the page wrappers; the component's `var(--color-text, #333)`
+ * then resolves to light ink. --color-bg / --color-bg-soft / --color-border
+ * already auto-flip via the tokens dark block, so the tree surfaces darken
+ * for free once the text is fixed. The component only renders on
+ * /lifetree/[slug] (article pages carry just a CTA banner), so scoping
+ * under .lifetree-page is safe. Gated on data-theme=dark.
+ * ===================================================================== */
+
+/* Alias the undefined text vars → ink tokens, scoped to the two wrappers.
+ * This single declaration fixes every LifeTree body/meta/date/alt line. */
+:root[data-theme='dark'] .lifetree-index,
+:root[data-theme='dark'] .lifetree-page {
+  --color-text: var(--color-ink);
+  --color-text-soft: var(--color-ink-soft);
+}
+
+/* Page base (cream #f8f1e9) → body bg. */
+:root[data-theme='dark'] .lifetree-index,
+:root[data-theme='dark'] .lifetree-page {
+  background: var(--color-bg);
+}
+/* Hero violet-tint wash over cream → flatten (keep it subtle on dark). */
+:root[data-theme='dark'] .lifetree-index__hero,
+:root[data-theme='dark'] .lifetree-page__hero {
+  background: none;
+}
+/* Serif headings (#1a3c34 teal) → ink. Violet eyebrow (#8b5cf6) kept.
+ * These use descendant selectors whose Astro-scoped counterparts carry
+ * DOUBLE data-astro-cid attributes (e.g. `.lifetree-index[cid] h1[cid]`,
+ * specificity 0,4,1) which out-specify a plain qualifier — so !important
+ * here, same recipe as .about-page .hero-title / .taiwan-shape-page h1. */
+:root[data-theme='dark'] .lifetree-index h1,
+:root[data-theme='dark'] .lifetree-index__card h2,
+:root[data-theme='dark'] .lifetree-page__title {
+  color: var(--color-ink) !important;
+}
+/* Lede / intro body (#2c3a36) → ink. */
+:root[data-theme='dark'] .lifetree-index__lede,
+:root[data-theme='dark'] .lifetree-index__intro,
+:root[data-theme='dark'] .lifetree-page__about {
+  color: var(--color-ink);
+}
+/* Muted meta (#5a6f6a): caveat/rationale/span/stats/source/empty/footer/
+ * subtitle/breadcrumbs. !important: the scoped counterparts carry a
+ * data-astro-cid attribute and in dev they're injected after this file,
+ * so ties/near-ties fall their way — force ours (still gated on dark). */
+:root[data-theme='dark'] .lifetree-index__caveat,
+:root[data-theme='dark'] .lifetree-index__rationale,
+:root[data-theme='dark'] .lifetree-index__span,
+:root[data-theme='dark'] .lifetree-index__stats,
+:root[data-theme='dark'] .lifetree-index__source-link,
+:root[data-theme='dark'] .lifetree-index__empty,
+:root[data-theme='dark'] .lifetree-index__footer,
+:root[data-theme='dark'] .lifetree-page__subtitle,
+:root[data-theme='dark'] .lifetree-page__breadcrumbs,
+:root[data-theme='dark'] .lifetree-page__caveat {
+  color: var(--color-ink-soft) !important;
+}
+/* Card link wrapper (color:inherit → picks up the global light-mode
+ * body ink #1a1a2e). Force it light so its non-h2 text (the plain nodes)
+ * reads. */
+:root[data-theme='dark'] .lifetree-index__card-link {
+  color: var(--color-ink);
+}
+/* Cards + panels (white bg / translucent-teal border). */
+:root[data-theme='dark'] .lifetree-index__card,
+:root[data-theme='dark'] .lifetree-index__caveat,
+:root[data-theme='dark'] .lifetree-page__about {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+/* Card source-link foot strip (rgba teal wash + dashed border-top). */
+:root[data-theme='dark'] .lifetree-index__source-link {
+  background: color-mix(in srgb, var(--color-ink) 5%, transparent);
+  border-top-color: var(--color-border);
+}
+:root[data-theme='dark'] .lifetree-index__source-link:hover {
+  background: color-mix(in srgb, #8b5cf6 12%, transparent);
+  color: #a78bda;
+}
+/* Dashed dividers (footer / breadcrumbs / about-caveat top rule). */
+:root[data-theme='dark'] .lifetree-index__footer,
+:root[data-theme='dark'] .lifetree-page__breadcrumbs {
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .lifetree-index__footer code {
+  background: color-mix(in srgb, #8b5cf6 16%, transparent);
+  color: #c4b5fd;
+}
+/* Detail-page footer nav buttons (translucent-white bg / teal text). */
+:root[data-theme='dark'] .lifetree-page__footer {
+  border-top-color: var(--color-border);
+}
+:root[data-theme='dark'] .lifetree-page__back,
+:root[data-theme='dark'] .lifetree-page__index {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-ink);
+}
+:root[data-theme='dark'] .lifetree-page__back:hover,
+:root[data-theme='dark'] .lifetree-page__index:hover {
+  background: color-mix(in srgb, #8b5cf6 14%, transparent);
+  border-color: color-mix(in srgb, #8b5cf6 45%, transparent);
+  color: #a78bda;
+}
+
+/* --- <LifeTree> component internals (.life-tree) --- */
+/* The container + node-content + intro + alt boxes read --color-bg /
+ * --color-bg-soft (auto-flip) with the text now aliased above. A few
+ * hardcoded hex remain: the provenance box #fff bg, the chose-box violet
+ * wash. Theme-color node tags/markers/dots + the green chose-icon +
+ * amber/violet plausibility rails all stay (data-ink / semantic). */
+:root[data-theme='dark'] .lifetree-page .life-tree__provenance {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  border-color: color-mix(in srgb, #8b5cf6 30%, transparent);
+}
+:root[data-theme='dark'] .lifetree-page .life-tree__provenance code {
+  background: color-mix(in srgb, #8b5cf6 16%, transparent);
+  color: #c4b5fd;
+}
+/* chose-box violet 4% wash is fine on dark; leave. node-theme-tag keeps
+ * white-on-theme-color (the theme colors are saturated enough). */
+
+/* =====================================================================
+ * Fork-graph (.fork-graph-page) — Tier 3b dark rollout (viz-heavy).
+ *
+ * A D3 branch/fork graph plus a 6-category legend + framing bands. The
+ * header + footer bands are already #1a1a2e (dark, kept). The GRAPH plate
+ * (bg-[#fafafa]) is KEPT LIGHT on purpose: every SVG element is painted by
+ * JS for a light background (grid #e0e0e0, axis labels #aaa, origin labels
+ * #999, white-fill fork nodes, row separators #f0f0f0) — inverting it would
+ * mean rewriting the D3 color logic, and the saturated data-ink (TW red
+ * #e74c3c / CN blue #3498db result nodes+labels) reads cleanly on the light
+ * plate. Same "viz on a light plate inside a dark page" call as the maps.
+ * We darken only: the page base, the white legend section, and its text.
+ * The 6 legend badge colors are categorical data-ink → kept. Gated on
+ * data-theme=dark → light mode pixel-identical.
+ * ===================================================================== */
+
+/* Page base (bg-[#f8f8f8]) → body bg. Header/footer #1a1a2e stay. */
+:root[data-theme='dark'] .fork-graph-page[class*='bg-[#f8f8f8]'] {
+  background-color: var(--color-bg);
+}
+/* Caption under the graph (#888 grey) → soft ink. The inline red/blue
+ * legend spans keep their saturated colors (data-ink, read on dark). */
+:root[data-theme='dark'] .fork-graph-page [class*='text-[#888]'] {
+  color: var(--color-ink-soft);
+}
+/* Legend section (white bg / #eee top+bottom border). */
+:root[data-theme='dark'] .fork-graph-page section[class~='bg-white'] {
+  background-color: var(--color-bg);
+  border-color: var(--color-border);
+}
+:root[data-theme='dark'] .fork-graph-page [class*='border-[#eee]'] {
+  border-color: var(--color-border);
+}
+/* Legend heading (#1a1a2e) → ink; item descriptions (#555, applied via the
+ * grid wrapper's [&_.fg-legend-item>p]:text-[#555] child variant → a
+ * native-nested @layer-utilities rule; re-declare in the layer to win, same
+ * recipe as the 404/projects nested-variant fixes). */
+:root[data-theme='dark'] .fork-graph-page [class*='text-[#1a1a2e]'] {
+  color: var(--color-ink);
+}
+@layer utilities {
+  :root[data-theme='dark']
+    .fork-graph-page
+    [class*='[&_.fg-legend-item>p]:text-[#555]'] {
+    & .fg-legend-item > p {
+      color: var(--color-ink-soft);
+    }
+  }
+}
+/* The 6 .fg-badge chips carry inline per-category color triplets
+ * (#xxxxxx22 tint bg / #xxxxxx text / #xxxxxx44 border) — categorical
+ * data-ink, KEPT as-is. Their ~13% tint reads fine on the dark bg. */
+
+/* ============================================================
+ * Footnotes (issue #1212 §1.2)
+ * article.template.astro scoped rules hardcode light grays +
+ * blue-600; their compiled specificity beats the generic
+ * `.prose a` dark rule. Measured on prod: .footnote-ref #2563eb
+ * on #050505 = 3.94:1 (AA fail), .footnotes a #6b7280 = 4.22:1.
+ * ============================================================ */
+:root[data-theme='dark'] .prose .footnotes {
+  border-top-color: color-mix(in srgb, var(--color-ink) 20%, transparent);
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .prose .footnotes li p {
+  color: var(--color-ink-soft);
+}
+:root[data-theme='dark'] .prose .footnotes a {
+  color: var(--color-ink-soft);
+  text-decoration-color: color-mix(
+    in srgb,
+    var(--color-ink-soft) 40%,
+    transparent
+  );
+}
+:root[data-theme='dark'] .prose .footnotes a:hover {
+  color: var(--color-ink);
+  text-decoration-color: var(--color-ink-soft);
+}
+/* `a.footnote-ref`（帶元素型別）讓 specificity 嚴格壓過 template 任何
+ * scoped-class 組合，不留 cascade 邊界情況。 */
+:root[data-theme='dark'] .prose a.footnote-ref {
+  color: var(--color-accent);
+}
+:root[data-theme='dark'] .prose a.footnote-ref:hover {
+  color: var(--color-accent);
+}
+:root[data-theme='dark'] .prose a.footnote-backref {
+  color: var(--color-ink-soft);
+}
+
+/* Footnote jump-target highlight — dark variants (light version lives in
+ * article.template.astro). */
+:root[data-theme='dark'] .prose .footnotes li:target {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  outline-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+:root[data-theme='dark'] .prose sup:target,
+:root[data-theme='dark'] .prose a.footnote-ref:target {
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+}

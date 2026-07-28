@@ -1,0 +1,20 @@
+{
+  "name": "taiwanmd",
+  "description": "Taiwan knowledge for your AI, plus the skill that turns your machine into a Taiwan.md working node. The MCP server answers from 860+ curated, citation-backed articles in 12 languages — free, no API key, queries stay on your machine. The node skill picks up one open task a day and returns it as a pull request.",
+  "version": "0.1.0",
+  "author": {
+    "name": "CheYu Wu",
+    "email": "cheyu.wu@monoame.com"
+  },
+  "homepage": "https://taiwan.md",
+  "repository": "https://github.com/frank890417/taiwan-md",
+  "license": "MIT",
+  "keywords": [
+    "taiwan",
+    "knowledge-base",
+    "rag",
+    "citations",
+    "anti-hallucination",
+    "mcp"
+  ]
+}

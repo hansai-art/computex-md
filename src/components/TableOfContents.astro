@@ -1,0 +1,147 @@
+---
+/**
+ * TableOfContents — Sticky left sidebar TOC.
+ * Parses h2/h3 headings from HTML content string, builds nested list.
+ * Highlights active section on scroll via IntersectionObserver.
+ */
+import { useTranslations, getLangFromUrl } from '../i18n/utils';
+
+interface Heading {
+  id: string;
+  text: string;
+  level: 2 | 3;
+}
+
+interface Props {
+  content: string; // raw processed HTML
+}
+
+const { content } = Astro.props;
+
+// 2026-07-26: the heading and the nav's accessible name were hardcoded zh-TW,
+// so all 11 non-zh languages rendered 目錄 / aria-label="文章目錄" (6,026 pages
+// in dist). `article.toc` already existed in ui.ts, translated for all 12
+// languages -- the component simply never used it. Lang comes from the URL, the
+// same way Footer.astro and Header.astro do it, so no call site has to change.
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Extract h2 / h3 headings from HTML
+function extractHeadings(html: string): Heading[] {
+  const headings: Heading[] = [];
+  const regex = /<h([23])[^>]*(?:id="([^"]*)")?[^>]*>(.*?)<\/h\1>/gi;
+  let match;
+  while ((match = regex.exec(html)) !== null) {
+    const level = parseInt(match[1]) as 2 | 3;
+    const existingId = match[2];
+    const rawText = match[3].replace(/<[^>]+>/g, '').trim();
+    // Generate id from text if no id
+    const id =
+      existingId ||
+      rawText
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\u4e00-\u9fff-]/g, '')
+        .slice(0, 60);
+    if (rawText) headings.push({ id, text: rawText, level });
+  }
+  return headings;
+}
+
+const headings = extractHeadings(content);
+---
+
+<!--
+  Phase 4 leaf migration #5: TableOfContents.astro
+  ────────────────────────────────────────────────
+  - Scoped <style> block removed entirely
+  - All classes → Tailwind atomic utilities
+  - .toc-link.active still controlled via the JS below (keeps the
+    existing active-class toggling logic unchanged), but the active
+    styles are now inside [&.active]: arbitrary variant so they land
+    when classList.add('active') is applied
+  - Preserves scrollbar-color via arbitrary custom-property syntax
+  - H3 text has nested font-size adjustment via [:where(...)] selector
+
+  Note: .toc-link .active is applied by the IntersectionObserver at
+  runtime. Tailwind's group-has-variant isn't ideal here because the
+  active state is on the link itself. Using [&.active]: to match the
+  link when it carries the class.
+-->{
+  headings.length > 1 && (
+    <nav
+      class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto py-6 [scrollbar-color:rgba(26,60,52,0.15)_transparent] [scrollbar-width:thin]"
+      aria-label={t('article.toc')}
+      id="toc"
+    >
+      <p class="mb-5 px-1 font-['Inter',system-ui,sans-serif] text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[#9aa89e]">
+        {t('article.toc')}
+      </p>
+      <ol class="m-0 flex list-none flex-col gap-[0.1rem] p-0">
+        {/* 2026-07-25 (OBSERVER-QUEUE #12 (a) 到期預設「hairline 極簡版」，
+            issue #1212 §1.1「TOC 底色分層或 hairline 分隔線」)：只在 H2 之間
+            放一條髮絲線當節區分隔，H3 不放（避免把子項切碎成清單）。顏色走
+            --color-border token，深淺色自動各自對比，不需要 dark 分支。
+            first:border-t-0 讓第一項上面不掛線。 */}
+        {headings.map((h, i) => (
+          <li
+            class={`${h.level === 3 ? 'ps-2' : 'border-t border-[var(--color-border)] pt-[0.1rem] first:border-t-0 first:pt-0'}`}
+          >
+            <a
+              href={`#${h.id}`}
+              class="toc-link flex items-baseline gap-[0.6rem] rounded-md border-s-2 border-transparent px-[0.6rem] py-[0.42rem] no-underline transition-[background-color,color] duration-150 hover:bg-[rgba(26,60,52,0.05)] hover:text-[#1a3c34] [&.active]:border-s-[#006d77] [&.active]:bg-[rgba(0,109,119,0.06)] [&.active]:text-[#006d77]"
+              data-toc-id={h.id}
+            >
+              <span class="w-[1.6rem] flex-shrink-0 font-['Inter',system-ui,sans-serif] text-[0.65rem] [font-variant-numeric:tabular-nums] text-[#b8c4be]">
+                {h.level === 2
+                  ? String(
+                      headings.filter((x, j) => x.level === 2 && j <= i).length,
+                    ).padStart(2, '0')
+                  : ''}
+              </span>
+              <span
+                class={`font-['Noto_Serif_TC',serif] leading-[1.45] [.toc-link:hover_&]:text-inherit [.toc-link.active_&]:text-inherit ${
+                  h.level === 2
+                    ? 'text-[0.82rem] font-medium text-[#3a4f44]'
+                    : 'text-[0.78rem] text-[#7a8b7e]'
+                }`}
+              >
+                {h.text}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}
+
+<script>
+  (function () {
+    const links = document.querySelectorAll<HTMLAnchorElement>('.toc-link');
+    if (!links.length) return;
+
+    const ids = Array.from(links).map((l) => l.dataset.tocId!);
+    const headingEls: HTMLElement[] = ids
+      .map((id) => document.getElementById(id) as HTMLElement)
+      .filter(Boolean);
+
+    if (!headingEls.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            links.forEach((l) => {
+              l.classList.toggle('active', l.dataset.tocId === id);
+            });
+          }
+        });
+      },
+      { rootMargin: '-12% 0px -72% 0px', threshold: 0 },
+    );
+
+    headingEls.forEach((el) => observer.observe(el));
+  })();
+</script>

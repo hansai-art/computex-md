@@ -1,0 +1,753 @@
+---
+/**
+ * ReaderSettings.astro — floating reader controls (theme + size + plain text).
+ *
+ * Sits next to the existing .floating-md button (Layout.astro). Exposes:
+ *   1. Light / Auto / Dark  — sets data-theme on <html>
+ *   2. Text size standard / large / xlarge — sets data-text-size on <html>
+ *   3. Link to /raw/{path}.md plain-text view
+ *
+ * FOUC-safe init lives in Layout.astro <head> so toggling never flashes.
+ * Born: Issue #615 / idlccp1984 reader options request, 2026-05-01 γ-late.
+ */
+import type { Lang } from '../config/languages';
+
+interface Props {
+  lang?: Lang;
+}
+const { lang = 'zh-TW' } = Astro.props;
+
+type Strings = {
+  open: string;
+  title: string;
+  themeLabel: string;
+  themeLight: string;
+  themeAuto: string;
+  themeDark: string;
+  sizeLabel: string;
+  sizeStandard: string;
+  sizeLarge: string;
+  sizeXLarge: string;
+  plainTextLabel: string;
+  plainTextHint: string;
+  close: string;
+  backToTop: string;
+};
+
+const STRINGS: Record<string, Strings> = {
+  'zh-TW': {
+    open: '閱讀設定',
+    title: '閱讀設定',
+    themeLabel: '主題',
+    themeLight: '日',
+    themeAuto: '隨系統',
+    themeDark: '夜',
+    sizeLabel: '字級',
+    sizeStandard: '標準',
+    sizeLarge: '較大',
+    sizeXLarge: '最大',
+    plainTextLabel: '純文字版',
+    plainTextHint: '無 JS / 無樣式 / 無圖片，適合弱網或舊裝置',
+    close: '關閉',
+    backToTop: '回到頂部',
+  },
+  en: {
+    open: 'Reader settings',
+    title: 'Reader settings',
+    themeLabel: 'Theme',
+    themeLight: 'Light',
+    themeAuto: 'Auto',
+    themeDark: 'Dark',
+    sizeLabel: 'Text size',
+    sizeStandard: 'Standard',
+    sizeLarge: 'Large',
+    sizeXLarge: 'X-Large',
+    plainTextLabel: 'Plain text version',
+    plainTextHint:
+      'No JS, no CSS, no images — for poor networks or old devices',
+    close: 'Close',
+    backToTop: 'Back to top',
+  },
+  ja: {
+    open: '表示設定',
+    title: '表示設定',
+    themeLabel: 'テーマ',
+    themeLight: 'ライト',
+    themeAuto: '自動',
+    themeDark: 'ダーク',
+    sizeLabel: '文字サイズ',
+    sizeStandard: '標準',
+    sizeLarge: '大',
+    sizeXLarge: '特大',
+    plainTextLabel: 'プレーンテキスト版',
+    plainTextHint: 'JS/CSS/画像なし — 低速回線や古い端末向け',
+    close: '閉じる',
+    backToTop: 'トップへ戻る',
+  },
+  ko: {
+    open: '읽기 설정',
+    title: '읽기 설정',
+    themeLabel: '테마',
+    themeLight: '라이트',
+    themeAuto: '자동',
+    themeDark: '다크',
+    sizeLabel: '글자 크기',
+    sizeStandard: '표준',
+    sizeLarge: '크게',
+    sizeXLarge: '아주 크게',
+    plainTextLabel: '플레인 텍스트 버전',
+    plainTextHint: 'JS/CSS/이미지 없음 — 저속망·구형 기기용',
+    close: '닫기',
+    backToTop: '맨 위로',
+  },
+  es: {
+    open: 'Ajustes de lectura',
+    title: 'Ajustes de lectura',
+    themeLabel: 'Tema',
+    themeLight: 'Claro',
+    themeAuto: 'Auto',
+    themeDark: 'Oscuro',
+    sizeLabel: 'Tamaño',
+    sizeStandard: 'Estándar',
+    sizeLarge: 'Grande',
+    sizeXLarge: 'Muy grande',
+    plainTextLabel: 'Versión texto plano',
+    plainTextHint:
+      'Sin JS, CSS o imágenes — redes lentas o dispositivos antiguos',
+    close: 'Cerrar',
+    backToTop: 'Volver arriba',
+  },
+  fr: {
+    open: 'Réglages de lecture',
+    title: 'Réglages de lecture',
+    themeLabel: 'Thème',
+    themeLight: 'Clair',
+    themeAuto: 'Auto',
+    themeDark: 'Sombre',
+    sizeLabel: 'Taille',
+    sizeStandard: 'Standard',
+    sizeLarge: 'Grande',
+    sizeXLarge: 'Très grande',
+    plainTextLabel: 'Version texte brut',
+    plainTextHint:
+      'Sans JS, CSS ni images — réseaux lents ou anciens appareils',
+    close: 'Fermer',
+    backToTop: 'Haut de page',
+  },
+  // ⚠️ 元件私有語言表——新語言出生不會自動出現在這裡（vi/id/pt/hi 出生一週
+  // 都掉回 zh 沒人發現，2026-07-25 ar/ru 開站日才補）。加語言同步 Layout.astro
+  // 的 skipLinkLabels。結構性收斂（併入 i18n bundle）待評估。
+  vi: {
+    open: 'Cài đặt đọc',
+    title: 'Cài đặt đọc',
+    themeLabel: 'Giao diện',
+    themeLight: 'Sáng',
+    themeAuto: 'Theo hệ thống',
+    themeDark: 'Tối',
+    sizeLabel: 'Cỡ chữ',
+    sizeStandard: 'Chuẩn',
+    sizeLarge: 'Lớn',
+    sizeXLarge: 'Lớn nhất',
+    plainTextLabel: 'Bản thuần văn bản',
+    plainTextHint: 'Không JS / CSS / hình ảnh — hợp mạng yếu, máy cũ',
+    close: 'Đóng',
+    backToTop: 'Về đầu trang',
+  },
+  id: {
+    open: 'Pengaturan baca',
+    title: 'Pengaturan baca',
+    themeLabel: 'Tema',
+    themeLight: 'Terang',
+    themeAuto: 'Ikuti sistem',
+    themeDark: 'Gelap',
+    sizeLabel: 'Ukuran huruf',
+    sizeStandard: 'Standar',
+    sizeLarge: 'Besar',
+    sizeXLarge: 'Terbesar',
+    plainTextLabel: 'Versi teks polos',
+    plainTextHint: 'Tanpa JS / CSS / gambar — cocok untuk jaringan lambat',
+    close: 'Tutup',
+    backToTop: 'Kembali ke atas',
+  },
+  pt: {
+    open: 'Preferências de leitura',
+    title: 'Preferências de leitura',
+    themeLabel: 'Tema',
+    themeLight: 'Claro',
+    themeAuto: 'Automático',
+    themeDark: 'Escuro',
+    sizeLabel: 'Tamanho da letra',
+    sizeStandard: 'Padrão',
+    sizeLarge: 'Grande',
+    sizeXLarge: 'Máximo',
+    plainTextLabel: 'Versão só texto',
+    plainTextHint:
+      'Sem JS, CSS nem imagens — redes lentas ou aparelhos antigos',
+    close: 'Fechar',
+    backToTop: 'Voltar ao topo',
+  },
+  hi: {
+    open: 'पठन सेटिंग',
+    title: 'पठन सेटिंग',
+    themeLabel: 'थीम',
+    themeLight: 'हल्की',
+    themeAuto: 'सिस्टम अनुसार',
+    themeDark: 'गहरी',
+    sizeLabel: 'अक्षर आकार',
+    sizeStandard: 'मानक',
+    sizeLarge: 'बड़ा',
+    sizeXLarge: 'सबसे बड़ा',
+    plainTextLabel: 'सादा पाठ संस्करण',
+    plainTextHint:
+      'बिना JS / CSS / चित्र — धीमे नेटवर्क या पुराने उपकरणों के लिए',
+    close: 'बंद करें',
+    backToTop: 'ऊपर जाएँ',
+  },
+  ar: {
+    open: 'إعدادات القراءة',
+    title: 'إعدادات القراءة',
+    themeLabel: 'المظهر',
+    themeLight: 'فاتح',
+    themeAuto: 'حسب النظام',
+    themeDark: 'داكن',
+    sizeLabel: 'حجم الخط',
+    sizeStandard: 'قياسي',
+    sizeLarge: 'كبير',
+    sizeXLarge: 'الأكبر',
+    plainTextLabel: 'نسخة نصية فقط',
+    plainTextHint:
+      'بدون JS أو CSS أو صور — مناسبة للشبكات البطيئة والأجهزة القديمة',
+    close: 'إغلاق',
+    backToTop: 'العودة إلى الأعلى',
+  },
+  ru: {
+    open: 'Настройки чтения',
+    title: 'Настройки чтения',
+    themeLabel: 'Тема',
+    themeLight: 'Светлая',
+    themeAuto: 'Как в системе',
+    themeDark: 'Тёмная',
+    sizeLabel: 'Размер шрифта',
+    sizeStandard: 'Стандартный',
+    sizeLarge: 'Крупный',
+    sizeXLarge: 'Самый крупный',
+    plainTextLabel: 'Текстовая версия',
+    plainTextHint:
+      'Без JS, CSS и картинок — для медленной сети и старых устройств',
+    close: 'Закрыть',
+    backToTop: 'Наверх',
+  },
+};
+
+const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
+---
+
+<!--
+  Back-to-top button (issue #1059 fix #4). Stacked ABOVE the Aa toggle
+  in the bottom-right floating cluster (same x as Aa, one button-row up),
+  so it never touches the bottom-left feedback FAB. Hidden until the reader
+  has scrolled past ~800px, then fades in; click smooth-scrolls to top.
+  Uses the same tokens (--color-ink / --color-accent) as .floating-md +
+  .reader-settings-toggle, so it flips with the theme automatically.
+-->
+<button
+  id="back-to-top"
+  class="back-to-top"
+  type="button"
+  aria-label={t.backToTop}
+  title={t.backToTop}
+  hidden
+>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <line x1="12" y1="19" x2="12" y2="5"></line>
+    <polyline points="5 12 12 5 19 12"></polyline>
+  </svg>
+</button>
+
+<button
+  id="reader-settings-toggle"
+  class="reader-settings-toggle"
+  type="button"
+  aria-label={t.open}
+  aria-controls="reader-settings-panel"
+  aria-expanded="false"
+  title={t.open}
+>
+  <!-- Aa glyph — chosen over a gear because the panel is reading-focused.
+       Keeps visual weight close to the .md button it sits next to. -->
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M4 19l4-12 4 12"></path>
+    <path d="M5.5 15h5"></path>
+    <path d="M14 12.5a3.5 3.5 0 0 1 7 0V19"></path>
+    <path d="M14 16.5h7"></path>
+  </svg>
+</button>
+
+<aside
+  id="reader-settings-panel"
+  class="reader-settings-panel"
+  role="dialog"
+  aria-modal="false"
+  aria-labelledby="reader-settings-title"
+  hidden
+>
+  <header class="rs-header">
+    <h2 id="reader-settings-title" class="rs-title">{t.title}</h2>
+    <button type="button" class="rs-close" aria-label={t.close} data-rs-close
+      >×</button
+    >
+  </header>
+
+  <fieldset class="rs-group">
+    <legend class="rs-legend">{t.themeLabel}</legend>
+    <div class="rs-segmented" role="group" aria-labelledby="rs-theme-label">
+      <button type="button" class="rs-seg" data-rs-theme="light"
+        >{t.themeLight}</button
+      >
+      <button type="button" class="rs-seg" data-rs-theme="auto"
+        >{t.themeAuto}</button
+      >
+      <button type="button" class="rs-seg" data-rs-theme="dark"
+        >{t.themeDark}</button
+      >
+    </div>
+  </fieldset>
+
+  <fieldset class="rs-group">
+    <legend class="rs-legend">{t.sizeLabel}</legend>
+    <div class="rs-segmented" role="group">
+      <button type="button" class="rs-seg" data-rs-size="standard"
+        >{t.sizeStandard}</button
+      >
+      <button type="button" class="rs-seg" data-rs-size="large"
+        >{t.sizeLarge}</button
+      >
+      <button type="button" class="rs-seg" data-rs-size="xlarge"
+        >{t.sizeXLarge}</button
+      >
+    </div>
+  </fieldset>
+
+  <div class="rs-group rs-group--plain">
+    <a
+      id="reader-settings-raw-link"
+      class="rs-raw-link"
+      href="#"
+      target="_blank"
+      rel="noopener"
+    >
+      <span class="rs-raw-label">{t.plainTextLabel} ↗</span>
+      <span class="rs-raw-hint">{t.plainTextHint}</span>
+    </a>
+  </div>
+</aside>
+
+<script is:inline>
+  (function () {
+    var toggle = document.getElementById('reader-settings-toggle');
+    var panel = document.getElementById('reader-settings-panel');
+    var rawLink = document.getElementById('reader-settings-raw-link');
+    if (!toggle || !panel) return;
+    var html = document.documentElement;
+    var mql =
+      window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+
+    function readTheme() {
+      var saved = null;
+      try {
+        saved = localStorage.getItem('tw-md-theme');
+      } catch (_) {}
+      // Default = 'light' when LS is empty. 'auto' is now an explicit
+      // opt-in (no longer the default state, post 2026-05-02 γ-late
+      // observer feedback to default-light everywhere).
+      if (saved === 'dark' || saved === 'auto') return saved;
+      return 'light';
+    }
+    function readSize() {
+      var saved = null;
+      try {
+        saved = localStorage.getItem('tw-md-text-size');
+      } catch (_) {}
+      return saved === 'large' || saved === 'xlarge' ? saved : 'standard';
+    }
+
+    function applyTheme(value) {
+      // value: 'light' | 'auto' | 'dark'.
+      // 'light' clears LS (it's the default). 'auto' and 'dark' write
+      // explicit values so the FOUC init script knows the user opted in.
+      try {
+        if (value === 'light') localStorage.removeItem('tw-md-theme');
+        else localStorage.setItem('tw-md-theme', value);
+      } catch (_) {}
+      var effective =
+        value === 'auto' ? (mql && mql.matches ? 'dark' : 'light') : value;
+      if (effective === 'dark') html.setAttribute('data-theme', 'dark');
+      else html.removeAttribute('data-theme');
+      paintActive();
+    }
+    function applySize(value) {
+      try {
+        if (value === 'standard') localStorage.removeItem('tw-md-text-size');
+        else localStorage.setItem('tw-md-text-size', value);
+      } catch (_) {}
+      if (value === 'large' || value === 'xlarge') {
+        html.setAttribute('data-text-size', value);
+      } else {
+        html.removeAttribute('data-text-size');
+      }
+      paintActive();
+    }
+    function paintActive() {
+      var theme = readTheme();
+      var size = readSize();
+      panel.querySelectorAll('[data-rs-theme]').forEach(function (b) {
+        b.classList.toggle(
+          'rs-seg--on',
+          b.getAttribute('data-rs-theme') === theme,
+        );
+      });
+      panel.querySelectorAll('[data-rs-size]').forEach(function (b) {
+        b.classList.toggle(
+          'rs-seg--on',
+          b.getAttribute('data-rs-size') === size,
+        );
+      });
+    }
+    function setRawLink() {
+      if (!rawLink) return;
+      // Insert the raw segment after the lang prefix to reach the
+      // article's plain-text view. Hub pages and non-article routes get
+      // hidden — no raw view exists for them.
+      var path = location.pathname.replace(/\/$/, '');
+      var langPrefixes = ['/en', '/ja', '/ko', '/es', '/fr'];
+      var prefix = '';
+      for (var i = 0; i < langPrefixes.length; i++) {
+        if (
+          path === langPrefixes[i] ||
+          path.indexOf(langPrefixes[i] + '/') === 0
+        ) {
+          prefix = langPrefixes[i];
+          path = path.slice(prefix.length);
+          break;
+        }
+      }
+      var parts = path.split('/').filter(Boolean);
+      if (parts.length === 2) {
+        // .md suffix matches the file route [slug].md.ts and signals
+        // "plain text markdown" to browsers (save-as friendly).
+        rawLink.href = prefix + '/raw/' + parts[0] + '/' + parts[1] + '.md';
+        rawLink.style.display = '';
+      } else {
+        rawLink.style.display = 'none';
+      }
+    }
+
+    toggle.addEventListener('click', function () {
+      var open = panel.hasAttribute('hidden')
+        ? false
+        : !panel.classList.contains('rs-panel--closed');
+      if (open) {
+        panel.classList.add('rs-panel--closed');
+        panel.setAttribute('hidden', '');
+        toggle.setAttribute('aria-expanded', 'false');
+      } else {
+        panel.removeAttribute('hidden');
+        panel.classList.remove('rs-panel--closed');
+        toggle.setAttribute('aria-expanded', 'true');
+        paintActive();
+        setRawLink();
+      }
+    });
+    panel
+      .querySelector('[data-rs-close]')
+      .addEventListener('click', function () {
+        panel.setAttribute('hidden', '');
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+    panel.querySelectorAll('[data-rs-theme]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        applyTheme(b.getAttribute('data-rs-theme'));
+      });
+    });
+    panel.querySelectorAll('[data-rs-size]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        applySize(b.getAttribute('data-rs-size'));
+      });
+    });
+    if (mql && mql.addEventListener) {
+      mql.addEventListener('change', function () {
+        if (readTheme() === 'auto') applyTheme('auto');
+      });
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !panel.hasAttribute('hidden')) {
+        panel.setAttribute('hidden', '');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.focus();
+      }
+    });
+  })();
+</script>
+
+<script is:inline>
+  // Back-to-top (issue #1059 fix #4). Plain JS + is:inline to match the
+  // sibling floating buttons. Show past ~800px, fade via .is-visible, click
+  // smooth-scrolls to top. rAF-throttled scroll handler so the read is cheap.
+  (function () {
+    var btn = document.getElementById('back-to-top');
+    if (!btn) return;
+    var THRESHOLD = 800;
+    var ticking = false;
+    function sync() {
+      ticking = false;
+      var show = window.scrollY > THRESHOLD;
+      if (show) {
+        // Reveal: drop [hidden] first so the opacity transition can run.
+        if (btn.hasAttribute('hidden')) btn.removeAttribute('hidden');
+        btn.classList.add('is-visible');
+      } else {
+        btn.classList.remove('is-visible');
+      }
+    }
+    function onScroll() {
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(sync);
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    btn.addEventListener('click', function () {
+      var reduce =
+        window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    });
+    sync();
+  })();
+</script>
+
+<style>
+  .reader-settings-toggle {
+    position: fixed;
+    bottom: 2rem;
+    right: calc(2rem + 48px + 12px);
+    width: 48px;
+    height: 48px;
+    background: var(--color-ink);
+    color: var(--color-accent);
+    border: 0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-card);
+    transition: all 0.2s;
+    z-index: 40;
+  }
+  .reader-settings-toggle:hover {
+    transform: translateY(-2px);
+    background: var(--color-accent);
+    color: var(--color-bg);
+  }
+  /* Back-to-top — same 48px chip + tokens as the Aa toggle, stacked one
+     button-row above it (same right offset, bottom bumped by a row). Hidden
+     by default; .is-visible fades it in once JS clears [hidden]. z-index 40
+     matches the sibling floating buttons. */
+  .back-to-top {
+    position: fixed;
+    bottom: calc(2rem + 48px + 12px);
+    right: calc(2rem + 48px + 12px);
+    width: 48px;
+    height: 48px;
+    background: var(--color-ink);
+    color: var(--color-accent);
+    border: 0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-card);
+    opacity: 0;
+    transform: translateY(6px);
+    transition:
+      opacity 0.2s,
+      transform 0.2s,
+      background 0.2s,
+      color 0.2s;
+    z-index: 40;
+  }
+  .back-to-top.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .back-to-top:hover {
+    transform: translateY(-2px);
+    background: var(--color-accent);
+    color: var(--color-bg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .back-to-top {
+      transition: opacity 0.2s;
+      transform: none;
+    }
+    .back-to-top.is-visible {
+      transform: none;
+    }
+  }
+  .reader-settings-panel {
+    position: fixed;
+    bottom: calc(2rem + 48px + 12px);
+    right: 2rem;
+    width: min(320px, calc(100vw - 4rem));
+    background: var(--color-surface);
+    color: var(--color-ink);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-card);
+    padding: 1rem 1.1rem 1.1rem;
+    z-index: 41;
+    font-family: var(--font-interface);
+  }
+  .rs-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.85rem;
+  }
+  .rs-title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--color-ink);
+  }
+  .rs-close {
+    background: transparent;
+    border: 0;
+    color: var(--color-ink-soft);
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 0.3rem;
+  }
+  .rs-close:hover {
+    color: var(--color-ink);
+  }
+  .rs-group {
+    border: 0;
+    padding: 0;
+    margin: 0 0 0.8rem;
+  }
+  .rs-group--plain {
+    margin-top: 0.4rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--color-border);
+  }
+  .rs-legend {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-soft);
+    padding: 0;
+    margin-bottom: 0.4rem;
+  }
+  .rs-segmented {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
+    background: color-mix(in srgb, var(--color-ink) 5%, transparent);
+    padding: 4px;
+    border-radius: 10px;
+  }
+  .rs-seg {
+    background: transparent;
+    border: 0;
+    padding: 0.5rem 0.4rem;
+    border-radius: 7px;
+    font-size: 0.85rem;
+    color: var(--color-ink-soft);
+    cursor: pointer;
+    transition:
+      background 0.15s,
+      color 0.15s;
+  }
+  .rs-seg:hover {
+    color: var(--color-ink);
+  }
+  .rs-seg--on {
+    background: var(--color-surface);
+    color: var(--color-ink);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.05),
+      0 0 0 1px var(--color-border);
+    font-weight: 600;
+  }
+  .rs-raw-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    text-decoration: none;
+    color: var(--color-ink);
+    padding: 0.55rem 0.7rem;
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);
+    transition: background 0.15s;
+  }
+  .rs-raw-link:hover {
+    background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  }
+  .rs-raw-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+  .rs-raw-hint {
+    font-size: 0.75rem;
+    color: var(--color-ink-soft);
+    line-height: 1.4;
+  }
+  /* Hide on screenshot mode — same surface that hides ?shot=1 chrome. */
+  :root[data-shot='1'] .reader-settings-toggle,
+  :root[data-shot='1'] .reader-settings-panel,
+  :root[data-shot='1'] .back-to-top {
+    display: none !important;
+  }
+  @media (max-width: 640px) {
+    .reader-settings-toggle {
+      bottom: 1.2rem;
+      right: calc(1.2rem + 48px + 10px);
+    }
+    .reader-settings-panel {
+      bottom: calc(1.2rem + 48px + 10px);
+      right: 1.2rem;
+    }
+    /* Stack above the Aa toggle at the mobile offsets too. */
+    .back-to-top {
+      bottom: calc(1.2rem + 48px + 10px);
+      right: calc(1.2rem + 48px + 10px);
+    }
+  }
+</style>

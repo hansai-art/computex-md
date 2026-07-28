@@ -1,0 +1,638 @@
+---
+import Layout from '../layouts/Layout.astro';
+import fs from 'fs';
+import path from 'path';
+import { LANGUAGES, DEFAULT_LANGUAGE } from '../config/languages';
+
+// 2026-04-25 β7 Phase 1：fix B1 cascade (i18n-evolution-roadmap audit)
+// 從 LANGUAGES_REGISTRY 動態 derive，取代之前 hardcoded ['en', 'ja', 'ko']
+// 透過 define:vars inject 給 client-side script
+const nonDefaultLangCodes = LANGUAGES.filter(
+  (l) => l.enabled && l.code !== DEFAULT_LANGUAGE.code,
+).map((l) => l.code);
+
+// Read article index at build time (inline into page)
+let articleIndex: Record<
+  string,
+  { zhTitle: string; enTitle: string; category: string; langs: string[] }
+> = {};
+try {
+  const indexPath = path.join(
+    process.cwd(),
+    'public',
+    'api',
+    'article-index.json',
+  );
+  if (fs.existsSync(indexPath)) {
+    articleIndex = JSON.parse(fs.readFileSync(indexPath, 'utf-8'));
+  }
+} catch {}
+
+// i18n strings embedded for client-side use
+const i18n: Record<string, Record<string, string>> = {
+  'zh-TW': {
+    'generic.title': '這個頁面不存在',
+    'generic.desc': '可能是連結過期、文章被移動，或是網址打錯了。',
+    'untranslated.title': '這篇文章尚未翻譯',
+    'untranslated.desc.prefix': '「',
+    'untranslated.desc.suffix': '」尚未有中文版本。',
+    'untranslated.view': '查看其他語言版本：',
+    'untranslated.contribute': '想幫忙翻譯？',
+    back: '← 回首頁',
+    'search.placeholder': '搜尋 COMPUTEX.md…',
+    'search.label': '搜尋',
+    'search.prompt': '試試搜尋你要找的內容：',
+    explore: '或者探索這些主題：',
+    'bug.title': '🐛 這是個 Bug 嗎？',
+    'bug.desc': '如果你覺得這個頁面應該存在，歡迎回報讓我們修復：',
+    'bug.btn': '📋 回報失效連結 (GitHub Issue)',
+    'lang.zh-TW': '中文',
+    'lang.en': 'English',
+    'lang.ja': '日本語',
+    'lang.ko': '한국어',
+    'cat.history': '📜 歷史',
+    'cat.culture': '🎭 文化',
+    'cat.food': '🧋 美食',
+    'cat.art': '🎨 藝術',
+    'cat.music': '🎵 音樂',
+    'cat.technology': '💻 科技',
+    'cat.nature': '🌿 自然',
+    'cat.people': '👥 人物',
+    'cat.economy': '📈 經濟',
+    'cat.society': '⚖️ 社會',
+  },
+  en: {
+    'generic.title': 'Page Not Found',
+    'generic.desc':
+      'The link may have expired, the article may have been moved, or the URL was mistyped.',
+    'untranslated.title': 'This Article Hasn\u2019t Been Translated Yet',
+    'untranslated.desc.prefix': '\u201C',
+    'untranslated.desc.suffix': '\u201D is not yet available in English.',
+    'untranslated.view': 'View in other languages:',
+    'untranslated.contribute': 'Want to help translate?',
+    back: '\u2190 Home',
+    'search.placeholder': 'Search COMPUTEX.md\u2026',
+    'search.label': 'Search',
+    'search.prompt': 'Try searching for what you need:',
+    explore: 'Or explore these topics:',
+    'bug.title': '🐛 Is this a bug?',
+    'bug.desc': 'If you think this page should exist, please report it:',
+    'bug.btn': '📋 Report Broken Link (GitHub Issue)',
+    'lang.zh-TW': 'Chinese',
+    'lang.en': 'English',
+    'lang.ja': 'Japanese',
+    'lang.ko': 'Korean',
+    'cat.history': '📜 History',
+    'cat.culture': '🎭 Culture',
+    'cat.food': '🧋 Food',
+    'cat.art': '🎨 Art',
+    'cat.music': '🎵 Music',
+    'cat.technology': '💻 Technology',
+    'cat.nature': '🌿 Nature',
+    'cat.people': '👥 People',
+    'cat.economy': '📈 Economy',
+    'cat.society': '⚖️ Society',
+  },
+  ja: {
+    'generic.title': 'このページは存在しません',
+    'generic.desc':
+      'リンクが期限切れ、記事が移動された、またはURLが間違っている可能性があります。',
+    'untranslated.title': 'この記事はまだ翻訳されていません',
+    'untranslated.desc.prefix': '「',
+    'untranslated.desc.suffix': '」はまだ日本語版がありません。',
+    'untranslated.view': '他の言語で見る：',
+    'untranslated.contribute': '翻訳を手伝ってください！',
+    back: '← ホーム',
+    'search.placeholder': 'COMPUTEX.mdを検索…',
+    'search.label': '検索',
+    'search.prompt': 'お探しの内容を検索してみてください：',
+    explore: 'またはこれらのトピックを探索：',
+    'bug.title': '🐛 これはバグですか？',
+    'bug.desc': 'このページが存在すべきだと思う場合は、報告してください：',
+    'bug.btn': '📋 リンク切れを報告 (GitHub Issue)',
+    'lang.zh-TW': '中文',
+    'lang.en': 'English',
+    'lang.ja': '日本語',
+    'lang.ko': '한국어',
+    'cat.history': '📜 歴史',
+    'cat.culture': '🎭 文化',
+    'cat.food': '🧋 食',
+    'cat.art': '🎨 芸術',
+    'cat.music': '🎵 音楽',
+    'cat.technology': '💻 テクノロジー',
+    'cat.nature': '🌿 自然',
+    'cat.people': '👥 人物',
+    'cat.economy': '📈 経済',
+    'cat.society': '⚖️ 社会',
+  },
+  ko: {
+    'generic.title': '이 페이지는 존재하지 않습니다',
+    'generic.desc':
+      '링크가 만료되었거나, 글이 이동되었거나, URL이 잘못되었을 수 있습니다.',
+    'untranslated.title': '이 글은 아직 번역되지 않았습니다',
+    'untranslated.desc.prefix': '「',
+    'untranslated.desc.suffix': '」 글은 아직 한국어 버전이 없습니다.',
+    'untranslated.view': '다른 언어로 보기:',
+    'untranslated.contribute': '번역을 도와주시겠습니까?',
+    back: '← 홈',
+    'search.placeholder': 'COMPUTEX.md 검색…',
+    'search.label': '검색',
+    'search.prompt': '찾고 있는 내용을 검색해 보세요:',
+    explore: '또는 이 주제들을 탐색하세요:',
+    'bug.title': '🐛 이것은 버그인가요?',
+    'bug.desc': '이 페이지가 존재해야 한다고 생각하시면 신고해 주세요:',
+    'bug.btn': '📋 링크 오류 신고 (GitHub Issue)',
+    'lang.zh-TW': '중국어',
+    'lang.en': 'English',
+    'lang.ja': '일본어',
+    'lang.ko': '한국어',
+    'cat.history': '📜 역사',
+    'cat.culture': '🎭 문화',
+    'cat.food': '🧋 음식',
+    'cat.art': '🎨 예술',
+    'cat.music': '🎵 음악',
+    'cat.technology': '💻 기술',
+    'cat.nature': '🌿 자연',
+    'cat.people': '👥 인물',
+    'cat.economy': '📈 경제',
+    'cat.society': '⚖️ 사회',
+  },
+};
+
+const categories = [
+  'history',
+  'culture',
+  'food',
+  'art',
+  'music',
+  'technology',
+  'nature',
+  'people',
+  'economy',
+  'society',
+];
+---
+
+<!--
+  Phase 6 page migration #3: 404.astro
+  ────────────────────────────────────
+  - Scoped <style> removed entirely (~210 lines CSS deleted)
+  - .error-page / .search-form kept as semantic hooks (referenced by
+    the <script> further down for JS-side form interception)
+  - .category-chips uses [&_a]:... arbitrary-child variants for the
+    static <a> children rendered from {categories.map(...)}
+  - The JS-created .lang-chip elements are now assigned Tailwind
+    utility strings directly in the <script> block — no CSS hook
+    needed
+-->
+<Layout title="404 | COMPUTEX.md" readerSettings={true}>
+  <main
+    class="error-page flex min-h-[80vh] items-center justify-center px-[var(--space-page-x)] py-8 opacity-0 transition-opacity duration-150"
+  >
+    <!-- Generic 404 -->
+    <div class="max-w-[600px] text-center" id="notfound-generic">
+      <h1
+        class="m-0 text-[clamp(4rem,10vw,8rem)] font-black leading-none text-[#1a1a2e] opacity-[0.15]"
+      >
+        404
+      </h1>
+      <p
+        class="my-2 font-[var(--font-editorial)] text-[1.5rem] font-bold"
+        data-i18n="generic.title"
+      >
+        這個頁面不存在
+      </p>
+      <p class="mb-8 leading-[1.6] text-[#666]" data-i18n="generic.desc">
+        可能是連結過期、文章被移動，或是網址打錯了。
+      </p>
+
+      <div
+        class="mb-10 flex justify-center gap-4 max-[640px]:flex-col max-[640px]:items-center"
+      >
+        <a
+          href="/"
+          class="inline-flex items-center rounded-lg bg-[#1a1a2e] px-5 py-[0.6rem] text-[0.95rem] font-semibold text-white no-underline transition-all duration-200 hover:bg-[#2d2d4a]"
+          id="back-link"
+          data-i18n-text="back">← 回首頁</a
+        >
+        <a
+          href="/graph"
+          class="inline-flex items-center rounded-lg bg-[#f0f0f0] px-5 py-[0.6rem] text-[0.95rem] font-semibold text-[#333] no-underline transition-all duration-200 hover:bg-[#e0e0e0]"
+          >🕸️ Knowledge Graph</a
+        >
+      </div>
+
+      <div class="mb-10">
+        <p class="mb-3 text-[0.9rem] text-[#888]" data-i18n="search.prompt">
+          試試搜尋你要找的內容：
+        </p>
+        <form
+          action="https://www.google.com/search"
+          method="get"
+          target="_blank"
+          class="search-form flex justify-center gap-2 max-[640px]:flex-col max-[640px]:items-center"
+        >
+          <input type="hidden" name="q" value="site:computex.md" />
+          <input
+            type="text"
+            name="q"
+            placeholder="搜尋 COMPUTEX.md…"
+            class="w-[280px] rounded-lg border-2 border-[#e0e0e0] px-4 py-2 text-[0.95rem] outline-none transition-colors duration-200 focus:border-[#1a1a2e] max-[640px]:w-full"
+            aria-label="搜尋 COMPUTEX.md"
+            data-i18n-placeholder="search.placeholder"
+          />
+          <button
+            type="submit"
+            class="inline-flex cursor-pointer items-center rounded-lg border-none bg-[#1a1a2e] px-5 py-[0.6rem] text-[0.95rem] font-semibold text-white no-underline transition-all duration-200 hover:bg-[#2d2d4a]"
+            data-i18n-text="search.label">搜尋</button
+          >
+        </form>
+      </div>
+
+      <div
+        class="mb-10 rounded-xl border border-[#fcd34d] bg-[#fef3c7] px-6 py-5"
+      >
+        <p class="m-0 mb-[0.4rem] text-base font-bold" data-i18n="bug.title">
+          🐛 這是個 Bug 嗎？
+        </p>
+        <p class="m-0 mb-4 text-[0.88rem] text-[#666]" data-i18n="bug.desc">
+          如果你覺得這個頁面應該存在，歡迎回報讓我們修復：
+        </p>
+        <a
+          href={`https://github.com/frank890417/taiwan-md/issues/new?template=broken-link.yml&title=404:+${encodeURIComponent('[填入你看到的網址]')}&labels=bug,broken-link`}
+          class="inline-flex items-center rounded-lg bg-[#f59e0b] px-5 py-[0.6rem] text-[0.9rem] font-semibold text-white no-underline transition-all duration-200 hover:bg-[#d97706]"
+          target="_blank"
+          rel="noopener"
+          id="report-link"
+          data-i18n-text="bug.btn"
+        >
+          📋 回報失效連結 (GitHub Issue)
+        </a>
+      </div>
+
+      <div
+        class="[&_a:hover]:bg-[#1a1a2e] [&_a:hover]:text-white [&_a]:rounded-[20px] [&_a]:bg-[#f5f5f5] [&_a]:px-3 [&_a]:py-[0.35rem] [&_a]:text-[0.85rem] [&_a]:text-[#333] [&_a]:no-underline [&_a]:transition-all [&_a]:duration-200"
+      >
+        <p class="mb-3 text-[0.9rem] text-[#888]" data-i18n="explore">
+          或者探索這些主題：
+        </p>
+        <div
+          class="category-chips flex flex-wrap justify-center gap-2"
+          id="category-chips"
+        >
+          {
+            categories.map((cat) => (
+              <a
+                href={`/${cat}`}
+                data-category={cat}
+                data-i18n-text={`cat.${cat}`}
+              >
+                {i18n['zh-TW'][`cat.${cat}`]}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Untranslated article notice (hidden by default) -->
+    <div class="hidden max-w-[600px] text-center" id="notfound-untranslated">
+      <h1
+        class="m-0 text-[clamp(4rem,10vw,8rem)] font-black leading-none text-[#1a1a2e] opacity-[0.08]"
+      >
+        📝
+      </h1>
+      <p
+        class="my-2 font-[var(--font-editorial)] text-[1.5rem] font-bold"
+        id="untranslated-title"
+        data-i18n="untranslated.title"
+      >
+        這篇文章尚未翻譯
+      </p>
+      <p class="mb-8 leading-[1.6] text-[#666]" id="untranslated-desc"></p>
+
+      <div class="my-6" id="lang-links">
+        <p class="mb-3 text-[0.9rem] text-[#888]" data-i18n="untranslated.view">
+          查看其他語言版本：
+        </p>
+        <div class="flex flex-wrap justify-center gap-2" id="lang-chips"></div>
+      </div>
+
+      <div
+        class="mt-6 rounded-xl border border-[#90caf9] bg-[#e3f2fd] px-6 py-5"
+      >
+        <p
+          class="m-0 mb-3 font-semibold text-[#1565c0]"
+          id="contribute-text"
+          data-i18n="untranslated.contribute"
+        >
+          想幫忙翻譯？
+        </p>
+        <a
+          href="https://github.com/frank890417/taiwan-md/blob/main/CONTRIBUTING.md"
+          class="inline-flex items-center rounded-lg bg-[#1a1a2e] px-5 py-[0.6rem] text-[0.95rem] font-semibold text-white no-underline transition-all duration-200 hover:bg-[#2d2d4a]"
+          target="_blank"
+          rel="noopener"
+        >
+          CONTRIBUTING.md
+        </a>
+      </div>
+
+      <div
+        class="mt-8 flex justify-center gap-4 max-[640px]:flex-col max-[640px]:items-center"
+      >
+        <a
+          href="/"
+          class="inline-flex items-center rounded-lg bg-[#f0f0f0] px-5 py-[0.6rem] text-[0.95rem] font-semibold text-[#333] no-underline transition-all duration-200 hover:bg-[#e0e0e0]"
+          id="back-link-2"
+          data-i18n-text="back">← 回首頁</a
+        >
+      </div>
+
+      <div
+        class="mt-8 [&_a:hover]:bg-[#1a1a2e] [&_a:hover]:text-white [&_a]:rounded-[20px] [&_a]:bg-[#f5f5f5] [&_a]:px-3 [&_a]:py-[0.35rem] [&_a]:text-[0.85rem] [&_a]:text-[#333] [&_a]:no-underline [&_a]:transition-all [&_a]:duration-200"
+      >
+        <p class="mb-3 text-[0.9rem] text-[#888]" data-i18n="explore">
+          或者探索這些主題：
+        </p>
+        <div class="flex flex-wrap justify-center gap-2" id="category-chips-2">
+          {
+            categories.map((cat) => (
+              <a
+                href={`/${cat}`}
+                data-category={cat}
+                data-i18n-text={`cat.${cat}`}
+              >
+                {i18n['zh-TW'][`cat.${cat}`]}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script define:vars={{ articleIndex, i18n, nonDefaultLangCodes }}>
+  (() => {
+    const main = document.querySelector('.error-page');
+    const pathname = window.location.pathname;
+
+    // Detect language from URL
+    // 2026-04-25 β7: 用 LANGUAGES_REGISTRY-derive 清單取代 hardcoded ['en','ja','ko']
+    // 修復「進 fr/es 404 後切其他語言會路由疊加」的 cascade bug
+    let lang = 'zh-TW';
+    let pathWithoutLang = pathname;
+    for (const prefix of nonDefaultLangCodes) {
+      if (pathname.startsWith(`/${prefix}/`) || pathname === `/${prefix}`) {
+        lang = prefix;
+        pathWithoutLang = pathname.slice(prefix.length + 1) || '/';
+        break;
+      }
+    }
+
+    const strings = i18n[lang] || i18n['zh-TW'];
+    const langPrefix = lang === 'zh-TW' ? '' : `/${lang}`;
+    const homeHref = langPrefix || '/';
+
+    // Localize all i18n elements
+    document.querySelectorAll('[data-i18n]').forEach((el) => {
+      const key = el.getAttribute('data-i18n');
+      if (strings[key]) el.textContent = strings[key];
+    });
+    document.querySelectorAll('[data-i18n-text]').forEach((el) => {
+      const key = el.getAttribute('data-i18n-text');
+      if (strings[key]) el.textContent = strings[key];
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (strings[key])
+        el.setAttribute(
+          'placeholder',
+          key === 'search.placeholder' ? strings[key] : strings[key],
+        );
+    });
+
+    // Update home links
+    document.querySelectorAll('#back-link, #back-link-2').forEach((el) => {
+      el.setAttribute('href', homeHref);
+    });
+
+    // Update category chips with language prefix
+    document
+      .querySelectorAll('#category-chips a, #category-chips-2 a')
+      .forEach((el) => {
+        const cat = el.getAttribute('data-category');
+        el.setAttribute('href', `${langPrefix}/${cat}`);
+      });
+
+    // Auto-fill bug report link
+    const reportLink = document.getElementById('report-link');
+    if (reportLink) {
+      const href = reportLink.getAttribute('href');
+      reportLink.setAttribute(
+        'href',
+        href.replace(
+          encodeURIComponent('[填入你看到的網址]'),
+          encodeURIComponent(pathname),
+        ),
+      );
+    }
+
+    // Fix Google search form
+    const form = document.querySelector('.search-form');
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        const inputs = form.querySelectorAll('input[name="q"]');
+        if (inputs.length === 2) {
+          const sitePrefix = inputs[0].value;
+          const userQuery = inputs[1].value.trim();
+          if (userQuery) {
+            inputs[0].value = `${sitePrefix} ${userQuery}`;
+            inputs[1].removeAttribute('name');
+          }
+        }
+      });
+    }
+
+    // ─── .md rescue (2026-07-17) ───────────────────────────
+    // LLM/agent readers fetch our raw markdown views and resolve relative
+    // wikilinks against them, producing dead paths such as
+    // /people/PersonA/PersonB.md (PersonB is a real article; PersonA is the
+    // referring article's title, mistaken for a path segment). CF log: 596
+    // .md 404s in 3 days. If the trailing segment matches a known article,
+    // send the reader straight to its raw plain-text view instead of a
+    // dead end. This flag is declared at IIFE top level (not var) so the
+    // tracking block near the bottom of this script can check it too.
+    // NOTE: this is a define:vars script — never write backticks anywhere in
+    // it (comments included); Astro's injection wrapper breaks on them.
+    let page404Fired = false;
+    if (/\.md$/.test(pathname)) {
+      const mdPath = pathWithoutLang.replace(/\.md$/, '');
+      const mdSegments = mdPath
+        .replace(/^\//, '')
+        .replace(/\/$/, '')
+        .split('/')
+        .filter(Boolean);
+
+      // Direct hit: category/slug is already a valid articleIndex key (the
+      // simple case — a reader appended .md to a known article URL). Falls
+      // back to matching against zhTitle, because the zh-TW raw view's real
+      // slug is the zh filename (e.g. knowledge/People/PersonB.md), which
+      // articleIndex only exposes as the zhTitle field, not as its key.
+      const findArticle = (category, slugSegment) => {
+        const decodedSlug = decodeURIComponent(slugSegment);
+        const directKey = category + '/' + decodedSlug;
+        if (articleIndex[directKey]) {
+          return { entry: articleIndex[directKey], key: directKey };
+        }
+        for (const key in articleIndex) {
+          const entry = articleIndex[key];
+          if (entry.category === category && entry.zhTitle === decodedSlug) {
+            return { entry: entry, key: key };
+          }
+        }
+        return null;
+      };
+
+      let mdMatch = null;
+      if (mdSegments.length >= 2) {
+        const lastSlug = mdSegments[mdSegments.length - 1];
+        mdMatch = findArticle(mdSegments[mdSegments.length - 2], lastSlug);
+        if (!mdMatch) {
+          mdMatch = findArticle(mdSegments[0], lastSlug);
+        }
+      }
+
+      if (
+        mdMatch &&
+        (lang === 'zh-TW' || mdMatch.entry.langs.indexOf(lang) !== -1)
+      ) {
+        // zh-TW raw slug = zh filename (zhTitle). Every other language's
+        // raw slug = the English slug half of the matched articleIndex key.
+        const rawSlug =
+          lang === 'zh-TW'
+            ? encodeURIComponent(mdMatch.entry.zhTitle)
+            : encodeURIComponent(mdMatch.key.split('/')[1]);
+        const rawPrefix = langPrefix ? langPrefix.replace(/^\//, '') + '/' : '';
+        const rawPath =
+          '/' +
+          rawPrefix +
+          'raw/' +
+          mdMatch.entry.category +
+          '/' +
+          rawSlug +
+          '.md';
+
+        try {
+          if (
+            typeof window !== 'undefined' &&
+            typeof window.gtag === 'function'
+          ) {
+            window.gtag('event', 'page_404', {
+              failed_path: window.location.pathname,
+              failed_url: window.location.href,
+              referrer: document.referrer || '(direct)',
+              page_lang: document.documentElement.lang || 'unknown',
+              had_suggestion: true,
+            });
+          }
+        } catch (e) {
+          console.error('[404] page_404 tracking failed:', e);
+        }
+        page404Fired = true;
+
+        setTimeout(() => {
+          window.location.replace(rawPath);
+        }, 150);
+      }
+    }
+
+    // Smart detection: is this a known but untranslated article?
+    // suggestedArticle lives at IIFE scope because the tracking block at the
+    // bottom reports it. It used to read the block-scoped "article" const
+    // declared two blocks down, which is out of scope there — a ReferenceError
+    // thrown while building the payload, swallowed by that block's catch, so
+    // page_404 never fired once between 2026-04 and 2026-07-17.
+    let suggestedArticle = null;
+    if (lang !== 'zh-TW' && pathWithoutLang !== '/') {
+      // Parse: /food/beef-noodle-soup → category=food, slug=beef-noodle-soup
+      const parts = pathWithoutLang
+        .replace(/^\//, '')
+        .replace(/\/$/, '')
+        .split('/');
+      if (parts.length === 2) {
+        const [category, slug] = parts;
+        const key = `${category}/${decodeURIComponent(slug)}`;
+        const article = articleIndex[key];
+        suggestedArticle = article || null;
+
+        if (article && !article.langs.includes(lang)) {
+          // Article exists but not in this language!
+          document.getElementById('notfound-generic').classList.add('hidden');
+          const untranslatedEl = document.getElementById(
+            'notfound-untranslated',
+          );
+          untranslatedEl.classList.remove('hidden');
+
+          // Build description
+          const desc = document.getElementById('untranslated-desc');
+          const titleDisplay =
+            article.enTitle !== article.zhTitle
+              ? `${article.zhTitle} (${article.enTitle})`
+              : article.zhTitle;
+          desc.textContent = `${strings['untranslated.desc.prefix']}${titleDisplay}${strings['untranslated.desc.suffix']}`;
+
+          // Build language links
+          const chipsContainer = document.getElementById('lang-chips');
+          const langUrls = {
+            'zh-TW': `/${category}/${encodeURIComponent(article.zhTitle)}`,
+            en: `/en/${category}/${slug}`,
+            ja: `/ja/${category}/${slug}`,
+            ko: `/ko/${category}/${slug}`,
+          };
+
+          for (const availLang of article.langs) {
+            const chip = document.createElement('a');
+            chip.href = langUrls[availLang] || '#';
+            chip.textContent = strings[`lang.${availLang}`] || availLang;
+            // Tailwind utility string — keeps the JS-created chip
+            // consistent with the rest of the Tailwind-first markup
+            chip.className =
+              'inline-flex items-center rounded-lg border border-[#a5d6a7] bg-[#e8f5e9] px-4 py-2 text-[0.95rem] font-semibold text-[#2e7d32] no-underline transition-all duration-200 hover:border-[#66bb6a] hover:bg-[#c8e6c9]';
+            chipsContainer.appendChild(chip);
+          }
+        }
+      }
+    }
+
+    // Reveal page (prevent FOUC)
+    main.style.opacity = '1';
+
+    // ─── 404 Observability (2026-04-11) ───────────────────
+    // Track the actual failed URL so we can diagnose which paths 404.
+    // GA4 otherwise only tells us "404 page visited" without the path.
+    // See reports/sense-2026-04-11.md §2 for the full rationale.
+    if (!page404Fired) {
+      try {
+        if (
+          typeof window !== 'undefined' &&
+          typeof window.gtag === 'function'
+        ) {
+          window.gtag('event', 'page_404', {
+            failed_path: window.location.pathname,
+            failed_url: window.location.href,
+            referrer: document.referrer || '(direct)',
+            page_lang: document.documentElement.lang || 'unknown',
+            had_suggestion: !!suggestedArticle,
+          });
+        }
+      } catch (e) {
+        // Never let tracking break the 404 page itself — but never let it die
+        // silently either. This catch hid a ReferenceError for three months
+        // while GA4 reported zero page_404 events and nothing complained.
+        console.error('[404] page_404 tracking failed:', e);
+      }
+    }
+  })();
+</script>

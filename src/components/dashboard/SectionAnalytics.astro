@@ -1,0 +1,36 @@
+---
+// SectionAnalytics — 📡 Live Pulse (GA4 Analytics) section (#analytics).
+// Ids/classes are a contract with src/scripts/dashboard-client.js and
+// src/styles/dashboard/ — do not rename.
+import { getLangFromUrl } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const isEn = lang === 'en';
+---
+
+<!-- GA4 Analytics -->
+<section class="section" id="analytics">
+  <h2 class="section-title">
+    {isEn ? '📡 Live Pulse' : '📡 即時脈搏'}
+    <span class="section-timestamp" data-source="analytics"></span>
+  </h2>
+  <p class="section-subtitle">
+    {
+      isEn
+        ? 'GA behavior + Search intent + Cloudflare edge signals'
+        : 'GA 行為 + 搜尋意圖 + Cloudflare 邊緣訊號'
+    }
+  </p>
+  <div class="analytics-grid">
+    <div class="analytics-totals" id="analytics-totals"></div>
+    <div class="analytics-sources" id="analytics-insights"></div>
+  </div>
+  <div class="analytics-detail-grid">
+    <div class="analytics-pages analytics-full" id="analytics-pages"></div>
+    <div class="analytics-pages analytics-full" id="analytics-articles-7d">
+    </div>
+    <div class="analytics-pages analytics-full" id="analytics-search"></div>
+    <div class="analytics-pages" id="analytics-crawlers"></div>
+    <div class="analytics-countries" id="analytics-countries"></div>
+  </div>
+</section>

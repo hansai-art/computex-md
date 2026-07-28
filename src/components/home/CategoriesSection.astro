@@ -1,0 +1,95 @@
+---
+import { useTranslations, getLangFromUrl } from '../../i18n/utils';
+import CategoryGrid from '../CategoryGrid.astro';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const isEn = lang === 'en';
+---
+
+<!--
+  Phase 7.6 — CategoriesSection.astro (Tier 1 home component)
+  Wrappers inlined. `.explore-prose :global(*)` rules stay
+  scoped because the prose content comes from a `<slot name="prose" />`
+  — the slotted HTML (including `<a class="topic-pill">` elements)
+  is written by whoever uses this component, not here, so Tailwind
+  utility classes can't reach it.
+-->
+<section class="my-24">
+  <div class="mb-12 text-center">
+    <h2
+      class="font-['jf-lanyangming','Noto_Serif_TC','Source_Han_Serif_TC',serif] text-[2rem] font-light text-[#1f2937]"
+    >
+      {t('home.categories.heading')}
+    </h2>
+  </div>
+
+  <div
+    class="explore-prose mx-auto mb-16 max-w-[800px] px-8 font-['jf-jinxuanlatte','Noto_Sans_TC','Source_Han_Sans_TC',sans-serif] leading-[2.2] max-[480px]:px-4"
+  >
+    <slot name="prose" />
+  </div>
+
+  <div
+    id="categories"
+    class="mx-auto mb-8 mt-12 flex max-w-[800px] items-center px-8 max-[480px]:px-4"
+  >
+    <div
+      class="h-px flex-1 bg-[linear-gradient(90deg,transparent,#d1d5db,transparent)]"
+    >
+    </div>
+    <span
+      class="whitespace-nowrap px-6 font-[var(--font-title,'Noto_Serif_TC',serif)] text-[1.3rem] font-bold tracking-[0.05em] text-[#1a3c34]"
+      >{t('home.categories.divider')}</span
+    >
+    <div
+      class="h-px flex-1 bg-[linear-gradient(90deg,transparent,#d1d5db,transparent)]"
+    >
+    </div>
+  </div>
+
+  <CategoryGrid lang={isEn ? 'en' : undefined} />
+</section>
+
+<style>
+  /* Slotted prose HTML (written by consumers) — :global() required
+     because Tailwind can't reach slot content. */
+  .explore-prose :global(p) {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 2rem;
+    text-align: justify;
+  }
+  .explore-prose :global(a) {
+    color: #1f2937;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 700;
+  }
+  .explore-prose :global(a.topic-pill) {
+    display: inline-block;
+    background: rgba(45, 80, 22, 0.08);
+    border: 1.5px solid rgba(45, 80, 22, 0.2);
+    border-radius: 6px;
+    padding: 0.15rem 0.6rem;
+    font-weight: 700;
+    color: #2d5016;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+  }
+  .explore-prose :global(a.topic-pill:hover) {
+    background: rgba(45, 80, 22, 0.15);
+    border-color: rgba(45, 80, 22, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(45, 80, 22, 0.15);
+  }
+  .explore-prose :global(a:hover) {
+    color: #2d5016;
+  }
+  @media (max-width: 480px) {
+    .explore-prose :global(p) {
+      font-size: 1rem;
+    }
+  }
+</style>

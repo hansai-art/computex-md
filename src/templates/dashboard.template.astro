@@ -1,0 +1,90 @@
+---
+// Dashboard template — thin composition layer. All section markup lives in
+// src/components/dashboard/* (one component per section, verbatim-moved
+// 2026-07-24). Section ids/classes are a contract with
+// src/scripts/dashboard-client.js and src/styles/dashboard/.
+import Layout from '../layouts/Layout.astro';
+import '../styles/dashboard/index.css';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import DashboardHero from '../components/dashboard/DashboardHero.astro';
+import DashboardQuickNav from '../components/dashboard/DashboardQuickNav.astro';
+import SectionVitals from '../components/dashboard/SectionVitals.astro';
+import SectionActivity from '../components/dashboard/SectionActivity.astro';
+import SectionRegistry from '../components/dashboard/SectionRegistry.astro';
+import SectionHealthDistribution from '../components/dashboard/SectionHealthDistribution.astro';
+import SectionOrganism from '../components/dashboard/SectionOrganism.astro';
+import SectionTranslation from '../components/dashboard/SectionTranslation.astro';
+import SectionI18nCoverage from '../components/dashboard/SectionI18nCoverage.astro';
+import SectionImmune from '../components/dashboard/SectionImmune.astro';
+import SectionSpores from '../components/dashboard/SectionSpores.astro';
+import SectionContributors from '../components/dashboard/SectionContributors.astro';
+import SectionGrowth from '../components/dashboard/SectionGrowth.astro';
+import SectionContentAnalysis from '../components/dashboard/SectionContentAnalysis.astro';
+import SectionOpsStatus from '../components/dashboard/SectionOpsStatus.astro';
+import SectionAnalytics from '../components/dashboard/SectionAnalytics.astro';
+import SectionSupporters from '../components/dashboard/SectionSupporters.astro';
+import SectionNextSteps from '../components/dashboard/SectionNextSteps.astro';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<Layout
+  lang={lang}
+  title={t('dashboard.meta.title')}
+  description={t('dashboard.meta.description')}
+  readerSettings={true}
+>
+  <main class="dashboard">
+    <DashboardHero />
+
+    <div class="dashboard-body">
+      <DashboardQuickNav />
+
+      <div class="dashboard-sections">
+        <SectionVitals />
+        <SectionActivity />
+        <SectionRegistry />
+        <SectionHealthDistribution />
+        <SectionOrganism />
+        <SectionTranslation />
+        <SectionI18nCoverage />
+        <SectionImmune />
+        <SectionSpores />
+        <SectionContributors />
+        <SectionGrowth />
+        <SectionContentAnalysis />
+        <SectionOpsStatus />
+        <SectionAnalytics />
+        <SectionSupporters />
+        <SectionNextSteps />
+      </div>
+      <!-- /.dashboard-sections -->
+    </div>
+    <!-- /.dashboard-body -->
+
+    <!-- Footer timestamp -->
+    <footer class="dashboard-footer" id="dashboard-footer"></footer>
+  </main>
+</Layout>
+
+<!-- d3 + d3-cloud for Search Console word cloud layout (loaded globally as UMD,
+     attach to window.d3 and window.d3.layout.cloud). is:inline keeps Astro from
+     bundling. Use defer to not block first paint; renderAnalytics waits on d3
+     before drawing the cloud. -->
+<script
+  is:inline
+  defer
+  src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script
+  is:inline
+  defer
+  src="https://cdn.jsdelivr.net/npm/d3-cloud@1.2.7/build/d3.layout.cloud.min.js"
+></script>
+
+<!-- Dashboard client 渲染邏輯（2,729 行）在 src/scripts/dashboard-client.js —
+     2026-06-13 抽出：原 define:vars inline 每語言頁各內嵌一份；改 Astro processed
+     module 後 6 頁共用一份 hashed bundle + 瀏覽器可快取。lang 改讀 <html lang>。-->
+<script>
+  import '../scripts/dashboard-client.js';
+</script>

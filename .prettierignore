@@ -1,0 +1,6 @@
+*.yml
+
+
+# routine cron prompt 是載荷不是散文——prettier 會把指令裡的 glob 星號當強調語法
+# 改成底線（2026-07-25 實測：reports/founder-lens-*/ → founder-lens-_/），語意被改掉
+docs/semiont/routine-prompts/

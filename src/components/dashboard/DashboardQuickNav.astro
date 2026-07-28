@@ -1,0 +1,109 @@
+---
+// DashboardQuickNav — left-side quick-nav (.dashboard-toc) listing all dashboard
+// sections, plus the IntersectionObserver script that toggles .active on
+// .dashboard-toc-link. Classes/data-toc-id are a contract with src/styles/dashboard/
+// and the script below; the id list must mirror the <section id> order in the template.
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const isEn = lang === 'en';
+
+// ── Left-side quick-nav (2026-07-24, per observer request) ──
+// Static list mirroring the <section id> order below — cheap to keep in
+// sync since both live in this one file. Emoji here are nav-only shorthand,
+// independent of whether the matching <h2> itself renders one.
+const tocSections = [
+  { id: 'vitals', emoji: '💓', label: t('dashboard.vitals.title') },
+  { id: 'activity', emoji: '🔔', label: isEn ? 'Recent Activity' : '最近活動' },
+  { id: 'registry', emoji: '📚', label: t('dashboard.registry.title') },
+  {
+    id: 'health-distribution',
+    emoji: '📊',
+    label: isEn ? 'Health Distribution' : '健康分布',
+  },
+  { id: 'organism', emoji: '🧬', label: t('dashboard.organism.title') },
+  { id: 'translation', emoji: '🌐', label: t('dashboard.translation.title') },
+  {
+    id: 'i18n-ui-coverage',
+    emoji: '🔤',
+    label: isEn ? 'UI Translation' : '介面翻譯',
+  },
+  { id: 'immune', emoji: '🛡️', label: t('dashboard.immune.title') },
+  {
+    id: 'spores',
+    emoji: '🌱',
+    label: isEn ? 'Spores & Reach' : '孢子與成效',
+  },
+  {
+    id: 'contributors',
+    emoji: '👥',
+    label: isEn ? 'Contributors' : '貢獻者排行',
+  },
+  { id: 'growth', emoji: '📈', label: t('dashboard.growth.title') },
+  {
+    id: 'content-analysis',
+    emoji: '📊',
+    label: isEn ? 'Content Analysis' : '內容成長分析',
+  },
+  {
+    id: 'ops-status',
+    emoji: '🩺',
+    label: isEn ? 'Operational Status' : '營運狀態',
+  },
+  { id: 'analytics', emoji: '📡', label: isEn ? 'Live Pulse' : '即時脈搏' },
+  { id: 'supporters', emoji: '💚', label: isEn ? 'Supporters' : '贊助時間軸' },
+  { id: 'next-steps', emoji: '🎯', label: isEn ? 'Next Steps' : '下一步' },
+];
+---
+
+<nav class="dashboard-toc" aria-label={isEn ? 'Jump to section' : '快速導覽'}>
+  <p class="dashboard-toc-heading">{isEn ? 'Jump to' : '快速導覽'}</p>
+  <ul class="dashboard-toc-list">
+    {
+      tocSections.map((s) => (
+        <li>
+          <a href={`#${s.id}`} class="dashboard-toc-link" data-toc-id={s.id}>
+            <span class="dashboard-toc-emoji" aria-hidden="true">
+              {s.emoji}
+            </span>
+            <span>{s.label}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<!-- Quick-nav active-section highlight — same IntersectionObserver pattern as
+     TableOfContents.astro, kept as its own tiny script (not folded into the
+     2,729-line dashboard-client.js) since it only touches nav link classes. -->
+<script>
+  (function () {
+    const links = document.querySelectorAll<HTMLAnchorElement>(
+      '.dashboard-toc-link',
+    );
+    if (!links.length) return;
+
+    const sectionEls = Array.from(links)
+      .map((l) => document.getElementById(l.dataset.tocId!))
+      .filter((el): el is HTMLElement => Boolean(el));
+    if (!sectionEls.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            links.forEach((l) => {
+              l.classList.toggle('active', l.dataset.tocId === id);
+            });
+          }
+        });
+      },
+      { rootMargin: '-15% 0px -70% 0px', threshold: 0 },
+    );
+
+    sectionEls.forEach((el) => observer.observe(el));
+  })();
+</script>

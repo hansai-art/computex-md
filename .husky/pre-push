@@ -1,0 +1,107 @@
+# 確保 git / gh 在 PATH（husky 環境 PATH 比 shell 窄）
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH:$HOME/.bun/bin"
+
+# ─────────────────────────────────────────────────────────────────────────
+# pre-push — 胼胝體鐵律 push 階段把關
+#   canonical: BECOME §行動鐵律 5 / REFLEXES #68
+#   設計: reports/multicore-git-coordination-design-2026-06-14.md §6.2
+#
+# 設計原則（兩類，刻意分開）：
+#   A. coordination 檢查（REMOTE_AHEAD / in-flight deploy / 工具不可用）：advisory + bounded-wait，
+#      「警告/等待但放行」，不 hard-block（避免打斷無人值守 routine；git+CI 自己處理硬情況）。
+#   B. correctness 檢查（全站 article-health = CI ci-deploy 同款 mirror，2026-06-21 新增）：HARD fail → block。
+#      理由：full sweep 紅＝CI 一定紅、deploy 一定不發生，提早在本機擋＝把失敗從 ci/cd 拉回 push
+#      （哲宇 directive「不要一直等到 ci/cd 才發現」）。pre-commit 只驗 staged 檔，抓不到「新 check /
+#      prettier mangle 讓不在本次 commit 的舊檔失格」這種 cross-file 失格——只有全掃抓得到。
+#      self-preventing：每個 push 都擋 → 壞樹永遠 land 不了 main → 後續 routine 不會被別人的 mess 連坐。
+#      逃生：TWMD_SKIP_PREPUSH_SWEEP=1（routine 真的不能停時；reflog 留痕，CI 仍會擋）。~4.5s on full corpus。
+#   coordination 三件事：
+#   1. REMOTE_AHEAD → 提醒先 rebase（git 自己會 reject non-ff，hook 不擋）
+#   2. in-flight deploy 已跑 >70% 典型時長(245s/350s) → bounded 等它完，避免白白觸發 66% 取消
+#   3. gh/工具不可用 → fail-loud 警告但放行（MANIFESTO §禁忌一：不 silent）
+#   跳過等待：TWMD_SKIP_PREPUSH_WAIT=1（給不能等的 routine）；上限 TWMD_PREPUSH_MAXWAIT(秒)
+# ─────────────────────────────────────────────────────────────────────────
+REPO="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+
+# 1. parallel-actor / remote-ahead 狀態（共用 lib，含 git fetch）
+LIB="$REPO/scripts/tools/lib/check-parallel-actor.sh"
+if [ -x "$LIB" ]; then
+  st="$(sh "$LIB" --status 2>/dev/null || echo CLEAN)"
+  case "$st" in
+    REMOTE_AHEAD) echo "🧬 pre-push: ⚠️ origin 領先 — 建議先 git pull --rebase 再 push（避 ref-lock reject）" ;;
+    ACTOR_BUSY)   echo "🧬 pre-push: ⚠️ 偵測到平行 git actor — 確認 push 範圍沒包到別 session 的檔（git log @{u}..）" ;;
+    DIRTY_BATCH)  echo "🧬 pre-push: ⚠️ working tree 有大量未 commit .md（疑似 sibling 翻譯批次）— 確認沒掃到" ;;
+  esac
+fi
+
+# 2. correctness gate — 全站 article-health（CI ci-deploy 同款 mirror）。HARD fail → block。
+#    抓 pre-commit staged-only 抓不到的 cross-file 失格（新 check / prettier mangle 弄壞舊檔）。
+#    ~4.5s。逃生：TWMD_SKIP_PREPUSH_SWEEP=1。先跑這個 → 壞樹直接擋，不用等下面 in-flight CI。
+if [ "${TWMD_SKIP_PREPUSH_SWEEP:-0}" = "1" ]; then
+  echo "🧬 pre-push: TWMD_SKIP_PREPUSH_SWEEP=1，跳過全站 article-health 全掃（CI 仍會擋）"
+elif [ -f "$REPO/scripts/tools/article-health.py" ] && command -v python3 >/dev/null 2>&1; then
+  if ! python3 "$REPO/scripts/tools/article-health.py" --all --profile=ci-deploy --quiet >/dev/null 2>&1; then
+    echo ""
+    echo "🧬 pre-push: ⛔ 全站 article-health 有 HARD fail — CI 一定會紅、deploy 不會發生。先在本機修掉再 push。"
+    echo "   哪幾篇＋哪個 check："
+    echo "     python3 scripts/tools/article-health.py --all --profile=ci-deploy | grep -B30 'passed=False' | grep -E '🧬 knowledge|🔴'"
+    echo "   這道 gate 防的是「新 check / prettier mangle 讓不在本次 commit 的舊檔失格」——pre-commit 只驗 staged 抓不到。"
+    echo "   逃生（routine 真的不能停）：TWMD_SKIP_PREPUSH_SWEEP=1 git push …（reflog 留痕，CI 仍會擋）"
+    exit 1
+  fi
+  echo "🧬 pre-push: ✅ 全站 article-health 全綠（ci-deploy mirror）"
+fi
+
+# 2b. orphan gate — 譯本 translatedFrom 指向已刪除的中文 source ＝ CD prebuild exit 2、deploy 不發生。
+#     pre-commit 只驗 staged，抓不到「rename/刪 zh 檔讓某語譯本變孤兒」這種 cross-file 後果。
+#     觸發：2026-06-28 流行音樂與金曲獎→金曲獎 rename，fr 譯本用雙引號漏掉 sed → orphan 滑到 CD 才爆。
+#     read-only --check（不寫 _translations.json）。grep 輸出抓 orphan（不靠 exit code，免被 out-of-sync 遮蔽）。
+if [ "${TWMD_SKIP_PREPUSH_SWEEP:-0}" != "1" ] &&
+  [ -f "$REPO/scripts/tools/sync-translations-json.py" ] &&
+  command -v python3 >/dev/null 2>&1; then
+  # || true 必要：--check 對 out-of-sync（非 orphan）也 exit 1，husky sh -e 下賦值失敗會靜默炸整個 hook
+  # （2026-07-24 實測：article-health ✅ 後 hook 無訊息 fail code 1——正是下面註解說要避免的「被 out-of-sync 遮蔽」）
+  tf_out="$(python3 "$REPO/scripts/tools/sync-translations-json.py" --check 2>&1 || true)"
+  if printf '%s' "$tf_out" | grep -q "Orphan translations"; then
+    echo ""
+    echo "🧬 pre-push: ⛔ 偵測到 orphan 譯本（translatedFrom 指向已刪除的中文 source）— CD prebuild 會 exit 2、deploy 不會發生。先在本機修掉再 push。"
+    printf '%s\n' "$tf_out" | grep -A6 "Orphan translations"
+    echo "   修：把 orphan 譯本 frontmatter 的 translatedFrom 改指新 slug，或刪掉該譯本 + redirect。"
+    echo "   逃生（routine 真的不能停）：TWMD_SKIP_PREPUSH_SWEEP=1 git push …（reflog 留痕，CI 仍會擋）"
+    exit 1
+  fi
+fi
+
+# 3. in-flight deploy 近完成 → 等它，避免白白取消（哲宇選 cancel-in-progress=true latest-wins）
+if [ "${TWMD_SKIP_PREPUSH_WAIT:-0}" = "1" ]; then
+  echo "🧬 pre-push: TWMD_SKIP_PREPUSH_WAIT=1，跳過 in-flight CI 等待"
+elif command -v gh >/dev/null 2>&1; then
+  THRESH=245                              # success≈350s 的 70%（校準 2026-06-14, REFLEXES #66）
+  STUCK=900                               # >2.5× 典型 350s = zombie/stuck run，不等（讓 cancel-in-progress 殺）
+  MAXWAIT="${TWMD_PREPUSH_MAXWAIT:-120}"  # 等待上限，避免無限卡 routine
+  WAITED=0
+  while :; do
+    started="$(gh run list --workflow=deploy.yml --status=in_progress --json startedAt -q '.[0].startedAt' 2>/dev/null)"
+    [ -z "$started" ] && break           # 無 in-flight deploy → 放行
+    start_epoch="$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$started" +%s 2>/dev/null || echo 0)"
+    elapsed=$(( $(date -u +%s) - start_epoch ))
+    if [ "$start_epoch" -eq 0 ] || [ "$elapsed" -lt "$THRESH" ]; then
+      echo "🧬 pre-push: in-flight deploy 還早（${elapsed}s<${THRESH}s）— 直接 push，cancel-in-progress 接手 latest-wins"
+      break
+    fi
+    if [ "$elapsed" -gt "$STUCK" ]; then
+      echo "🧬 pre-push: in-flight run 已跑 ${elapsed}s（>${STUCK}s = stuck/zombie，非近完成）— 直接 push 讓 cancel-in-progress 殺殭屍"
+      break
+    fi
+    if [ "$WAITED" -ge "$MAXWAIT" ]; then
+      echo "🧬 pre-push: 等了 ${WAITED}s deploy 仍未完，放行（不無限等）"
+      break
+    fi
+    echo "🧬 pre-push: in-flight deploy 已跑 ${elapsed}s（近完成）— 等它跑完免白白取消（${WAITED}/${MAXWAIT}s）"
+    sleep 15; WAITED=$(( WAITED + 15 ))
+  done
+else
+  echo "🧬 pre-push: ⚠️ gh 不可用，跳過 in-flight CI 檢查（fail-loud allow，per §禁忌一不 silent）"
+fi
+
+exit 0

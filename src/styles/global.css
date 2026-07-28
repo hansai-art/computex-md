@@ -1,0 +1,679 @@
+/**
+ * global.css — site-wide stylesheet entry point
+ *
+ * Phase 3 (2026-04-10): the "Tailwind Flip" phase.
+ * Phase 7 (2026-04-10): dead-code cleanup — @theme bridge block and
+ *   @layer components tw-* class library removed, both unused.
+ *
+ * Architecture (post-Phase-7):
+ *
+ *   1. tokens.css = design SSOT (CSS variables only)
+ *   2. Tailwind v4 imported via explicit layer imports so we control
+ *      which layers the reset / theme / utilities land in
+ *   3. @layer base = preflight + our site-wide base styles (html/body/
+ *      h1-h6/main/a/img/blockquote/nav/floating-md/media queries).
+ *      Layout.astro has NO <style> block at all.
+ *   4. @layer utilities = Tailwind atomic utilities (flex, p-4, dark:)
+ *   5. Top-level @keyframes (float*) — used by TopicCard's dynamic
+ *      `animation: var(--anim)` arbitrary utility
+ *
+ * Cascade order:
+ *   @layer theme       ← Tailwind theme tokens
+ *     ↓
+ *   @layer base        ← Tailwind preflight + our site base styles
+ *     ↓
+ *   @layer utilities   ← Tailwind atomic utilities
+ *     ↓
+ *   UNLAYERED          ← component scoped <style> blocks (always win)
+ *
+ * Consequences of this architecture:
+ * - Tailwind preflight removes h1-h6 font-sizes, ul/ol bullets, a
+ *   colors, etc. We explicitly restore what we need in @layer base.
+ * - Component scoped <style> blocks remain the highest priority and
+ *   can override anything here.
+ * - Phase 4+ leaf migrations use inline Tailwind arbitrary values
+ *   (`bg-[#007864]`, `[&_h2]:mt-6`) instead of the Phase 2 tw-*
+ *   prebuilt classes (which were never adopted and are now deleted).
+ *
+ * ⚠️ New design tokens → tokens.css
+ * ⚠️ New base / typography → @layer base here
+ * ⚠️ One-off atomic utility in HTML → use Tailwind class directly
+ */
+
+@import './tokens.css';
+
+/* Layer order declaration — anything added to these layers lands in
+ * the declared order regardless of source position in the file.
+ * The `components` layer was removed in Phase 7 along with the
+ * tw-* prebuilt class library that never got adopted. */
+@layer theme, base, utilities;
+
+/* Tailwind v4 layered imports. `theme.css` provides Tailwind's default
+ * palette + base tokens; `preflight.css` is the CSS reset; `utilities`
+ * is the atomic utility generator. Explicit layer assignments mean we
+ * can override any of them in our own @layer base. */
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+/* Content scanning — tell Tailwind which files to look in for class
+ * names it should generate utilities for. The path is relative to
+ * THIS file (src/styles/global.css). */
+@source "../**/*.{astro,ts,tsx,js,jsx,mdx}";
+
+/* Phase 7 (2026-04-10): the `@theme` bridge block that mapped tokens →
+ * Tailwind utilities (font-title, max-w-reading, rounded-card, etc.)
+ * was removed because nothing in the markup actually used those
+ * generated classes. Phase 4+ leaf migrations went straight to
+ * inline Tailwind arbitrary values instead. The raw tokens
+ * themselves still live in tokens.css and are referenced from
+ * `@layer base` below via `var(--font-title)` etc. */
+
+/* ==========================================================================
+ * @layer base — site-wide base styles.
+ *
+ * After Tailwind preflight runs, these rules apply. Note that preflight:
+ *   - sets h1-h6 font-size to inherit (we restore em sizing below)
+ *   - removes ul/ol list-style and indent (we restore)
+ *   - sets * { margin: 0; padding: 0; border: 0 solid; box-sizing: border-box }
+ *   - sets a { color: inherit; text-decoration: inherit }
+ *   - sets img { max-width: 100%; height: auto; display: block }
+ *
+ * The rules here are either:
+ *   (a) restoring browser defaults that preflight killed (headings, lists)
+ *   (b) applying Taiwan.md site identity (fonts, background, colors, layout)
+ * ========================================================================== */
+
+@layer base {
+  /* ------------------------------------------------------------------------
+   * Box model + overflow — preflight already does * { box-sizing: border-box }
+   * but the max-width: 100vw and overflow-x: hidden are site-specific.
+   * ------------------------------------------------------------------------ */
+
+  html {
+    font-size: 118%;
+    /* 2026-04-27: 改用 `overflow-x: clip` 而非 `hidden`。
+       原因：當 overflow-x 設成 hidden/auto/scroll 任一非 visible 值，
+       CSS 規範會自動把另一軸（overflow-y）也計算成 auto，把元素變成
+       scroll container。這會讓所有後代 `position: sticky` 都被綁定到
+       這個 scroll container（而非 window），且 sticky 在「實際不滾動但
+       computed 是 scroll container」的元素內常常 broken。
+       `overflow-x: clip` 同樣會剪掉橫向超出，但不會 promote y-axis。
+       支援度：Chrome 90+ / Firefox 81+ / Safari 16+ —— Taiwan.md 不支援更舊。 */
+    overflow-x: clip;
+  }
+
+  html,
+  body {
+    max-width: 100vw;
+    overflow-x: clip;
+  }
+
+  /* Focus styles for keyboard accessibility */
+  *:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  /* Skip-to-content link (2026-07-06 design-audit §2.9-1).
+     First focusable element in <body> (Layout.astro). Visually hidden until
+     it receives keyboard focus, then it pins to the top leading corner so a
+     keyboard / screen-reader user can jump straight to #main-content, past the
+     header nav. Uses design tokens so it inherits the site accent +
+     background. Logical inset so it lands top-right under dir=rtl (ar). */
+  .skip-link {
+    position: fixed;
+    top: 0;
+    inset-inline-start: 0;
+    z-index: 2000;
+    /* Slid off the top edge until focused. Using transform (not display:none
+       or visibility:hidden) keeps it focusable + in the accessibility tree. */
+    transform: translateY(-120%);
+    padding: 0.6rem 1rem;
+    background: var(--color-accent);
+    color: var(--color-bg);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    /* Only the corner that faces into the page is rounded — logical so it
+       follows the skip link to the other side when dir=rtl (ar). */
+    border-end-end-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.18s ease;
+  }
+  .skip-link:focus,
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  /* ------------------------------------------------------------------------
+   * Body — reading font, line height, background gradient.
+   * ------------------------------------------------------------------------ */
+
+  body {
+    font-family: var(--font-reading);
+    font-weight: 400;
+    line-height: 1.75;
+    color: var(--color-ink);
+    background-color: var(--color-bg);
+    background-image:
+      radial-gradient(
+        circle at top,
+        color-mix(in srgb, var(--color-ink) 8%, transparent),
+        transparent 30%
+      ),
+      linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-soft) 100%);
+    /* Reader size now scales :root font-size (tokens.css), which cascades
+     * into all `rem`-based values. Multiplying body on top of that would
+     * double-scale, so we just inherit. */
+    font-size: 1rem;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings:
+      'kern' 1,
+      'liga' 1;
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  /* ------------------------------------------------------------------------
+   * Headings — font family + weight + preflight-compensating font-size.
+   *
+   * Tailwind preflight sets h1-h6 { font-size: inherit } which makes them
+   * all render at body size. We restore browser-default em sizing so
+   * rendered Markdown and any <h1>-<h6> without a scoped override keeps
+   * a visible hierarchy. Component scoped styles still win via "unlayered
+   * > layered" cascade.
+   * ------------------------------------------------------------------------ */
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-title);
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+  h1 {
+    font-size: 2em;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+  }
+  h2 {
+    font-size: 1.5em;
+    font-weight: 800;
+  }
+  h3 {
+    font-size: 1.17em;
+    font-weight: 700;
+  }
+  h4 {
+    font-size: 1em;
+    font-weight: 700;
+  }
+  h5 {
+    font-size: 0.83em;
+    font-weight: 600;
+  }
+  h6 {
+    font-size: 0.67em;
+    font-weight: 600;
+  }
+
+  /* ------------------------------------------------------------------------
+   * Lists — preflight removes list-style and padding-inline-start which
+   * breaks article body bullets, footnotes, and reference lists. Restore
+   * inside main so nav / footer / sidebar lists stay unstyled by default.
+   * ------------------------------------------------------------------------ */
+
+  main ul,
+  main ol {
+    padding-inline-start: 2rem;
+  }
+  main ul {
+    list-style: disc;
+  }
+  main ol {
+    list-style: decimal;
+  }
+
+  /* ------------------------------------------------------------------------
+   * Blockquote (article body).
+   * ------------------------------------------------------------------------ */
+
+  main blockquote {
+    font-family: var(--font-quote);
+    font-weight: 400;
+    font-style: normal;
+    letter-spacing: 0.01em;
+    line-height: 1.8;
+  }
+
+  /* ------------------------------------------------------------------------
+   * Interface-font UI elements (nav, buttons, meta).
+   * ------------------------------------------------------------------------ */
+
+  nav,
+  button,
+  .btn-primary,
+  .btn-secondary,
+  .btn-cta,
+  [class*='btn'],
+  .meta-item,
+  .tag,
+  .category-badge,
+  .search-input {
+    font-family: var(--font-interface);
+    font-weight: 600;
+  }
+
+  /* ------------------------------------------------------------------------
+   * Category-specific heading fonts (justfont webfont system).
+   * ------------------------------------------------------------------------ */
+
+  .jf-food h1 {
+    font-family: 'jf-kamabit', 'Noto Sans TC', sans-serif;
+    font-weight: 700;
+  }
+  .jf-history h1 {
+    font-family: 'rixingsong-semibold', 'Noto Serif TC', serif;
+    font-weight: 600;
+  }
+
+  /* FOUC prevention: hide body while justfont is loading (#401).
+     justfont SDK adds jf-loading to <html> synchronously before body
+     renders, switches to jf-active (or jf-inactive on timeout) when
+     fonts are ready. Hiding with opacity (not visibility) preserves
+     layout so there's no shift when content appears. */
+  html.jf-loading > body {
+    opacity: 0;
+  }
+  html.jf-active > body,
+  html.jf-inactive > body {
+    opacity: 1;
+    transition: opacity 0.25s ease-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html.jf-active > body,
+    html.jf-inactive > body {
+      transition: none;
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+   * Main element + category-specific padding adjustments.
+   * ------------------------------------------------------------------------ */
+
+  main {
+    min-height: calc(100vh - 60px);
+    width: 100%;
+    max-width: 100vw;
+    /* 2026-04-27 sticky bug fix：用 clip 而非 hidden，避免 overflow-x: hidden
+       自動把 overflow-y promote 成 auto、讓 main 變成 scroll container 而
+       破壞所有 TOC / sidebar 的 position: sticky。詳見 html { } 註解。 */
+    overflow-x: clip;
+  }
+
+  /* ------------------------------------------------------------------------
+   * 2026-04-27: 點擊 TOC 連結（或任何 #anchor 連結）的捲動行為
+   *
+   * 問題：fixed top navbar 高度 ~72px。anchor click 預設讓 heading 貼到
+   * viewport 頂端 = 完全被 navbar 遮住。
+   * 解法（純 CSS，不寫 JS handler）：
+   *   1. scroll-padding-top: 92px on <html> — 告訴瀏覽器 anchor scroll
+   *      時保留頂端空間，heading 落到 viewport top + 92px
+   *   2. scroll-behavior: smooth on <html> — 滑動取代瞬移（觀察者要求：
+   *      避免「像跳新頁面」的體驗）
+   *   3. respect prefers-reduced-motion — 系統設定要求減少動畫時瞬移
+   *
+   * 不加 scroll-margin-top on heading：scroll-padding-top + scroll-margin-top
+   * 是 additive，兩個 92px 會疊成 184px 雙倍 offset，heading 落到太下面。
+   *
+   * 早期 debug 經驗：曾在 hidden Chrome MCP tab 測 smooth scroll 完全沒動，
+   * 誤以為是 sticky/IO 觀察器互相干擾導致 Chrome cancel。實情是 hidden
+   * tab 的 requestAnimationFrame 被 throttle 到 ~1Hz，所以任何依賴 rAF
+   * 的 smooth scroll（含 native CSS smooth）都被「凍結」。一回到 visible
+   * tab 就完全正常。教訓：不要在 hidden tab 驗證 scroll 行為。
+   * ------------------------------------------------------------------------ */
+  html {
+    /* navbar 72px + 20px buffer = 92px */
+    scroll-padding-top: 92px;
+    scroll-behavior: smooth;
+  }
+
+  /* respect 系統「減少動畫」偏好 */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  /* 開啟搜尋 modal / 手機選單時鎖住背景捲動（issue #1212 A2-4）。
+   * :has() 在所有 evergreen browser 支援；不支援的舊瀏覽器退回
+   * 現行行為（背景可捲），不會壞。 */
+  body:has(#search-modal.open),
+  body:has(.nav-mobile.open) {
+    overflow: hidden;
+  }
+
+  body.page-default main {
+    padding-top: 56px;
+  }
+  body.page-default main.article-page,
+  body.page-default main.graph-page,
+  body.page-default main.dashboard,
+  body.page-default main.term-page,
+  body.page-default main.fork-graph-page,
+  body.page-default main.category-page {
+    padding-top: 0;
+  }
+
+  main img {
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  /* ------------------------------------------------------------------------
+   * Global link styles (the long :not() chain excludes component-owned
+   * variants). Kept verbatim from Layout.astro.
+   * ------------------------------------------------------------------------ */
+
+  main
+    a:not(.nav-link):not([class*='btn']):not(.card-link):not(.logo):not(
+      .category-card
+    ):not(.floating-md):not(.search-item):not(.reading-step):not(.update-item) {
+    color: var(--color-ink-soft);
+    text-decoration: none;
+    border-bottom: 1px solid
+      color-mix(in srgb, var(--color-ink-soft) 35%, transparent);
+    padding-bottom: 1px;
+    transition: all 0.2s ease;
+  }
+  main
+    a:not(.nav-link):not([class*='btn']):not(.card-link):not(.logo):not(
+      .category-card
+    ):not(.floating-md):not(.search-item):not(.reading-step):not(
+      .update-item
+    ):hover {
+    color: var(--color-ink);
+    border-bottom-color: var(--color-ink);
+  }
+
+  /* External links get an upward arrow */
+  main
+    a[target='_blank']:not(.nav-link):not([class*='btn']):not(.card-link):not(
+      .logo
+    ):not(.category-card):not(.floating-md):not(.contributor-card):not(
+      .no-external-icon
+    )::after {
+    content: '↗';
+    font-size: 0.8em;
+    margin-inline-start: 0.2em;
+    opacity: 0.7;
+  }
+
+  /* ------------------------------------------------------------------------
+   * Floating .md button (bottom-right corner of the site).
+   * ------------------------------------------------------------------------ */
+
+  .floating-md {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 48px;
+    height: 48px;
+    background: var(--color-ink);
+    color: var(--color-accent);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: var(--shadow-card);
+    transition: all 0.2s;
+    z-index: 40;
+  }
+  .floating-md:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px
+      color-mix(in srgb, var(--color-accent) 30%, transparent);
+    background: var(--color-accent);
+    color: var(--color-bg);
+  }
+
+  /* ------------------------------------------------------------------------
+   * Mobile overrides.
+   * ------------------------------------------------------------------------ */
+
+  @media (max-width: 768px) {
+    html {
+      font-size: 100%;
+    }
+    body.page-default main {
+      padding-top: 52px;
+    }
+    body.page-default main.article-page,
+    body.page-default main.graph-page,
+    body.page-default main.dashboard,
+    body.page-default main.term-page,
+    body.page-default main.fork-graph-page,
+    body.page-default main.category-page {
+      padding-top: 0;
+    }
+    .floating-md {
+      bottom: 1rem;
+      right: 1rem;
+      width: 42px;
+      height: 42px;
+      font-size: 0.78rem;
+    }
+  }
+}
+
+/* ==========================================================================
+ * .hero-title font-family override — must live OUTSIDE @layer base.
+ *
+ * justfont SDK injects `.jf-active .hero-title { font-family:
+ * rixingsong-semibold }` (single name, no fallback chain) into a runtime
+ * `<style>` tag at end of <head>. CSS @layer cascade rule: any rule outside
+ * a layer ALWAYS wins over rules inside layers, regardless of specificity
+ * — so an `@layer base { ... }` declaration can never beat justfont's
+ * unlayered injection.
+ *
+ * Putting this rule outside @layer base lets it compete on specificity:
+ *   - SDK rule:   `.jf-active .hero-title`           (0,0,2,0)
+ *   - This rule:  `html.jf-active .hero-title`       (0,0,2,1)  ← wins
+ *
+ * Effect: hero titles try rixingsong first; if its woff fails to parse
+ * (broken justfont CDN subset, e.g. titles containing `鴞`), browser
+ * gracefully falls through to Noto Serif TC instead of UA-default serif.
+ *
+ * Food articles still get kamabit because `.jf-active .jf-food h1`
+ * (0,0,2,1) ties this rule on specificity — both unlayered, source order
+ * decides, and SDK's `<style>` is appended at runtime AFTER this static
+ * link, so kamabit wins for food. (We tested: works.) 2026-05-04.
+ * ========================================================================== */
+html.jf-active .hero-title {
+  font-family:
+    'rixingsong-semibold', 'Noto Serif TC', 'Source Han Serif TC', serif;
+}
+
+/* ==========================================================================
+ * .prose body 字體統一 — 內文 + 內文標題都用 jf-jinxuanlatte 2.0（四分糖）
+ *
+ * 範圍：article + hub 的 markdown 渲染區（`<div class="prose">`）。
+ * 目的：article 內文標題（h2/h3/h4 from markdown）跟內文同一字族，避免兩
+ * 種視覺族（lanyanghei 標題 + jinxuanlatte 內文）撕裂閱讀節奏。
+ *
+ * justfont SDK 注入 `.jf-active h2-h6` → `jf-lanyanghei`（site-wide nav /
+ * hero / sidebar 用，OK 保留）。`.prose` 內的 h2-h6 用更高 specificity 覆蓋：
+ *   - SDK rule `.jf-active h2`        : (0,0,1,1)
+ *   - This rule `html.jf-active .prose :is(h1,…,h6)` : (0,0,2,1) ← wins
+ * 同樣 placed OUTSIDE @layer base 才能蓋過 SDK 的 unlayered <style> 注入
+ * (per CSS @layer cascade rule: layered < unlayered regardless of specificity).
+ *
+ * 註：weight 600 跟 SDK 對 h2-h6 的 lanyanghei extrabold (800) 不同 —— 因為
+ * 金萱沒提供等粗的 extrabold variant；600 是 jinxuanlatte 視覺重量 baseline。
+ * 2026-05-04 v2.0「四分糖」升級。
+ * ========================================================================== */
+html.jf-active .prose :is(h1, h2, h3, h4, h5, h6) {
+  font-family:
+    'jf-jinxuanlatte', 'Noto Sans TC', 'Source Han Sans TC', sans-serif;
+  /* Browser font-weight 600 matches the jinxuanlatte-semibold @font-face
+     registered in Layout.astro (alias 'jf-jinxuanlatte', weight 600).
+     Body 內文 keeps weight 400 (regular). 2026-05-04. */
+  font-weight: 600;
+}
+
+/* ==========================================================================
+ * Global @keyframes — animation names that need to be referenced from
+ * inline `animation: var(--anim) ...` rules (which can't resolve inside
+ * Tailwind arbitrary utilities unless the keyframes live at a global
+ * scope). Currently used by TopicCard.astro's per-category float icon.
+ * ========================================================================== */
+
+@keyframes floatDrift {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-6px) rotate(3deg);
+  }
+  66% {
+    transform: translateY(-3px) rotate(-2deg);
+  }
+}
+
+@keyframes floatSwing {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(8deg) scale(1.05);
+  }
+  75% {
+    transform: rotate(-6deg) scale(0.97);
+  }
+}
+
+@keyframes floatPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
+@keyframes floatGlow {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.06);
+    filter: brightness(1.3);
+  }
+}
+
+@keyframes floatWave {
+  0%,
+  100% {
+    transform: translateX(0) scaleX(1);
+  }
+  40% {
+    transform: translateX(-4px) scaleX(0.95);
+  }
+  70% {
+    transform: translateX(4px) scaleX(1.05);
+  }
+}
+
+@keyframes floatScroll {
+  0%,
+  100% {
+    transform: translateY(0) rotateX(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotateX(8deg);
+  }
+}
+
+@keyframes floatBrush {
+  0%,
+  100% {
+    transform: rotate(-5deg) translateY(0);
+  }
+  50% {
+    transform: rotate(5deg) translateY(-6px);
+  }
+}
+
+@keyframes floatRise {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.04);
+  }
+}
+
+/* Marquee animations for CommunityFeedback scrolling rows (Phase 7.6).
+   Promoted to global scope so inline Tailwind
+   `[animation:marquee-left_100s_linear_infinite]` can resolve them. */
+@keyframes marquee-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Dice-roll for RandomDiscovery's 🎲 icon (Phase 7.6). */
+@keyframes dice-roll {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(5deg) scale(1.05);
+  }
+  50% {
+    transform: rotate(-5deg) scale(1.1);
+  }
+  75% {
+    transform: rotate(3deg) scale(1.05);
+  }
+}

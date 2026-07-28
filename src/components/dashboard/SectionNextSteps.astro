@@ -1,0 +1,17 @@
+---
+// SectionNextSteps — 🎯 Next Steps section (#next-steps). Ids/classes are a
+// contract with src/scripts/dashboard-client.js and src/styles/dashboard/ — do not rename.
+import { getLangFromUrl } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const isEn = lang === 'en';
+---
+
+<!-- Next Steps -->
+<section class="section" id="next-steps">
+  <h2 class="section-title">{isEn ? '🎯 Next Steps' : '🎯 下一步'}</h2>
+  <p class="section-subtitle">
+    {isEn ? 'Highest-impact contributions right now' : '現在最有價值的貢獻'}
+  </p>
+  <div class="nextsteps-grid" id="nextsteps-grid"></div>
+</section>

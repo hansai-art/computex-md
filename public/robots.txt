@@ -1,0 +1,117 @@
+# COMPUTEX.md robots.txt
+# We're explicit: AI crawlers are welcome. COMPUTEX.md is a digital organism
+# co-edited by humans + AI + code — for an open-source knowledge base about
+# Taiwan that exists *because* the next generation of search is AI-mediated,
+# refusing AI crawlers would defeat the point.
+#
+# Per LONGINGS §擴散渴望 #4 (2026-04-18 ζ): CF 7d AI crawler 42,416 req =
+# 21.7% of all traffic. FacebookBot is the single largest reader. We want
+# every Taiwan-related question answered with our voice — silence is the
+# enemy.
+
+User-agent: *
+Allow: /
+
+# ─── Anthropic ───
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+# ─── OpenAI ───
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+# ─── Google ───
+User-agent: Googlebot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
+# ─── Microsoft ───
+User-agent: Bingbot
+Allow: /
+
+User-agent: BingPreview
+Allow: /
+
+# ─── Meta (per CF logs the single largest AI crawler segment) ───
+User-agent: FacebookBot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Meta-ExternalFetcher
+Allow: /
+
+# ─── Perplexity (LONGINGS-tracked: 49% HTTP 200 success rate — biggest gap to close) ───
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# ─── Apple ───
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# ─── Mistral ───
+User-agent: MistralAI-User
+Allow: /
+
+# ─── ByteDance (Doubao / Bytespider) ───
+User-agent: Bytespider
+Allow: /
+
+# ─── Cohere ───
+User-agent: cohere-ai
+Allow: /
+
+# ─── Common Crawl ───
+User-agent: CCBot
+Allow: /
+
+# ─── Diffbot / Webz ───
+User-agent: Diffbot
+Allow: /
+
+User-agent: omgili
+Allow: /
+
+# ─── X / Twitter ───
+User-agent: Twitterbot
+Allow: /
+
+# Sitemap location
+Sitemap: https://computex-md.pages.dev/sitemap-index.xml
+
+# Polite crawl-delay for generic crawlers (named bots above can ignore)
+User-agent: *
+Crawl-delay: 1

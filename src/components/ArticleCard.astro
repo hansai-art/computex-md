@@ -1,0 +1,836 @@
+---
+/**
+ * ArticleCard — shared article card component.
+ *
+ * 跨站共用的「文章卡」元件，四種 density mode：
+ * - `premium` — **canonical 文章卡（2026-06-14 進化）**：cover（無圖時分類色漸層 +
+ *   icon）+ 分類 badge（+ 選用更新日）+ serif 標題 + desc + 閱讀時間/閱讀全文 CTA。
+ *   站上最新 rail（client template-clone）+ 你可能也想讀 grid 共用同一份；以此樣式為準。
+ * - `compact` (default) — 緊湊 sidebar list 用：dot + title + 1-2 line desc + meta
+ * - `row`              — 極簡單列：分類 pill + serif 標題 + 1 行描述 + 右側日期（borderless）
+ * - `detailed`         — 時序列（/latest）卡片：框 + pill + 更新日 + serif 標題 + 完整描述 + tags + 引用/閱讀時間 footer
+ *
+ * 設計目標：
+ * 1. Astro 靜態 render（文章列表 / 你可能也想讀 grid / /latest / explore）
+ * 2. **client-side 重用 = template-clone**：把一份 server-render 的 <ArticleCard>
+ *    放進 <template>，JS clone + 填 slot（站上最新 rail 場景）。重用「真元件」而非
+ *    手刻 innerHTML 字串 —— 這是 2026-06-14 哲宇 directive「拿來共用才有意義」的正解。
+ * 3. `<style is:global>` 仍保留：map.template.astro 的 sidebar 仍用 innerHTML 組
+ *    `.article-card`（compact）字串（最後一個 :global 消費者，待 map 改 template-clone
+ *    後可全 scope）。新工作一律走 template-clone，勿再手刻 class 字串。
+ *
+ * CSS classes exposed for dynamic use:
+ * - `.article-card`              — base card container
+ * - `.article-card-body`         — content column
+ * - `.article-card-title`        — title heading, tag via `titleTag` prop (h3/h4，預設 h4)
+ * - `.article-card-desc`         — p description
+ * - `.article-card-meta`         — small meta line
+ * - `.article-card-dot`          — category color dot (compact)
+ * - `.article-card-pill`         — row variant category pill (icon + label)
+ * - `.article-card-rowmeta`      — row variant right-aligned meta cluster (footnotes/readingTime/date)
+ * - `.article-card-date`         — row variant date (nested in `.article-card-rowmeta`)
+ * - `.article-card-cta`          — "閱讀全文 →" link text
+ * - `.article-card.is-premium`   — premium variant
+ * - `.article-card.is-compact`   — compact variant (default)
+ * - `.article-card.is-row`       — row variant
+ *
+ * Map page 客製化延伸：
+ * - `.article-card.route-stop-card` 在卡片左側加 numbered badge（透過 .stop-number）
+ *   route 站點繼承本元件 base + 附加 stop-number 視覺
+ */
+
+import { useTranslations, getLangFromUrl } from '../i18n/utils';
+
+export interface Props {
+  /** Article URL — wraps card in <a> when present. */
+  href?: string;
+  /** 主標題（必填）*/
+  title: string;
+  /** 副描述（選用）*/
+  description?: string;
+  /** 分類標籤（顯示在 meta 區）*/
+  categoryLabel?: string;
+  /** 分類顏色（用在左側 dot / premium badge 背景 / row pill 文字）*/
+  categoryColor?: string;
+  /** 分類 emoji icon（row variant 的 pill 前綴）*/
+  categoryIcon?: string;
+  /** 顯示用日期字串（row / detailed variant 的更新日；呼叫端先格式化好）*/
+  date?: string;
+  /** 閱讀時間顯示字串（compact meta / detailed footer；含單位，e.g. "12 分鐘"）*/
+  readingTime?: string;
+  /** 引用（腳註）數 — detailed footer 的深度訊號；0 不顯示 */
+  footnotes?: number;
+  /** 標籤 — detailed footer 顯示前幾個 #tag */
+  tags?: string[];
+  /** 封面圖 URL（premium hero / detailed 右側縮圖）*/
+  coverImage?: string;
+  /** 縮圖載入策略（detailed）— 首屏 eager、其餘 lazy 防流量爆炸 */
+  imageLoading?: 'eager' | 'lazy';
+  /** 卡片密度 */
+  density?: 'premium' | 'compact' | 'row' | 'detailed';
+  /** 標題 heading tag — 預設 h4（既有頁面階層不變）；row 變體在 hub 列表頁用 h3
+   * 搭配頁面 h1（page）→ h2（subcategory group）→ h3（card title）階層 */
+  titleTag?: 'h3' | 'h4';
+  /** detailed 變體縮圖擺左或右（左圖右文用 'left'）。預設 'right' 保留 /latest 既有版面 */
+  imageSide?: 'left' | 'right';
+  /** Click 行為：'new-tab' 預設另開分頁 / 'same-tab' 同分頁 */
+  openIn?: 'new-tab' | 'same-tab';
+  /** 額外 class（給特定 mode 客製化用，e.g. route-stop-card / latest-row）*/
+  extraClass?: string;
+  /** 透傳到根元素的 data-* 屬性（filter / GA 等 consumer 機制留在呼叫端）*/
+  dataAttrs?: Record<string, string | undefined>;
+}
+
+const {
+  href,
+  title,
+  description,
+  categoryLabel,
+  categoryColor = '#16a34a',
+  categoryIcon,
+  date,
+  readingTime,
+  footnotes,
+  tags,
+  coverImage,
+  imageLoading = 'lazy',
+  density = 'compact',
+  titleTag = 'h4',
+  imageSide = 'right',
+  openIn = 'new-tab',
+  extraClass = '',
+  dataAttrs = {},
+} = Astro.props;
+
+// 2026-07-26: the citation-count tooltip was a hardcoded zh-TW「引用」, so every
+// non-zh page showed Chinese on hover. `category.citations` already existed for
+// all 12 languages and carries the count, so the tooltip also stops being a
+// bare noun ("12 citations" instead of "citations").
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const citationsLabel = footnotes
+  ? t('category.citations').replace('{n}', String(footnotes))
+  : undefined;
+
+const target = openIn === 'new-tab' ? '_blank' : '_self';
+const rel = openIn === 'new-tab' ? 'noopener noreferrer' : undefined;
+const Tag = href ? 'a' : 'div';
+const TitleTag = titleTag;
+const densityClass = `is-${density}`;
+// detailed 變體無圖時的「drop cap」placeholder：標題首字（Unicode code-point-safe,
+// 防 CJK/emoji surrogate pair 被切一半）大字低透明度立在分類色淡底上，取代舊版
+// 灰底 + 巨大 emoji watermark（design audit 2026-07-06 §2.10/§3.1 P0-6）。
+const dropCapChar = title ? [...title.trim()][0] : undefined;
+// 左圖右文：detailed 變體把縮圖移到文字左側（其他變體不受影響）
+const imgSideClass =
+  density === 'detailed' && imageSide === 'left' ? 'is-img-left' : '';
+const classes = ['article-card', densityClass, imgSideClass, extraClass]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<Tag
+  class={classes}
+  href={href}
+  target={href ? target : undefined}
+  rel={rel}
+  {...dataAttrs}
+>
+  {
+    density === 'premium' && (
+      <div
+        class="article-card-hero"
+        style={
+          coverImage
+            ? `background-image: url('${coverImage}');`
+            : `background: linear-gradient(135deg, ${categoryColor}22, ${categoryColor}44);`
+        }
+        aria-hidden="true"
+      >
+        {!coverImage && categoryIcon && (
+          <span
+            class="article-card-hero-icon"
+            style={`color: ${categoryColor};`}
+          >
+            {categoryIcon}
+          </span>
+        )}
+        {coverImage && <span class="article-card-hero-overlay" />}
+      </div>
+    )
+  }
+  {
+    density === 'compact' && categoryColor && (
+      <span
+        class="article-card-dot"
+        style={`background: ${categoryColor};`}
+        aria-hidden="true"
+      />
+    )
+  }
+  {
+    density === 'row' && categoryLabel && (
+      <span
+        class="article-card-pill"
+        style={`color: ${categoryColor}; background: ${categoryColor}1f;`}
+      >
+        {categoryIcon ? `${categoryIcon} ${categoryLabel}` : categoryLabel}
+      </span>
+    )
+  }
+
+  <div class="article-card-body">
+    {
+      density === 'detailed' && (categoryLabel || date) && (
+        <div class="article-card-toprow">
+          {categoryLabel && (
+            <span
+              class="article-card-pill"
+              style={`color: ${categoryColor}; background: ${categoryColor}1f;`}
+            >
+              {categoryIcon
+                ? `${categoryIcon} ${categoryLabel}`
+                : categoryLabel}
+            </span>
+          )}
+          {date && <span class="article-card-updated">{date}</span>}
+        </div>
+      )
+    }
+    {
+      density === 'premium' && (categoryLabel || date) && (
+        <div class="article-card-premrow">
+          {categoryLabel && (
+            <span
+              class="article-card-badge"
+              style={`color: ${categoryColor}; background: ${categoryColor}14; border-color: ${categoryColor}28;`}
+            >
+              {categoryLabel}
+            </span>
+          )}
+          {date && <span class="article-card-premdate">{date}</span>}
+        </div>
+      )
+    }
+
+    <TitleTag class="article-card-title">{title}</TitleTag>
+
+    {description && <p class="article-card-desc">{description}</p>}
+
+    {
+      (categoryLabel || readingTime) && density === 'compact' && (
+        <span class="article-card-meta">
+          {categoryLabel}
+          {categoryLabel && readingTime && ' · '}
+          {readingTime}
+        </span>
+      )
+    }
+
+    {
+      density === 'premium' && (
+        <span class="article-card-cta" style={`color: ${categoryColor};`}>
+          <span class="article-card-cta-label">
+            {readingTime || '閱讀全文'}
+          </span>
+          <svg
+            class="article-card-cta-arrow"
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            aria-hidden="true"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </span>
+      )
+    }
+
+    {
+      density === 'detailed' &&
+        ((tags && tags.length > 0) || !!footnotes || !!readingTime) && (
+          <div class="article-card-foot">
+            {tags && tags.length > 0 && (
+              <span class="article-card-tags">
+                {tags.slice(0, 3).map((tg) => (
+                  <span class="article-card-tag">#{tg}</span>
+                ))}
+              </span>
+            )}
+            {(!!footnotes || !!readingTime) && (
+              <span class="article-card-stats">
+                {!!footnotes && (
+                  <span class="article-card-stat" title={citationsLabel}>
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    {footnotes}
+                  </span>
+                )}
+                {!!readingTime && (
+                  <span class="article-card-stat">
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    {readingTime}
+                  </span>
+                )}
+              </span>
+            )}
+          </div>
+        )
+    }
+  </div>
+
+  {
+    density === 'row' && (footnotes || readingTime || date) && (
+      <span class="article-card-rowmeta">
+        {!!footnotes && (
+          <span class="article-card-stat" title={citationsLabel}>
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            {footnotes}
+          </span>
+        )}
+        {!!readingTime && (
+          <span class="article-card-stat">
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            {readingTime}
+          </span>
+        )}
+        {date && <span class="article-card-date">{date}</span>}
+      </span>
+    )
+  }
+
+  {
+    density === 'detailed' &&
+      (coverImage ? (
+        <span class="article-card-thumbwrap">
+          <img
+            class="article-card-thumb"
+            src={coverImage}
+            alt=""
+            loading={imageLoading}
+            decoding="async"
+          />
+        </span>
+      ) : (
+        <span
+          class="article-card-thumbwrap article-card-thumb-ph"
+          style={`background: ${categoryColor}1a;`}
+          aria-hidden="true"
+        >
+          <span
+            class="article-card-thumb-dropcap"
+            style={`color: ${categoryColor};`}
+          >
+            {dropCapChar}
+          </span>
+        </span>
+      ))
+  }
+</Tag>
+
+<style is:global>
+  /* === Article Card — base (compact mode default) === */
+  .article-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    margin: 6px 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    transition:
+      transform 0.16s,
+      border-color 0.16s,
+      box-shadow 0.16s,
+      background 0.16s;
+    text-decoration: none;
+    color: inherit;
+    text-align: start;
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .article-card:hover {
+    border-color: #16a34a;
+    background: #fafdf6;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.08);
+  }
+  .article-card-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .article-card-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #14532d;
+    margin: 0;
+    line-height: 1.35;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .article-card-desc {
+    font-size: 0.78rem;
+    color: #6b7280;
+    line-height: 1.45;
+    margin: 0;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .article-card-meta {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    margin-top: 2px;
+    font-weight: 500;
+  }
+  .article-card-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+  .article-card-cta {
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-top: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #16a34a;
+  }
+
+  /* === Premium variant — cover hero + (badge·date) + serif title + desc +
+     reading-time CTA。2026-06-14 進化為 canonical 文章卡樣式：站上最新 rail
+     (template-clone) + 你可能也想讀 grid 共用同一個元件，不再各自手刻。=== */
+  .article-card.is-premium {
+    flex-direction: column;
+    /* base .article-card is align-items:flex-start (for compact dot / row pill);
+       premium is a flex column → must reset to stretch so the hero (cover OR
+       gradient fallback) + body fill the full card width. 2026-06-14 fix. */
+    align-items: stretch;
+    padding: 0;
+    overflow: hidden;
+    gap: 0;
+    border-radius: 16px;
+    border-color: rgba(26, 60, 52, 0.07);
+    box-shadow: 0 2px 12px rgba(26, 60, 52, 0.05);
+    transition:
+      transform 0.25s,
+      box-shadow 0.25s;
+  }
+  .article-card.is-premium:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(26, 60, 52, 0.12);
+    border-color: rgba(26, 60, 52, 0.07);
+    background: white;
+  }
+  .article-card.is-premium .article-card-hero {
+    position: relative;
+    height: 160px;
+    background-size: cover;
+    background-position: center;
+    background-color: #e8efec;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .article-card.is-premium .article-card-hero-icon {
+    font-size: 2.8rem;
+    line-height: 1;
+    opacity: 0.75;
+  }
+  .article-card.is-premium .article-card-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 40%,
+      rgba(10, 22, 19, 0.35)
+    );
+  }
+  .article-card.is-premium .article-card-body {
+    padding: 20px 24px 24px;
+    gap: 8px;
+  }
+  .article-card.is-premium .article-card-premrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+  }
+  .article-card.is-premium .article-card-badge {
+    display: inline-block;
+    padding: 0.22rem 0.65rem;
+    border-radius: 9999px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    border: 1px solid transparent;
+    margin: 0;
+  }
+  .article-card.is-premium .article-card-premdate {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-variant-numeric: tabular-nums;
+  }
+  .article-card.is-premium .article-card-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a3c34;
+    line-height: 1.45;
+    -webkit-line-clamp: 2;
+    transition: color 0.16s;
+  }
+  .article-card.is-premium:hover .article-card-title {
+    color: #006d77;
+  }
+  .article-card.is-premium .article-card-desc {
+    font-size: 0.8rem;
+    color: #7a8b7e;
+    line-height: 1.5;
+    -webkit-line-clamp: 4;
+  }
+  .article-card.is-premium .article-card-cta {
+    margin-top: auto;
+    padding-top: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* === Row variant — 時序列 (/latest)：pill + serif title + 1-line desc + date === */
+  .article-card.is-row {
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    margin: 0;
+    border-color: transparent;
+    background: transparent;
+    border-radius: 8px;
+  }
+  .article-card.is-row:hover {
+    border-color: #e2e8f0;
+    background: #f8fafc;
+    transform: none;
+    box-shadow: none;
+  }
+  .article-card.is-row .article-card-pill {
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 0.18rem 0.55rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+  .article-card.is-row .article-card-body {
+    gap: 2px;
+  }
+  .article-card.is-row .article-card-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.02rem;
+    font-weight: 600;
+    color: #1a3c34;
+    line-height: 1.45;
+    -webkit-line-clamp: 1;
+    transition: color 0.16s;
+  }
+  .article-card.is-row:hover .article-card-title {
+    color: #065f46;
+  }
+  .article-card.is-row .article-card-desc {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    line-height: 1.5;
+    -webkit-line-clamp: 1;
+    margin-top: 0.1rem;
+  }
+  .article-card.is-row .article-card-date {
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.78rem;
+    color: #94a3b8;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Row meta cluster (2026-07-10 hub-template overhaul) — wraps the
+   * optional footnotes/readingTime stats + the pre-existing date span so
+   * hub-list rows can show citation/reading-time signal without touching
+   * the base .article-card-date rule above. Occupies the exact flex slot
+   * .article-card-date used to sit in directly: when a consumer only
+   * passes `date` (every current row consumer), .article-card-rowmeta
+   * collapses to that single child's own margin box, so cross-axis
+   * alignment renders pixel-identical to before wrapping. New tokens
+   * here (--color-ink-soft) intentionally deviate from this file's
+   * historical hex + dark-polish.css patch convention — see ArticleCard
+   * doc comment / PR notes for rationale. */
+  .article-card.is-row .article-card-rowmeta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+  .article-card.is-row .article-card-rowmeta .article-card-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 0.2rem;
+    font-size: 0.76rem;
+    color: var(--color-ink-soft, #94a3b8);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .article-card.is-row .article-card-rowmeta .article-card-stat svg {
+    opacity: 0.8;
+  }
+
+  /* === Detailed variant — 時序列 (/latest) 卡片：框 + pill + serif 標題 + 完整描述 + tags + 引用/閱讀 footer + 右側 16:10 縮圖 ===
+   * 縮圖固定比例（200×125 / 手機 96×96）貼齊頂部，不隨卡片高度直伸 —
+   * 無圖時 render 分類色 placeholder（icon + 淡分類底色），版面節奏一致；
+   * 補圖後自動換成真圖。 */
+  .article-card.is-detailed {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 18px;
+    margin: 0;
+    border-radius: 14px;
+  }
+  .article-card.is-detailed .article-card-thumbwrap {
+    width: 200px;
+    height: 125px;
+    flex-shrink: 0;
+    align-self: center;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+  }
+  .article-card.is-detailed .article-card-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  .article-card.is-detailed:hover .article-card-thumb {
+    transform: scale(1.04);
+  }
+  /* Drop-cap placeholder（無圖時）：標題首字大字低透明度立在分類色淡底上，
+     取代舊版灰底 + 巨大 emoji watermark。字級用 box 高度的倍數撐大再讓
+     overflow:hidden（繼承自 .article-card-thumbwrap）裁切，desktop 固定
+     125px 高、手機 aspect-ratio 16/10 撐開時都不會撐壞版面。 */
+  .article-card.is-detailed .article-card-thumb-ph {
+    position: relative;
+  }
+  .article-card.is-detailed .article-card-thumb-dropcap {
+    font-family: var(--font-title);
+    font-weight: 700;
+    font-size: 4.6rem;
+    line-height: 1;
+    opacity: 0.25;
+    transform: translateY(0.06em);
+    white-space: nowrap;
+  }
+  /* 左圖右文：縮圖移到文字左側（desktop）。手機仍走下方 column 規則（圖上文下）。 */
+  .article-card.is-detailed.is-img-left .article-card-thumbwrap {
+    order: -1;
+  }
+  @media (max-width: 768px) {
+    /* 手機改直向堆疊：圖上文下（縮圖移到卡片最頂、滿版橫幅，維持 16:10）— 2026-06-13 哲宇 */
+    .article-card.is-detailed {
+      flex-direction: column;
+    }
+    .article-card.is-detailed .article-card-thumbwrap {
+      order: -1;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 10;
+      align-self: stretch;
+    }
+    .article-card.is-detailed .article-card-thumb-dropcap {
+      font-size: 6.4rem;
+    }
+  }
+  .article-card.is-detailed .article-card-body {
+    gap: 8px;
+  }
+  .article-card.is-detailed .article-card-toprow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .article-card.is-detailed .article-card-pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+  .article-card.is-detailed .article-card-updated {
+    flex-shrink: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.76rem;
+    color: #94a3b8;
+    font-variant-numeric: tabular-nums;
+  }
+  .article-card.is-detailed .article-card-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.12rem;
+    font-weight: 700;
+    color: #1a3c34;
+    line-height: 1.4;
+    -webkit-line-clamp: 2;
+    transition: color 0.16s;
+  }
+  .article-card.is-detailed:hover .article-card-title {
+    color: #065f46;
+  }
+  .article-card.is-detailed .article-card-desc {
+    font-size: 0.9rem;
+    color: #64748b;
+    line-height: 1.6;
+    display: block; /* 完整描述 — 不截斷 */
+    -webkit-line-clamp: unset;
+    overflow: visible;
+  }
+  .article-card.is-detailed .article-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+  }
+  .article-card.is-detailed .article-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+  }
+  .article-card.is-detailed .article-card-tag {
+    font-size: 0.74rem;
+    font-weight: 500;
+    color: #64748b;
+    white-space: nowrap;
+  }
+  .article-card.is-detailed .article-card-stats {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .article-card.is-detailed .article-card-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.76rem;
+    color: #94a3b8;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .article-card.is-detailed .article-card-stat svg {
+    opacity: 0.8;
+  }
+
+  /* === Map-page 客製化延伸：route-stop-card === */
+  .article-card.route-stop-card .stop-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* === category-hub.template.astro 客製化延伸：hub-row-featured ===
+   * Subtle leading-edge accent for featured articles in the hub list rows —
+   * 2px categoryColor border, with matching inline-start padding reduction
+   * (row density's base padding is 12px) so the text column doesn't
+   * visually shift relative to non-featured rows. */
+  .article-card.hub-row-featured {
+    border-inline-start: 2px solid var(--categoryColor, #2d5016);
+    padding-inline-start: 10px;
+  }
+</style>

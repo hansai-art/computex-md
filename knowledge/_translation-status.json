@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "lastUpdated": "2026-07-29T01:07:09+08:00",
+    "zhCommitHead": "",
+    "totalZh": 0,
+    "activeLanguages": ["en"],
+    "summary": {
+      "en": {
+        "total_zh": 0,
+        "fresh": 0,
+        "stale": 0,
+        "metadata_stale": 0,
+        "missing": 0,
+        "orphan": 0
+      }
+    },
+    "orphans": {
+      "en": []
+    }
+  },
+  "byArticle": {}
+}

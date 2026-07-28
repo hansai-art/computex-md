@@ -1,0 +1,210 @@
+name: PR Frontmatter Gate
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 為什麼有這條 gate（2026-07-05 誕生）
+#
+# GitHub UI 的 merge 按鈕 **不經過本地 .husky pre-commit / pre-push hook**。
+# 2026-07-05 傍晚哲宇從 UI 連 merge 七篇 contributor PR，其中四篇的 YAML
+# frontmatter 整包裹在 ``` code fence 裡（不是真 frontmatter，同一產出工具簽名），
+# 直接落 main、打紅了 deploy.yml 的全站 article-health 健檢——但那是 **merge 後**
+# 才發現，壞 frontmatter 已經在 main 上了。
+#
+# 這條 gate 把同樣的驗證前移到 PR **merge 前**：對 PR 改動的 knowledge/ 檔案跑
+#   1) test-frontmatter.mjs（YAML 結構：title/desc/date/tags/subcategory/dup-slug/
+#      翻譯檔 frontmatter，缺 --- 區塊會因缺 subcategory 而 hard-fail）
+#   2) article-health.py --profile=pre-commit（缺 frontmatter 區塊 HARD +
+#      cjk-punct / footnote-format / wikilink-target / format-structure）
+# 任一不過 → job 紅 X + PR 留言說明怎麼修。跟本地 pre-commit 同一套規則，只是
+# 搬到 CI 讓 UI-merge 也擋得住。
+#
+# ⚠️ 紅 X 本身只是「訊號」。要真正**擋住 merge 按鈕**，需在 repo Settings →
+#    Branches → main branch protection 把本 check（"frontmatter-gate"）設為
+#    required status check。那是 repo 治理設定（影響所有 contributor 的 merge
+#    條件），留給哲宇拍板，本 workflow 不代設。
+#
+# Fork PR 權限：用 `pull_request`（非 pull_request_target），fork PR 的 token
+# 是唯讀，所以留言步驟會失敗——已加 continue-on-error 優雅降級；紅 X（job exit
+# code）不受 token 影響，永遠有效。跟 pr-review.yml 同一套 fork-safe 模式。
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - 'knowledge/**'
+      - 'scripts/core/test-frontmatter.mjs'
+      - 'scripts/tools/article-health.py'
+      - 'scripts/tools/lib/article_health/**'
+      - '.github/workflows/pr-frontmatter-gate.yml'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+# 同一 PR 連推多次 → 只跑最新一次，取消排隊中的舊 run
+concurrency:
+  group: frontmatter-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  frontmatter-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node (with npm cache)
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies (gray-matter for test-frontmatter)
+        run: npm ci --prefer-offline --no-audit
+
+      # article-health.py 是純 stdlib，不需 pip install；ubuntu-latest 內建 python3
+
+      - name: Detect PR-changed knowledge/ files
+        id: files
+        run: |
+          # 3-dot merge-base diff（只拿 PR 真正 A/C/M/R 的檔，避開「main 領先」
+          # 把 main 新增檔誤報成 PR 改動——pr-review.yml PR #582 post-mortem）。
+          # fork PR 的 head.sha 不在 local clone → fall back 到 merge commit 的
+          # 兩個 parent（HEAD^1=base / HEAD^2=fork head，checkout@v5 已 fetch）。
+          FILES=$(git diff --name-only --diff-filter=ACMR \
+            "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}" \
+            2>/dev/null)
+          if [ -z "$FILES" ] && git rev-parse HEAD^2 >/dev/null 2>&1; then
+            echo "ℹ️  Falling back to merge-parents diff (likely fork PR)"
+            FILES=$(git diff --name-only --diff-filter=ACMR HEAD^1...HEAD^2)
+          fi
+
+          # 全語系 knowledge/*.md（給 test-frontmatter，它自己驗 en/es/ja/ko 結構）
+          ALL_KN=""
+          # 只 zh-TW root knowledge/<Category>/*.md（給 article-health --profile=pre-commit，
+          # 該 profile 是 zh-TW 導向；翻譯檔交給 test-frontmatter）
+          ZH_KN=""
+          while IFS= read -r f; do
+            [[ -z "$f" ]] && continue
+            [[ "$f" =~ ^knowledge/.*\.md$ ]] || continue
+            [[ -f "$f" ]] || continue          # 防 diff-filter edge case：檔真的要在 HEAD 上
+            ALL_KN+="$f"$'\n'
+            # zh-TW root = knowledge/<大寫開頭分類>/…；排除 knowledge/<小寫語系碼>/…
+            if [[ "$f" =~ ^knowledge/[A-Z][A-Za-z]*/.*\.md$ ]]; then
+              ZH_KN+="$f"$'\n'
+            fi
+          done <<< "$FILES"
+
+          {
+            echo "all_kn<<EOF"; printf '%s' "$ALL_KN"; echo "EOF"
+            echo "zh_kn<<EOF";  printf '%s' "$ZH_KN";  echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          ALL_COUNT=$(printf '%s' "$ALL_KN" | grep -c . || true)
+          ZH_COUNT=$(printf '%s' "$ZH_KN" | grep -c . || true)
+          echo "count=$ALL_COUNT" >> "$GITHUB_OUTPUT"
+          echo "🔍 PR 改動 knowledge/ 檔：$ALL_COUNT（其中 zh-TW root $ZH_COUNT）"
+
+      - name: Validate frontmatter (test-frontmatter + article-health)
+        id: validate
+        if: steps.files.outputs.count != '0'
+        env:
+          ALL_KN: ${{ steps.files.outputs.all_kn }}
+          ZH_KN: ${{ steps.files.outputs.zh_kn }}
+        run: |
+          set +e
+          : > gate-result.txt
+          STATUS="pass"
+
+          # 1) test-frontmatter --strict：一次驗全部語系（它自己跨檔 aggregate errors，
+          #    任一檔有 error → exit 1）。用 --strict 讓「缺 title/desc/date」也算 error——
+          #    否則 fence-wrapped 的**翻譯檔**（不要求 subcategory）只會 warn 而漏抓
+          #    （2026-07-05 實測 relaxed 模式放行壞 en 檔）。zh-TW 檔缺 --- 區塊本來就會
+          #    因缺 subcategory hard-fail，--strict 只是把翻譯檔的漏洞一起補上。
+          echo "── test-frontmatter.mjs --strict（YAML 結構：title/desc/date/tags/subcategory/dup-slug/翻譯檔）──" | tee -a gate-result.txt
+          TWMD_VALIDATE_FILES="$ALL_KN" node scripts/core/test-frontmatter.mjs --strict 2>&1 | tee -a gate-result.txt
+          [ "${PIPESTATUS[0]}" != "0" ] && STATUS="fail"
+          echo "" | tee -a gate-result.txt
+
+          # 2) article-health：**逐檔**跑 — 為了 PR 留言能逐檔標 🔴/✅ 歸屬（哪個檔壞）
+          #    + 穩健。註（2026-07-05 收官更正）：多檔一次跑的 exit code 其實**有**正確
+          #    aggregate（main() 是 sum(hard_count for all reports)，broken 在前在後都
+          #    exit 1）——本檔早前的 commit 訊息說「只反映最後一檔」是量測失誤（只看了
+          #    最後一檔的 Summary print 就誤判）。逐檔保留純為歸屬 UX，不是因為多檔會漏。
+          echo "── article-health.py --profile=pre-commit（逐 zh-TW 檔，方便逐檔標示：缺 frontmatter 區塊 / cjk-punct / footnote / wikilink / format）──" | tee -a gate-result.txt
+          if [ -n "$(printf '%s' "$ZH_KN" | tr -d '[:space:]')" ]; then
+            while IFS= read -r f; do
+              [ -z "$f" ] && continue
+              OUT=$(python3 scripts/tools/article-health.py "$f" --profile=pre-commit 2>&1)
+              if [ "$?" != "0" ]; then
+                STATUS="fail"
+                { echo "🔴 $f"; echo "$OUT" | grep -E "🔴|hard=[1-9]|缺 |對應" | head -6; } | tee -a gate-result.txt
+              else
+                echo "✅ $f" | tee -a gate-result.txt
+              fi
+            done <<< "$ZH_KN"
+          else
+            echo "（無 zh-TW root 檔改動，此段跳過）" | tee -a gate-result.txt
+          fi
+
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+          echo ""
+          echo "gate status = $STATUS"
+
+      - name: Comment gate result on PR
+        if: steps.files.outputs.count != '0' && always()
+        continue-on-error: true # fork PR token 唯讀，留言失敗不影響紅 X
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const status = '${{ steps.validate.outputs.status }}';
+            if (!status) return; // validate 步驟沒跑（無檔改動）
+            let result = '';
+            try { result = fs.readFileSync('gate-result.txt', 'utf8'); } catch {}
+            // GitHub comment 有長度上限，截斷保險
+            if (result.length > 55000) result = result.slice(0, 55000) + '\n…（截斷，詳見 Actions log）';
+
+            const pass = status === 'pass';
+            const header = pass
+              ? '## ✅ Frontmatter Gate 通過'
+              : '## 🔴 Frontmatter Gate 未通過 — merge 前請先修';
+            const fixHint = pass ? '' : [
+              '',
+              '### 最常見的修法',
+              '- **YAML 被包在 ``` code fence 裡**（不是真 frontmatter）→ 把開頭的 ` ```yaml ` / ` ``` ` 換成 `---`，結尾 ` ``` ` 也換成 `---`。frontmatter 必須用 `---` 包住、貼在檔案最頂端。',
+              '- **缺 `subcategory`** → 對照 [`docs/taxonomy/SUBCATEGORY.md`](../blob/main/docs/taxonomy/SUBCATEGORY.md) 該分類的子分類補上。',
+              '- **腳註格式 / 半形標點 / wikilink** → 本地跑 `python3 scripts/tools/article-health.py <檔> --profile=pre-commit --fix` 多數可自動修。',
+              '',
+              '修好 push 到同一個 PR 分支，這條 gate 會自動重跑。',
+            ].join('\n');
+
+            const body = `${header}\n\n\`\`\`\n${result.trim()}\n\`\`\`${fixHint}\n\n---\n*Taiwan.md Frontmatter Gate • 把本地 pre-commit 的 frontmatter 驗證前移到 PR，擋住 UI-merge 繞過 hook*`;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const bot = comments.find(c => c.body.includes('Taiwan.md Frontmatter Gate'));
+            if (bot) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                comment_id: bot.id, body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: context.issue.number, body,
+              });
+            }
+
+      - name: Fail the check if frontmatter is broken
+        if: steps.validate.outputs.status == 'fail'
+        run: |
+          echo "❌ Frontmatter gate 未通過——見上方步驟輸出與 PR 留言。"
+          echo "   本地重現：TWMD_VALIDATE_FILES=\"<改動檔>\" node scripts/core/test-frontmatter.mjs"
+          echo "            python3 scripts/tools/article-health.py <zh-TW 檔> --profile=pre-commit"
+          exit 1

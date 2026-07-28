@@ -1,0 +1,5 @@
+node_modules/
+.npmrc
+
+# built .mcpb bundle (run scripts/build-mcpb.sh)
+dist/

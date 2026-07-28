@@ -1,0 +1,98 @@
+---
+/**
+ * en article slug page — thin wrapper.
+ *
+ * 2026-05-03 sleepy-colden Tier 2.5 Phase B unified template extraction。
+ * 從 1201 行 → 105 行：邏輯全在 src/templates/article.template.astro，本檔
+ * 只負責 getStaticPaths 列出 knowledge/en/ 下哪些 article 存在。
+ *
+ * Cross-lang baseline (5/3) 後，knowledge/en/{Cat}/ 內的檔案 basename = canonical
+ * URL slug，不需要 translations.json filter（per cross-lang URL convention）。
+ */
+import { readdir, readFile } from 'fs/promises';
+import { resolve, join, basename } from 'path';
+import matter from 'gray-matter';
+import ArticleTemplate from '../../../templates/article.template.astro';
+import {
+  buildGitInfoCache,
+  emptyGitInfo,
+  type GitInfo,
+} from '../../../utils/contributors';
+
+let _gitCache: Map<string, GitInfo> | null = null;
+function getGitInfo(filePath: string) {
+  if (!_gitCache) _gitCache = buildGitInfoCache('knowledge/en/');
+  return _gitCache.get(filePath) || emptyGitInfo();
+}
+
+export async function getStaticPaths() {
+  const CATEGORY_MAPPING: Record<string, string> = {
+    about: 'About',
+    history: 'History',
+    geography: 'Geography',
+    culture: 'Culture',
+    food: 'Food',
+    art: 'Art',
+    music: 'Music',
+    technology: 'Technology',
+    nature: 'Nature',
+    people: 'People',
+    society: 'Society',
+    economy: 'Economy',
+    lifestyle: 'Lifestyle',
+    politics: 'Politics',
+  };
+
+  const safeMatter = (fileContent: string) => {
+    try {
+      return matter(fileContent);
+    } catch {
+      const stripped = fileContent.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '');
+      return { data: {}, content: stripped };
+    }
+  };
+
+  const paths: any[] = [];
+  for (const [categorySlug, folderName] of Object.entries(CATEGORY_MAPPING)) {
+    try {
+      const folderPath = resolve(process.cwd(), 'knowledge', 'en', folderName);
+      const files = await readdir(folderPath);
+      for (const file of files.filter(
+        (f) => f.endsWith('.md') && !f.startsWith('_'),
+      )) {
+        const filePath = join(folderPath, file).normalize('NFC');
+        const fileContent = await readFile(filePath, 'utf-8');
+        const { data: frontmatter, content } = safeMatter(fileContent);
+        const slug = basename(file, '.md');
+        let gitInfo = emptyGitInfo();
+        try {
+          gitInfo = getGitInfo(filePath);
+        } catch {}
+        paths.push({
+          params: { category: categorySlug, slug },
+          props: {
+            title: frontmatter.title || slug,
+            description: frontmatter.description || '',
+            content,
+            frontmatter,
+            lang: 'en',
+            contributors: gitInfo.contributors,
+            lastModified: gitInfo.lastModified,
+          },
+        });
+      }
+    } catch {
+      // category folder missing for this lang — skip
+    }
+  }
+  if (paths.length === 0) {
+    throw new Error('[en getStaticPaths] Generated 0 paths.');
+  }
+  return paths;
+}
+
+const props = Astro.props;
+const { category, slug } = Astro.params;
+---
+
+<ArticleTemplate {...props} category={category!} slug={slug!} />

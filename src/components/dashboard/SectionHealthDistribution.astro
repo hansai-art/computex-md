@@ -1,0 +1,22 @@
+---
+// SectionHealthDistribution — 📊 Health Distribution section (#health-distribution).
+// Ids/classes are a contract with src/scripts/dashboard-client.js and
+// src/styles/dashboard/ — do not rename.
+import { getLangFromUrl } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const isEn = lang === 'en';
+---
+
+<!-- Health Distribution -->
+<section class="section" id="health-distribution">
+  <h2 class="section-title">
+    {isEn ? '📊 Health Distribution' : '📊 健康分布'}
+    <span class="section-timestamp" data-source="articles"></span>
+  </h2>
+  <p class="section-subtitle">
+    {isEn ? 'How healthy are our articles?' : '文章的健康分數分布'}
+  </p>
+  <div class="health-chart" id="health-chart"></div>
+  <p class="health-summary" id="health-summary"></p>
+</section>

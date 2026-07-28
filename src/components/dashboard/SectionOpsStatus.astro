@@ -1,0 +1,243 @@
+---
+// SectionOpsStatus — 🩺 Operational Status section (#ops-status). The only SSG
+// build-time section: reads public/api/dashboard-status.json in frontmatter and
+// bakes the uptime grid into HTML (zero client JS). Classes are a contract with
+// src/styles/dashboard/ — do not rename.
+import fs from 'fs';
+import path from 'path';
+import { getLangFromUrl } from '../../i18n/utils';
+import { LANGUAGE_DISPLAY_NAMES } from '../../config/languages.mjs';
+
+const lang = getLangFromUrl(Astro.url);
+const isEn = lang === 'en';
+
+// ── 🩺 營運狀態 section 資料（2026-07-24，per
+//    reports/design-dashboard-status-section-2026-07-24.md §六）
+//    這是本頁唯一 build-time 讀 JSON、直接烘進 HTML 的 section —— 其餘
+//    section 都是 client fetch + dashboard-client.js 渲染。uptime 網格
+//    刻意要求零 client JS（graph.md visible-by-default 鐵律），所以在
+//    frontmatter 直接讀 scripts/core/generate-dashboard-status.mjs 的產出，
+//    跟 bench.template.astro 讀 bench-results.json 同一種手法。
+const opsStatusPath = path.join(
+  process.cwd(),
+  'public/api/dashboard-status.json',
+);
+const opsStatus = fs.existsSync(opsStatusPath)
+  ? JSON.parse(fs.readFileSync(opsStatusPath, 'utf-8'))
+  : null;
+
+function opsRelTime(iso) {
+  if (!iso) return isEn ? 'never fired' : '從未 fire';
+  const diffMs = Date.now() - new Date(iso).getTime();
+  if (diffMs < 0) return isEn ? 'just now' : '剛剛';
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 60) return isEn ? `${mins}m ago` : `${mins} 分鐘前`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return isEn ? `${hours}h ago` : `${hours} 小時前`;
+  const days = Math.floor(hours / 24);
+  return isEn ? `${days}d ago` : `${days} 天前`;
+}
+
+function opsGapArrow(delta) {
+  if (!delta) return '=0';
+  return delta > 0 ? `▲${delta}` : `▼${Math.abs(delta)}`;
+}
+
+const OPS_STATUS_LABEL = {
+  operational: isEn ? 'Operational' : '正常',
+  degraded: isEn ? 'Degraded' : '延遲',
+  down: isEn ? 'Down' : '中斷',
+  disabled: isEn ? 'Disabled' : '已停用',
+};
+
+const opsRoutineItems = opsStatus?.routines?.items ?? [];
+const opsRoutinesShown = opsRoutineItems.filter((r) => r.enabled);
+const opsRoutinesDisabled = opsRoutineItems.filter((r) => !r.enabled);
+const opsStaleHours = opsStatus?.routines?.stale_hours ?? null;
+const opsBabel = opsStatus?.babel ?? null;
+const opsBabelNodes = (opsBabel?.nodes ?? []).map((n) => ({
+  ...n,
+  isEndpoint: typeof n.alive === 'boolean',
+}));
+const opsIncidents = opsStatus?.incidents ?? [];
+const opsDeploys = opsStatus?.deploys ?? null;
+---
+
+<!--
+  Operational Status — 🩺 status.claude.com 式營運狀態 (2026-07-24)
+  唯一 SSG build-time 烘進 HTML 的 section，零 client JS：uptime 網格
+  是純 CSS grid，讀者不用等 JS fetch 才看得到 routine 飛輪死活。
+  Source: public/api/dashboard-status.json
+  Generator: scripts/core/generate-dashboard-status.mjs
+  Design report: reports/design-dashboard-status-section-2026-07-24.md
+-->
+<section class="section" id="ops-status">
+  <h2 class="section-title">
+    {isEn ? '🩺 Operational Status' : '🩺 營運狀態'}
+  </h2>
+  <p class="section-subtitle">
+    {
+      isEn
+        ? "Is this organism's automation alive right now — routine flywheel, babel translation infra, recent incidents."
+        : '這個生命體的自動化器官現在活著嗎——routine 飛輪、巴別塔翻譯基建、最近事件。'
+    }
+  </p>
+
+  {
+    opsStaleHours !== null && opsStaleHours > 48 && (
+      <p class="ops-stale-note">
+        {isEn
+          ? `⚠️ Routine snapshot is ${opsStaleHours}h old — data-refresh rider hasn't run`
+          : `⚠️ 排程快照齡 ${opsStaleHours}h — data-refresh rider 未跑`}
+      </p>
+    )
+  }
+
+  <!-- Routine 飛輪狀態列 -->
+  <h3 class="subsection-title">
+    {isEn ? '🔁 Routine Flywheel' : '🔁 Routine 飛輪'}
+  </h3>
+  {
+    opsStatus?.routines ? (
+      <>
+        <div class="ops-routine-list">
+          {opsRoutinesShown.map((r) => (
+            <div class="ops-routine-row">
+              <span
+                class={`ops-dot ops-dot-${r.status}`}
+                title={OPS_STATUS_LABEL[r.status]}
+              />
+              <span class="ops-routine-id">{r.id}</span>
+              <span class="ops-routine-cadence">{r.cadence_human}</span>
+              <span class="ops-routine-lastfire">
+                {opsRelTime(r.last_fire)}
+              </span>
+              <span class="ops-grid14">
+                {r.grid14.map((c) => (
+                  <span
+                    class={`ops-cell ops-cell-${c.state}`}
+                    title={`${c.date} · ${c.state}`}
+                  />
+                ))}
+              </span>
+            </div>
+          ))}
+        </div>
+        {opsRoutinesDisabled.length > 0 && (
+          <p class="ops-disabled-note">
+            {isEn ? 'Disabled: ' : '已停用：'}
+            {opsRoutinesDisabled.map((r) => r.id).join(isEn ? ', ' : '、')}
+          </p>
+        )}
+      </>
+    ) : (
+      <p class="ops-empty">
+        {isEn
+          ? 'Routine data unavailable this build.'
+          : '這次 build 沒有 routine 資料。'}
+      </p>
+    )
+  }
+
+  <!-- 巴別塔覆蓋 -->
+  <h3 class="subsection-title">
+    {isEn ? '🌐 Babel Coverage' : '🌐 巴別塔覆蓋'}
+  </h3>
+  {
+    opsBabel ? (
+      <>
+        <div class="ops-babel-bars">
+          {opsBabel.langs.map((l) => (
+            <div class="ops-babel-row">
+              <span class="ops-babel-lang">
+                {LANGUAGE_DISPLAY_NAMES[l.lang] || l.lang}
+              </span>
+              <span class="ops-bar-track">
+                <span
+                  class="ops-bar-fresh"
+                  style={`width:${((l.fresh / opsBabel.total_zh) * 100).toFixed(1)}%`}
+                />
+                <span
+                  class="ops-bar-stale"
+                  style={`width:${((l.stale / opsBabel.total_zh) * 100).toFixed(1)}%`}
+                />
+              </span>
+              <span class="ops-babel-pct">{l.coverage_pct}%</span>
+            </div>
+          ))}
+        </div>
+        <p class="ops-babel-summary">
+          {isEn
+            ? `Gap total ${opsBabel.gap_total} (${opsGapArrow(opsBabel.gap_delta_vs_prev)} vs prev snapshot) · fresh +${opsBabel.fresh_delta_24h} in 24h`
+            : `總缺口 ${opsBabel.gap_total}（${opsGapArrow(opsBabel.gap_delta_vs_prev)} vs 上一快照）· 近 24h fresh +${opsBabel.fresh_delta_24h}`}
+        </p>
+        <div class="ops-babel-nodes">
+          {opsBabelNodes.map((n) => (
+            <span class="ops-node">
+              {n.isEndpoint ? (
+                <span
+                  class={`ops-node-dot ${n.alive ? 'ops-node-alive' : 'ops-node-dead'}`}
+                />
+              ) : (
+                <span class="ops-node-counts">
+                  {n.ok}✓ {n.fail}✗
+                </span>
+              )}
+              <span class="ops-node-name">{n.name}</span>
+            </span>
+          ))}
+        </div>
+      </>
+    ) : (
+      <p class="ops-empty">
+        {isEn
+          ? 'Babel data unavailable this build.'
+          : '這次 build 沒有巴別塔資料。'}
+      </p>
+    )
+  }
+
+  <!-- 最近事件 -->
+  <h3 class="subsection-title">
+    {isEn ? '🚨 Recent Incidents' : '🚨 最近事件'}
+  </h3>
+  <div class="ops-incidents">
+    {
+      opsIncidents.length === 0 ? (
+        <p class="ops-empty">
+          {isEn ? 'No active incidents.' : '目前沒有事件。'}
+        </p>
+      ) : (
+        opsIncidents.map((inc) => (
+          <div class="ops-incident-row">
+            <span
+              class={`ops-dot ops-dot-${inc.level === 'red' ? 'down' : 'degraded'}`}
+            />
+            <span class="ops-incident-text">{inc.text}</span>
+            <span class="ops-incident-ts">{inc.ts}</span>
+          </div>
+        ))
+      )
+    }
+  </div>
+  {
+    opsDeploys && opsDeploys.length > 0 && (
+      <>
+        <h3 class="subsection-title">
+          {isEn ? '🚀 Recent Deploys' : '🚀 最近部署'}
+        </h3>
+        <div class="ops-deploys">
+          {opsDeploys.map((d) => (
+            <div class="ops-deploy-row">
+              <span
+                class={`ops-dot ${d.conclusion === 'success' ? 'ops-dot-operational' : 'ops-dot-down'}`}
+              />
+              <span class="ops-deploy-title">{d.title}</span>
+              <span class="ops-deploy-ts">{opsRelTime(d.ts)}</span>
+            </div>
+          ))}
+        </div>
+      </>
+    )
+  }
+</section>

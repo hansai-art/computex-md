@@ -1,0 +1,165 @@
+---
+import {
+  useTranslations,
+  getLangFromUrl,
+  useTranslatedPath,
+} from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+// Per-quote color variant — the original scoped CSS used
+// :nth-child(even) and :last-child to paint timeline dots/lines
+// blue / green / yellow. Now computed in the frontmatter so we
+// don't need cascading pseudo-class selectors.
+type Variant = {
+  dot: string;
+  line: string;
+  labelColor: string;
+  labelBg: string;
+};
+const BLUE: Variant = {
+  dot: '#3b82f6',
+  line: 'linear-gradient(180deg,#3b82f6,#e2e8f0)',
+  labelColor: '#3b82f6',
+  labelBg: '#eff6ff',
+};
+const GREEN: Variant = {
+  dot: '#059669',
+  line: 'linear-gradient(180deg,#059669,#e2e8f0)',
+  labelColor: '#059669',
+  labelBg: '#ecfdf5',
+};
+const YELLOW: Variant = {
+  dot: '#fbbf24',
+  line: 'linear-gradient(180deg,#fbbf24,#e2e8f0)',
+  labelColor: '#b45309',
+  labelBg: '#fffbeb',
+};
+
+const rawQuotes = [
+  {
+    eraKey: 'home.cover.era.indigenous' as const,
+    quoteKey: 'home.cover.quote.indigenous' as const,
+    citeKey: 'home.cover.cite.indigenous' as const,
+  },
+  {
+    era: '1584',
+    quoteKey: 'home.cover.quote.1584' as const,
+    citeKey: 'home.cover.cite.1584' as const,
+  },
+  {
+    era: '1697',
+    quoteKey: 'home.cover.quote.1697' as const,
+    citeKey: 'home.cover.cite.1697' as const,
+  },
+  {
+    era: '1926',
+    quoteKey: 'home.cover.quote.1926' as const,
+    citeKey: 'home.cover.cite.1926' as const,
+  },
+  {
+    era: '1946',
+    quoteKey: 'home.cover.quote.1946' as const,
+    citeKey: 'home.cover.cite.1946' as const,
+  },
+  {
+    era: '2013',
+    quoteKey: 'home.cover.quote.2013' as const,
+    citeKey: 'home.cover.cite.2013' as const,
+  },
+  {
+    eraKey: 'home.cover.era.contemporary' as const,
+    quoteKey: 'home.cover.quote.contemporary' as const,
+    citeKey: 'home.cover.cite.contemporary' as const,
+  },
+  // 2026-05-27 Wave 3 / A3: COMPUTEX.md self-positioning entry (8th timeline
+  // entry). Echoes MANIFESTO §主權的巴別塔 — 不寫成宣傳，寫成共生宣言。
+  // 編輯紀律 per report §A3：避免自我吹捧 / 跟既有 7 條同樣 first-person 口吻。
+  {
+    eraKey: 'home.cover.era.taiwanmd' as const,
+    quoteKey: 'home.cover.quote.taiwanmd' as const,
+    citeKey: 'home.cover.cite.taiwanmd' as const,
+  },
+];
+
+const quotes = rawQuotes.map((q, i) => ({
+  ...q,
+  variant: i === rawQuotes.length - 1 ? YELLOW : i % 2 === 1 ? GREEN : BLUE,
+  isLast: i === rawQuotes.length - 1,
+}));
+---
+
+<!--
+  Phase 7.6 — CoverStory.astro (Tier 1 home component)
+  Scoped <style> removed. The old `:nth-child(even)` and
+  `:last-child` rules that painted timeline dots blue/green/yellow
+  are now computed in the frontmatter as a `variant` object per
+  quote and passed via inline `style=""`.
+-->
+<section class="bg-[#fafbfc] px-8 py-24">
+  <div class="mx-auto max-w-[780px]">
+    <h2
+      class="mb-4 text-center font-['jf-lanyangming','Noto_Serif_TC','Source_Han_Serif_TC',serif] text-[2rem] font-light tracking-normal text-[#1a1a2e]"
+    >
+      {t('home.cover.heading')}
+    </h2>
+    <p
+      class="mb-12 text-center font-['jf-jinxuanlatte','Noto_Sans_TC','Source_Han_Sans_TC',sans-serif] text-[1.1rem] font-semibold leading-[2] text-[#475569]"
+    >
+      {t('home.cover.lead')}<br />
+      {t('home.cover.lead2')}
+    </p>
+    <div class="flex flex-col">
+      {
+        quotes.map((q, i) => (
+          <div class="grid grid-cols-[28px_1fr] gap-x-4">
+            <div class="flex flex-col items-center">
+              <div
+                class="mt-[0.35rem] h-3 w-3 flex-shrink-0 rounded-full border-2 border-white outline outline-2"
+                style={`background:${q.variant.dot};outline-color:${q.variant.dot};`}
+              />
+              {i < quotes.length - 1 && (
+                <div
+                  class="mt-1 min-h-[2rem] w-[2px] flex-1"
+                  style={`background:${q.variant.line};`}
+                />
+              )}
+            </div>
+            <div class="pb-8">
+              <span
+                class="mb-2 inline-block rounded px-2 py-[0.15rem] font-['jf-jinxuanlatte','Noto_Sans_TC','Source_Han_Sans_TC',sans-serif] text-[0.72rem] font-bold"
+                style={`color:${q.variant.labelColor};background:${q.variant.labelBg};`}
+              >
+                {'eraKey' in q && q.eraKey ? t(q.eraKey) : q.era}
+              </span>
+              <blockquote class="m-0 font-['jf-jinxuanlatte','Noto_Sans_TC','Source_Han_Sans_TC',sans-serif] text-[1.05rem] font-semibold not-italic leading-[1.9] text-[#1e293b]">
+                {t(q.quoteKey)}
+                <cite class="mt-[0.4rem] block font-['jf-jinxuanlatte','Noto_Sans_TC','Source_Han_Sans_TC',sans-serif] text-[0.8rem] not-italic text-[#94a3b8]">
+                  {t(q.citeKey)}
+                </cite>
+              </blockquote>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+    <div
+      class="mt-12 text-center font-['jf-jinxuanlatte','Noto_Sans_TC','Source_Han_Sans_TC',sans-serif] text-[1.05rem] leading-[1.9] text-[#475569] [&>p>strong]:text-[#1a1a2e] [&>p]:mb-4"
+    >
+      <p>{t('home.cover.closing1')}</p>
+      <p>
+        <strong>{t('home.cover.closing2')}</strong>
+        {t('home.cover.closing3')}
+      </p>
+      <a
+        href={translatePath('/about')}
+        data-ga-section="cover_story"
+        data-ga-label="read_full"
+        class="mt-2 inline-block font-medium text-[#3b82f6] no-underline hover:underline"
+        >{t('home.cover.link')}</a
+      >
+    </div>
+  </div>
+</section>

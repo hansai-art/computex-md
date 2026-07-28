@@ -1,0 +1,48 @@
+---
+// SectionContributors — 👥 Contribution Leaderboard section (#contributors).
+// Ids/classes are a contract with src/scripts/dashboard-client.js and
+// src/styles/dashboard/ — do not rename.
+import { getLangFromUrl } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const isEn = lang === 'en';
+---
+
+<!-- Contribution Leaderboard — Top Contributors (2026-04-19 β) -->
+<section class="section" id="contributors">
+  <h2 class="section-title">
+    {isEn ? '👥 Contribution Leaderboard' : '👥 貢獻者排行榜'}
+    <span class="section-timestamp" data-source="contributors"></span>
+  </h2>
+  <p class="section-subtitle">
+    {
+      isEn
+        ? 'Top 20 contributors by commits + primary area (content / system / translation)'
+        : '依 commits 數排序的前 20 位貢獻者，以及主要貢獻類型（內容 / 系統 / 翻譯）'
+    }
+  </p>
+
+  <div class="contributors-overview" id="contributors-overview"></div>
+
+  <h3 class="subsection-title">
+    {isEn ? '🏆 Top 20 Contributors' : '🏆 前 20 位貢獻者'}
+  </h3>
+  <div class="contributors-leaderboard" id="contributors-leaderboard"></div>
+
+  <h3 class="subsection-title">
+    {isEn ? '📊 By Primary Area' : '📊 依主要貢獻領域'}
+  </h3>
+  <div class="contributors-areas" id="contributors-areas"></div>
+
+  <h3 class="subsection-title">
+    {isEn ? '🌱 Recently Joined' : '🌱 最近加入'}
+  </h3>
+  <p class="section-subtitle" style="margin-top:-8px">
+    {
+      isEn
+        ? 'First-time contributors in the last 30 days'
+        : '過去 30 天第一次貢獻的小丑魚'
+    }
+  </p>
+  <div class="contributors-recent" id="contributors-recent"></div>
+</section>

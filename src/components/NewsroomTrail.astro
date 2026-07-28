@@ -1,0 +1,181 @@
+---
+// NewsroomTrail — 文章底部「編輯室現場」beta 入口＋溯源連結（zh-TW 先行）
+//
+// 哲宇 2026-07-16 directive×2：(1) 早期產物（研究報告／投影／編輯室審查）在文章頁
+// 可即刻溯源（人與 AI）；(2) 比照人生分支數（LifeTree CTA banner）做一個 beta 功能
+// 入口，點進去看 AI 新聞台內部的思考怎麼打架（/semiont/newsroom/{slug}）。
+// 資料：newsroom-lookup（dashboard-newsroom.json）＋ frontmatter.researchReport fallback。
+import {
+  findNewsroomRecord,
+  hasMakingOf,
+  resolveMakingOfSlug,
+} from '../lib/newsroom-lookup';
+
+interface Props {
+  slug: string;
+  category: string;
+  frontmatter: Record<string, any>;
+  lang: string;
+}
+const { slug, category, frontmatter, lang } = Astro.props;
+
+const GH = 'https://github.com/frank890417/taiwan-md/blob/main/';
+const rec = findNewsroomRecord(category, slug);
+
+const LABEL: Record<string, string> = {
+  research: '研究報告',
+  projection: '投影藍圖',
+  room_projection: '投影室審查',
+  room_prose: '正文室審查',
+  room_chief: '總編總評',
+};
+
+const links: { label: string; href: string }[] = [];
+if (rec) {
+  for (const [k, label] of Object.entries(LABEL)) {
+    const art = rec.stages?.[k]?.artifact;
+    if (art) links.push({ label, href: GH + art });
+  }
+  const v = rec.stages?.verify;
+  if (v?.stage35_artifact)
+    links.push({
+      label: '事實審計 3.5',
+      href: GH + (v as any).stage35_artifact,
+    });
+  if (v?.stage36_artifact)
+    links.push({
+      label: '原子審計 3.6',
+      href: GH + (v as any).stage36_artifact,
+    });
+}
+if (!links.length && frontmatter?.researchReport) {
+  links.push({
+    label: '研究報告',
+    href: GH + String(frontmatter.researchReport).replace(/^\//, ''),
+  });
+}
+
+// CTA 只在真有 making-of 頁時亮（projection / room）——research-only 只秀原始產物連結，避免 404
+// slug 從 artifact 檔名推（不是 rec.slug），避免 `Shopping Design` vs `Shopping-Design` 漂移
+const makingOfSlug = rec && hasMakingOf(rec) ? resolveMakingOfSlug(rec) : null;
+const makingOf = makingOfSlug
+  ? `/semiont/newsroom/${encodeURIComponent(makingOfSlug)}/`
+  : null;
+const show = lang === 'zh-TW' && (links.length > 0 || !!makingOf);
+---
+
+{
+  show && (
+    <aside class="newsroom-trail" aria-label="編輯室現場">
+      {makingOf && (
+        <a href={makingOf} class="nt-cta">
+          <span class="nt-cta-left">
+            <span class="nt-cta-icon">🏛️</span>
+            <span>
+              <span class="nt-cta-title">
+                編輯室現場 <span class="nt-beta">BETA</span>
+              </span>
+              <span class="nt-cta-desc">
+                看這篇文章在 AI
+                新聞台裡怎麼被想、被吵、被驗——投影論點、分席對抗、攻防與裁決，思考脈絡全部攤開
+              </span>
+            </span>
+          </span>
+          <span class="nt-cta-arrow">→</span>
+        </a>
+      )}
+      {links.length > 0 && (
+        <p class="nt-body">
+          原始產物：
+          {links.map((l) => (
+            <a href={l.href} target="_blank" rel="noopener">
+              {l.label} ↗
+            </a>
+          ))}
+          <a href="/semiont/newsroom/">共享編輯台 →</a>
+        </p>
+      )}
+    </aside>
+  )
+}
+
+<style>
+  .newsroom-trail {
+    margin: 2rem 0;
+  }
+  .nt-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border: 1px dashed rgba(79, 209, 176, 0.5);
+    border-radius: 12px;
+    background: linear-gradient(
+      to right,
+      rgba(79, 209, 176, 0.07),
+      rgba(127, 184, 232, 0.05)
+    );
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+  }
+  .nt-cta:hover {
+    border-style: solid;
+    border-color: #4fd1b0;
+    box-shadow: 0 2px 12px rgba(79, 209, 176, 0.15);
+  }
+  .nt-cta-left {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+  .nt-cta-icon {
+    font-size: 1.6rem;
+  }
+  .nt-cta-title {
+    display: block;
+    font-weight: 700;
+    font-size: 0.98rem;
+  }
+  .nt-beta {
+    font-size: 0.62rem;
+    border: 1px solid #4fd1b0;
+    color: #4fd1b0;
+    border-radius: 999px;
+    padding: 0 0.5em;
+    vertical-align: middle;
+    letter-spacing: 0.08em;
+  }
+  .nt-cta-desc {
+    display: block;
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin-top: 0.15rem;
+    line-height: 1.6;
+  }
+  .nt-cta-arrow {
+    font-size: 1.3rem;
+    color: #4fd1b0;
+    transition: transform 0.2s ease;
+  }
+  .nt-cta:hover .nt-cta-arrow {
+    transform: translateX(4px);
+  }
+  .nt-body {
+    margin: 0.6rem 0 0;
+    font-size: 0.82rem;
+    opacity: 0.8;
+    line-height: 2;
+  }
+  .nt-body a {
+    display: inline-block;
+    margin-right: 0.9em;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.4);
+    color: inherit;
+  }
+  .nt-body a:hover {
+    border-bottom-color: currentColor;
+  }
+</style>

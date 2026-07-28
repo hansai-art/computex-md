@@ -1,0 +1,1216 @@
+---
+import '../styles/global.css';
+import '../styles/shot-mode.css';
+import '../styles/dark-polish.css';
+import '../styles/article-modules.css';
+import SEO from '../components/SEO.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import BrandMark from '../components/BrandMark.astro';
+import ReaderSettings from '../components/ReaderSettings.astro';
+import FeedbackWidget from '../components/FeedbackWidget.astro';
+import HeadInlineScripts from '../components/HeadInlineScripts.astro';
+import EventTracker from '../components/EventTracker.astro';
+
+import type { Lang } from '../config/languages';
+import { getLanguage } from '../config/languages';
+
+interface Props {
+  title: string;
+  description?: string;
+  lang?: Lang;
+  image?: string;
+  type?: 'website' | 'article';
+  datePublished?: string;
+  dateModified?: string;
+  content?: string;
+  tags?: string[];
+  category?: string;
+  slug?: string;
+  categorySlug?: string;
+  /** Passthrough to SEO's CollectionPage JSON-LD (see SEO.astro props). */
+  collectionItems?: { name: string; url: string }[];
+  collectionTotal?: number;
+  noindex?: boolean;
+  /**
+   * Opt this surface into the floating ReaderSettings panel
+   * (light/auto/dark theme + text-size + plain-text link) and
+   * the FOUC-safe pre-paint theme init script.
+   *
+   * Contract for opting in: the surface MUST be dark-mode tested.
+   * Per-surface dark polish lives in `src/styles/dark-polish.css`
+   * scoped under the surface's <main class="..."> hook (e.g.
+   * `main.article-page`, `main.category-page`). Don't enable
+   * this on a surface that hasn't been visually audited dark —
+   * the panel will toggle data-theme on <html> globally and a
+   * surface without dark coverage will look broken.
+   *
+   * Default: false. Article + category-hub templates opt in.
+   */
+  readerSettings?: boolean;
+  /**
+   * Opt this surface into the floating reader FeedbackWidget
+   * (correction / bug / new-topic → managed backend → cron → GitHub issue).
+   * Self-gates on PUBLIC_FEEDBACK_MODE (off/github-only/mock/supabase); when
+   * unconfigured it degrades to a static "report on GitHub" button, so it is
+   * always safe to leave on. Default: true (every surface that uses Layout).
+   * Pass feedback={false} to opt a surface out (e.g. embed/raw views).
+   */
+  feedback?: boolean;
+  /**
+   * GA4 page_type dimension for the engagement tracker (EventTracker is mounted
+   * once here for EVERY page). Optional — when omitted it's derived from the
+   * URL + category/slug props, so every surface gets a sensible page_type with
+   * zero per-page wiring. Pass explicitly to override (e.g. pageType="home").
+   */
+  pageType?: string;
+}
+
+const { lang = 'zh-TW' } = Astro.props;
+// Text direction — read from the LANGUAGES registry (SSOT: src/config/languages.ts
+// `dir` field). Every language defaults to 'ltr' unless the registry marks it
+// 'rtl' (2026-07-25: ar is the site's first RTL language). Keeping this a
+// registry lookup instead of a hardcoded list means a future RTL language
+// (e.g. he/fa) only needs the one `dir: 'rtl'` line in languages.ts.
+const dir = getLanguage(lang)?.dir ?? 'ltr';
+const {
+  title,
+  description = lang === 'zh-TW'
+    ? '讓全世界完整認識台灣'
+    : 'Open-source knowledge base about Taiwan',
+  image,
+  type,
+  datePublished,
+  dateModified,
+  content,
+  tags,
+  category,
+  slug,
+  categorySlug: propCategorySlug,
+  collectionItems,
+  collectionTotal,
+  noindex,
+  readerSettings = false,
+  feedback = true,
+  pageType: pageTypeProp,
+} = Astro.props;
+
+// Search index now loaded via /api/search-index.json (fetch API)
+const isEn = lang === 'en';
+// categorySlug: prefer the English URL slug passed explicitly (e.g. 'food',
+// 'history') so the body's `jf-{slug}` class matches the English selectors
+// the justfont SDK config below uses (`.jf-food h1`, `.jf-history h1`).
+// Pre-2026-05-04 this took `category?.toLowerCase()` which ALSO captured the
+// localized display name (`自然`, `美食`) and produced classes like `jf-自然`
+// that no SDK selector matched — the category-specific font rules were dead
+// in production. Falling back to the old behavior for callers that don't
+// pass categorySlug (utility pages still get `jf-${category}` like before).
+const categorySlug =
+  propCategorySlug?.toLowerCase() || category?.toLowerCase() || '';
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+
+// ── page_type for the engagement tracker (EventTracker, mounted once below) ──
+// Explicit prop wins; else derived: an article sets `slug`, a category hub sets
+// `category` (no slug); everything else maps to its first URL segment (lang
+// prefix stripped) so /about → about, /dashboard → dashboard, / → home.
+const pageType =
+  pageTypeProp ||
+  (slug
+    ? 'article'
+    : category
+      ? 'category'
+      : currentPath
+          .replace(/^\/(en|ja|ko|es|fr)(?=\/|$)/, '')
+          .split('/')
+          .filter(Boolean)[0] || 'home');
+const isHome = currentPath === '/' || currentPath === '/en';
+// Feedback widget page-kind (v2): drives context-aware category set + inline
+// text-selection annotation on articles. Derived from page type + path.
+const fbPageKind =
+  type === 'article'
+    ? 'article'
+    : currentPath.includes('/dashboard')
+      ? 'dashboard'
+      : currentPath.includes('/semiont')
+        ? 'semiont'
+        : isHome
+          ? 'home'
+          : propCategorySlug
+            ? 'category'
+            : 'other';
+// justfont: only put the body font class on <body> to avoid rate-limit.
+// Other font classes go on specific elements (h1-h6, blockquote, nav, etc.)
+const jfClass = [
+  'jf-jinxuanlatte-regular',
+  isHome ? 'page-home' : 'page-default',
+  categorySlug ? `jf-${categorySlug}` : '',
+]
+  .filter(Boolean)
+  .join(' ');
+
+// Skip-to-content link label, localized by the Layout's lang prop
+// (2026-07-06 design-audit §2.9-1)。⚠️ 這張表是元件私有的第三套翻譯系統，
+// 新語言出生時不會自動出現在這裡——vi/id/pt/hi 出生一週都掉回 zh 沒人發現，
+// ar/ru 開站日（2026-07-25）才被抓到。加語言記得同步 ReaderSettings.astro。
+const skipLinkLabels: Record<string, string> = {
+  'zh-TW': '跳到主要內容',
+  en: 'Skip to content',
+  ja: '本文へスキップ',
+  ko: '본문으로 건너뛰기',
+  es: 'Saltar al contenido',
+  fr: 'Aller au contenu',
+  vi: 'Bỏ qua đến nội dung chính',
+  id: 'Langsung ke konten utama',
+  pt: 'Ir para o conteúdo',
+  hi: 'मुख्य सामग्री पर जाएँ',
+  ar: 'الانتقال إلى المحتوى الرئيسي',
+  ru: 'Перейти к основному содержимому',
+};
+const skipLinkLabel = skipLinkLabels[lang] ?? skipLinkLabels['zh-TW'];
+---
+
+<!doctype html>
+<html lang={lang} dir={dir}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <!-- Apple touch icons: 2026-04-11 fix. Cloudflare logs showed 130 req/day
+         404 on /apple-touch-icon.png + /apple-touch-icon-precomposed.png.
+         iOS/macOS Safari auto-probes these paths. -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link
+      rel="apple-touch-icon-precomposed"
+      href="/apple-touch-icon-precomposed.png"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Taiwan Typography System -->
+    <!-- Google Fonts: Noto Sans/Serif TC for fallback -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;800;900&family=Noto+Serif+TC:wght@400;600;700;900&display=swap"
+      rel="preload"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <!-- justfont 蘭陽明體 已透過 justfont SDK 載入，無需額外 import -->
+    <!-- Fallback for critical text -->
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;800;900&family=Noto+Serif+TC:wght@400;600;700;900&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+    <title>{title} | COMPUTEX.md</title>
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="COMPUTEX.md RSS"
+      href="/rss.xml"
+    />
+    <SEO
+      title={title}
+      description={description}
+      lang={lang}
+      image={image}
+      type={type}
+      datePublished={datePublished}
+      dateModified={dateModified}
+      content={content}
+      tags={tags}
+      category={category}
+      slug={slug}
+      categorySlug={propCategorySlug}
+      collectionItems={collectionItems}
+      collectionTotal={collectionTotal}
+    />
+    <!-- FOUC fix: hide <html> until fonts loaded (2026-05-11 picked up from
+         tboydar-agent PR #1012 / fixes #401). Combined with shot-mode +
+         reader-settings init below for complete pre-paint FOUC prevention. -->
+    <style>
+      html {
+        visibility: hidden;
+      }
+      html.fonts-loaded {
+        visibility: visible;
+      }
+    </style>
+    <script is:inline>
+      (function () {
+        if (document.fonts) {
+          document.fonts.ready.then(function () {
+            document.documentElement.classList.add('fonts-loaded');
+          });
+        } else {
+          // fallback for older browsers
+          document.documentElement.classList.add('fonts-loaded');
+        }
+      })();
+    </script>
+    <!-- Pre-paint inline scripts: shot-mode + reader-settings FOUC init.
+         2026-05-03 sleepy-colden Tier 2.6: 抽到 src/components/HeadInlineScripts.astro
+         讓 Layout 主結構乾淨。原本 ~150 行 inline 邏輯都在這裡。 -->
+    <HeadInlineScripts readerSettings={readerSettings} />
+    <script
+      is:inline
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-JGC5W00N7T"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-JGC5W00N7T');
+    </script>
+    <!-- FOUC fallback (#401): if justfont takes > 800ms, reveal body anyway -->
+    <script is:inline>
+      (function () {
+        setTimeout(function () {
+          var html = document.documentElement;
+          if (html.classList.contains('jf-loading')) {
+            html.classList.remove('jf-loading');
+            html.classList.add('jf-inactive');
+          }
+        }, 800);
+      })();
+    </script>
+    <!-- justfont Webfont (Production) -->
+    <script is:inline>
+      var _jf = _jf || [];
+      _jf.push(['p', '65854']);
+      _jf.push(['initAction', true]);
+      // justfont: target specific elements to avoid rate-limit
+      // (don't scan entire body for every font)
+      _jf.push([
+        '_setFont',
+        'jf-jinxuanlatte-regular',
+        'css',
+        'main p, main li, main td',
+      ]);
+      _jf.push([
+        '_setFont',
+        'jf-jinxuanlatte-regular',
+        'alias',
+        'jf-jinxuanlatte',
+      ]);
+      _jf.push(['_setFont', 'jf-jinxuanlatte-regular', 'weight', 400]);
+      // jinxuanlatte-semibold (weight 600) for article + hub body headings
+      // (.prose h2-h6). 2026-05-04 user 把更多 jinxuanlatte 變體加進 project
+      // 65854 (book/regular/medium/semibold/bold) — 此處挑 semibold 給內文
+      // 標題視覺重量。alias 同 jf-jinxuanlatte，browser 依 font-weight 600
+      // 自動 match 到此變體（regular weight 400 仍給內文）。
+      _jf.push([
+        '_setFont',
+        'jf-jinxuanlatte-semibold',
+        'css',
+        '.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6',
+      ]);
+      _jf.push([
+        '_setFont',
+        'jf-jinxuanlatte-semibold',
+        'alias',
+        'jf-jinxuanlatte',
+      ]);
+      _jf.push(['_setFont', 'jf-jinxuanlatte-semibold', 'weight', 600]);
+      _jf.push([
+        '_setFont',
+        'jf-lanyanghei-extrabold',
+        'css',
+        'h2, h3, h4, h5, h6, nav, button',
+      ]);
+      _jf.push([
+        '_setFont',
+        'jf-lanyanghei-extrabold',
+        'alias',
+        'jf-lanyanghei',
+      ]);
+      _jf.push(['_setFont', 'jf-lanyanghei-extrabold', 'weight', 800]);
+      _jf.push(['_setFont', 'jf-lanyanghei-extraheavy', 'css', 'h1']);
+      _jf.push([
+        '_setFont',
+        'jf-lanyanghei-extraheavy',
+        'alias',
+        'jf-lanyanghei',
+      ]);
+      _jf.push(['_setFont', 'jf-lanyanghei-extraheavy', 'weight', 920]);
+      _jf.push(['_setFont', 'jf-lanyangming-book', 'css', 'main blockquote']);
+      _jf.push(['_setFont', 'jf-lanyangming-book', 'alias', 'jf-lanyangming']);
+      _jf.push(['_setFont', 'jf-lanyangming-book', 'weight', 300]);
+      _jf.push(['_setFont', 'jf-kamabit', 'css', '.jf-food h1']);
+      _jf.push(['_setFont', 'jf-kamabit', 'alias', 'jf-kamabit']);
+      _jf.push(['_setFont', 'jf-kamabit', 'weight', 700]);
+      // rixingsong-semibold: applied to .hero-title (site-wide hero titles)
+      // AND .jf-history h1 (history articles). Status as of 2026-05-04:
+      // justfont's rixingsong subsetter is **character-set dependent broken**:
+      //   ✅ /history/二二八事件 → loaded
+      //   ✅ /history/19世紀的樟腦戰爭：世界要的香氣，藏在原住民的山 → loaded
+      //   ❌ /nature/黃魚鴞:六公里溪流養一對,1,800 公尺烏心石上的夜行猛禽
+      //      → FontFace `Invalid font data` (probable trigger: rare glyph
+      //      `鴞` missing from rixingsong master, or ASCII punctuation).
+      // Other 5 site fonts parse cleanly across all subsets tested.
+      // SDK injects single-name `font-family: rixingsong-semibold` (no
+      // fallback chain) — global.css overrides with a chain rule scoped to
+      // `html.jf-active .hero-title` so when rixingsong fails to load the
+      // browser falls back to Noto Serif TC instead of UA-default serif.
+      // .jf-history h1 takes its fallback from the static .jf-history h1
+      // rule in global.css (also rixingsong → Noto Serif TC chain).
+      _jf.push([
+        '_setFont',
+        'rixingsong-semibold',
+        'css',
+        '.jf-history h1, .hero-title',
+      ]);
+      _jf.push([
+        '_setFont',
+        'rixingsong-semibold',
+        'alias',
+        'rixingsong-semibold',
+      ]);
+      _jf.push(['_setFont', 'rixingsong-semibold', 'weight', 600]);
+      (function (A, p, c, m, l, q, r, h, B, D) {
+        var b = A._jf;
+        if (b.constructor !== Object) {
+          var t = !0,
+            u = function (a) {
+              var f = !0,
+                e;
+              for (e in b)
+                b[e][0] == a &&
+                  (f && (f = f && !1 !== b[e][1].call(b)),
+                  (b[e] = null),
+                  delete b[e]);
+            },
+            v = /\S+/g,
+            w = /[\t\r\n\f]/g,
+            C = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,
+            n = ''.trim,
+            x =
+              n && !n.call('\ufeff\u00a0')
+                ? function (a) {
+                    return null == a ? '' : n.call(a);
+                  }
+                : function (a) {
+                    return null == a ? '' : (a + '').replace(C, '');
+                  },
+            k = function (a) {
+              var f, b, g;
+              if (
+                'string' === typeof a &&
+                a &&
+                ((a = (a || '').match(v) || []),
+                (f = h[c] ? (' ' + h[c] + ' ').replace(w, ' ') : ' '))
+              ) {
+                for (g = 0; (b = a[g++]); )
+                  0 > f.indexOf(' ' + b + ' ') && (f += b + ' ');
+                h[c] = x(f);
+              }
+            },
+            d = function (a) {
+              var b, e, g;
+              if (0 === arguments.length || ('string' === typeof a && a)) {
+                var d = (a || '').match(v) || [];
+                if ((b = h[c] ? (' ' + h[c] + ' ').replace(w, ' ') : '')) {
+                  for (g = 0; (e = d[g++]); )
+                    for (; 0 <= b.indexOf(' ' + e + ' '); )
+                      b = b.replace(' ' + e + ' ', ' ');
+                  h[c] = a ? x(b) : '';
+                }
+              }
+            },
+            y;
+          b.addScript = y = function (b, f, e, g, d, c) {
+            d = d || function () {};
+            c = c || function () {};
+            var a = p.createElement('script'),
+              h = p.getElementsByTagName('script')[0],
+              k,
+              m = !1,
+              l = function () {
+                a.src = '';
+                a.parentNode.removeChild(a);
+                a = a.onerror = a.onload = a.onreadystatechange = null;
+              };
+            g &&
+              (k = setTimeout(function () {
+                l();
+                c();
+              }, g));
+            a.type = f || 'text/javascript';
+            a.async = e;
+            a.onload = a.onreadystatechange = function (b, c) {
+              m ||
+                (a.readyState && !/loaded|complete/.test(a.readyState)) ||
+                ((m = !0), g && clearTimeout(k), l(), c || d());
+            };
+            a.onerror = function (a, b, d) {
+              g && clearTimeout(k);
+              l();
+              c();
+              return !0;
+            };
+            a.src = b;
+            h.parentNode.insertBefore(a, h);
+          };
+          for (var z in b) 'initAction' == b[z][0] && (t = b[z][1]);
+          b.push([
+            '_eventPreload',
+            function () {
+              1 == t && k(m);
+              y(B, null, !1, 3e3, null, function () {
+                u('_eventInactived');
+              });
+            },
+          ]);
+          b.push([
+            '_eventReload',
+            function () {
+              d(r);
+              d(q);
+              k(l);
+            },
+          ]);
+          b.push([
+            '_eventActived',
+            function () {
+              d(m);
+              d(l);
+              k(q);
+            },
+          ]);
+          b.push([
+            '_eventInactived',
+            function () {
+              d(m);
+              d(l);
+              k(r);
+            },
+          ]);
+          u('_eventPreload');
+        }
+      })(
+        this,
+        this.document,
+        'className',
+        'jf-loading',
+        'jf-reloading',
+        'jf-active',
+        'jf-inactive',
+        this.document.getElementsByTagName('html')[0],
+        '//ds.justfont.com/js/stable/v/6.1/id/493908836063',
+      );
+    </script>
+  </head>
+  <body class={jfClass}>
+    <!-- Skip-to-content link — first focusable element in <body> so keyboard /
+         screen-reader users can bypass the header nav. Visually hidden until
+         focused (.skip-link in global.css). 2026-07-06 design-audit §2.9-1. -->
+    <a href="#main-content" class="skip-link">{skipLinkLabel}</a>
+
+    <Header />
+
+    <script is:inline>
+      // ── CJK bigram query tokenizer ──
+      var _STOP_BIGRAMS = new Set([
+        '不是',
+        '不用',
+        '不會',
+        '也不',
+        '也有',
+        '也是',
+        '他的',
+        '他們',
+        '但是',
+        '你的',
+        '到了',
+        '到的',
+        '到這',
+        '們的',
+        '在這',
+        '她的',
+        '就是',
+        '我的',
+        '我們',
+        '是不',
+        '是我',
+        '是有',
+        '是在',
+        '是這',
+        '有的',
+        '的不',
+        '的是',
+        '用的',
+        '而是',
+        '都不',
+        '都有',
+        '都是',
+        '這是',
+        '為了',
+        '這個',
+        '那個',
+        '這些',
+        '這樣',
+        '這麼',
+        '那麼',
+        '這裡',
+        '這次',
+        '這篇',
+        '什麼',
+        '自己',
+        '己的',
+        '其他',
+        '其中',
+        '可以',
+        '因為',
+        '所以',
+        '因此',
+        '沒有',
+        '不過',
+        '還是',
+        '如果',
+        '雖然',
+        '而且',
+        '或是',
+        '或許',
+        '除了',
+        '對於',
+        '已經',
+        '可能',
+        '應該',
+        '需要',
+        '比較',
+        '目前',
+        '真的',
+        '還有',
+        '只是',
+        '一個',
+        '一些',
+        '一下',
+        '有一',
+        '了一',
+        '是一',
+        '的一',
+        '覺得',
+        '起來',
+        '出來',
+        '就可',
+        '也可',
+        '是可',
+        '是很',
+        '算是',
+        '上的',
+        '中的',
+        '來的',
+        '面的',
+        '樣的',
+        '關的',
+        '趣的',
+        '多的',
+        '大的',
+        '好的',
+        '單的',
+        '類的',
+        '子的',
+        '人的',
+        '本的',
+        '要的',
+      ]);
+
+      function _isCJK(ch) {
+        var cp = ch.codePointAt(0);
+        // 範圍必須跟 scripts/core/build-search-index.mjs 的 isCJK 同步 —
+        // 2026-06-13 Phase 0 補假名 + 諺文（query 端打不中 index 端的洞）
+        return (
+          (cp >= 0x4e00 && cp <= 0x9fff) ||
+          (cp >= 0x3400 && cp <= 0x4dbf) ||
+          (cp >= 0x3040 && cp <= 0x30ff) ||
+          (cp >= 0x31f0 && cp <= 0x31ff) ||
+          (cp >= 0xac00 && cp <= 0xd7a3)
+        );
+      }
+
+      function _queryBigrams(text) {
+        var normalized = text.toLowerCase().normalize('NFKC').trim();
+        var segments = normalized.split(/\s+/).filter(Boolean);
+        var allTokens = [];
+        var filtered = [];
+        for (var s = 0; s < segments.length; s++) {
+          var seg = segments[s];
+          var chars = Array.from(seg);
+          var hasCJK = chars.some(function (ch) {
+            return _isCJK(ch);
+          });
+          if (!hasCJK) {
+            allTokens.push(seg);
+            filtered.push(seg);
+            continue;
+          }
+          if (chars.length === 1) {
+            allTokens.push(chars[0]);
+            filtered.push(chars[0]);
+          } else {
+            for (var i = 0; i < chars.length - 1; i++) {
+              var bigram = chars[i] + chars[i + 1];
+              allTokens.push(bigram);
+              if (!_STOP_BIGRAMS.has(bigram)) filtered.push(bigram);
+            }
+          }
+        }
+        return filtered.length > 0 ? filtered : allTokens;
+      }
+
+      // ── Search engine (MiniSearch with fallback) ──
+      var _searchEngine = null;
+      var _searchMode = 'loading';
+      var _fallbackIdx = null;
+
+      async function _initSearchEngine() {
+        try {
+          // 2026-06-13 RAG Phase 0：先抓本頁語言的 per-lang shard（六語各一份，
+          // ja/ko/es/fr 讀者從零母語結果 → 全母語語料）；shard 404 時退回
+          // legacy combined zh+en（舊部署 / 快取相容）。
+          var _docLang =
+            document.documentElement.getAttribute('lang') || 'zh-TW';
+          var res = await fetch('/api/search-minisearch-' + _docLang + '.json');
+          if (!res.ok) res = await fetch('/api/search-minisearch.json');
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          var data = await res.json();
+          var MiniSearch = (
+            await import('https://cdn.jsdelivr.net/npm/minisearch@7/dist/es/index.min.js')
+          ).default;
+          _searchEngine = MiniSearch.loadJSON(JSON.stringify(data), {
+            idField: 'id',
+            fields: ['title_bigram', 'desc_bigram', 'tags_bigram'],
+            storeFields: ['t', 'd', 'u', 'tags', 'lang'],
+            tokenize: function (text) {
+              return text.split(/\s+/).filter(Boolean);
+            },
+            searchOptions: {
+              boost: { title_bigram: 6, tags_bigram: 4, desc_bigram: 2 },
+              prefix: true,
+            },
+          });
+          _searchMode = 'minisearch';
+        } catch (e) {
+          console.warn(
+            '[search] MiniSearch failed, falling back to indexOf:',
+            e,
+          );
+          try {
+            var res2 = await fetch('/api/search-index.json');
+            if (res2.ok) _fallbackIdx = await res2.json();
+            else _fallbackIdx = [];
+          } catch (e2) {
+            _fallbackIdx = [];
+          }
+          _searchMode = 'fallback';
+        }
+        // engine ready 後若使用者已經在打字，重新觸發一次渲染
+        // （否則「載入中...」會停留到下一次鍵入）
+        var _pending = document.getElementById('search-input');
+        if (_pending && _pending.value.trim()) {
+          _pending.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+
+      function _doSearch(q, lang) {
+        if (_searchMode === 'minisearch' && _searchEngine) {
+          var bigrams = _queryBigrams(q);
+          var raw = _searchEngine.search(bigrams.join(' '), {
+            prefix: true,
+            limit: 200,
+          });
+          var topScore = raw.length > 0 ? raw[0].score : 0;
+          var cutoff = topScore * 0.02;
+          var matches = raw
+            .filter(function (r) {
+              return r.score >= cutoff;
+            })
+            .slice(0, 30);
+          // Sort: current language first
+          matches.sort(function (a, b) {
+            var aLang = a.lang === lang ? 0 : 1;
+            var bLang = b.lang === lang ? 0 : 1;
+            return aLang - bLang;
+          });
+          return matches;
+        }
+        // Fallback: indexOf
+        var idx = _fallbackIdx || [];
+        var lq = q.toLowerCase();
+        var matches = idx.filter(function (item) {
+          return (
+            item.t.toLowerCase().indexOf(lq) !== -1 ||
+            item.d.toLowerCase().indexOf(lq) !== -1 ||
+            item.tags.some(function (tag) {
+              return String(tag).toLowerCase().indexOf(lq) !== -1;
+            })
+          );
+        });
+        matches.sort(function (a, b) {
+          return (a.lang === lang ? 0 : 1) - (b.lang === lang ? 0 : 1);
+        });
+        return matches;
+      }
+
+      function _escHtml(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+          return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;',
+          }[c];
+        });
+      }
+      // 對 query 每個 segment 做 case-insensitive 高亮。
+      // 單一 pass 走「原文切片 → 每段各自 escape」：多 segment 逐輪
+      // replace 會重掃已插入的 <mark> 標籤與 &amp; entity（query 含
+      // "m"/"amp" 這類子字串時直接產生壞 HTML），切片法結構上不可能。
+      function _hlText(text, q) {
+        var raw = String(text);
+        var segs = (q || '')
+          .toLowerCase()
+          .normalize('NFKC')
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean)
+          .sort(function (a, b) {
+            return b.length - a.length; // 長 segment 優先，重疊時吃最長匹配
+          })
+          .map(function (s) {
+            return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          });
+        if (!segs.length) return _escHtml(raw);
+        var re = new RegExp('(' + segs.join('|') + ')', 'gi');
+        var out = '';
+        var last = 0;
+        var m;
+        while ((m = re.exec(raw)) !== null) {
+          out +=
+            _escHtml(raw.slice(last, m.index)) +
+            '<mark>' +
+            _escHtml(m[0]) +
+            '</mark>';
+          last = m.index + m[0].length;
+          if (m.index === re.lastIndex) re.lastIndex++; // zero-length guard
+        }
+        return out + _escHtml(raw.slice(last));
+      }
+
+      function _renderResult(item, idx, q) {
+        var langBadge = item.lang === 'en' ? 'EN' : '中';
+        var title = item.t || '';
+        var desc = item.d || '';
+        return (
+          '<a id="search-item-' +
+          idx +
+          '" role="option" class="search-item" href="' +
+          item.u +
+          '">' +
+          '<span class="search-item-lang">' +
+          langBadge +
+          '</span>' +
+          '<div class="search-item-text">' +
+          '<span class="search-item-title">' +
+          _hlText(title, q) +
+          '</span>' +
+          (desc
+            ? '<span class="search-item-desc">' + _hlText(desc, q) + '</span>'
+            : '') +
+          '</div></a>'
+        );
+      }
+
+      function initSearch() {
+        var isEn = document.documentElement.lang === 'en';
+        var lang = isEn ? 'en' : 'zh-TW';
+        var input = document.getElementById('search-input');
+        if (!input) return;
+        var results = document.getElementById('search-results');
+        // 伺服器端渲染的空狀態（提示 + 熱門搜尋 chips），清空時還原
+        var _emptyStateHTML = results.innerHTML;
+        var modal = document.getElementById('search-modal');
+        var hintEmpty = isEn
+          ? 'Type to search across all articles'
+          : '輸入關鍵字搜尋所有文章';
+        var hintNone = isEn ? 'No results found' : '找不到相關文章';
+
+        // GA4 search tracking (debounced)
+        var _gaDebounceTimer = null;
+        var _lastTrackedQuery = '';
+        var _lastMatchCount = 0;
+        var _currentQuery = '';
+
+        function _trackSearchQuery(query, count) {
+          if (query.length < 2) return;
+          if (query === _lastTrackedQuery) return;
+          _lastTrackedQuery = query;
+          if (typeof gtag === 'function') {
+            gtag('event', 'search_query', {
+              search_term: query,
+              results_count: count,
+              search_lang: lang,
+              search_mode: _searchMode,
+            });
+          }
+        }
+
+        function _trackSearchClick(query, title, url, position) {
+          if (typeof gtag === 'function') {
+            gtag('event', 'search_result_click', {
+              search_term: query,
+              click_title: title,
+              click_url: url,
+              click_position: position,
+            });
+          }
+        }
+
+        _initSearchEngine();
+
+        // /explore?q=… 深連結需要的狀態（issue #1212 A1）：先宣告在這裡，
+        // 下面的 input listener 才能同步寫回網址列。
+        var _isExplore = /^\/(en\/|ja\/|ko\/|fr\/|es\/)?explore\/?$/.test(
+          location.pathname,
+        );
+        var _urlSyncTimer = null;
+        // ↑↓ + Enter 鍵盤導航目前選取的 index（issue #1212 A2-2）
+        var _kbIndex = -1;
+
+        input.addEventListener('input', function () {
+          var q = this.value.trim();
+          _currentQuery = q;
+          _kbIndex = -1;
+          if (!q) {
+            results.innerHTML = _emptyStateHTML;
+            clearTimeout(_gaDebounceTimer);
+            return;
+          }
+          // Single-char queries are handled by prefix match
+          if (_searchMode === 'loading') {
+            results.innerHTML =
+              '<div class="search-hint">' +
+              (isEn ? 'Loading...' : '載入中...') +
+              '</div>';
+            return;
+          }
+          var matches = _doSearch(q, lang);
+          _lastMatchCount = matches.length;
+          if (matches.length === 0) {
+            results.innerHTML =
+              '<div class="search-hint">' + hintNone + '</div>';
+          } else {
+            var html = matches
+              .slice(0, 12)
+              .map(function (it, i) {
+                return _renderResult(it, i, q);
+              })
+              .join('');
+            if (matches.length > 12) {
+              html +=
+                '<div class="search-hint">' +
+                (isEn
+                  ? '...and ' + (matches.length - 12) + ' more'
+                  : '...還有 ' + (matches.length - 12) + ' 篇') +
+                '</div>';
+            }
+            results.innerHTML = html;
+          }
+
+          // Debounce GA4 tracking: fire after 800ms of inactivity
+          clearTimeout(_gaDebounceTimer);
+          _gaDebounceTimer = setTimeout(function () {
+            _trackSearchQuery(q, _lastMatchCount);
+          }, 800);
+
+          // explore 頁：query 同步進 ?q=（可分享、可 reload 還原）
+          if (_isExplore) {
+            clearTimeout(_urlSyncTimer);
+            _urlSyncTimer = setTimeout(function () {
+              var u = new URL(location.href);
+              if (q) u.searchParams.set('q', q);
+              else u.searchParams.delete('q');
+              history.replaceState(null, '', u);
+            }, 400);
+          }
+        });
+
+        // ↑↓ + Enter 鍵盤導航（issue #1212 A2-2）
+        function _kbApply() {
+          var items = results.querySelectorAll('.search-item');
+          for (var i = 0; i < items.length; i++) {
+            items[i].classList.toggle('kb-active', i === _kbIndex);
+            items[i].setAttribute(
+              'aria-selected',
+              i === _kbIndex ? 'true' : 'false',
+            );
+          }
+          if (_kbIndex >= 0 && items[_kbIndex]) {
+            input.setAttribute('aria-activedescendant', items[_kbIndex].id);
+            items[_kbIndex].scrollIntoView({ block: 'nearest' });
+          } else {
+            input.removeAttribute('aria-activedescendant');
+          }
+        }
+        input.addEventListener('keydown', function (e) {
+          var items = results.querySelectorAll('.search-item');
+          if (!items.length) return;
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            _kbIndex = (_kbIndex + 1) % items.length;
+            _kbApply();
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            _kbIndex = _kbIndex <= 0 ? items.length - 1 : _kbIndex - 1;
+            _kbApply();
+          } else if (e.key === 'Enter' && _kbIndex >= 0 && items[_kbIndex]) {
+            e.preventDefault();
+            items[_kbIndex].click();
+          }
+        });
+
+        // Track search result clicks via event delegation
+        results.addEventListener('click', function (e) {
+          var chip = e.target.closest('.search-hot-chip');
+          if (chip) {
+            input.value =
+              chip.getAttribute('data-term') || chip.textContent.trim();
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.focus();
+            return;
+          }
+          var link = e.target.closest('.search-item');
+          if (!link) return;
+          var allLinks = results.querySelectorAll('.search-item');
+          var position = 1;
+          for (var i = 0; i < allLinks.length; i++) {
+            if (allLinks[i] === link) {
+              position = i + 1;
+              break;
+            }
+          }
+          var title =
+            link.querySelector('.search-item-title')?.textContent || '';
+          _trackSearchClick(
+            _currentQuery,
+            title,
+            link.getAttribute('href'),
+            position,
+          );
+        });
+
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && modal.classList.contains('open')) {
+            modal.classList.remove('open');
+          }
+          if (e.key === 'Escape') {
+            var _nm = document.querySelector('.nav-mobile.open');
+            if (_nm) {
+              _nm.classList.remove('open');
+              var _mt = document.querySelector('.menu-toggle');
+              if (_mt) {
+                _mt.textContent = '☰';
+                _mt.setAttribute('aria-expanded', 'false');
+              }
+            }
+          }
+          if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            modal.classList.toggle('open');
+            if (modal.classList.contains('open')) {
+              setTimeout(function () {
+                input.focus();
+              }, 100);
+            }
+          }
+          // Restore `/` shortcut (was removed during MiniSearch rewrite, issue #110)
+          if (
+            e.key === '/' &&
+            !modal.classList.contains('open') &&
+            !['INPUT', 'TEXTAREA', 'SELECT'].includes(
+              (document.activeElement || document.body).tagName,
+            ) &&
+            !(document.activeElement || document.body).isContentEditable
+          ) {
+            e.preventDefault();
+            modal.classList.add('open');
+            setTimeout(function () {
+              input.focus();
+            }, 100);
+          }
+        });
+
+        // /explore?q=… 深連結：進站自動開 modal 帶入 query（issue #1212 A1）
+        if (_isExplore) {
+          var _q0 = new URLSearchParams(location.search).get('q');
+          if (_q0) {
+            modal.classList.add('open');
+            input.value = _q0;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            setTimeout(function () {
+              input.focus();
+            }, 150);
+          }
+        }
+      }
+
+      function _tryInit() {
+        if (document.getElementById('search-input')) {
+          initSearch();
+        } else {
+          setTimeout(_tryInit, 50);
+        }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', _tryInit);
+      } else {
+        _tryInit();
+      }
+    </script>
+
+    <!-- Screenshot mode (?shot=1) watermark — BrandMark (light variant) 固定右下角。
+         display: none 由 shot-mode.css 控制，只在 ?shot=1 時顯示。
+         必須在 <main> 之外，避免被「hide everything inside main except hero section」
+         規則吞掉。2026-04-22 β 從 zh-TW [slug].astro 搬來 Layout，四語言共用。 -->
+    <div class="shot-watermark" aria-hidden="true">
+      <BrandMark variant="light" size={1.8} />
+    </div>
+
+    <main id="main-content" role="main">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <!-- Floating .md button -->
+    <a
+      id="md-btn"
+      class="floating-md"
+      title="查看 Raw Markdown 版本"
+      target="_blank"
+    >
+      .md
+    </a>
+
+    <!-- Reader settings: theme + size + plain-text link
+         (Issue #615 / idlccp1984 reader options, 2026-05-01 γ-late)
+         v1.2 (2026-05-04 zen-mendeleev): gated by explicit `readerSettings`
+         prop on Layout. Surfaces opt in by passing readerSettings={true}
+         (and audit dark CSS in dark-polish.css before doing so). -->
+    {readerSettings && <ReaderSettings lang={lang} />}
+
+    <!-- Reader feedback widget: correction / bug / new-topic → backend → cron → issue.
+         Self-gates on PUBLIC_FEEDBACK_MODE; safe to leave on (degrades to a static
+         GitHub-issue button when unconfigured). 2026-06-01 feedback-login-system. -->
+    {
+      feedback && (
+        <FeedbackWidget
+          lang={lang}
+          slug={slug}
+          category={categorySlug}
+          title={title}
+          pageKind={fbPageKind}
+        />
+      )
+    }
+
+    <script is:inline>
+      // Set .md button href based on current path
+      const btn = document.getElementById('md-btn');
+      const pathname = window.location.pathname;
+      const ghBase = 'https://github.com/frank890417/taiwan-md/blob/main';
+
+      let target = '/README.md'; // Default fallback
+
+      // Handle special pages
+      if (
+        pathname === '/' ||
+        pathname === '/en' ||
+        pathname === '/en/' ||
+        pathname === '/index.html'
+      ) {
+        target = '/README.md';
+      } else if (pathname.includes('/contribute')) {
+        target = '/CONTRIBUTING.md';
+      } else if (pathname.includes('/resources')) {
+        target = '/knowledge/About/台灣官方網站資源.md';
+      } else if (pathname.includes('/graph')) {
+        target = '/src/pages/graph.astro';
+      } else if (pathname.includes('/map')) {
+        target = pathname.startsWith('/en')
+          ? '/src/pages/en/map.astro'
+          : '/src/pages/map.astro';
+      } else if (pathname.includes('/about')) {
+        target = '/src/pages/about.astro';
+      } else {
+        // Content pages (Categories or Articles)
+        const isEn = pathname.startsWith('/en/');
+        // Remove /en/ prefix and leading/trailing slashes
+        const cleanPath = pathname
+          .replace(/^\/en/, '')
+          .replace(/^\//, '')
+          .replace(/\/$/, '')
+          .replace('index.html', '');
+        const parts = cleanPath.split('/');
+
+        if (parts.length > 0 && parts[0]) {
+          const cat = parts[0];
+          // Capitalize first letter of category (history -> History)
+          const catFolder = cat.charAt(0).toUpperCase() + cat.slice(1);
+
+          // ZH source is in knowledge/Category, EN source is in knowledge/en/Category
+          const prefix = isEn ? '/knowledge/en' : '/knowledge';
+
+          if (parts.length === 1) {
+            // Category Hub: knowledge/History/_History Hub.md
+            target = `${prefix}/${catFolder}/_${catFolder} Hub.md`;
+          } else {
+            // Article: knowledge/History/article-name.md
+            const slug = decodeURIComponent(parts.slice(1).join('/'));
+            target = `${prefix}/${catFolder}/${slug}.md`;
+          }
+        }
+      }
+
+      btn.href = ghBase + target;
+
+      // Hash-based active state can only be detected client-side
+      if (window.location.hash === '#categories') {
+        document
+          .querySelectorAll('.nav-link[href$="/#categories"]')
+          .forEach((l) => l.classList.add('active'));
+      }
+    </script>
+
+    <!--
+      2026-04-27 全站 hash anchor 平滑捲動 + navbar offset
+      ──────────────────────────────────────────────────
+      改用純 CSS 解（見 global.css §scroll-padding-top）：
+        - html { scroll-padding-top: 92px; scroll-behavior: smooth; }
+        - prefers-reduced-motion: scroll-behavior: auto
+      （刻意不疊 scroll-margin-top on heading，會 additive 變雙倍 offset）
+
+      原本寫過 rAF 自寫動畫繞 Chrome「smooth scroll 被 cancel」的疑似 bug，
+      實情是 hidden tab 的 rAF 被 throttle 到 ~1Hz（凍結）造成的測試假象，
+      回到 visible tab 後 native smooth scroll 完全正常。教訓 commit 在
+      global.css 的 comment 裡，避免下次 contributor 重蹈覆轍。
+    -->
+
+    <!-- Site-wide GA4 engagement tracker (scroll_depth / section_view /
+         content_click / time_milestone, all carrying page_type) — mounted once
+         here so EVERY page is covered. Landmarks via data-ga-view, CTAs via
+         data-ga-section. 2026-06-14 cross-page rollout. -->
+    <EventTracker pageType={pageType} />
+  </body>
+</html>
+
+<!--
+  All site-wide base styles moved to src/styles/global.css @layer base
+  as part of Tailwind refactor Phase 3 (2026-04-10). The layout no longer
+  carries any scoped or global CSS — it is purely a structural template.
+  See ADR-001 for the decision rationale and REFACTOR-LOG for drift notes.
+-->

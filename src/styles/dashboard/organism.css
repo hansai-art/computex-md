@@ -1,0 +1,122 @@
+/* ── Organism ── */
+.organ-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+.organ-card {
+  background: var(--surface-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  padding: 1.2rem;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  min-height: 180px;
+}
+.organ-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.organ-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+.organ-emoji {
+  font-size: 1.5rem;
+}
+.organ-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.organ-metaphor {
+  font-size: 0.8rem;
+  opacity: 0.5;
+  margin-bottom: 0.8rem;
+}
+.organ-score-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.organ-score {
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.organ-trend {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.organ-trend.up {
+  color: #4ade80;
+}
+.organ-trend.down {
+  color: #f87171;
+}
+.organ-trend.stable {
+  color: #94a3b8;
+}
+.organ-bar {
+  height: 6px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.organ-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+/* ── Organ File Links ── */
+.organ-file {
+  margin-top: 0.8rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+.organ-concern {
+  font-size: 0.7rem;
+  color: #f59e0b;
+  margin-top: 0.4rem;
+  padding: 0.2rem 0.5rem;
+  background: rgba(245, 158, 11, 0.06);
+  border-radius: 4px;
+  text-align: center;
+}
+.organ-file-link {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-decoration: none;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.5rem;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.organ-file-link:hover {
+  color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.08);
+}
+
+/* ── Organ Heart Pulse ── */
+.organ-card-heart {
+  animation: organPulse 2s ease-in-out infinite;
+}
+@keyframes organPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}

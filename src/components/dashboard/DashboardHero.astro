@@ -1,0 +1,113 @@
+---
+// DashboardHero — the dashboard page hero: gradient shell + animated EKG SVG +
+// nested PageHero + JS-updated hero-stats row. Ids (#hero-stats, #hero-stat-*)
+// are a contract with src/scripts/dashboard-client.js; classes with src/styles/dashboard/.
+import PageHero from '../PageHero.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const isEn = lang === 'en';
+---
+
+<!-- Hero --><!--
+  Phase 7.5 partial migration — dashboard.template.astro
+  Hero section moved to inline Tailwind. `.ekg-line` + its
+  @keyframes ekgDraw animation stay scoped (the animation can't
+  be reached via Tailwind arbitrary utilities without promoting
+  the keyframes to global.css — too small a win to justify).
+  Inner sections (vitals-grid, dashboard cards, organism
+  anatomy, etc.) remain scoped — ~170 classes with tight JS
+  coupling.
+--><!--
+  Dashboard hero is a structural outlier: a rounded-card gradient
+  shell with an animated EKG SVG background and a JS-updated stats
+  row. PageHero can't absorb the shell (would need `bgShape=rounded`
+  + `<slot name=background>` + new stats slot for one consumer), so
+  we NEST PageHero inside the custom shell to handle the standard
+  title/subtitle/footer axis, and keep the EKG + stats as custom
+  siblings. Partial migration: structural consistency for the
+  "this page has a title" part, custom code only where it's truly
+  unique.
+-->
+<section
+  class="page-hero-dashboard-shell relative mb-4 overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#1a1a2e_0%,#2d1b69_60%,#1a1a2e_100%)] text-white"
+>
+  <svg
+    class="pointer-events-none absolute left-0 top-1/2 h-[60px] w-full -translate-y-1/2 opacity-60"
+    viewBox="0 0 600 60"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+  >
+    <path
+      class="ekg-line"
+      d="M0,30 L120,30 L140,30 L155,8 L165,52 L175,20 L185,38 L195,30 L280,30 L300,30 L315,8 L325,52 L335,20 L345,38 L355,30 L440,30 L460,30 L475,8 L485,52 L495,20 L505,38 L515,30 L600,30"
+      fill="none"
+      stroke="rgba(139,92,246,0.25)"
+      stroke-width="2"></path>
+  </svg>
+  <PageHero
+    containerWidth="full"
+    padding="compact"
+    bgTone="dark"
+    titleVariant="inherit"
+    titleWeight="bold"
+    titleSize="sm"
+  >
+    <Fragment slot="title">
+      <span class="relative text-[1.8rem]">🔬</span>
+      <span class="relative">{t('dashboard.hero.title')}</span>
+    </Fragment>
+    <Fragment slot="subtitle">{t('dashboard.hero.subtitle')}</Fragment>
+    <Fragment slot="meta">{t('dashboard.hero.description')}</Fragment>
+    <Fragment slot="footer">
+      <a
+        href="https://github.com/frank890417/taiwan-md/tree/main/docs/semiont"
+        target="_blank"
+        rel="noopener"
+        class="inline-block text-[0.85rem] text-[#94a3b8] no-underline opacity-80 transition-opacity duration-200 hover:text-[#cbd5e1] hover:opacity-100"
+      >
+        {
+          isEn
+            ? '→ Cognitive Layer (Self-Awareness System)'
+            : '→ 前往認知層（自我覺察系統）'
+        }
+      </a>
+    </Fragment>
+  </PageHero>
+  <div
+    class="relative mb-8 flex justify-center gap-12 max-[768px]:gap-6"
+    id="hero-stats"
+  >
+    <div class="flex flex-col items-center">
+      <span
+        class="text-[2.8rem] font-black leading-[1.1] [font-variant-numeric:tabular-nums]"
+        id="hero-stat-articles">—</span
+      >
+      <span
+        class="mt-[0.3rem] text-[0.85rem] uppercase tracking-[0.05em] opacity-70"
+        >{isEn ? 'Articles' : '文章'}</span
+      >
+    </div>
+    <div class="flex flex-col items-center">
+      <span
+        class="text-[2.8rem] font-black leading-[1.1] [font-variant-numeric:tabular-nums]"
+        id="hero-stat-languages">—</span
+      >
+      <span
+        class="mt-[0.3rem] text-[0.85rem] uppercase tracking-[0.05em] opacity-70"
+        >{isEn ? 'Languages' : '語言'}</span
+      >
+    </div>
+    <div class="flex flex-col items-center">
+      <span
+        class="text-[2.8rem] font-black leading-[1.1] [font-variant-numeric:tabular-nums]"
+        id="hero-stat-contributors">—</span
+      >
+      <span
+        class="mt-[0.3rem] text-[0.85rem] uppercase tracking-[0.05em] opacity-70"
+        >{isEn ? 'Contributors' : '貢獻者'}</span
+      >
+    </div>
+  </div>
+</section>

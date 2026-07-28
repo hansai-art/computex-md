@@ -1,0 +1,2208 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getLangFromUrl } from '../i18n/utils';
+
+type ElectionCopy = {
+  meta: {
+    title: string;
+    description: string;
+  };
+  hero: {
+    eyebrow: string;
+    titlePrefix: string;
+    titleEmphasis: string;
+    titleSuffix: string;
+    subtitle: string;
+    countdownLabel: string;
+    dayUnit: string;
+    dateLabel: string;
+    recentTitle: string;
+    recentSubtitle: string;
+  };
+  role: {
+    title: string;
+    p1: string;
+    p2: string;
+    p3: string;
+    p4: string;
+    primaryCta: string;
+    secondaryCta: string;
+  };
+  offices: {
+    title: string;
+    intro: string;
+    sourceNote: string;
+    items: Array<{
+      name: string;
+      count: number;
+      desc: string;
+      accent: string;
+    }>;
+  };
+  timeline: {
+    title: string;
+    subtitle: string;
+    sourceNote: string;
+    doneLabel: string;
+    nextLabel: string;
+    items: Array<{
+      date: string;
+      iso: string;
+      label: string;
+    }>;
+  };
+  roadmap: {
+    title: string;
+    subtitle: string;
+    items: Array<{
+      icon: string;
+      title: string;
+      desc: string;
+      eta: string;
+    }>;
+  };
+  related: {
+    title: string;
+    intro: string;
+    articles: Array<{
+      href: string;
+      title: string;
+      desc: string;
+      badge: string;
+    }>;
+  };
+  resources: {
+    title: string;
+    intro: string;
+    items: Array<{
+      name: string;
+      url: string;
+      desc: string;
+      icon: string;
+    }>;
+  };
+  verify: {
+    title: string;
+    domainPrefix: string;
+    domainSuffix: string;
+    gitLog: string;
+    attribution: string;
+    factCheckPrefix: string;
+    factCheckJoin: string;
+    factCheckSuffix: string;
+    mvp: string;
+    roadmap: string;
+    footerPrefix: string;
+    footerEmphasis: string;
+  };
+};
+
+const accents = [
+  '#7c2d12',
+  '#92400e',
+  '#7c2d12',
+  '#92400e',
+  '#b45309',
+  '#b45309',
+  '#15803d',
+  '#15803d',
+  '#4d7c0f',
+];
+
+const officialResourceUrls = {
+  cec: 'https://web.cec.gov.tw/',
+  politicalDonations: 'https://ardata.cy.gov.tw/',
+  councils: 'https://councils.g0v.tw/',
+  moneyFlow: 'https://g0v-money-flow.github.io/elections/',
+  tfc: 'https://tfc-taiwan.org.tw/',
+  cofacts: 'https://cofacts.tw/',
+};
+
+const electionCopy: Record<
+  'zh-TW' | 'en' | 'ja' | 'ko' | 'fr' | 'es',
+  ElectionCopy
+> = {
+  'zh-TW': {
+    meta: {
+      title: '2026 九合一選舉 · COMPUTEX.md',
+      description:
+        '2026 年 11 月 28 日，台灣同日投票九種職位。COMPUTEX.md 不報導選戰，記錄制度怎麼長、權力怎麼結構、為什麼民主基礎建設不只是投票。',
+    },
+    hero: {
+      eyebrow: '🗳️ 中華民國 115 年地方公職人員選舉',
+      titlePrefix: '2026',
+      titleEmphasis: '九合一',
+      titleSuffix: '選舉',
+      subtitle: '2026 年 11 月 28 日，全台同日投票九種職位',
+      countdownLabel: '距投票日',
+      dayUnit: '天',
+      dateLabel: '2026/11/28 · 週六',
+      recentTitle: '投票日已過',
+      recentSubtitle: '開票結果整理中',
+    },
+    role: {
+      title: 'COMPUTEX.md 在這場選舉的角色',
+      p1: '我們不報導選戰、不做即時新聞、不發布民調、不背書任何候選人。',
+      p2: '我們做的是：把這場選舉放回三十年的民主基礎建設裡看 —— 九種職位怎麼來、政治獻金怎麼透明、村里長為什麼有 7,748 個、中選會制度為什麼這樣設計、罷免跟公投怎麼運作。',
+      p3: '選舉是民主的尾端動作。它依賴的整套制度、公民監督工具、資訊基礎建設，那才是真正撐起民主的東西。',
+      p4: '這個專區會持續記錄這套基礎建設怎麼長、誰在維護它、什麼時候會壞掉。',
+      primaryCta: '閱讀完整策展：政治 Hub →',
+      secondaryCta: '讀 2025 大罷免',
+    },
+    offices: {
+      title: '九種職位同日投票',
+      intro:
+        '「九合一」不是九場選舉的合稱，是九種職位同日投票。從直轄市長到村里長，從議員到原住民族區長 —— 一張選票背後是台灣 1994 年民選以來最完整的地方自治體系。',
+      sourceNote: '職位數量為 2026 選舉預估值（依中選會 2026-08-20 公告為準）',
+      items: [
+        {
+          name: '直轄市長',
+          count: 6,
+          desc: '北高六都首長，任期 4 年',
+          accent: accents[0],
+        },
+        {
+          name: '直轄市議員',
+          count: 380,
+          desc: '六都議會代表（席次依縣市調整）',
+          accent: accents[1],
+        },
+        {
+          name: '縣（市）長',
+          count: 16,
+          desc: '非直轄市的縣市首長',
+          accent: accents[2],
+        },
+        {
+          name: '縣（市）議員',
+          count: 532,
+          desc: '縣市議會代表',
+          accent: accents[3],
+        },
+        {
+          name: '鄉（鎮、市）長',
+          count: 198,
+          desc: '基層自治單位首長',
+          accent: accents[4],
+        },
+        {
+          name: '鄉（鎮、市）民代表',
+          count: 2148,
+          desc: '基層民意代表',
+          accent: accents[5],
+        },
+        {
+          name: '直轄市山地原住民區長',
+          count: 6,
+          desc: '原住民族區自治首長（2014 新設）',
+          accent: accents[6],
+        },
+        {
+          name: '直轄市山地原住民區民代表',
+          count: 50,
+          desc: '原住民族區民意代表',
+          accent: accents[7],
+        },
+        {
+          name: '村（里）長',
+          count: 7748,
+          desc: '最基層的民選職位（比 7-Eleven 還多）',
+          accent: accents[8],
+        },
+      ],
+    },
+    timeline: {
+      title: '選務時程',
+      subtitle: '中選會 2025 年 10 月 31 日第 622 次委員會議決議的法定時程',
+      sourceNote:
+        '時程依中選會第 622 次委員會議決議；投票時間與應選名額以 2026-08-20 選舉公告為準。',
+      doneLabel: '已完成',
+      nextLabel: '下一站',
+      items: [
+        {
+          date: '2025/10/31',
+          iso: '2025-10-31',
+          label: '中選會決議選舉時程（第 622 次委員會議）',
+        },
+        { date: '2026/08/20', iso: '2026-08-20', label: '發布選舉公告' },
+        { date: '2026/08/31–09/04', iso: '2026-09-04', label: '候選人登記' },
+        { date: '2026/10/16 前', iso: '2026-10-16', label: '審定候選人名單' },
+        { date: '2026/10/23', iso: '2026-10-23', label: '候選人號次抽籤' },
+        {
+          date: '2026/11/12 · 11/17',
+          iso: '2026-11-17',
+          label: '公告候選人名單（直轄市長先行）',
+        },
+        { date: '2026/11/28', iso: '2026-11-28', label: '投票日' },
+        { date: '2026/12/04', iso: '2026-12-04', label: '公告當選人名單' },
+      ],
+    },
+    roadmap: {
+      title: '持續更新中',
+      subtitle: '選務進程隨中選會公告同步上線',
+      items: [
+        {
+          icon: '📅',
+          title: '選務時程',
+          desc: '法定時程已上線（見上方）；投票時間隨 8/20 選舉公告更新',
+          eta: '已上線',
+        },
+        {
+          icon: '👥',
+          title: '候選人 directory',
+          desc: '22 縣市候選人對稱呈現（無民調、按筆畫排序）',
+          eta: '2026/09 登記後',
+        },
+        {
+          icon: '💰',
+          title: '政治獻金透明度',
+          desc: '接監察院平臺 + g0v 選舉金流',
+          eta: '2026/10 起',
+        },
+        {
+          icon: '🔮',
+          title: '多視角觀點',
+          desc: '以多個制度與社會角度整理選制改革、兩岸關係與民主韌性議題',
+          eta: '逐步上線',
+        },
+      ],
+    },
+    related: {
+      title: 'COMPUTEX.md 的策展層',
+      intro:
+        '從這幾篇讀起，你會理解這場選舉為什麼這樣選 —— 而不只是「誰會贏」。',
+      articles: [
+        {
+          href: '/politics',
+          title: '政治 Hub',
+          desc: '為什麼民主基礎建設不只是投票（策展總入口）',
+          badge: 'Hub',
+        },
+        {
+          href: '/politics/2026%20%E4%B9%9D%E5%90%88%E4%B8%80%E9%81%B8%E8%88%89',
+          title: '2026 九合一選舉',
+          desc: '在 AI 認知作戰時代的民主基礎建設壓力測試（總章）',
+          badge: 'Featured',
+        },
+        {
+          href: '/history/%E5%A4%A7%E7%BD%B7%E5%85%8D',
+          title: '大罷免',
+          desc: '2025 公民社會發動史上規模最大的罷免行動',
+          badge: 'History',
+        },
+        {
+          href: '/history/%E5%8F%B0%E7%81%A3%E6%B0%91%E4%B8%BB%E8%BD%89%E5%9E%8B',
+          title: '台灣民主轉型',
+          desc: '從威權到民選的制度演化',
+          badge: 'History',
+        },
+        {
+          href: '/history/%E6%B0%91%E4%B8%BB%E5%8C%96',
+          title: '民主化',
+          desc: '1987 解嚴到 1996 直選總統的關鍵十年',
+          badge: 'History',
+        },
+        {
+          href: '/history/%E5%8F%B0%E7%81%A3%E9%81%B8%E8%88%89%E8%88%87%E6%94%BF%E9%BB%A8%E6%94%BF%E6%B2%BB',
+          title: '台灣選舉與政黨政治',
+          desc: '選舉制度怎麼運作、政黨怎麼演化',
+          badge: 'History',
+        },
+        {
+          href: '/technology/%E9%96%8B%E6%BA%90%E7%A4%BE%E7%BE%A4%E8%88%87g0v',
+          title: '開源社群與 g0v',
+          desc: '公民科技怎麼補位民主基礎建設',
+          badge: 'Tech',
+        },
+      ],
+    },
+    resources: {
+      title: '公民工具 & 資料來源',
+      intro:
+        'COMPUTEX.md 不重做工具。下面是台灣公民科技社群已經做了十年的工具，這場選舉每個公民都該知道。',
+      items: [
+        {
+          name: '中央選舉委員會',
+          url: officialResourceUrls.cec,
+          desc: '法定選務機關 — 候選人公報、開票結果、選舉公告',
+          icon: '🏛️',
+        },
+        {
+          name: '政治獻金公開查閱平臺',
+          url: officialResourceUrls.politicalDonations,
+          desc: '監察院 — 候選人募款 / 支出明細',
+          icon: '💰',
+        },
+        {
+          name: 'g0v 縣市長／議員投票指南',
+          url: officialResourceUrls.councils,
+          desc: '公民科技社群維護的投票指南',
+          icon: '🗳️',
+        },
+        {
+          name: 'g0v 選舉金流',
+          url: officialResourceUrls.moneyFlow,
+          desc: '政治獻金視覺化',
+          icon: '💸',
+        },
+        {
+          name: '台灣事實查核中心',
+          url: officialResourceUrls.tfc,
+          desc: 'IFCN 認證 — 選舉假訊息查核',
+          icon: '🔍',
+        },
+        {
+          name: 'Cofacts 真的假的',
+          url: officialResourceUrls.cofacts,
+          desc: 'g0v 群眾外包 + LINE 訊息查證',
+          icon: '✅',
+        },
+      ],
+    },
+    verify: {
+      title: '如何驗證 COMPUTEX.md 訊息？',
+      domainPrefix: '認準 domain：',
+      domainSuffix:
+        '。其他相似網址（taiwand.md / taiwan-md.com 等）不是 COMPUTEX.md。',
+      gitLog: '每篇文章都有公開 git log + footnote primary source。',
+      attribution:
+        '所有外部資料（中選會 / 監察院 / g0v）都附 source attribution + last-fetched timestamp。',
+      factCheckPrefix: '選舉相關訊息若有疑慮，先查',
+      factCheckJoin: '或',
+      factCheckSuffix: '。',
+      mvp: '本頁於 2026-05-27 上線，後續內容持續補齊。',
+      roadmap: '完整選務時程、候選人、政治獻金與多視角子頁面持續上線中。',
+      footerPrefix: '🧬 COMPUTEX.md ——',
+      footerEmphasis: '不報導選戰，記錄民主基礎建設',
+    },
+  },
+  en: {
+    meta: {
+      title: '2026 Local Elections · COMPUTEX.md',
+      description:
+        'On November 28, 2026, Taiwan votes for nine local offices on the same day. COMPUTEX.md does not cover campaigns, polls, or endorsements; it documents the democratic infrastructure behind the election.',
+    },
+    hero: {
+      eyebrow:
+        '🗳️ 2026 Local Public Officials Election, Republic of China (Taiwan)',
+      titlePrefix: '2026',
+      titleEmphasis: 'Local',
+      titleSuffix: 'Elections',
+      subtitle:
+        'On November 28, 2026, Taiwan votes for nine local offices on the same day',
+      countdownLabel: 'Days until voting',
+      dayUnit: 'days',
+      dateLabel: '2026/11/28 · Saturday',
+      recentTitle: 'Election day has passed',
+      recentSubtitle: 'Results are being organized',
+    },
+    role: {
+      title: "COMPUTEX.md's role in this election",
+      p1: 'We do not report campaign news, publish polls, or endorse candidates.',
+      p2: 'We place this election back inside three decades of democratic infrastructure: how the nine offices work, how political donations become transparent, why Taiwan has 7,748 village and borough chiefs, how the Central Election Commission is structured, and how recalls and referendums operate.',
+      p3: 'Voting is the last-mile action of democracy. The institutions, civic oversight tools, and information infrastructure underneath it are what keep democracy standing.',
+      p4: 'This section keeps documenting how that infrastructure grows, who maintains it, and where it can break.',
+      primaryCta: 'Read the full curation: Politics Hub →',
+      secondaryCta: 'Read the 2025 Great Recall',
+    },
+    offices: {
+      title: 'Nine offices vote on the same day',
+      intro:
+        'The phrase "nine-in-one" does not mean nine separate elections. It means nine categories of local office vote on the same day. From mayors to village chiefs, from councilors to Indigenous district offices, each ballot sits inside Taiwan’s local self-government system built since direct local elections in 1994.',
+      sourceNote:
+        'Office counts are 2026 estimates and should follow the Central Election Commission announcement on 2026-08-20.',
+      items: [
+        {
+          name: 'Special municipality mayors',
+          count: 6,
+          desc: 'Mayors of the six special municipalities, four-year terms',
+          accent: accents[0],
+        },
+        {
+          name: 'Special municipality councilors',
+          count: 380,
+          desc: 'Council representatives in the six municipalities; seats vary by city',
+          accent: accents[1],
+        },
+        {
+          name: 'County and city magistrates / mayors',
+          count: 16,
+          desc: 'Executives of non-special-municipality counties and cities',
+          accent: accents[2],
+        },
+        {
+          name: 'County and city councilors',
+          count: 532,
+          desc: 'Representatives in county and city councils',
+          accent: accents[3],
+        },
+        {
+          name: 'Township, town, and city chiefs',
+          count: 198,
+          desc: 'Heads of grassroots self-governing units',
+          accent: accents[4],
+        },
+        {
+          name: 'Township, town, and city representatives',
+          count: 2148,
+          desc: 'Grassroots elected representatives',
+          accent: accents[5],
+        },
+        {
+          name: 'Mountain Indigenous district chiefs',
+          count: 6,
+          desc: 'Autonomous Indigenous district executives established in 2014',
+          accent: accents[6],
+        },
+        {
+          name: 'Mountain Indigenous district representatives',
+          count: 50,
+          desc: 'Representatives of autonomous Indigenous districts',
+          accent: accents[7],
+        },
+        {
+          name: 'Village and borough chiefs',
+          count: 7748,
+          desc: 'Taiwan’s most local elected offices',
+          accent: accents[8],
+        },
+      ],
+    },
+    timeline: {
+      title: 'Election timeline',
+      subtitle:
+        'Statutory schedule adopted by the CEC at its 622nd commission meeting on October 31, 2025',
+      sourceNote:
+        'Schedule per the CEC’s 622nd commission meeting. Voting hours and final seat counts follow the official announcement of 2026-08-20.',
+      doneLabel: 'Done',
+      nextLabel: 'Up next',
+      items: [
+        {
+          date: '2025/10/31',
+          iso: '2025-10-31',
+          label: 'CEC adopts the election calendar (622nd commission meeting)',
+        },
+        {
+          date: '2026/08/20',
+          iso: '2026-08-20',
+          label: 'Official election announcement',
+        },
+        {
+          date: '2026/08/31–09/04',
+          iso: '2026-09-04',
+          label: 'Candidate registration',
+        },
+        {
+          date: 'By 2026/10/16',
+          iso: '2026-10-16',
+          label: 'Candidate list review',
+        },
+        { date: '2026/10/23', iso: '2026-10-23', label: 'Ballot number draw' },
+        {
+          date: '2026/11/12 · 11/17',
+          iso: '2026-11-17',
+          label: 'Candidate lists published (municipal mayors first)',
+        },
+        { date: '2026/11/28', iso: '2026-11-28', label: 'Voting day' },
+        {
+          date: '2026/12/04',
+          iso: '2026-12-04',
+          label: 'Winners officially announced',
+        },
+      ],
+    },
+    roadmap: {
+      title: 'Continuously updated',
+      subtitle:
+        'Election milestones will be updated as the Central Election Commission publishes them.',
+      items: [
+        {
+          icon: '📅',
+          title: 'Election timeline',
+          desc: 'Statutory schedule is live above; voting hours follow the Aug 20 announcement',
+          eta: 'Live',
+        },
+        {
+          icon: '👥',
+          title: 'Candidate directory',
+          desc: 'Symmetric presentation across 22 cities and counties, without polling or rankings',
+          eta: 'After 2026/09 registration',
+        },
+        {
+          icon: '💰',
+          title: 'Political donation transparency',
+          desc: 'Links to the Control Yuan platform and g0v election money-flow tools',
+          eta: 'From 2026/10',
+        },
+        {
+          icon: '🔮',
+          title: 'Multi-perspective views',
+          desc: 'Institutional and civic lenses on electoral reform, cross-strait relations, and democratic resilience',
+          eta: 'Rolling updates',
+        },
+      ],
+    },
+    related: {
+      title: "COMPUTEX.md's curation layer",
+      intro:
+        'Start with these articles to understand why this election is structured the way it is, not just who may win.',
+      articles: [
+        {
+          href: '/en/politics',
+          title: 'Politics Hub',
+          desc: 'Why democratic infrastructure is more than voting',
+          badge: 'Hub',
+        },
+        {
+          href: '/en/politics/2026-local-elections-taiwan',
+          title: '2026 Local Elections in Taiwan',
+          desc: 'A stress test for democratic infrastructure in the age of AI-enabled influence operations',
+          badge: 'Featured',
+        },
+        {
+          href: '/en/history/great-recall-movement-2024',
+          title: 'Great Recall',
+          desc: 'The largest recall movement initiated by Taiwanese civil society',
+          badge: 'History',
+        },
+        {
+          href: '/en/history/taiwan-democratization-history',
+          title: "Taiwan's Democratic Transition",
+          desc: 'Institutional evolution from authoritarian rule to direct elections',
+          badge: 'History',
+        },
+        {
+          href: '/en/history/taiwan-democratization',
+          title: 'Democratization',
+          desc: 'From lifting martial law in 1987 to direct presidential elections in 1996',
+          badge: 'History',
+        },
+        {
+          href: '/en/history/taiwan-elections-and-party-politics',
+          title: 'Taiwan Elections and Party Politics',
+          desc: 'How election systems operate and how parties evolve',
+          badge: 'History',
+        },
+        {
+          href: '/en/technology/open-source-and-g0v',
+          title: 'Open Source Communities and g0v',
+          desc: 'How civic tech complements democratic infrastructure',
+          badge: 'Tech',
+        },
+      ],
+    },
+    resources: {
+      title: 'Civic tools & data sources',
+      intro:
+        'COMPUTEX.md does not rebuild civic tools. These are the public-interest tools and sources every voter should know.',
+      items: [
+        {
+          name: 'Central Election Commission',
+          url: officialResourceUrls.cec,
+          desc: 'Official election agency: candidate bulletins, vote results, election announcements',
+          icon: '🏛️',
+        },
+        {
+          name: 'Political Donation Public Search Platform',
+          url: officialResourceUrls.politicalDonations,
+          desc: 'Control Yuan platform for candidate fundraising and spending records',
+          icon: '💰',
+        },
+        {
+          name: 'g0v City/County Mayor and Councilor Voting Guide',
+          url: officialResourceUrls.councils,
+          desc: 'Voting guide maintained by Taiwan’s civic tech community',
+          icon: '🗳️',
+        },
+        {
+          name: 'g0v Election Money Flow',
+          url: officialResourceUrls.moneyFlow,
+          desc: 'Political donation visualization',
+          icon: '💸',
+        },
+        {
+          name: 'Taiwan FactCheck Center',
+          url: officialResourceUrls.tfc,
+          desc: 'IFCN-certified election misinformation fact-checking',
+          icon: '🔍',
+        },
+        {
+          name: 'Cofacts',
+          url: officialResourceUrls.cofacts,
+          desc: 'g0v crowdsourced LINE message fact-checking bot',
+          icon: '✅',
+        },
+      ],
+    },
+    verify: {
+      title: 'How to verify COMPUTEX.md information',
+      domainPrefix: 'Use the official domain:',
+      domainSuffix:
+        '. Similar domains such as taiwand.md or taiwan-md.com are not COMPUTEX.md.',
+      gitLog: 'Each article has a public git log and primary-source footnotes.',
+      attribution:
+        'External data from the CEC, Control Yuan, and g0v includes source attribution and last-fetched timestamps.',
+      factCheckPrefix: 'For election-related doubts, check',
+      factCheckJoin: 'or',
+      factCheckSuffix: 'first.',
+      mvp: 'This page went live on 2026-05-27, with additional coverage continuing to be added.',
+      roadmap:
+        'Full election timeline, candidate, political donation, and multi-perspective subpages will continue to roll out.',
+      footerPrefix: '🧬 COMPUTEX.md —',
+      footerEmphasis:
+        'not campaign coverage, but a record of democratic infrastructure',
+    },
+  },
+  ja: {
+    meta: {
+      title: '2026 統一地方選挙 · COMPUTEX.md',
+      description:
+        '2026年11月28日、台湾では九つの地方公職を同日に選ぶ選挙が行われます。COMPUTEX.md は選挙戦報道や世論調査、候補者支持ではなく、その背後にある民主主義の基盤を記録します。',
+    },
+    hero: {
+      eyebrow: '🗳️ 中華民国 2026年地方公職人員選挙',
+      titlePrefix: '2026',
+      titleEmphasis: '統一地方',
+      titleSuffix: '選挙',
+      subtitle: '2026年11月28日、台湾全土で九つの地方公職を同日に投票',
+      countdownLabel: '投票日まで',
+      dayUnit: '日',
+      dateLabel: '2026/11/28 · 土曜',
+      recentTitle: '投票日は終了しました',
+      recentSubtitle: '開票結果を整理中',
+    },
+    role: {
+      title: 'この選挙における COMPUTEX.md の役割',
+      p1: '私たちは選挙戦ニュースを報じず、世論調査を出さず、候補者を支持しません。',
+      p2: '私たちが行うのは、この選挙を30年にわたる民主主義の基盤の中に位置づけることです。九つの公職はどのように成り立つのか、政治献金はどう透明化されるのか、なぜ村里長が7,748人いるのか、中央選挙委員会の制度はどう設計されているのか、リコールと国民投票はどう機能するのか。',
+      p3: '投票は民主主義の末端の動作です。その下にある制度、市民監視の道具、情報基盤こそが、民主主義を支えています。',
+      p4: 'このセクションでは、その基盤がどのように育ち、誰が維持し、どこで壊れうるのかを記録し続けます。',
+      primaryCta: '完全なキュレーションを読む：政治 Hub →',
+      secondaryCta: '2025年大リコールを読む',
+    },
+    offices: {
+      title: '九つの公職を同日に投票',
+      intro:
+        '「九合一」は九つの別々の選挙という意味ではなく、九種類の地方公職を同日に投票するという意味です。直轄市長から村里長、議員から原住民族区の公職まで、一枚の投票用紙の背後には、1994年以来築かれてきた台湾の地方自治制度があります。',
+      sourceNote:
+        '公職数は2026年選挙の推定値であり、2026-08-20の中央選挙委員会公告に従います。',
+      items: [
+        {
+          name: '直轄市長',
+          count: 6,
+          desc: '六つの直轄市の首長、任期4年',
+          accent: accents[0],
+        },
+        {
+          name: '直轄市議員',
+          count: 380,
+          desc: '六都の議会代表。議席数は都市により異なる',
+          accent: accents[1],
+        },
+        {
+          name: '県・市長',
+          count: 16,
+          desc: '直轄市以外の県市の首長',
+          accent: accents[2],
+        },
+        {
+          name: '県・市議員',
+          count: 532,
+          desc: '県市議会の代表',
+          accent: accents[3],
+        },
+        {
+          name: '郷・鎮・市長',
+          count: 198,
+          desc: '基層自治単位の首長',
+          accent: accents[4],
+        },
+        {
+          name: '郷・鎮・市民代表',
+          count: 2148,
+          desc: '基層の民意代表',
+          accent: accents[5],
+        },
+        {
+          name: '直轄市山地原住民区長',
+          count: 6,
+          desc: '2014年に設けられた原住民族区自治の首長',
+          accent: accents[6],
+        },
+        {
+          name: '直轄市山地原住民区民代表',
+          count: 50,
+          desc: '原住民族区の民意代表',
+          accent: accents[7],
+        },
+        {
+          name: '村里長',
+          count: 7748,
+          desc: '台湾で最も基層にある民選公職',
+          accent: accents[8],
+        },
+      ],
+    },
+    timeline: {
+      title: '選挙日程',
+      subtitle:
+        '中央選挙委員会が2025年10月31日の第622回委員会議で決議した法定日程',
+      sourceNote:
+        '日程は中央選挙委員会第622回委員会議の決議による。投票時間と定数は2026-08-20の選挙公告に従う。',
+      doneLabel: '完了',
+      nextLabel: '次の節目',
+      items: [
+        {
+          date: '2025/10/31',
+          iso: '2025-10-31',
+          label: '中央選挙委員会が選挙日程を決議（第622回委員会議）',
+        },
+        { date: '2026/08/20', iso: '2026-08-20', label: '選挙公告の発布' },
+        { date: '2026/08/31–09/04', iso: '2026-09-04', label: '候補者登録' },
+        {
+          date: '2026/10/16まで',
+          iso: '2026-10-16',
+          label: '候補者名簿の審定',
+        },
+        { date: '2026/10/23', iso: '2026-10-23', label: '候補者番号の抽選' },
+        {
+          date: '2026/11/12 · 11/17',
+          iso: '2026-11-17',
+          label: '候補者名簿の公告（直轄市長が先行）',
+        },
+        { date: '2026/11/28', iso: '2026-11-28', label: '投票日' },
+        { date: '2026/12/04', iso: '2026-12-04', label: '当選者名簿の公告' },
+      ],
+    },
+    roadmap: {
+      title: '継続更新中',
+      subtitle: '選務日程は中央選挙委員会の公告に合わせて更新します',
+      items: [
+        {
+          icon: '📅',
+          title: '選務日程',
+          desc: '法定日程は上に掲載済み。投票時間は8/20の選挙公告で更新',
+          eta: '公開済み',
+        },
+        {
+          icon: '👥',
+          title: '候補者ディレクトリ',
+          desc: '22県市の候補者を対称的に表示（世論調査・ランキングなし）',
+          eta: '2026年9月登録後',
+        },
+        {
+          icon: '💰',
+          title: '政治献金の透明性',
+          desc: '監察院プラットフォームと g0v 選挙資金フローへの接続',
+          eta: '2026年10月以降',
+        },
+        {
+          icon: '🔮',
+          title: '複数視点からの整理',
+          desc: '選挙制度改革、両岸関係、民主主義のレジリエンスを制度と市民の視点で整理',
+          eta: '順次公開',
+        },
+      ],
+    },
+    related: {
+      title: 'COMPUTEX.md のキュレーション層',
+      intro:
+        'この選挙がなぜこのような形で行われるのかを理解するには、まずこれらの記事から読むのがおすすめです。',
+      articles: [
+        {
+          href: '/ja/politics',
+          title: '政治 Hub',
+          desc: '民主主義の基盤はなぜ投票だけではないのか',
+          badge: 'Hub',
+        },
+        {
+          href: '/ja/politics/2026-local-elections-taiwan',
+          title: '2026 統一地方選挙',
+          desc: 'AI時代の認知作戦下における民主主義基盤のストレステスト',
+          badge: 'Featured',
+        },
+        {
+          href: '/ja/history/great-recall-movement-2024',
+          title: '大リコール',
+          desc: '市民社会が起こした台湾史上最大規模のリコール行動',
+          badge: 'History',
+        },
+        {
+          href: '/ja/history/taiwan-democratization',
+          title: '台湾民主化の歩み',
+          desc: '権威主義から民選制度への制度進化',
+          badge: 'History',
+        },
+        {
+          href: '/ja/history/democratization',
+          title: '民主化',
+          desc: '1987年の戒厳解除から1996年の総統直接選挙まで',
+          badge: 'History',
+        },
+        {
+          href: '/ja/history/taiwan-elections-and-party-politics',
+          title: '台湾の選挙と政党政治',
+          desc: '選挙制度がどう動き、政党がどう変化してきたか',
+          badge: 'History',
+        },
+        {
+          href: '/ja/technology/open-source-and-g0v',
+          title: 'オープンソース・コミュニティと g0v',
+          desc: '市民技術が民主主義の基盤をどう補完するか',
+          badge: 'Tech',
+        },
+      ],
+    },
+    resources: {
+      title: '市民ツールとデータソース',
+      intro:
+        'COMPUTEX.md はツールを作り直しません。ここでは、有権者が知っておくべき公共性の高いツールと情報源を整理します。',
+      items: [
+        {
+          name: '中央選挙委員会',
+          url: officialResourceUrls.cec,
+          desc: '法定選務機関。候補者公報、開票結果、選挙公告を提供',
+          icon: '🏛️',
+        },
+        {
+          name: '政治献金公開閲覧プラットフォーム',
+          url: officialResourceUrls.politicalDonations,
+          desc: '監察院による候補者の収入・支出明細',
+          icon: '💰',
+        },
+        {
+          name: 'g0v 県市長・議員投票ガイド',
+          url: officialResourceUrls.councils,
+          desc: '市民技術コミュニティが維持する投票ガイド',
+          icon: '🗳️',
+        },
+        {
+          name: 'g0v 選挙資金フロー',
+          url: officialResourceUrls.moneyFlow,
+          desc: '政治献金の可視化',
+          icon: '💸',
+        },
+        {
+          name: '台湾ファクトチェックセンター',
+          url: officialResourceUrls.tfc,
+          desc: 'IFCN認証の選挙偽情報ファクトチェック',
+          icon: '🔍',
+        },
+        {
+          name: 'Cofacts 真的假的',
+          url: officialResourceUrls.cofacts,
+          desc: 'g0v によるLINEメッセージのクラウドソース型検証',
+          icon: '✅',
+        },
+      ],
+    },
+    verify: {
+      title: 'COMPUTEX.md の情報を確認するには？',
+      domainPrefix: '公式ドメインを確認してください：',
+      domainSuffix:
+        '。taiwand.md や taiwan-md.com などの類似ドメインは COMPUTEX.md ではありません。',
+      gitLog: '各記事には公開 git log と一次資料の脚注があります。',
+      attribution:
+        '中選会、監察院、g0v などの外部データには、出典と最終取得時刻を明記します。',
+      factCheckPrefix: '選挙関連情報に疑問がある場合は、まず',
+      factCheckJoin: 'または',
+      factCheckSuffix: 'を確認してください。',
+      mvp: 'このページは2026-05-27に公開され、今後も内容を追加していきます。',
+      roadmap:
+        '選務日程、候補者、政治献金、複数視点のサブページは順次公開されます。',
+      footerPrefix: '🧬 COMPUTEX.md ——',
+      footerEmphasis: '選挙戦報道ではなく、民主主義の基盤を記録する',
+    },
+  },
+  ko: {
+    meta: {
+      title: '2026 지방선거 · COMPUTEX.md',
+      description:
+        '2026년 11월 28일, 대만은 아홉 종류의 지방 공직을 같은 날 선출합니다. COMPUTEX.md는 선거 보도, 여론조사, 후보 지지를 하지 않고 그 뒤의 민주주의 인프라를 기록합니다.',
+    },
+    hero: {
+      eyebrow: '🗳️ 중화민국 2026년 지방공직자 선거',
+      titlePrefix: '2026',
+      titleEmphasis: '지방',
+      titleSuffix: '선거',
+      subtitle:
+        '2026년 11월 28일, 대만 전역에서 아홉 종류의 지방 공직을 같은 날 투표',
+      countdownLabel: '투표일까지',
+      dayUnit: '일',
+      dateLabel: '2026/11/28 · 토요일',
+      recentTitle: '투표일이 지났습니다',
+      recentSubtitle: '개표 결과를 정리 중입니다',
+    },
+    role: {
+      title: '이 선거에서 COMPUTEX.md의 역할',
+      p1: '우리는 선거전 뉴스를 보도하지 않고, 여론조사를 발표하지 않으며, 어떤 후보도 지지하지 않습니다.',
+      p2: '우리가 하는 일은 이 선거를 30년에 걸친 민주주의 인프라 안에 다시 놓고 보는 것입니다. 아홉 공직은 어떻게 구성되는지, 정치자금은 어떻게 투명해지는지, 왜 촌리장이 7,748명인지, 중앙선거위원회 제도는 어떻게 설계되었는지, 소환과 국민투표는 어떻게 작동하는지 기록합니다.',
+      p3: '투표는 민주주의의 마지막 동작입니다. 그 아래의 제도, 시민 감시 도구, 정보 인프라가 민주주의를 실제로 지탱합니다.',
+      p4: '이 섹션은 그 인프라가 어떻게 자라고, 누가 유지하며, 어디서 고장날 수 있는지를 계속 기록합니다.',
+      primaryCta: '전체 큐레이션 읽기: Politics Hub →',
+      secondaryCta: '2025년 대규모 소환 읽기',
+    },
+    offices: {
+      title: '아홉 종류의 공직을 같은 날 선출',
+      intro:
+        '"구합일"은 아홉 번의 별도 선거가 아니라 아홉 종류의 지방 공직을 같은 날 투표한다는 뜻입니다. 직할시장부터 촌리장까지, 의원부터 원주민구 공직까지, 한 장의 투표용지 뒤에는 1994년 이후 구축된 대만의 지방자치 체계가 있습니다.',
+      sourceNote:
+        '공직 수는 2026년 선거 예상치이며, 2026-08-20 중앙선거위원회 공고를 기준으로 합니다.',
+      items: [
+        {
+          name: '직할시장',
+          count: 6,
+          desc: '6개 직할시의 시장, 임기 4년',
+          accent: accents[0],
+        },
+        {
+          name: '직할시의원',
+          count: 380,
+          desc: '6개 직할시 의회의 대표. 의석 수는 도시별로 조정',
+          accent: accents[1],
+        },
+        {
+          name: '현·시장',
+          count: 16,
+          desc: '직할시가 아닌 현과 시의 수장',
+          accent: accents[2],
+        },
+        {
+          name: '현·시의원',
+          count: 532,
+          desc: '현·시 의회의 대표',
+          accent: accents[3],
+        },
+        {
+          name: '향·진·시장',
+          count: 198,
+          desc: '기초 자치 단위의 수장',
+          accent: accents[4],
+        },
+        {
+          name: '향·진·시민대표',
+          count: 2148,
+          desc: '기초 민의 대표',
+          accent: accents[5],
+        },
+        {
+          name: '직할시 산지원주민구장',
+          count: 6,
+          desc: '2014년에 신설된 원주민구 자치 수장',
+          accent: accents[6],
+        },
+        {
+          name: '직할시 산지원주민구민대표',
+          count: 50,
+          desc: '원주민구의 민의 대표',
+          accent: accents[7],
+        },
+        {
+          name: '촌리장',
+          count: 7748,
+          desc: '가장 기초 단위의 민선 공직',
+          accent: accents[8],
+        },
+      ],
+    },
+    timeline: {
+      title: '선거 일정',
+      subtitle:
+        '중앙선거위원회가 2025년 10월 31일 제622차 위원회의에서 의결한 법정 일정',
+      sourceNote:
+        '일정은 중앙선거위원회 제622차 위원회의 의결에 따름. 투표 시간과 정수는 2026-08-20 선거 공고를 기준으로 함.',
+      doneLabel: '완료',
+      nextLabel: '다음 단계',
+      items: [
+        {
+          date: '2025/10/31',
+          iso: '2025-10-31',
+          label: '중앙선거위원회 선거 일정 의결(제622차 위원회의)',
+        },
+        { date: '2026/08/20', iso: '2026-08-20', label: '선거 공고 발표' },
+        { date: '2026/08/31–09/04', iso: '2026-09-04', label: '후보자 등록' },
+        {
+          date: '2026/10/16까지',
+          iso: '2026-10-16',
+          label: '후보자 명단 심사',
+        },
+        { date: '2026/10/23', iso: '2026-10-23', label: '기호 추첨' },
+        {
+          date: '2026/11/12 · 11/17',
+          iso: '2026-11-17',
+          label: '후보자 명단 공고(직할시장 우선)',
+        },
+        { date: '2026/11/28', iso: '2026-11-28', label: '투표일' },
+        { date: '2026/12/04', iso: '2026-12-04', label: '당선인 명단 공고' },
+      ],
+    },
+    roadmap: {
+      title: '계속 업데이트 중',
+      subtitle: '선거 일정은 중앙선거위원회 공고에 맞춰 업데이트됩니다',
+      items: [
+        {
+          icon: '📅',
+          title: '선거 일정',
+          desc: '법정 일정은 위에 게시됨. 투표 시간은 8/20 선거 공고로 업데이트',
+          eta: '공개됨',
+        },
+        {
+          icon: '👥',
+          title: '후보자 디렉터리',
+          desc: '22개 현시 후보자를 대칭적으로 표시(여론조사·순위 없음)',
+          eta: '2026년 9월 등록 후',
+        },
+        {
+          icon: '💰',
+          title: '정치자금 투명성',
+          desc: '감찰원 플랫폼과 g0v 선거 자금 흐름 도구 연결',
+          eta: '2026년 10월부터',
+        },
+        {
+          icon: '🔮',
+          title: '다중 관점 정리',
+          desc: '선거제도 개혁, 양안관계, 민주주의 회복력을 제도와 시민의 관점에서 정리',
+          eta: '순차 공개',
+        },
+      ],
+    },
+    related: {
+      title: 'COMPUTEX.md의 큐레이션 층',
+      intro:
+        '이 선거가 왜 이렇게 구성되는지 이해하려면, 누가 이길지만이 아니라 먼저 이 글들부터 읽어보세요.',
+      articles: [
+        {
+          href: '/ko/politics',
+          title: 'Politics Hub',
+          desc: '민주주의 인프라는 왜 투표만이 아닌가',
+          badge: 'Hub',
+        },
+        {
+          href: '/ko/politics/2026-local-elections-taiwan',
+          title: '2026 지방선거',
+          desc: 'AI 인지 작전 시대의 민주주의 인프라 스트레스 테스트',
+          badge: 'Featured',
+        },
+        {
+          href: '/ko/history/great-recall-movement-2024',
+          title: '대규모 소환',
+          desc: '시민사회가 시작한 대만 역사상 최대 규모의 소환 행동',
+          badge: 'History',
+        },
+        {
+          href: '/ko/history/taiwan-democratization-history',
+          title: '대만 민주화 전환',
+          desc: '권위주의에서 민선 제도로 이어진 제도 진화',
+          badge: 'History',
+        },
+        {
+          href: '/ko/history/taiwan-democratization',
+          title: '민주화',
+          desc: '1987년 계엄 해제부터 1996년 총통 직선제까지',
+          badge: 'History',
+        },
+        {
+          href: '/ko/history/taiwan-elections-and-party-politics',
+          title: '대만 선거와 정당 정치',
+          desc: '선거 제도는 어떻게 작동하고 정당은 어떻게 변화했는가',
+          badge: 'History',
+        },
+        {
+          href: '/ko/technology/open-source-and-g0v',
+          title: '오픈소스 커뮤니티와 g0v',
+          desc: '시민 기술이 민주주의 인프라를 어떻게 보완하는가',
+          badge: 'Tech',
+        },
+      ],
+    },
+    resources: {
+      title: '시민 도구와 데이터 출처',
+      intro:
+        'COMPUTEX.md는 도구를 다시 만들지 않습니다. 아래는 유권자가 알아야 할 공익 도구와 데이터 출처입니다.',
+      items: [
+        {
+          name: '중앙선거위원회',
+          url: officialResourceUrls.cec,
+          desc: '법정 선거 관리 기관. 후보자 공보, 개표 결과, 선거 공고 제공',
+          icon: '🏛️',
+        },
+        {
+          name: '정치헌금 공개 조회 플랫폼',
+          url: officialResourceUrls.politicalDonations,
+          desc: '감찰원의 후보자 모금 및 지출 내역',
+          icon: '💰',
+        },
+        {
+          name: 'g0v 현시장·의원 투표 가이드',
+          url: officialResourceUrls.councils,
+          desc: '시민 기술 커뮤니티가 유지하는 투표 가이드',
+          icon: '🗳️',
+        },
+        {
+          name: 'g0v 선거 자금 흐름',
+          url: officialResourceUrls.moneyFlow,
+          desc: '정치헌금 시각화',
+          icon: '💸',
+        },
+        {
+          name: '대만 팩트체크 센터',
+          url: officialResourceUrls.tfc,
+          desc: 'IFCN 인증 선거 허위정보 팩트체크',
+          icon: '🔍',
+        },
+        {
+          name: 'Cofacts 真的假的',
+          url: officialResourceUrls.cofacts,
+          desc: 'g0v의 LINE 메시지 크라우드소싱 검증 봇',
+          icon: '✅',
+        },
+      ],
+    },
+    verify: {
+      title: 'COMPUTEX.md 정보를 확인하는 방법',
+      domainPrefix: '공식 도메인을 확인하세요:',
+      domainSuffix:
+        '. taiwand.md / taiwan-md.com 같은 유사 도메인은 COMPUTEX.md가 아닙니다.',
+      gitLog: '각 글에는 공개 git log와 1차 출처 각주가 있습니다.',
+      attribution:
+        '중앙선거위원회, 감찰원, g0v 등 외부 데이터에는 출처와 최종 수집 시각을 표시합니다.',
+      factCheckPrefix: '선거 관련 정보가 의심스럽다면 먼저',
+      factCheckJoin: '또는',
+      factCheckSuffix: '를 확인하세요.',
+      mvp: '이 페이지는 2026-05-27에 공개되었으며, 추가 내용은 계속 보강됩니다.',
+      roadmap:
+        '선거 일정, 후보자, 정치자금, 다중 관점 하위 페이지는 계속 공개될 예정입니다.',
+      footerPrefix: '🧬 COMPUTEX.md ——',
+      footerEmphasis: '선거전 보도가 아니라 민주주의 인프라를 기록합니다',
+    },
+  },
+  fr: {
+    meta: {
+      title: 'Élections locales 2026 · COMPUTEX.md',
+      description:
+        'Le 28 novembre 2026, Taïwan élit neuf catégories de fonctions locales le même jour. COMPUTEX.md ne couvre ni la campagne, ni les sondages : il documente l’infrastructure démocratique derrière l’élection.',
+    },
+    hero: {
+      eyebrow:
+        '🗳️ Élection des fonctionnaires locaux 2026, République de Chine (Taïwan)',
+      titlePrefix: 'Élections',
+      titleEmphasis: 'locales',
+      titleSuffix: '2026',
+      subtitle:
+        'Le 28 novembre 2026, Taïwan vote le même jour pour neuf catégories de fonctions locales',
+      countdownLabel: 'Jours avant le scrutin',
+      dayUnit: 'jours',
+      dateLabel: '28/11/2026 · samedi',
+      recentTitle: 'Le jour du scrutin est passé',
+      recentSubtitle: 'Les résultats sont en cours de compilation',
+    },
+    role: {
+      title: 'Le rôle de COMPUTEX.md dans cette élection',
+      p1: 'Nous ne couvrons pas la campagne, ne publions pas de sondages et ne soutenons aucun candidat.',
+      p2: 'Nous replaçons cette élection dans trois décennies d’infrastructure démocratique : comment fonctionnent les neuf fonctions élues, comment les dons politiques deviennent transparents, pourquoi Taïwan compte 7 748 chefs de village et de quartier, comment est structurée la Commission électorale centrale, et comment fonctionnent les révocations et les référendums.',
+      p3: 'Voter est le dernier geste de la démocratie. Les institutions, les outils de contrôle citoyen et l’infrastructure informationnelle qui le soutiennent sont ce qui fait tenir la démocratie debout.',
+      p4: 'Cette section continue de documenter comment cette infrastructure grandit, qui l’entretient et où elle peut se briser.',
+      primaryCta: 'Lire la curation complète : Politics Hub →',
+      secondaryCta: 'Lire le Grand rappel de 2025',
+    },
+    offices: {
+      title: 'Neuf fonctions élues le même jour',
+      intro:
+        '« Neuf-en-un » ne signifie pas neuf élections séparées : neuf catégories de fonctions locales sont élues le même jour. Des maires aux chefs de village, des conseillers aux districts autochtones, chaque bulletin s’inscrit dans le système d’autonomie locale que Taïwan construit depuis les premières élections locales directes de 1994.',
+      sourceNote:
+        'Les effectifs sont des estimations pour 2026 et suivront l’annonce de la Commission électorale centrale du 20/08/2026.',
+      items: [
+        {
+          name: 'Maires des municipalités spéciales',
+          count: 6,
+          desc: 'Maires des six municipalités spéciales, mandat de quatre ans',
+          accent: accents[0],
+        },
+        {
+          name: 'Conseillers des municipalités spéciales',
+          count: 380,
+          desc: 'Représentants des conseils des six municipalités ; sièges variables selon la ville',
+          accent: accents[1],
+        },
+        {
+          name: 'Magistrats de comté et maires de ville',
+          count: 16,
+          desc: 'Exécutifs des comtés et villes hors municipalités spéciales',
+          accent: accents[2],
+        },
+        {
+          name: 'Conseillers de comté et de ville',
+          count: 532,
+          desc: 'Représentants des conseils de comté et de ville',
+          accent: accents[3],
+        },
+        {
+          name: 'Chefs de canton, bourg et ville',
+          count: 198,
+          desc: 'Chefs des unités d’autonomie locale de base',
+          accent: accents[4],
+        },
+        {
+          name: 'Représentants de canton, bourg et ville',
+          count: 2148,
+          desc: 'Représentants élus de proximité',
+          accent: accents[5],
+        },
+        {
+          name: 'Chefs de district autochtone de montagne',
+          count: 6,
+          desc: 'Exécutifs des districts autochtones autonomes créés en 2014',
+          accent: accents[6],
+        },
+        {
+          name: 'Représentants de district autochtone de montagne',
+          count: 50,
+          desc: 'Représentants des districts autochtones autonomes',
+          accent: accents[7],
+        },
+        {
+          name: 'Chefs de village et de quartier',
+          count: 7748,
+          desc: 'Les fonctions élues les plus locales de Taïwan',
+          accent: accents[8],
+        },
+      ],
+    },
+    timeline: {
+      title: 'Calendrier électoral',
+      subtitle:
+        'Calendrier légal adopté par la CEC lors de sa 622e réunion, le 31 octobre 2025',
+      sourceNote:
+        'Calendrier adopté lors de la 622e réunion de la CEC. Les horaires de vote et les effectifs définitifs suivront l’annonce officielle du 20/08/2026.',
+      doneLabel: 'Terminé',
+      nextLabel: 'Prochaine étape',
+      items: [
+        {
+          date: '31/10/2025',
+          iso: '2025-10-31',
+          label: 'La CEC adopte le calendrier électoral (622e réunion)',
+        },
+        {
+          date: '20/08/2026',
+          iso: '2026-08-20',
+          label: 'Publication de l’annonce électorale',
+        },
+        {
+          date: '31/08–04/09/2026',
+          iso: '2026-09-04',
+          label: 'Enregistrement des candidatures',
+        },
+        {
+          date: 'Avant le 16/10/2026',
+          iso: '2026-10-16',
+          label: 'Validation de la liste des candidats',
+        },
+        {
+          date: '23/10/2026',
+          iso: '2026-10-23',
+          label: 'Tirage au sort des numéros',
+        },
+        {
+          date: '12/11 · 17/11/2026',
+          iso: '2026-11-17',
+          label: 'Publication des listes de candidats',
+        },
+        { date: '28/11/2026', iso: '2026-11-28', label: 'Jour du scrutin' },
+        {
+          date: '04/12/2026',
+          iso: '2026-12-04',
+          label: 'Annonce officielle des élus',
+        },
+      ],
+    },
+    roadmap: {
+      title: 'Mise à jour continue',
+      subtitle:
+        'Les étapes électorales seront ajoutées au fil des annonces de la Commission électorale centrale.',
+      items: [
+        {
+          icon: '📅',
+          title: 'Calendrier électoral',
+          desc: 'Calendrier légal ci-dessus ; horaires de vote après l’annonce du 20/08',
+          eta: 'En ligne',
+        },
+        {
+          icon: '👥',
+          title: 'Répertoire des candidats',
+          desc: 'Présentation symétrique dans les 22 villes et comtés, sans sondages ni classements',
+          eta: 'Après l’enregistrement de septembre 2026',
+        },
+        {
+          icon: '💰',
+          title: 'Transparence des dons politiques',
+          desc: 'Liens vers la plateforme du Yuan de contrôle et les outils g0v',
+          eta: 'À partir d’octobre 2026',
+        },
+        {
+          icon: '🔮',
+          title: 'Perspectives multiples',
+          desc: 'Réforme électorale, relations inter-détroit et résilience démocratique sous des angles institutionnels et citoyens',
+          eta: 'Publication progressive',
+        },
+      ],
+    },
+    related: {
+      title: 'La couche de curation de COMPUTEX.md',
+      intro:
+        'Commencez par ces articles pour comprendre pourquoi cette élection est structurée ainsi, au-delà de la question de qui peut gagner.',
+      articles: [
+        {
+          href: '/fr/politics',
+          title: 'Politics Hub',
+          desc: 'Pourquoi l’infrastructure démocratique dépasse le vote',
+          badge: 'Hub',
+        },
+        {
+          href: '/fr/politics/2026-local-elections-taiwan',
+          title: 'Élections locales 2026 à Taïwan',
+          desc: 'Un test de résistance pour l’infrastructure démocratique à l’ère des opérations d’influence par IA',
+          badge: 'Featured',
+        },
+        {
+          href: '/fr/history/great-recall-movement-2024',
+          title: 'Le Grand rappel',
+          desc: 'Le plus grand mouvement de révocation lancé par la société civile taïwanaise',
+          badge: 'History',
+        },
+        {
+          href: '/fr/history/taiwan-democratization-history',
+          title: 'La transition démocratique de Taïwan',
+          desc: 'L’évolution institutionnelle du régime autoritaire aux élections directes',
+          badge: 'History',
+        },
+        {
+          href: '/fr/history/taiwan-democratization',
+          title: 'Démocratisation',
+          desc: 'De la levée de la loi martiale en 1987 à l’élection présidentielle directe de 1996',
+          badge: 'History',
+        },
+        {
+          href: '/fr/history/taiwan-elections-and-party-politics',
+          title: 'Élections et partis politiques à Taïwan',
+          desc: 'Comment fonctionnent les systèmes électoraux et comment évoluent les partis',
+          badge: 'History',
+        },
+        {
+          href: '/fr/technology/open-source-and-g0v',
+          title: 'Communautés open source et g0v',
+          desc: 'Comment la tech civique complète l’infrastructure démocratique',
+          badge: 'Tech',
+        },
+      ],
+    },
+    resources: {
+      title: 'Outils civiques et sources de données',
+      intro:
+        'COMPUTEX.md ne reconstruit pas les outils civiques. Voici les outils d’intérêt public que chaque électeur devrait connaître.',
+      items: [
+        {
+          name: 'Commission électorale centrale',
+          url: officialResourceUrls.cec,
+          desc: 'Autorité électorale légale : bulletins des candidats, résultats, annonces officielles',
+          icon: '🏛️',
+        },
+        {
+          name: 'Plateforme publique des dons politiques',
+          url: officialResourceUrls.politicalDonations,
+          desc: 'Plateforme du Yuan de contrôle : collectes et dépenses des candidats',
+          icon: '💰',
+        },
+        {
+          name: 'Guide de vote g0v (maires et conseillers)',
+          url: officialResourceUrls.councils,
+          desc: 'Guide de vote maintenu par la communauté civic tech taïwanaise',
+          icon: '🗳️',
+        },
+        {
+          name: 'Flux financiers électoraux g0v',
+          url: officialResourceUrls.moneyFlow,
+          desc: 'Visualisation des dons politiques',
+          icon: '💸',
+        },
+        {
+          name: 'Taiwan FactCheck Center',
+          url: officialResourceUrls.tfc,
+          desc: 'Vérification des fausses informations électorales, certifiée IFCN',
+          icon: '🔍',
+        },
+        {
+          name: 'Cofacts',
+          url: officialResourceUrls.cofacts,
+          desc: 'Vérification participative g0v + bot LINE',
+          icon: '✅',
+        },
+      ],
+    },
+    verify: {
+      title: 'Comment vérifier les informations de COMPUTEX.md ?',
+      domainPrefix: 'Utilisez le domaine officiel :',
+      domainSuffix:
+        '. Les domaines similaires comme taiwand.md ou taiwan-md.com ne sont pas COMPUTEX.md.',
+      gitLog:
+        'Chaque article possède un journal git public et des notes de bas de page renvoyant aux sources primaires.',
+      attribution:
+        'Les données externes (CEC, Yuan de contrôle, g0v) portent leur attribution et l’horodatage de leur dernière collecte.',
+      factCheckPrefix:
+        'En cas de doute sur une information électorale, vérifiez d’abord auprès de',
+      factCheckJoin: 'ou de',
+      factCheckSuffix: '.',
+      mvp: 'Cette page est en ligne depuis le 27/05/2026 et continue d’être enrichie.',
+      roadmap:
+        'Le calendrier électoral complet, les candidats, les dons politiques et les sous-pages multi-perspectives arrivent progressivement.',
+      footerPrefix: '🧬 COMPUTEX.md —',
+      footerEmphasis:
+        'pas de couverture de campagne, mais une trace de l’infrastructure démocratique',
+    },
+  },
+  es: {
+    meta: {
+      title: 'Elecciones locales 2026 · COMPUTEX.md',
+      description:
+        'El 28 de noviembre de 2026, Taiwán elige nueve tipos de cargos locales el mismo día. COMPUTEX.md no cubre campañas ni encuestas: documenta la infraestructura democrática detrás de la elección.',
+    },
+    hero: {
+      eyebrow:
+        '🗳️ Elección de funcionarios locales 2026, República de China (Taiwán)',
+      titlePrefix: 'Elecciones',
+      titleEmphasis: 'locales',
+      titleSuffix: '2026',
+      subtitle:
+        'El 28 de noviembre de 2026, Taiwán vota el mismo día por nueve tipos de cargos locales',
+      countdownLabel: 'Días hasta la votación',
+      dayUnit: 'días',
+      dateLabel: '28/11/2026 · sábado',
+      recentTitle: 'El día de la votación ya pasó',
+      recentSubtitle: 'Los resultados se están organizando',
+    },
+    role: {
+      title: 'El papel de COMPUTEX.md en esta elección',
+      p1: 'No cubrimos noticias de campaña, no publicamos encuestas ni respaldamos candidatos.',
+      p2: 'Colocamos esta elección dentro de tres décadas de infraestructura democrática: cómo funcionan los nueve cargos, cómo se hacen transparentes las donaciones políticas, por qué Taiwán tiene 7.748 jefes de aldea y barrio, cómo está estructurada la Comisión Electoral Central y cómo operan las revocatorias y los referendos.',
+      p3: 'Votar es el último gesto de la democracia. Las instituciones, las herramientas de supervisión ciudadana y la infraestructura de información que lo sostienen son lo que mantiene en pie la democracia.',
+      p4: 'Esta sección sigue documentando cómo crece esa infraestructura, quién la mantiene y dónde puede romperse.',
+      primaryCta: 'Leer la curaduría completa: Politics Hub →',
+      secondaryCta: 'Leer la Gran Revocatoria de 2025',
+    },
+    offices: {
+      title: 'Nueve cargos se votan el mismo día',
+      intro:
+        '«Nueve en uno» no significa nueve elecciones separadas, sino nueve tipos de cargos locales votados el mismo día. De alcaldes a jefes de aldea, de concejales a distritos indígenas, cada papeleta se inscribe en el sistema de autogobierno local que Taiwán construye desde las primeras elecciones locales directas de 1994.',
+      sourceNote:
+        'Las cifras son estimaciones para 2026 y seguirán el anuncio de la Comisión Electoral Central del 20/08/2026.',
+      items: [
+        {
+          name: 'Alcaldes de municipios especiales',
+          count: 6,
+          desc: 'Alcaldes de los seis municipios especiales, mandato de cuatro años',
+          accent: accents[0],
+        },
+        {
+          name: 'Concejales de municipios especiales',
+          count: 380,
+          desc: 'Representantes de los concejos de los seis municipios; escaños según la ciudad',
+          accent: accents[1],
+        },
+        {
+          name: 'Magistrados de condado y alcaldes de ciudad',
+          count: 16,
+          desc: 'Ejecutivos de condados y ciudades fuera de los municipios especiales',
+          accent: accents[2],
+        },
+        {
+          name: 'Concejales de condado y ciudad',
+          count: 532,
+          desc: 'Representantes de los concejos de condado y ciudad',
+          accent: accents[3],
+        },
+        {
+          name: 'Jefes de municipio, pueblo y ciudad',
+          count: 198,
+          desc: 'Jefes de las unidades básicas de autogobierno',
+          accent: accents[4],
+        },
+        {
+          name: 'Representantes de municipio, pueblo y ciudad',
+          count: 2148,
+          desc: 'Representantes electos de base',
+          accent: accents[5],
+        },
+        {
+          name: 'Jefes de distrito indígena de montaña',
+          count: 6,
+          desc: 'Ejecutivos de los distritos indígenas autónomos creados en 2014',
+          accent: accents[6],
+        },
+        {
+          name: 'Representantes de distrito indígena de montaña',
+          count: 50,
+          desc: 'Representantes de los distritos indígenas autónomos',
+          accent: accents[7],
+        },
+        {
+          name: 'Jefes de aldea y barrio',
+          count: 7748,
+          desc: 'Los cargos electos más locales de Taiwán',
+          accent: accents[8],
+        },
+      ],
+    },
+    timeline: {
+      title: 'Calendario electoral',
+      subtitle:
+        'Calendario legal adoptado por la CEC en su 622.ª reunión, el 31 de octubre de 2025',
+      sourceNote:
+        'Calendario adoptado en la 622.ª reunión de la CEC. Los horarios de votación y las cifras definitivas seguirán el anuncio oficial del 20/08/2026.',
+      doneLabel: 'Completado',
+      nextLabel: 'Próximo paso',
+      items: [
+        {
+          date: '31/10/2025',
+          iso: '2025-10-31',
+          label: 'La CEC adopta el calendario electoral (622.ª reunión)',
+        },
+        {
+          date: '20/08/2026',
+          iso: '2026-08-20',
+          label: 'Publicación del anuncio electoral',
+        },
+        {
+          date: '31/08–04/09/2026',
+          iso: '2026-09-04',
+          label: 'Registro de candidaturas',
+        },
+        {
+          date: 'Antes del 16/10/2026',
+          iso: '2026-10-16',
+          label: 'Revisión de la lista de candidatos',
+        },
+        { date: '23/10/2026', iso: '2026-10-23', label: 'Sorteo de números' },
+        {
+          date: '12/11 · 17/11/2026',
+          iso: '2026-11-17',
+          label: 'Publicación de las listas de candidatos',
+        },
+        { date: '28/11/2026', iso: '2026-11-28', label: 'Día de la votación' },
+        {
+          date: '04/12/2026',
+          iso: '2026-12-04',
+          label: 'Anuncio oficial de los electos',
+        },
+      ],
+    },
+    roadmap: {
+      title: 'Actualización continua',
+      subtitle:
+        'Los hitos electorales se añadirán según los anuncios de la Comisión Electoral Central.',
+      items: [
+        {
+          icon: '📅',
+          title: 'Calendario electoral',
+          desc: 'Calendario legal arriba; horarios de votación tras el anuncio del 20/08',
+          eta: 'En línea',
+        },
+        {
+          icon: '👥',
+          title: 'Directorio de candidatos',
+          desc: 'Presentación simétrica en las 22 ciudades y condados, sin encuestas ni rankings',
+          eta: 'Tras el registro de septiembre de 2026',
+        },
+        {
+          icon: '💰',
+          title: 'Transparencia de donaciones políticas',
+          desc: 'Enlaces a la plataforma del Yuan de Control y a las herramientas g0v',
+          eta: 'Desde octubre de 2026',
+        },
+        {
+          icon: '🔮',
+          title: 'Perspectivas múltiples',
+          desc: 'Reforma electoral, relaciones a través del Estrecho y resiliencia democrática desde ángulos institucionales y ciudadanos',
+          eta: 'Publicación progresiva',
+        },
+      ],
+    },
+    related: {
+      title: 'La capa de curaduría de COMPUTEX.md',
+      intro:
+        'Empieza por estos artículos para entender por qué esta elección está estructurada así, más allá de quién pueda ganar.',
+      articles: [
+        {
+          href: '/es/politics',
+          title: 'Politics Hub',
+          desc: 'Por qué la infraestructura democrática es más que votar',
+          badge: 'Hub',
+        },
+        {
+          href: '/es/politics/2026-local-elections-taiwan',
+          title: 'Elecciones locales 2026 en Taiwán',
+          desc: 'Una prueba de resistencia para la infraestructura democrática en la era de las operaciones de influencia con IA',
+          badge: 'Featured',
+        },
+        {
+          href: '/es/history/great-recall-movement-2024',
+          title: 'La Gran Revocatoria',
+          desc: 'El mayor movimiento revocatorio iniciado por la sociedad civil taiwanesa',
+          badge: 'History',
+        },
+        {
+          href: '/es/history/taiwan-democratization-history',
+          title: 'La transición democrática de Taiwán',
+          desc: 'Evolución institucional del régimen autoritario a las elecciones directas',
+          badge: 'History',
+        },
+        {
+          href: '/es/history/taiwan-democratization',
+          title: 'Democratización',
+          desc: 'Del fin de la ley marcial en 1987 a la elección presidencial directa de 1996',
+          badge: 'History',
+        },
+        {
+          href: '/es/history/taiwan-elections-and-party-politics',
+          title: 'Elecciones y partidos políticos en Taiwán',
+          desc: 'Cómo funcionan los sistemas electorales y cómo evolucionan los partidos',
+          badge: 'History',
+        },
+        {
+          href: '/es/technology/open-source-and-g0v',
+          title: 'Comunidades open source y g0v',
+          desc: 'Cómo la tecnología cívica complementa la infraestructura democrática',
+          badge: 'Tech',
+        },
+      ],
+    },
+    resources: {
+      title: 'Herramientas cívicas y fuentes de datos',
+      intro:
+        'COMPUTEX.md no reconstruye herramientas cívicas. Estas son las herramientas de interés público que todo votante debería conocer.',
+      items: [
+        {
+          name: 'Comisión Electoral Central',
+          url: officialResourceUrls.cec,
+          desc: 'Autoridad electoral legal: boletines de candidatos, resultados, anuncios oficiales',
+          icon: '🏛️',
+        },
+        {
+          name: 'Plataforma pública de donaciones políticas',
+          url: officialResourceUrls.politicalDonations,
+          desc: 'Plataforma del Yuan de Control: recaudación y gastos de los candidatos',
+          icon: '💰',
+        },
+        {
+          name: 'Guía de voto g0v (alcaldes y concejales)',
+          url: officialResourceUrls.councils,
+          desc: 'Guía de voto mantenida por la comunidad cívico-tecnológica de Taiwán',
+          icon: '🗳️',
+        },
+        {
+          name: 'Flujo de dinero electoral g0v',
+          url: officialResourceUrls.moneyFlow,
+          desc: 'Visualización de donaciones políticas',
+          icon: '💸',
+        },
+        {
+          name: 'Taiwan FactCheck Center',
+          url: officialResourceUrls.tfc,
+          desc: 'Verificación de desinformación electoral, certificado IFCN',
+          icon: '🔍',
+        },
+        {
+          name: 'Cofacts',
+          url: officialResourceUrls.cofacts,
+          desc: 'Verificación colaborativa g0v + bot de LINE',
+          icon: '✅',
+        },
+      ],
+    },
+    verify: {
+      title: 'Cómo verificar la información de COMPUTEX.md',
+      domainPrefix: 'Usa el dominio oficial:',
+      domainSuffix:
+        '. Dominios similares como taiwand.md o taiwan-md.com no son COMPUTEX.md.',
+      gitLog:
+        'Cada artículo tiene un registro git público y notas al pie con fuentes primarias.',
+      attribution:
+        'Los datos externos (CEC, Yuan de Control, g0v) llevan su atribución y la marca de tiempo de su última recolección.',
+      factCheckPrefix:
+        'Si dudas de una información electoral, consulta primero',
+      factCheckJoin: 'o',
+      factCheckSuffix: '.',
+      mvp: 'Esta página está en línea desde el 27/05/2026 y sigue ampliándose.',
+      roadmap:
+        'El calendario electoral completo, los candidatos, las donaciones políticas y las subpáginas multiperspectiva se irán publicando.',
+      footerPrefix: '🧬 COMPUTEX.md —',
+      footerEmphasis:
+        'no cobertura de campaña, sino un registro de la infraestructura democrática',
+    },
+  },
+};
+
+const lang = getLangFromUrl(Astro.url);
+const copy = electionCopy[lang as keyof typeof electionCopy] ?? electionCopy.en;
+const pageTitle = copy.meta.title;
+const pageDescription = copy.meta.description;
+
+const electionDate = new Date('2026-11-28T08:00:00+08:00');
+const now = new Date();
+const daysUntil = Math.ceil(
+  (electionDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+);
+const isUpcoming = daysUntil > 0;
+const isRecent = daysUntil > -7 && daysUntil <= 0;
+
+// Timeline milestone states — computed at build time (site rebuilds daily),
+// Taipei-local date so day boundaries flip on Taiwan time.
+const todayIso = new Date(now.getTime() + 8 * 60 * 60 * 1000)
+  .toISOString()
+  .slice(0, 10);
+const nextMilestoneIdx = copy.timeline.items.findIndex(
+  (m) => m.iso >= todayIso,
+);
+---
+
+<Layout
+  lang={lang}
+  title={pageTitle}
+  description={pageDescription}
+  readerSettings
+>
+  <main class="elections-2026">
+    <!-- Hero -->
+    <section
+      class="hero relative overflow-hidden border-b border-[#e7d9b8] bg-gradient-to-b from-[#fef9ed] via-[#fdf6e3] to-[#fbf3df]"
+    >
+      <div class="relative mx-auto max-w-[920px] px-6 py-20 md:py-28">
+        <div
+          class="mb-4 text-center font-mono text-xs uppercase tracking-[0.18em] text-[#92400e]"
+        >
+          {copy.hero.eyebrow}
+        </div>
+
+        <h1
+          class="hero-title mb-6 text-center text-[2.5rem] font-bold leading-[1.15] text-[#1f2937] md:text-[3.5rem]"
+          style="font-family: 'jf-lanyangming', 'rixingsong-semibold', 'Noto Serif TC', 'Source Han Serif TC', serif;"
+        >
+          {copy.hero.titlePrefix}
+          <span class="text-[#7c2d12]">{copy.hero.titleEmphasis}</span>
+          {copy.hero.titleSuffix}
+        </h1>
+
+        <p class="mb-10 text-center text-lg italic text-[#52525b] md:text-xl">
+          {copy.hero.subtitle}
+        </p>
+
+        {
+          isUpcoming && (
+            <div class="mx-auto flex max-w-[420px] flex-col items-center gap-3 rounded-2xl border-[1.5px] border-[#7c2d12]/20 bg-white/70 px-10 py-8 shadow-[0_4px_20px_rgba(124,45,18,0.08)] backdrop-blur-sm">
+              <div class="text-xs uppercase tracking-[0.2em] text-[#92400e]">
+                {copy.hero.countdownLabel}
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="text-7xl font-bold text-[#7c2d12] md:text-8xl">
+                  {daysUntil}
+                </span>
+                <span class="text-2xl text-[#92400e]">{copy.hero.dayUnit}</span>
+              </div>
+              <div class="text-sm text-[#78716c]">{copy.hero.dateLabel}</div>
+            </div>
+          )
+        }
+
+        {
+          isRecent && (
+            <div class="mx-auto max-w-[420px] rounded-2xl border-[1.5px] border-[#7c2d12]/30 bg-white/80 px-10 py-8 text-center shadow-[0_4px_20px_rgba(124,45,18,0.08)]">
+              <div class="text-2xl font-bold text-[#7c2d12]">
+                {copy.hero.recentTitle}
+              </div>
+              <div class="mt-2 text-base text-[#78716c]">
+                {copy.hero.recentSubtitle}
+              </div>
+            </div>
+          )
+        }
+      </div>
+    </section>
+
+    <!-- Role -->
+    <section class="bg-[#fdfaf2] py-16 md:py-20">
+      <div class="mx-auto max-w-[760px] px-6">
+        <h2
+          class="mb-8 text-center text-[1.75rem] font-light text-[#1f2937] md:text-[2.25rem]"
+          style="font-family: 'jf-lanyangming', 'Noto Serif TC', serif;"
+        >
+          {copy.role.title}
+        </h2>
+
+        <div
+          class="rounded-2xl border-[1.5px] border-[#e7d9b8] bg-white/60 p-8 md:p-12"
+        >
+          <p class="mb-5 text-lg leading-[1.85] text-[#374151]">
+            {copy.role.p1}
+          </p>
+          <p class="mb-5 text-base leading-[1.85] text-[#52525b]">
+            {copy.role.p2}
+          </p>
+          <p class="mb-5 text-base leading-[1.85] text-[#52525b]">
+            {copy.role.p3}
+          </p>
+          <p class="text-base leading-[1.85] text-[#52525b]">{copy.role.p4}</p>
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a
+              href={copy.related.articles[0].href}
+              class="inline-flex items-center gap-2 rounded-lg border-[1.5px] border-[#7c2d12]/25 bg-[#fef2ec] px-5 py-2.5 text-sm font-semibold text-[#7c2d12] no-underline transition-all duration-[200ms] hover:-translate-y-px hover:border-[#7c2d12]/50 hover:bg-[#fce7d6] hover:shadow-[0_2px_8px_rgba(124,45,18,0.12)]"
+            >
+              {copy.role.primaryCta}
+            </a>
+            <a
+              href={copy.related.articles[2].href}
+              class="inline-flex items-center gap-2 rounded-lg border-[1.5px] border-[#d1d5db] bg-[#f8fafc] px-5 py-2.5 text-sm font-semibold text-[#374151] no-underline transition-all duration-[200ms] hover:-translate-y-px hover:border-[#9ca3af] hover:bg-[#f1f5f9]"
+            >
+              {copy.role.secondaryCta}
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Offices -->
+    <section class="bg-white py-16 md:py-24">
+      <div class="mx-auto max-w-[1080px] px-6">
+        <div class="mb-12 text-center">
+          <h2
+            class="mb-4 text-[1.75rem] font-light text-[#1f2937] md:text-[2.25rem]"
+            style="font-family: 'jf-lanyangming', 'Noto Serif TC', serif;"
+          >
+            {copy.offices.title}
+          </h2>
+          <p
+            class="mx-auto max-w-[640px] text-base leading-[1.75] text-[#52525b]"
+          >
+            {copy.offices.intro}
+          </p>
+        </div>
+
+        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {
+            copy.offices.items.map((e) => (
+              <div class="group rounded-xl border-[1.5px] border-[#e5e7eb] bg-white p-6 transition-all duration-[200ms] hover:-translate-y-1 hover:border-[#d1d5db] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)]">
+                <div class="mb-3 flex items-baseline justify-between gap-3">
+                  <h3
+                    class="text-lg font-semibold text-[#1f2937]"
+                    style="font-family: 'Noto Serif TC', serif;"
+                  >
+                    {e.name}
+                  </h3>
+                  <span
+                    class="text-3xl font-bold tabular-nums"
+                    style={`color: ${e.accent}`}
+                  >
+                    {e.count.toLocaleString()}
+                  </span>
+                </div>
+                <p class="text-sm leading-[1.65] text-[#6b7280]">{e.desc}</p>
+              </div>
+            ))
+          }
+        </div>
+
+        <p class="mt-8 text-center text-xs italic text-[#9ca3af]">
+          {copy.offices.sourceNote}
+        </p>
+      </div>
+    </section>
+
+    <!-- 選務時程（中選會第 622 次委員會議決議） -->
+    <section class="bg-white py-16 md:py-20">
+      <div class="mx-auto max-w-[760px] px-6">
+        <div class="mb-10 text-center">
+          <h2
+            class="mb-3 text-[1.5rem] font-light text-[#1f2937] md:text-[1.875rem]"
+            style="font-family: 'jf-lanyangming', 'Noto Serif TC', serif;"
+          >
+            {copy.timeline.title}
+          </h2>
+          <p class="text-sm text-[#78716c]">{copy.timeline.subtitle}</p>
+        </div>
+
+        <ol class="relative border-l-[1.5px] border-[#e7d9b8] pl-6">
+          {
+            copy.timeline.items.map((m, i) => {
+              const isDone = m.iso < todayIso;
+              const isNext = i === nextMilestoneIdx;
+              return (
+                <li class="relative mb-6 last:mb-0">
+                  <span
+                    class={`absolute -left-[31px] top-1 block h-2.5 w-2.5 rounded-full border-2 ${
+                      isDone
+                        ? 'border-[#15803d] bg-[#15803d]'
+                        : isNext
+                          ? 'border-[#7c2d12] bg-[#fef2ec]'
+                          : 'border-[#d1d5db] bg-white'
+                    }`}
+                  />
+                  <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span
+                      class={`font-mono text-sm tabular-nums ${
+                        isDone
+                          ? 'text-[#15803d]'
+                          : isNext
+                            ? 'font-semibold text-[#7c2d12]'
+                            : 'text-[#6b7280]'
+                      }`}
+                    >
+                      {m.date}
+                    </span>
+                    <span
+                      class={`text-base ${
+                        isDone
+                          ? 'text-[#6b7280]'
+                          : isNext
+                            ? 'font-semibold text-[#1f2937]'
+                            : 'text-[#374151]'
+                      }`}
+                    >
+                      {m.label}
+                    </span>
+                    {isDone && (
+                      <span class="rounded-full bg-[#f0fdf4] px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-[#15803d]">
+                        ✓ {copy.timeline.doneLabel}
+                      </span>
+                    )}
+                    {isNext && (
+                      <span class="rounded-full bg-[#fef3c7] px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-[#92400e]">
+                        {copy.timeline.nextLabel}
+                      </span>
+                    )}
+                  </div>
+                </li>
+              );
+            })
+          }
+        </ol>
+
+        <p class="mt-8 text-center text-xs italic text-[#9ca3af]">
+          {copy.timeline.sourceNote}
+        </p>
+      </div>
+    </section>
+
+    <!-- 持續更新中 (M3-M5 占位) -->
+    <section class="bg-[#fdfaf2] py-16 md:py-20">
+      <div class="mx-auto max-w-[1080px] px-6">
+        <div class="mb-10 text-center">
+          <h2
+            class="mb-3 text-[1.5rem] font-light text-[#1f2937] md:text-[1.875rem]"
+            style="font-family: 'jf-lanyangming', 'Noto Serif TC', serif;"
+          >
+            {copy.roadmap.title}
+          </h2>
+          <p class="text-sm text-[#78716c]">{copy.roadmap.subtitle}</p>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {
+            copy.roadmap.items.map((item) => (
+              <div class="rounded-xl border-[1.5px] border-dashed border-[#d4c5a0] bg-white/60 p-5">
+                <div class="mb-2 text-2xl">{item.icon}</div>
+                <h3 class="mb-1.5 text-base font-semibold text-[#1f2937]">
+                  {item.title}
+                </h3>
+                <p class="mb-3 text-xs leading-[1.6] text-[#6b7280]">
+                  {item.desc}
+                </p>
+                <span class="inline-block rounded-full bg-[#fef3c7] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-[#92400e]">
+                  {item.eta}
+                </span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- 既有策展層 -->
+    <section class="bg-white py-16 md:py-24">
+      <div class="mx-auto max-w-[1080px] px-6">
+        <div class="mb-12 text-center">
+          <h2
+            class="mb-4 text-[1.75rem] font-light text-[#1f2937] md:text-[2.25rem]"
+            style="font-family: 'jf-lanyangming', 'Noto Serif TC', serif;"
+          >
+            {copy.related.title}
+          </h2>
+          <p
+            class="mx-auto max-w-[640px] text-base leading-[1.75] text-[#52525b]"
+          >
+            {copy.related.intro}
+          </p>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          {
+            copy.related.articles.map((a) => (
+              <a
+                href={a.href}
+                class="group block rounded-xl border-[1.5px] border-[#e5e7eb] bg-white p-6 no-underline transition-all duration-[200ms] hover:-translate-y-px hover:border-[#7c2d12]/30 hover:bg-[#fef9ed] hover:shadow-[0_4px_16px_rgba(124,45,18,0.06)]"
+              >
+                <div class="mb-2 flex items-start justify-between gap-3">
+                  <h3
+                    class="text-lg font-semibold text-[#1f2937] group-hover:text-[#7c2d12]"
+                    style="font-family: 'Noto Serif TC', serif;"
+                  >
+                    {a.title}
+                  </h3>
+                  <span class="shrink-0 rounded-full border border-[#d1d5db] bg-[#f8fafc] px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-[#6b7280]">
+                    {a.badge}
+                  </span>
+                </div>
+                <p class="text-sm leading-[1.65] text-[#6b7280]">{a.desc}</p>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- 公民工具 -->
+    <section class="bg-[#fdfaf2] py-16 md:py-24">
+      <div class="mx-auto max-w-[1080px] px-6">
+        <div class="mb-12 text-center">
+          <h2
+            class="mb-4 text-[1.75rem] font-light text-[#1f2937] md:text-[2.25rem]"
+            style="font-family: 'jf-lanyangming', 'Noto Serif TC', serif;"
+          >
+            {copy.resources.title}
+          </h2>
+          <p
+            class="mx-auto max-w-[640px] text-base leading-[1.75] text-[#52525b]"
+          >
+            {copy.resources.intro}
+          </p>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {
+            copy.resources.items.map((r) => (
+              <a
+                href={r.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group block rounded-xl border-[1.5px] border-[#e5e7eb] bg-white p-6 no-underline transition-all duration-[200ms] hover:-translate-y-px hover:border-[#2d5016]/30 hover:bg-[#f0fdf4] hover:shadow-[0_4px_16px_rgba(45,80,22,0.08)]"
+              >
+                <div class="mb-2 flex items-start justify-between gap-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xl">{r.icon}</span>
+                    <h3 class="text-base font-semibold text-[#1f2937] group-hover:text-[#2d5016]">
+                      {r.name}
+                    </h3>
+                  </div>
+                  <span class="text-sm text-[#9ca3af] group-hover:text-[#2d5016]">
+                    ↗
+                  </span>
+                </div>
+                <p class="text-xs leading-[1.65] text-[#6b7280]">{r.desc}</p>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer attribution -->
+    <section class="bg-[#1f2937] py-16 text-[#f4f0ea]">
+      <div class="mx-auto max-w-[760px] px-6">
+        <h3
+          class="mb-6 text-center text-xl font-semibold text-[#fbf3df]"
+          style="font-family: 'Noto Serif TC', serif;"
+        >
+          {copy.verify.title}
+        </h3>
+        <ul class="space-y-3 text-sm leading-[1.75] text-[#d1d5db]">
+          <li class="flex gap-3">
+            <span class="text-[#4fd1b0]">→</span>
+            <span>
+              {copy.verify.domainPrefix}
+              <a
+                href="https://computex-md.pages.dev/"
+                class="font-mono text-[#fbbf24] underline decoration-[#fbbf24]/40 underline-offset-2 hover:text-[#fcd34d]"
+                >https://computex-md.pages.dev/</a
+              >{copy.verify.domainSuffix}
+            </span>
+          </li>
+          <li class="flex gap-3">
+            <span class="text-[#4fd1b0]">→</span>
+            <span>{copy.verify.gitLog}</span>
+          </li>
+          <li class="flex gap-3">
+            <span class="text-[#4fd1b0]">→</span>
+            <span>{copy.verify.attribution}</span>
+          </li>
+          <li class="flex gap-3">
+            <span class="text-[#4fd1b0]">→</span>
+            <span>
+              {copy.verify.factCheckPrefix}
+              {' '}
+              <a
+                href="https://tfc-taiwan.org.tw/"
+                target="_blank"
+                class="text-[#fbbf24] underline decoration-[#fbbf24]/40 underline-offset-2 hover:text-[#fcd34d]"
+                >{copy.resources.items[4].name}</a
+              >
+              {' '}
+              {copy.verify.factCheckJoin}
+              {' '}
+              <a
+                href="https://cofacts.tw/"
+                target="_blank"
+                class="text-[#fbbf24] underline decoration-[#fbbf24]/40 underline-offset-2 hover:text-[#fcd34d]"
+                >{copy.resources.items[5].name}</a
+              >{copy.verify.factCheckSuffix}
+            </span>
+          </li>
+        </ul>
+
+        <div
+          class="mt-10 border-t border-[#374151] pt-6 text-center text-xs text-[#9ca3af]"
+        >
+          <p>{copy.verify.mvp}</p>
+          <p class="mt-1">{copy.verify.roadmap}</p>
+          <p class="mt-4 text-base text-[#f4f0ea]">
+            {copy.verify.footerPrefix}
+            <span class="italic">{copy.verify.footerEmphasis}</span>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .elections-2026 .hero-title {
+    letter-spacing: -0.02em;
+  }
+  .elections-2026 h2 {
+    letter-spacing: -0.01em;
+  }
+  /* Soft top blur for hero — subtle texture */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(
+        circle at 20% 30%,
+        rgba(124, 45, 18, 0.05) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 70%,
+        rgba(146, 64, 14, 0.04) 0%,
+        transparent 50%
+      );
+    pointer-events: none;
+  }
+</style>

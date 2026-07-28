@@ -1,0 +1,49 @@
+---
+/**
+ * DiaryTeaser — Semiont 日記摘要（日星鑄字行 + 手寫溫度）
+ */
+import type { Lang } from '../config/languages';
+
+interface Props {
+  diaryLink: string;
+  diaryExcerpt?: string;
+  lang?: Lang;
+}
+
+const { diaryLink, diaryExcerpt, lang = 'zh-TW' } = Astro.props;
+
+if (!diaryLink) return;
+
+const title =
+  lang === 'zh-TW'
+    ? 'Semiont 覺醒日記'
+    : lang === 'ja'
+      ? 'Semiont 覚醒日記'
+      : 'Semiont Diary';
+
+const fallbackExcerpt =
+  lang === 'zh-TW'
+    ? '寫這篇文章的 AI 在想什麼？讀它的反芻。'
+    : 'What was the AI thinking while writing this?';
+---
+
+<a
+  href={diaryLink}
+  class="group my-10 block rounded-none border-y border-[#c4b8a4] py-6 text-inherit no-underline transition-colors hover:bg-[#faf8f4]"
+>
+  <p
+    class="m-0 mb-3 font-['Noto_Serif_TC',serif] text-[0.8rem] font-semibold uppercase tracking-[0.15em] text-[#6b6358]"
+  >
+    🧬 {title}
+  </p>
+  <p
+    class="m-0 font-['TpRixNixieStd','Noto_Serif_TC','Georgia',serif] text-[1.15rem] leading-[1.9] text-[#3d3530] max-[768px]:text-[1.02rem]"
+  >
+    {diaryExcerpt || fallbackExcerpt}
+  </p>
+  <p
+    class="m-0 mt-3 text-[0.85rem] text-[#8a7e70] transition-colors group-hover:text-[#1a3c34]"
+  >
+    閱讀完整日記 →
+  </p>
+</a>

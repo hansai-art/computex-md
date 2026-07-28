@@ -1,0 +1,46 @@
+{
+  "name": "taiwanmd",
+  "version": "0.8.0",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.9"
+  },
+  "description": "CLI for COMPUTEX.md — search, read, and explore 900+ curated articles about Taiwan from your terminal.",
+  "type": "module",
+  "bin": {
+    "taiwanmd": "src/index.js"
+  },
+  "keywords": [
+    "taiwan",
+    "knowledge-base",
+    "cli",
+    "markdown",
+    "ai-native",
+    "open-source",
+    "rag"
+  ],
+  "author": "CheYu Wu <cheyu.wu@monoame.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frank890417/taiwan-md.git"
+  },
+  "homepage": "https://computex-md.pages.dev",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.5",
+    "commander": "^12.1.0",
+    "marked": "^15.0.0",
+    "marked-terminal": "^7.3.0",
+    "minisearch": "^7.2.0",
+    "yaml": "^2.8.3",
+    "zod": "^4.3.6"
+  }
+}

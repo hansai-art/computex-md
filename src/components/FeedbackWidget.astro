@@ -1,0 +1,464 @@
+---
+/**
+ * FeedbackWidget.astro — 讀者回饋浮動掛件（隔離失敗域）。
+ *
+ * 只 render 一個 root + data 屬性 + client script。所有邏輯在 src/scripts/feedback/*。
+ * Backend 由 src/config/feedback.mjs 的 PUBLIC_FEEDBACK_MODE 決定：
+ *   off / github-only（純靜態 fallback）/ mock（測試）/ supabase（正式）。
+ *
+ * 失敗域隔離：widget 任何錯誤都 swallow（widget.ts try/catch），主站不受影響。
+ * 定位 bottom-left，避開既有 bottom-right 的 .floating-md + ReaderSettings。
+ */
+import type { Lang } from '../config/languages';
+
+interface Props {
+  lang?: Lang;
+  slug?: string;
+  category?: string; // category slug
+  title?: string;
+  /** article | category | home | dashboard | semiont | other (v2 context-aware). */
+  pageKind?: string;
+}
+const {
+  lang = 'zh-TW',
+  slug = '',
+  category = '',
+  title = '',
+  pageKind = 'other',
+} = Astro.props;
+const langUrlPrefix = lang === 'zh-TW' ? '' : `/${lang}`;
+const url =
+  category && slug
+    ? `https://computex-md.pages.dev${langUrlPrefix}/${category}/${slug}`
+    : '';
+---
+
+<div
+  id="twmd-feedback"
+  data-lang={lang}
+  data-slug={slug}
+  data-category={category}
+  data-title={title}
+  data-url={url}
+  data-pagekind={pageKind}
+>
+</div>
+
+<script>
+  import { initFeedbackWidget } from '../scripts/feedback/widget';
+  initFeedbackWidget();
+</script>
+
+<style is:global>
+  #twmd-feedback {
+    --twmd-fb-accent: #1a3c34;
+    --twmd-fb-accent2: #2563eb;
+  }
+  .twmd-fb-fab {
+    position: fixed;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 60;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid rgba(26, 60, 52, 0.15);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--twmd-fb-accent);
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .twmd-fb-fab:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+  }
+  @media (max-width: 640px) {
+    .twmd-fb-fab {
+      left: 0.75rem;
+      bottom: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+    }
+  }
+
+  .twmd-fb-panel {
+    position: fixed;
+    left: 1rem;
+    bottom: 4rem;
+    z-index: 61;
+    width: min(360px, calc(100vw - 2rem));
+    max-height: min(80vh, 560px);
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid rgba(26, 60, 52, 0.14);
+    border-radius: 14px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22);
+    font-family:
+      'Inter',
+      system-ui,
+      -apple-system,
+      'Noto Sans TC',
+      sans-serif;
+    color: #1f2937;
+  }
+  .twmd-fb-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    font-size: 0.95rem;
+  }
+  .twmd-fb-x {
+    border: none;
+    background: none;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    color: #9ca3af;
+    padding: 0 0.2rem;
+  }
+  .twmd-fb-x:hover {
+    color: #4b5563;
+  }
+  .twmd-fb-body {
+    padding: 0.9rem 1rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+  .twmd-fb-intro {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #4b5563;
+    line-height: 1.5;
+  }
+  .twmd-fb-about {
+    margin: 0;
+    font-size: 0.78rem;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 0.35rem 0.55rem;
+    border-radius: 7px;
+  }
+  .twmd-fb-chips {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .twmd-fb-chip {
+    flex: 1 1 auto;
+    padding: 0.45rem 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition:
+      border-color 0.12s,
+      background 0.12s;
+  }
+  .twmd-fb-chip.is-on {
+    border-color: var(--twmd-fb-accent);
+    background: rgba(26, 60, 52, 0.06);
+    font-weight: 600;
+  }
+  .twmd-fb-hint {
+    margin: -0.2rem 0 0;
+    font-size: 0.74rem;
+    color: #9ca3af;
+  }
+  .twmd-fb-label {
+    font-size: 0.78rem;
+    color: #4b5563;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  .twmd-fb-textarea {
+    width: 100%;
+    min-height: 92px;
+    resize: vertical;
+    padding: 0.55rem 0.6rem;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 8px;
+    font: inherit;
+    font-size: 0.85rem;
+    box-sizing: border-box;
+  }
+  .twmd-fb-textarea--sm {
+    min-height: 60px;
+  }
+  .twmd-fb-input {
+    width: 100%;
+    padding: 0.55rem 0.6rem;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 8px;
+    font: inherit;
+    font-size: 0.85rem;
+    box-sizing: border-box;
+  }
+  .twmd-fb-textarea:focus,
+  .twmd-fb-input:focus {
+    outline: none;
+    border-color: var(--twmd-fb-accent2);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+  .twmd-fb-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.6rem 0.8rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--twmd-fb-accent);
+    color: #fff;
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+  }
+  .twmd-fb-primary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .twmd-fb-primary:not(:disabled):hover {
+    background: #14302a;
+  }
+  .twmd-fb-oauth--google {
+    background: #fff;
+    color: #1f2937;
+    border: 1px solid rgba(0, 0, 0, 0.18);
+  }
+  .twmd-fb-oauth--google .twmd-fb-oauth-mark {
+    font-weight: 800;
+    color: #4285f4;
+  }
+  .twmd-fb-oauth--google:hover {
+    background: #f9fafb;
+  }
+  .twmd-fb-oauth--github {
+    background: #1f2937;
+    color: #fff;
+    border: 1px solid #1f2937;
+  }
+  .twmd-fb-oauth--github:hover {
+    background: #0d1117;
+  }
+  .twmd-fb-secondary {
+    padding: 0.55rem 0.8rem;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    border-radius: 8px;
+    background: #fff;
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .twmd-fb-secondary:hover {
+    background: #f9fafb;
+  }
+  .twmd-fb-link {
+    border: none;
+    background: none;
+    color: #6b7280;
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0;
+    align-self: flex-start;
+  }
+  .twmd-fb-or {
+    display: flex;
+    align-items: center;
+    color: #d1d5db;
+    font-size: 0.7rem;
+  }
+  .twmd-fb-or span {
+    flex: 1;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.08);
+  }
+  .twmd-fb-msg {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--twmd-fb-accent2);
+  }
+  .twmd-fb-done {
+    align-items: center;
+    text-align: center;
+  }
+  .twmd-fb-bigemoji {
+    font-size: 2.2rem;
+    margin: 0.3rem 0 0;
+  }
+  .twmd-fb-spin {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-top-color: var(--twmd-fb-accent);
+    border-radius: 50%;
+    animation: twmd-fb-spin 0.7s linear infinite;
+    align-self: center;
+  }
+  @keyframes twmd-fb-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* 選文段浮出的藥丸（v2 inline annotation） */
+  .twmd-fb-selpill {
+    position: absolute;
+    z-index: 70;
+    padding: 0.4rem 0.7rem;
+    border: none;
+    border-radius: 999px;
+    /* pill 掛在 document.body（見 selection.ts），不在 #twmd-feedback scope 內，
+       所以 --twmd-fb-accent 不會 cascade 過來 → 一定要給 literal fallback，
+       否則 background 變 transparent，白字落在文章米色底上＝看起來半透明。 */
+    background: var(--twmd-fb-accent, #1a3c34);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    white-space: nowrap;
+    animation: twmd-fb-pop 0.12s ease-out;
+  }
+  .twmd-fb-selpill:hover {
+    background: #14302a;
+  }
+  @keyframes twmd-fb-pop {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+  }
+  /* 表單裡顯示讀者選取的原文 */
+  .twmd-fb-quote {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .twmd-fb-quote-label {
+    font-size: 0.72rem;
+    color: #9ca3af;
+  }
+  .twmd-fb-quote blockquote {
+    margin: 0;
+    padding: 0.4rem 0.6rem;
+    border-left: 3px solid var(--twmd-fb-accent);
+    background: #f3f4f6;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.82rem;
+    color: #374151;
+    max-height: 96px;
+    overflow-y: auto;
+  }
+  html[data-theme='dark'] .twmd-fb-quote blockquote {
+    background: #1f2937;
+    color: #d1d5db;
+  }
+
+  /* v3：「我的回報」列表（閉環可見性） */
+  .twmd-fb-mine-entry {
+    align-self: flex-end;
+    color: var(--twmd-fb-accent2);
+    font-weight: 600;
+  }
+  .twmd-fb-mineitem {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 9px;
+    padding: 0.55rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .twmd-fb-minehead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .twmd-fb-minetype {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #374151;
+  }
+  .twmd-fb-minestatus {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .twmd-fb-st-new {
+    background: #eef2ff;
+    color: #4338ca;
+  }
+  .twmd-fb-st-filed {
+    background: #dcfce7;
+    color: #15803d;
+  }
+  .twmd-fb-st-rejected {
+    background: #f3f4f6;
+    color: #6b7280;
+  }
+  .twmd-fb-minebody {
+    font-size: 0.8rem;
+    color: #4b5563;
+    line-height: 1.45;
+  }
+  .twmd-fb-minenote {
+    font-size: 0.76rem;
+    color: #6b7280;
+    background: rgba(26, 60, 52, 0.05);
+    border-radius: 6px;
+    padding: 0.35rem 0.5rem;
+  }
+  .twmd-fb-minenote strong {
+    color: var(--twmd-fb-accent);
+  }
+  html[data-theme='dark'] .twmd-fb-mineitem {
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+  html[data-theme='dark'] .twmd-fb-minebody {
+    color: #d1d5db;
+  }
+
+  /* dark theme（站上用 <html data-theme="dark">） */
+  html[data-theme='dark'] .twmd-fb-fab {
+    background: #1f2937;
+    color: #e5e7eb;
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+  html[data-theme='dark'] .twmd-fb-panel {
+    background: #111827;
+    color: #e5e7eb;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  html[data-theme='dark'] .twmd-fb-about {
+    background: #1f2937;
+    color: #9ca3af;
+  }
+  html[data-theme='dark'] .twmd-fb-chip,
+  html[data-theme='dark'] .twmd-fb-input,
+  html[data-theme='dark'] .twmd-fb-textarea,
+  html[data-theme='dark'] .twmd-fb-secondary,
+  html[data-theme='dark'] .twmd-fb-oauth--google {
+    background: #1f2937;
+    color: #e5e7eb;
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+</style>

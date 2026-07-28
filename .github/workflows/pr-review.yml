@@ -1,0 +1,241 @@
+name: PR Content Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    # 2026-05-03 cross-lang-baseline post-mortem: PR #797 1435 file change 撞
+    # GitHub Actions「Argument list too long」shell limit。PR review 只對
+    # CONTENT / ENGINEERING change 有意義 — 純 docs/ memory/ diary/ reports/
+    # PR 跳過避免 false-fail + 加速 CI。
+    paths:
+      - 'knowledge/**'
+      - 'src/**'
+      - 'scripts/**'
+      - 'astro.config.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: files
+        run: |
+          # Use 3-dot (merge-base) diff + --diff-filter=ACMR to get only files
+          # actually added/modified/copied/renamed BY the PR — not files that
+          # disappeared because main moved ahead while the PR branch stayed put.
+          # Bug history: 2026-04-21 PR #582 (code-only i18n refactor) failed
+          # content review because main had just gained Hello-Nico.md, which
+          # 2-dot diff reported as "deleted in PR head". See:
+          # https://github.com/frank890417/taiwan-md/actions/runs/24703099747
+          #
+          # 2026-05-06 jovial-feistel fix: for fork PRs, the head SHA isn't in
+          # the local clone, so `base.sha...head.sha` returned empty and the
+          # workflow false-classified every fork PR as `pr_type=engineering`
+          # then SKIPPED review entirely. Fall back to the merge ref's two
+          # parents (HEAD^1 = base, HEAD^2 = fork's PR head) which
+          # actions/checkout@v5 fetched as part of the synthetic merge commit.
+          FILES=$(git diff --name-only --diff-filter=ACMR \
+            "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}" \
+            2>/dev/null)
+          if [ -z "$FILES" ] && git rev-parse HEAD^2 >/dev/null 2>&1; then
+            echo "ℹ️  Falling back to merge-parents diff (likely fork PR)"
+            FILES=$(git diff --name-only --diff-filter=ACMR HEAD^1...HEAD^2)
+          fi
+          echo "all_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Classify PR type
+          CONTENT_ONLY=true
+          TRANSLATION_ONLY=true
+          HAS_CONTENT=false
+          HAS_ENGINEERING=false
+
+          while IFS= read -r f; do
+            [[ -z "$f" ]] && continue
+            if [[ "$f" =~ ^knowledge/.*\.md$ ]] || [[ "$f" =~ ^src/content/.*\.md$ ]]; then
+              HAS_CONTENT=true
+              # Translation locale segment (knowledge/<lang>/… or src/content/<lang>/…)
+              # Keep locales in sync with .github/workflows/translation-check.yml (+ pt/th/id/ar from its validator)
+              if [[ "$f" =~ ^knowledge/(en|es|ja|ko|fr|de|vi|pt|th|id|ar)/ ]] || \
+                 [[ "$f" =~ ^src/content/(en|es|ja|ko|fr|de|vi|pt|th|id|ar)/ ]]; then
+                :
+              else
+                TRANSLATION_ONLY=false
+              fi
+            else
+              CONTENT_ONLY=false
+              TRANSLATION_ONLY=false
+              HAS_ENGINEERING=true
+            fi
+          done <<< "$FILES"
+
+          if [[ "$CONTENT_ONLY" == "true" ]] && [[ "$HAS_CONTENT" == "true" ]]; then
+            if [[ "$TRANSLATION_ONLY" == "true" ]]; then
+              echo "pr_type=translation" >> $GITHUB_OUTPUT
+            else
+              echo "pr_type=content" >> $GITHUB_OUTPUT
+            fi
+          elif [[ "$HAS_CONTENT" == "true" ]] && [[ "$HAS_ENGINEERING" == "true" ]]; then
+            echo "pr_type=mixed" >> $GITHUB_OUTPUT
+          else
+            echo "pr_type=engineering" >> $GITHUB_OUTPUT
+          fi
+
+          # Content files only (for review script).
+          # Defensive: also filter out any files that don't actually exist in
+          # the checked-out HEAD (belt-and-suspenders against --diff-filter
+          # edge cases or base/head sha weirdness).
+          CONTENT_FILES=""
+          while IFS= read -r f; do
+            [[ -z "$f" ]] && continue
+            [[ "$f" =~ ^(knowledge|src/content)/.*\.md$ ]] || continue
+            [[ -f "$f" ]] || continue
+            CONTENT_FILES+="$f"$'\n'
+          done <<< "$FILES"
+          echo "content_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CONTENT_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Label PR type
+        if: steps.files.outputs.pr_type == 'mixed'
+        continue-on-error: true
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['mixed-pr']
+            });
+
+      - name: Skip non-content PRs
+        if: steps.files.outputs.pr_type == 'engineering'
+        run: echo "⏭️ Engineering PR — skipping content review"
+
+      - name: Run content review
+        if: steps.files.outputs.pr_type == 'content' || steps.files.outputs.pr_type == 'mixed'
+        id: review
+        run: |
+          chmod +x scripts/tools/review-pr.sh
+          CONTENT_FILES="${{ steps.files.outputs.content_files }}"
+          
+          # Convert newlines to space for script args
+          ARGS=$(echo "$CONTENT_FILES" | tr '\n' ' ')
+          
+          # Run review (capture output, don't fail yet)
+          set +e
+          RESULT=$(bash scripts/tools/review-pr.sh $ARGS 2>&1 | sed 's/\x1b\[[0-9;]*m//g')
+          EXIT_CODE=$?
+          set -e
+          
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+          
+          # Determine status for labeling
+          if echo "$RESULT" | grep -q '🔴 FAIL'; then
+            echo "status=fail" >> $GITHUB_OUTPUT
+          elif echo "$RESULT" | grep -q '🟡 WARNING'; then
+            echo "status=warning" >> $GITHUB_OUTPUT
+          else
+            echo "status=pass" >> $GITHUB_OUTPUT
+          fi
+          
+          # Save result for comment
+          echo "result<<EOF" >> $GITHUB_OUTPUT
+          echo "$RESULT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Comment review result
+        if: steps.files.outputs.pr_type == 'content' || steps.files.outputs.pr_type == 'mixed'
+        continue-on-error: true
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const result = `${{ steps.review.outputs.result }}`;
+            const status = '${{ steps.review.outputs.status }}';
+            
+            let header = '';
+            if (status === 'pass') header = '## ✅ 自動審核通過';
+            else if (status === 'warning') header = '## 🟡 自動審核通過（有建議）';
+            else header = '## 🔴 自動審核未通過';
+            
+            const body = `${header}\n\n\`\`\`\n${result}\n\`\`\`\n\n---\n*Taiwan.md PR Review Bot • 四層免疫系統*`;
+            
+            // Find and update existing bot comment, or create new
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const botComment = comments.find(c => c.body.includes('Taiwan.md PR Review Bot'));
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      - name: Label result
+        if: steps.files.outputs.pr_type == 'content' || steps.files.outputs.pr_type == 'mixed'
+        continue-on-error: true
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const status = '${{ steps.review.outputs.status }}';
+            const labels = {
+              pass: 'ready-for-review',
+              warning: 'needs-review',
+              fail: 'needs-work'
+            };
+            const removeLabels = ['ready-for-review', 'needs-review', 'needs-work'];
+            
+            // Remove old labels
+            for (const label of removeLabels) {
+              try {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  name: label,
+                });
+              } catch (e) { /* label not present */ }
+            }
+            
+            // Add new label
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: [labels[status]],
+            });
+
+      - name: Fail on review failure
+        if: (steps.files.outputs.pr_type == 'content' || steps.files.outputs.pr_type == 'mixed') && steps.review.outputs.status == 'fail'
+        run: |
+          echo "Content review failed. See the Run content review log for details."
+          exit 1

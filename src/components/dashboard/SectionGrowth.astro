@@ -1,0 +1,18 @@
+---
+// SectionGrowth — 📈 Growth Timeline section (#growth). Ids/classes are a
+// contract with src/scripts/dashboard-client.js and src/styles/dashboard/ — do not rename.
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<!-- Growth Timeline -->
+<section class="section" id="growth">
+  <h2 class="section-title">
+    {t('dashboard.growth.title')}
+    <span class="section-timestamp" data-source="articles"></span>
+  </h2>
+  <p class="section-subtitle">{t('dashboard.growth.subtitle')}</p>
+  <div class="growth-chart" id="growth-chart"></div>
+</section>

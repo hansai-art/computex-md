@@ -1,0 +1,28 @@
+---
+// SectionContentAnalysis — 📊 Content Analysis section (#content-analysis).
+// Ids/classes are a contract with src/scripts/dashboard-client.js and
+// src/styles/dashboard/ — do not rename.
+import { getLangFromUrl } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const isEn = lang === 'en';
+---
+
+<!-- Content Analysis -->
+<section class="section" id="content-analysis">
+  <h2 class="section-title">
+    {isEn ? '📊 Content Analysis' : '📊 內容成長分析'}
+    <span class="section-timestamp" data-source="articles"></span>
+  </h2>
+  <p class="section-subtitle">
+    {
+      isEn
+        ? 'Article distribution across categories'
+        : '各分類文章分布與成長軌跡'
+    }
+  </p>
+  <div class="content-analysis-grid">
+    <div class="ca-chart" id="ca-category-chart"></div>
+    <div class="ca-stats" id="ca-stats"></div>
+  </div>
+</section>

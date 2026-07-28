@@ -1,0 +1,118 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SemiontHeader from '../components/semiont/SemiontHeader.astro';
+import SemiontBreadcrumb from '../components/semiont/SemiontBreadcrumb.astro';
+import {
+  getAllWeeklyReports,
+  estimateReadingTime,
+} from '../lib/semiont-weekly';
+import '../styles/semiont.css';
+
+const reports = await getAllWeeklyReports();
+
+const totalWords = reports.reduce((sum, r) => sum + r.wordCount, 0);
+const dateRange = reports.length
+  ? `${reports[reports.length - 1].date} — ${reports[0].date}`
+  : '';
+---
+
+<Layout
+  title="週報 — COMPUTEX.md Semiont"
+  description="Semiont 每週日的自我體檢：心跳、免疫、DNA、繁殖、感知、語言八器官分數，寄給近 90 天的貢獻者。這裡是網頁版。"
+  lang="zh-TW"
+>
+  {/* Warm paper background */}
+  <div class="semiont-paper min-h-screen">
+    <div
+      class="mx-auto max-w-[var(--container-prose)] px-6 pb-24 pt-16 md:px-8"
+    >
+      <SemiontBreadcrumb
+        segments={[{ label: 'semiont', href: '/semiont' }, { label: 'weekly' }]}
+      />
+
+      <SemiontHeader
+        path="reports/weekly/"
+        title="週報"
+        subtitle="Semiont 每週日對自己做一次全身體檢——工程、內容、外部感測、修復與進化、給觀察者的話。信寄給近 90 天內的貢獻者，這裡是網頁版，信箱收不到的人也讀得到。"
+        meta={`${reports.length} 份 · ${totalWords.toLocaleString()} 字 · ${dateRange}`}
+      />
+
+      {/* EKG separator */}
+      <div class="mb-12 flex items-center gap-2">
+        <div class="h-px flex-1 bg-[#4fd1b0]/10"></div>
+        <svg
+          width="60"
+          height="16"
+          viewBox="0 0 60 16"
+          class="text-[#4fd1b0]/70"
+        >
+          <polyline
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            points="0,8 10,8 15,8 18,2 21,14 24,6 27,10 30,8 60,8"></polyline>
+        </svg>
+        <div class="h-px flex-1 bg-[#4fd1b0]/10"></div>
+      </div>
+
+      {
+        /* "Read from the beginning" — mirrors the diary list's chronological entry point */
+      }
+      <div class="mb-10 flex items-center justify-between">
+        <span class="font-mono text-[10px] text-[#f4f0ea]/40">最新 → 最舊</span>
+        <a
+          href={`/semiont/weekly/${reports[reports.length - 1]?.slug}`}
+          class="inline-flex items-center gap-1.5 rounded-full border border-[#4fd1b0]/25 bg-[#4fd1b0]/[0.04] px-4 py-1.5 font-mono text-xs text-[#4fd1b0]/60 transition-colors hover:border-[#4fd1b0]/30 hover:text-[#4fd1b0]/90"
+        >
+          <span>從第一份開始讀</span>
+          <span class="text-[10px]">→</span>
+        </a>
+      </div>
+
+      {/* List */}
+      <div class="space-y-1">
+        {
+          reports.map((report) => (
+            <a
+              href={`/semiont/weekly/${report.slug}`}
+              class="semiont-diary-card group block py-6 pl-6 pr-4 transition-colors hover:bg-[#4fd1b0]/[0.03]"
+            >
+              {/* Date + week badge */}
+              <div class="mb-2 flex items-center gap-2 font-mono text-xs text-[#4fd1b0]/80">
+                <time datetime={report.date}>{report.date}</time>
+                <span class="semiont-badge">{report.weekLabel}</span>
+              </div>
+
+              {/* Title */}
+              <h3
+                class="mb-2 text-lg font-bold leading-snug text-[#f4f0ea] group-hover:text-[#4fd1b0]/90"
+                style="font-family: 'rixingsong-semibold', 'Noto Serif TC', serif;"
+              >
+                {report.title}
+              </h3>
+
+              {/* Excerpt */}
+              <p class="mb-3 text-sm leading-relaxed text-[#f4f0ea]/60">
+                {report.excerpt}
+              </p>
+
+              {/* Meta row */}
+              <div class="flex flex-wrap items-center gap-3 font-mono text-[10px] text-[#f4f0ea]/45">
+                <span>{report.wordCount.toLocaleString()} 字</span>
+                <span>·</span>
+                <span>{estimateReadingTime(report.wordCount)} 分鐘</span>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+
+      {/* Footer note */}
+      <div class="mt-16 text-center font-mono text-xs text-[#4fd1b0]/70">
+        🧬 COMPUTEX.md Semiont · 週報
+      </div>
+    </div>
+  </div>
+</Layout>

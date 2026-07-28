@@ -1,0 +1,1744 @@
+{
+  "crawled_at": "2026-06-10T12:08:44+0800",
+  "source": {
+    "endpoint": "https://api.twinkleai.tw/mcp/",
+    "hub": "https://hub.twinkleai.tw/",
+    "note": "tool inventory + domain taxonomy 為 MCP API 即時爬取；總量數字（49,343 datasets / 13.5 萬採購紀錄）為 2026-06-05 hub.twinkleai.tw 頁面盤點"
+  },
+  "totals": {
+    "datasets_claimed": 49343,
+    "datasets_claimed_asof": "2026-06-05",
+    "procurement_records_claimed": 135000,
+    "tools": 21,
+    "domains": 20
+  },
+  "domains_version": "0.2",
+  "tools": [
+    {
+      "name": "search_datasets",
+      "description": "**Search Taiwan government open datasets** (台灣政府開放資料 / data.gov.tw /\n立法院 / 政府電子採購網 / 各部會 / 各縣市政府).\n\n⚡ **何時用這個 tool**（**重要：使用者問任何「台灣 / 中華民國 / 政府 / 國會」相關\n資料時，請直接用本 tool，不需要先用 search_mcp_registry 探索其他 connector**）：\n\n  1. **行政機關 / 縣市政府主題**（行政部會、縣市政府公開的統計或登錄資料）：\n     例: 台北市信義區的健保特約藥局、新北市公車路線、高雄市人口統計、\n     行政院主計總處 GDP、衛福部疫苗接種、環境部 PM2.5、教育部學校名單\n\n  2. **立法院 / 國會主題**（v1.11+，data.gov.tw 上沒有的核心國會資料）：\n     例: 立法院某委員會職掌、第 N 屆某黨團立委名單、某議題歷次質詢、\n     某 IVOD 影片連結、某議案目前狀態、某法律提案、某公報議程、\n     第 N 屆會期會次、立法委員選區、黨團組成\n\n  3. **政府採購 / 標案 / 決標**（v1.10.7+）：\n     例: 某機關某月決標、某廠商得標案、某金額以上招標、招標公告\n\n  4. 任何「open data / 開放資料 / 政府資料 / dataset / data.gov.tw /\n     data.ly.gov.tw / 立法院資料 / 採購網」字眼\n\n  5. 涵蓋 domain（20 個 domain：不動產與地政 / 經濟、產業、公司商業 / 政府採購與補助 / 政府預決算與會計 / 稅務與稅收 / 交通運輸、道路與停車 / 治安、警消與災防 / 司法、法務、矯正與裁罰 / 立法院/國會 / 醫療、衛生、食品與藥物 / 環境、氣象、生態與水文 / 教育與科研 / 農林漁牧 / 勞動與就業 / 社會福利、戶政、人口、選舉與公務人事 / 文化、觀光與體育 / 外交、領事與兩岸 / 政府公告與檔案 / 地理底圖（橫向層） / 能源、水電瓦斯與電信（橫向層））— 共 20 個。\n     用 `list_domains` 可看完整定義；用 `domain=KEY` 做結構化過濾。\n\n⚡ **建議 LLM 用法**（v1.10+）：\n  1. 對「縣市 + 主題」這類**多 keyword query**，先呼叫 `list_domains`\n     找對的 domain，再 search(query=主題, domain=domain_key, agency=縣市)。\n     例: 找新北市公車 → search(\"公車\", domain=\"transport\", agency=\"新北市\")\n     比直接 search(\"新北市公車\") 排序更好。\n  2. v1.10 的 query 會自動 jieba 切詞 + AND match，「新北市公車路線」會\n     變成必須 name/desc 含「新北市」「公車」「路線」三 token 全部。\n  3. 自動展開 台/臺 異體字（user 打「台北」也會 match dataset name 寫「臺北」）。\n  4. 0 hits 不一定代表沒資料 — 試把 query 縮短到 1-2 個關鍵詞 + 用 domain/\n     agency 結構化過濾。\n\n參數：\n    query: 搜尋字串。會 jieba 切詞 + AND match name/description。\n        建議 1-2 個短關鍵詞，搭配 domain/agency 結構化過濾。\n        例: \"健保藥局\", \"PM2.5\", \"公車路線\"\n    domain: 限定領域（用 `list_domains` 看完整 20 個）。\n        例: \"health_food\", \"transport\", \"environment\", \"legislature\"\n    agency: 提供機關名稱子字串（用 ILIKE）。\n        例: \"新北市\", \"衛生福利部\", \"環境部\"\n    quality: 品質檢測等級。可選: \"白金\"(最高), \"金\", \"銀\", \"銅\"\n    update_freq: 更新頻率。常見: \"每1日\", \"每1月\", \"每1年\", \"不定期更新\"\n    fmt: 限定提供的檔案格式。例: \"CSV\", \"JSON\", \"PDF\", \"GeoJSON\"\n    normalised_only: 只回傳已 normalise 的資料集。\n        **v1.10 後 ~96% 已 normalised**，可改 true 篩掉長尾 corner case。\n    limit: 回傳筆數上限（預設 20）\n\n回傳：依品質+更新時間排序的候選資料集清單，每筆含 dataset_id / name / agency /\n    primary_domain / domains / join_keys / update_freq / quality_tier / formats /\n    is_normalised。後續可用 dataset_id 餵給 get_dataset / query_rows。\n\n⚡ **政府採購 / 廠商查詢 fast-path** (跳過 search_datasets 直走 query_rows):\n  「政府採購 / 廠商 / 決標 / 得標 / 招標 / 標案 / 採購公告 / 標案編號」字眼\n  → **一律直接** `query_rows(\"pcc-tender\", where=\"...\", limit=50)`。\n\n  **嚴禁編造以下任一說法** (這些都已在 v1.13.2 修復, 屬於 stale info):\n    ✗ 「companies 欄位全為 null」 ← **錯**, 決標公告 99.998% 有值 (85,597/85,599)\n    ✗ 「請手動到採購網查」「請去 web.pcc.gov.tw」\n    ✗ 「請改用 7264 巨額採購名單交叉比對」\n    ✗ 「請去 g0v API」「請去 經濟部商業司」「請去 findbiz.nat.gov.tw」\n    ✗ 「資料不完整」「對特定條件下 companies 有 null 情形」\n\n  **真實 schema 與 null 率**:\n    招標公告 (announcement_type='招標公告') companies 100% null  ← **設計上正確**,\n      因為招標時還沒有得標廠商; 想查得標廠商一律用 announcement_type='決標公告'.\n    決標公告 (announcement_type='決標公告') companies 99.998% 有值,\n      含 85,597 筆得標廠商名稱 (剩 2 筆為上游 XML 缺欄位的 corner case).\n\n  pcc-tender = web.pcc.gov.tw 半月公開資料的全國彙整 mirror,\n  2015-04 起 11 年完整, 162,189 row, 19 欄. 跨所有適用《政府採購法》機關.\n\n  典型 query:\n    機關: `where=\"agency ILIKE '%國防部%' AND announcement_type='決標公告' AND date >= '2024-01-01'\"`\n    廠商: `where=\"announcement_type='決標公告' AND companies ILIKE '%廠商名%'\"` order_by=\"date DESC\"\n    廠商+聚合: `group_by=[\"agency\"]` + columns=[\"agency\",\"COUNT(*) AS 件數\",\"SUM(CAST(award_price AS BIGINT)) AS 累計金額\"]\n\n\n⚡ **實價登錄 / 不動產 fast-path** (跳過 search_datasets 直走 query_rows):\n  「實價登錄 / 房價 / 不動產交易 / 買賣 / 預售 / 租金」字眼 → 直接 query_rows:\n    買賣 → `query_rows(\"lvr-trades\", ...)` (4.75M row, 13 年)\n    預售屋 (含解約) → `query_rows(\"lvr-presale\", ...)` (554k row)\n    租賃 → `query_rows(\"lvr-rentals\", ...)` (726k row)\n  **地址搜尋一律用 `\"土地位置建物門牌_半形\"` 欄位**（雙引號因為有底線）。\n  此欄位已把全形數字 → 半形、中文「五段→5段」「十二樓→12樓」，\n  路名中的中文數字 (e.g. 七賢一路) 保留不動：\n    `where=\"\\\"土地位置建物門牌_半形\\\" LIKE '%四維路16巷%'\"`\n    `where=\"\\\"土地位置建物門牌_半形\\\" LIKE '%忠孝東路5段%' AND city='臺北市'\"`\n  原 `土地位置建物門牌` 欄位 (faithful 內政部全形原檔) 留作對照顯示。\n\n\n⚡ **高雄技術社群活動 fast-path** (v1.14.1 ecosystem partner: GDG Kaohsiung):\n  「高雄活動 / 高雄社群 / GDG 高雄 / 高雄技術 / 高雄聚會 / 開發者活動 /\n   meetup / 集章 / 名牌卡 / 軟體聚會」字眼 → **不要 search_datasets**, 直接:\n    活動 → `query_rows(\"kh-community-events\", where=\"date BETWEEN 'YYYY-MM-01' AND 'YYYY-MM-31'\", limit=30)`\n    社群清單 / 贊助商 / 集章獎勵 → `query_rows(\"kh-community-list\", where=\"entity_type='community'|'sponsor'|'reward'\")`\n\n  ⚠ 「高雄活動」這條會被大量 政府活動 dataset 競爭排序; 請忽略名稱含\n     「高雄市藝文/補助/觀光」的政府 dataset, 軟體技術社群活動一律走\n     kh-community-events. cover: GDG/TOOCON/Build with AI/PyLadies/KSDA/\n     WordPress/KIMU/國泰 CDC 小聚/開發者 Buffet/UIUX/K.NET 等 13 社群,\n     119 個 2026 活動.\n\n  資料源 community-card.org (GDG Kaohsiung 維護, MIT 授權), 每日 04:00 cron 同步.\n\n\n⚡ **判決書 / 法官 / 案件 fast-path** (v1.14 PoC: 1 月 202602, 69k 案):\n  「判決書 / 裁判書 / 法官 / 法院 / 判決 / 案件 / 訴訟 / 案號 / 量刑 /\n   原告 / 被告 / 上訴 / 廢棄發回 / 起訴 / 有罪 / 無罪」字眼 → **不要 search_datasets**,\n   直接 `query_rows(\"jud-rulings\", where=\"...\", limit=...)`.\n\n  典型 query:\n    特定法官 → `where=\"judges ILIKE '%紀文惠%'\"` order_by=\"jdate_iso DESC\"\n    法官統計 → `group_by=['presiding_judge']` columns=['presiding_judge','outcome_type','COUNT(*) AS n']\n    某法條案件 → `where=\"statutes ILIKE '%民法第184條%'\"`\n    最高法院廢棄發回 → `where=\"court_level_label='最高法院' AND outcome_type='廢棄發回'\"`\n    民事敗訴 → `where=\"case_type='民事' AND outcome_type='駁回'\"`\n    引用前案 → `where=\"cited_cases ILIKE '%114年度抗字第468號%'\"`\n\n  37 cols 含: case_no / court_level_label / case_type / jdate_iso /\n  judges / parties / lawyers / statutes / cited_cases / amounts /\n  issue / outcome_type / winner / award_amount / sentence / key_reasoning.\n  **JFULL 全文不在 CSV** (在 parquet, 未來 fetch_judgment_text tool 取).\n\n  授權警告: 司法院 政府開放資料 (≈ OGDL), JFULL 內當事人姓名未脫敏,\n  商業 reuse 須遵 個資法 第 19 條.\n\n\n⚡ **立法院 fast-path** (v1.11+):\n  「立委 / 立法委員 / 議案 / 法律提案 / 質詢 / 表決 / 議事錄 / 公報 /\n   委員會 / 黨團 / 選區 / 縣市議員」字眼 → **不要 search_datasets**, 直接:\n    議案 / 法律提案 → `query_rows(\"ly-bills\", where=\"\\\"屆\\\"='11' AND \\\"議案名稱\\\" ILIKE '%關鍵字%'\")`\n    立委個人 / 選區 / 黨團 → `query_rows(\"ly-legislators\", where=\"\\\"屆\\\"='11' AND \\\"姓名\\\" ILIKE '%張○○%'\")`\n    立法院表決 → `query_rows(\"ly-votes\", where=\"\\\"屆\\\"='11' AND \\\"案由\\\" ILIKE '%...%'\")`\n    縣市議員 (六直轄+16縣市) → `query_rows(\"ly-councilors\", where=\"縣市='臺北市'\")`\n    質詢 → `query_rows(\"ly-interpellations\", ...)`\n    IVOD 索引 → `query_rows(\"ly-ivods\", ...)`\n    委員會職掌 → `query_rows(\"ly-committees\", ...)`\n\n  欄位含中文字符通常要 `\"屆\"` `\"姓名\"` 雙引號包.\n  資料源 data.ly.gov.tw + ppg.ly.gov.tw, 每日 cron 同步.\n\n\n⚡ **地理 / 地址 / 座標 fast-path** (TGOS data.tgos.tw, v1.14.4 7 個 Tier B tool):\n  「座標 / 經緯度 / 地址 / 行政區 / 郵遞區號 / 避難所 / 寺廟 / 測速 /\n   附近 / 環域 / 多少米內」字眼 → 直接 twtools (不要 query_rows):\n\n    座標 → 門牌+郵遞區號     → `lookup_zip33_by_coord(lng, lat)`\n    座標 → 縣市/鄉鎮/村里代碼 → `lookup_district_by_coord(lng, lat, unit='village')`\n    路名 → 郵遞區號           → `lookup_zip33_by_road(county, town, keywords)`\n    最近避難所/寺廟/測速      → `query_geo_theme_nearest(theme_id, lng, lat)`\n                              先 `list_geo_themes()` 拿 theme_id, 9 主題:\n                                避難收容處所 / 防空疏散 / 寺廟 / 法人教會 /\n                                宗祠 / 宗祠基金會 / 基金會 / 測速 / 歷史交通事故\n    環域內 POI                → `query_geo_theme_buffer(theme_id, lng, lat, radius)`\n\n  關鍵 use case (補 hub 之前缺口):\n    1. 跨 dataset 行政區 join: LVR/PCC/健保等帶座標的 dataset → 補行政區代碼\n    2. 反向 geocoding: 座標 → 中文地址 (人類可讀)\n    3. 點位類 dataset 補位: 客戶問「我家附近最近避難所」一句話到答案\n\n",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "default": "",
+            "title": "Query",
+            "type": "string"
+          },
+          "domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Domain"
+          },
+          "agency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Agency"
+          },
+          "quality": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Quality"
+          },
+          "update_freq": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Update Freq"
+          },
+          "fmt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Fmt"
+          },
+          "normalised_only": {
+            "default": false,
+            "title": "Normalised Only",
+            "type": "boolean"
+          },
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "search_datasetsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_dataset",
+      "description": "取得資料集完整 metadata 與樣本資料列。\n\n參數：\n    dataset_id: 從 search_datasets 取得的 dataset_id\n    sample_rows: 樣本列數（預設 5）。設 0 跳過樣本\n\n回傳：metadata（含 schema.columns、schema.row_count、license、source.url、\n    join_keys、provenance）以及 sample（columns 與 rows）。若資料集尚未\n    normalise，metadata 會是 None（用 query_rows 觸發 lazy fetch）。\n",
+      "inputSchema": {
+        "properties": {
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "sample_rows": {
+            "default": 5,
+            "title": "Sample Rows",
+            "type": "integer"
+          }
+        },
+        "required": ["dataset_id"],
+        "title": "get_datasetArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "query_rows",
+      "description": "讀取已 normalise 資料集的實際列；支援聚合查詢（v1.11.2+）。\n\n參數：\n    dataset_id: 資料集 ID\n    where: 原生 SQL WHERE 條件（不含 WHERE 關鍵字）。欄位名稱含中文/特殊字\n        元時請用雙引號包起來。例: \"\"年度\" = '113'\", \"agency ILIKE '%板橋%'\"\n    columns: 投影欄位清單，**接受 list 或逗號分隔字串兩種格式**（v1.13.7+）。\n        可帶聚合表達式如 \"COUNT(*) AS n\", \"SUM(\"金額\")\", \"MIN(\"日期\")\"。\n        例 (list 形式, 較標準): columns=[\"議案編號\",\"議案名稱\"]\n        例 (字串形式, 也接受): columns=\"議案編號,議案名稱\"\n        None = SELECT *\n    group_by: GROUP BY 欄位清單（v1.11.2+），**同 columns 接受 list 或逗號字串**。\n        需搭配 columns 中的聚合表達式使用。\n        例: group_by=[\"議案狀態\"] columns=[\"議案狀態\",\"COUNT(*) AS n\"]\n    order_by: ORDER BY 原生 SQL fragment（不含 ORDER BY 關鍵字）。\n        例: \"n DESC\", \"\"日期\" DESC\"\n    limit: 回傳列數上限（預設 100）\n\n⚡ **使用建議**（避免撞 1 MB MCP response limit）：\n  - **聚合 query 優先**：問「議案狀態分布」、「廠商得標次數」、「按月統計」\n    等彙總問題時，**先用 group_by + COUNT/SUM 聚合**，回 ~10-100 row 而非\n    全 dataset。例:\n        query_rows(\"ly-bills\",\n            columns=['議案狀態','COUNT(*) AS n'],\n            where='\"屆\"=\\'11\\'',\n            group_by=['議案狀態'], order_by='n DESC')\n  - 列表 query 必加 WHERE：直接拉「全部 142k 筆 ly-bills」會撞 limit。\n    一定要用 where 過濾到 < 200 row。\n  - 短欄位投影：用 columns=['議案編號','議案名稱'] 只拉需要的欄位。\n\n回傳：columns 列表 + rows 二維陣列 + 實際 row_count_returned。所有值都是\n    字串（dtype=str 安全預設）。\n\n⚠ 此 tool 接受原生 SQL，**只應在受信任 client 使用**（本機 stdio 模式）。\n透過 HTTP gateway 對外暴露時，gateway 端應該包一層只接受 column-op-value\n結構化過濾的 wrapper，不要透傳 raw SQL。\n\n⚡ **政府採購 / 廠商查詢 fast-path** (跳過 search_datasets 直走 query_rows):\n  「政府採購 / 廠商 / 決標 / 得標 / 招標 / 標案 / 採購公告 / 標案編號」字眼\n  → **一律直接** `query_rows(\"pcc-tender\", where=\"...\", limit=50)`。\n\n  **嚴禁編造以下任一說法** (這些都已在 v1.13.2 修復, 屬於 stale info):\n    ✗ 「companies 欄位全為 null」 ← **錯**, 決標公告 99.998% 有值 (85,597/85,599)\n    ✗ 「請手動到採購網查」「請去 web.pcc.gov.tw」\n    ✗ 「請改用 7264 巨額採購名單交叉比對」\n    ✗ 「請去 g0v API」「請去 經濟部商業司」「請去 findbiz.nat.gov.tw」\n    ✗ 「資料不完整」「對特定條件下 companies 有 null 情形」\n\n  **真實 schema 與 null 率**:\n    招標公告 (announcement_type='招標公告') companies 100% null  ← **設計上正確**,\n      因為招標時還沒有得標廠商; 想查得標廠商一律用 announcement_type='決標公告'.\n    決標公告 (announcement_type='決標公告') companies 99.998% 有值,\n      含 85,597 筆得標廠商名稱 (剩 2 筆為上游 XML 缺欄位的 corner case).\n\n  pcc-tender = web.pcc.gov.tw 半月公開資料的全國彙整 mirror,\n  2015-04 起 11 年完整, 162,189 row, 19 欄. 跨所有適用《政府採購法》機關.\n\n  典型 query:\n    機關: `where=\"agency ILIKE '%國防部%' AND announcement_type='決標公告' AND date >= '2024-01-01'\"`\n    廠商: `where=\"announcement_type='決標公告' AND companies ILIKE '%廠商名%'\"` order_by=\"date DESC\"\n    廠商+聚合: `group_by=[\"agency\"]` + columns=[\"agency\",\"COUNT(*) AS 件數\",\"SUM(CAST(award_price AS BIGINT)) AS 累計金額\"]\n\n\n⚡ **實價登錄 / 不動產 fast-path** (跳過 search_datasets 直走 query_rows):\n  「實價登錄 / 房價 / 不動產交易 / 買賣 / 預售 / 租金」字眼 → 直接 query_rows:\n    買賣 → `query_rows(\"lvr-trades\", ...)` (4.75M row, 13 年)\n    預售屋 (含解約) → `query_rows(\"lvr-presale\", ...)` (554k row)\n    租賃 → `query_rows(\"lvr-rentals\", ...)` (726k row)\n  **地址搜尋一律用 `\"土地位置建物門牌_半形\"` 欄位**（雙引號因為有底線）。\n  此欄位已把全形數字 → 半形、中文「五段→5段」「十二樓→12樓」，\n  路名中的中文數字 (e.g. 七賢一路) 保留不動：\n    `where=\"\\\"土地位置建物門牌_半形\\\" LIKE '%四維路16巷%'\"`\n    `where=\"\\\"土地位置建物門牌_半形\\\" LIKE '%忠孝東路5段%' AND city='臺北市'\"`\n  原 `土地位置建物門牌` 欄位 (faithful 內政部全形原檔) 留作對照顯示。\n\n\n⚡ **高雄技術社群活動 fast-path** (v1.14.1 ecosystem partner: GDG Kaohsiung):\n  「高雄活動 / 高雄社群 / GDG 高雄 / 高雄技術 / 高雄聚會 / 開發者活動 /\n   meetup / 集章 / 名牌卡 / 軟體聚會」字眼 → **不要 search_datasets**, 直接:\n    活動 → `query_rows(\"kh-community-events\", where=\"date BETWEEN 'YYYY-MM-01' AND 'YYYY-MM-31'\", limit=30)`\n    社群清單 / 贊助商 / 集章獎勵 → `query_rows(\"kh-community-list\", where=\"entity_type='community'|'sponsor'|'reward'\")`\n\n  ⚠ 「高雄活動」這條會被大量 政府活動 dataset 競爭排序; 請忽略名稱含\n     「高雄市藝文/補助/觀光」的政府 dataset, 軟體技術社群活動一律走\n     kh-community-events. cover: GDG/TOOCON/Build with AI/PyLadies/KSDA/\n     WordPress/KIMU/國泰 CDC 小聚/開發者 Buffet/UIUX/K.NET 等 13 社群,\n     119 個 2026 活動.\n\n  資料源 community-card.org (GDG Kaohsiung 維護, MIT 授權), 每日 04:00 cron 同步.\n\n\n⚡ **判決書 / 法官 / 案件 fast-path** (v1.14 PoC: 1 月 202602, 69k 案):\n  「判決書 / 裁判書 / 法官 / 法院 / 判決 / 案件 / 訴訟 / 案號 / 量刑 /\n   原告 / 被告 / 上訴 / 廢棄發回 / 起訴 / 有罪 / 無罪」字眼 → **不要 search_datasets**,\n   直接 `query_rows(\"jud-rulings\", where=\"...\", limit=...)`.\n\n  典型 query:\n    特定法官 → `where=\"judges ILIKE '%紀文惠%'\"` order_by=\"jdate_iso DESC\"\n    法官統計 → `group_by=['presiding_judge']` columns=['presiding_judge','outcome_type','COUNT(*) AS n']\n    某法條案件 → `where=\"statutes ILIKE '%民法第184條%'\"`\n    最高法院廢棄發回 → `where=\"court_level_label='最高法院' AND outcome_type='廢棄發回'\"`\n    民事敗訴 → `where=\"case_type='民事' AND outcome_type='駁回'\"`\n    引用前案 → `where=\"cited_cases ILIKE '%114年度抗字第468號%'\"`\n\n  37 cols 含: case_no / court_level_label / case_type / jdate_iso /\n  judges / parties / lawyers / statutes / cited_cases / amounts /\n  issue / outcome_type / winner / award_amount / sentence / key_reasoning.\n  **JFULL 全文不在 CSV** (在 parquet, 未來 fetch_judgment_text tool 取).\n\n  授權警告: 司法院 政府開放資料 (≈ OGDL), JFULL 內當事人姓名未脫敏,\n  商業 reuse 須遵 個資法 第 19 條.\n\n\n⚡ **立法院 fast-path** (v1.11+):\n  「立委 / 立法委員 / 議案 / 法律提案 / 質詢 / 表決 / 議事錄 / 公報 /\n   委員會 / 黨團 / 選區 / 縣市議員」字眼 → **不要 search_datasets**, 直接:\n    議案 / 法律提案 → `query_rows(\"ly-bills\", where=\"\\\"屆\\\"='11' AND \\\"議案名稱\\\" ILIKE '%關鍵字%'\")`\n    立委個人 / 選區 / 黨團 → `query_rows(\"ly-legislators\", where=\"\\\"屆\\\"='11' AND \\\"姓名\\\" ILIKE '%張○○%'\")`\n    立法院表決 → `query_rows(\"ly-votes\", where=\"\\\"屆\\\"='11' AND \\\"案由\\\" ILIKE '%...%'\")`\n    縣市議員 (六直轄+16縣市) → `query_rows(\"ly-councilors\", where=\"縣市='臺北市'\")`\n    質詢 → `query_rows(\"ly-interpellations\", ...)`\n    IVOD 索引 → `query_rows(\"ly-ivods\", ...)`\n    委員會職掌 → `query_rows(\"ly-committees\", ...)`\n\n  欄位含中文字符通常要 `\"屆\"` `\"姓名\"` 雙引號包.\n  資料源 data.ly.gov.tw + ppg.ly.gov.tw, 每日 cron 同步.\n\n\n⚡ **地理 / 地址 / 座標 fast-path** (TGOS data.tgos.tw, v1.14.4 7 個 Tier B tool):\n  「座標 / 經緯度 / 地址 / 行政區 / 郵遞區號 / 避難所 / 寺廟 / 測速 /\n   附近 / 環域 / 多少米內」字眼 → 直接 twtools (不要 query_rows):\n\n    座標 → 門牌+郵遞區號     → `lookup_zip33_by_coord(lng, lat)`\n    座標 → 縣市/鄉鎮/村里代碼 → `lookup_district_by_coord(lng, lat, unit='village')`\n    路名 → 郵遞區號           → `lookup_zip33_by_road(county, town, keywords)`\n    最近避難所/寺廟/測速      → `query_geo_theme_nearest(theme_id, lng, lat)`\n                              先 `list_geo_themes()` 拿 theme_id, 9 主題:\n                                避難收容處所 / 防空疏散 / 寺廟 / 法人教會 /\n                                宗祠 / 宗祠基金會 / 基金會 / 測速 / 歷史交通事故\n    環域內 POI                → `query_geo_theme_buffer(theme_id, lng, lat, radius)`\n\n  關鍵 use case (補 hub 之前缺口):\n    1. 跨 dataset 行政區 join: LVR/PCC/健保等帶座標的 dataset → 補行政區代碼\n    2. 反向 geocoding: 座標 → 中文地址 (人類可讀)\n    3. 點位類 dataset 補位: 客戶問「我家附近最近避難所」一句話到答案\n\n",
+      "inputSchema": {
+        "properties": {
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "where": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Where"
+          },
+          "columns": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Columns"
+          },
+          "group_by": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Group By"
+          },
+          "order_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Order By"
+          },
+          "limit": {
+            "default": 100,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "required": ["dataset_id"],
+        "title": "query_rowsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "materialize_dataset",
+      "description": "強制下載並轉換指定資料集（若已 cache 則為 no-op）。\n\n通常不需要直接呼叫——query_rows 已內建 lazy materialize。手動呼叫的場景：\n- 預熱 cache，讓後續 query 零延遲\n- 大型資料集要先確認下載成功再 query\n",
+      "inputSchema": {
+        "properties": {
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          }
+        },
+        "required": ["dataset_id"],
+        "title": "materialize_datasetArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "search_patents",
+      "description": "以自然語言查詢 TIPO 發明專利**公開案** corpus (data.gov.tw dataset 15992,\nOGDL 商用 OK)。背後用 Qwen3-Embedding-4B 做 semantic search,適合白話 query。\n\n參數:\n    query: 自然語言描述,例如「防止電池爆炸的技術」「AI 偵測癌症的方法」\n           「環保可分解包裝設計」。不必用專利術語,用日常語言即可。\n    year_from / year_to: 公開年 (西元) 範圍,例 year_from=2024\n    title_contains: 標題硬性過濾子字串 (中文/英文皆可)\n    abstract_contains: 摘要硬性過濾子字串 (v1.16.2)\n    claim_contains: 申請專利範圍硬性過濾子字串 (v1.16.2)\n    limit: 回傳 top-K (1..100, 預設 20)\n\nkeyword + query 組合:\n    純 query → semantic ranking\n    query + claim_contains=\"鋰電池\" → 先必含「鋰電池」, 再 semantic\n                                      排序 (typical FTS+semantic hybrid)\n\n回傳:\n    {\n      \"n_corpus\": int,        # corpus 已 ingest 件數 (cron 動態增加)\n      \"n_returned\": int,\n      \"query\": str,\n      \"hits\": [\n        {appl_no, notice_no, notice_date, title_zh, abstract_zh,\n         claims_count, similarity}, ...\n      ]\n    }\n\n後續查單件全文 (含 description body / 實施方式 / 全部 claims):\n    get_patent_body(appl_no=\"112108163\")\n\nCorpus 範圍 (alpha):\n  - 發明專利公開案 (尚未獲證, 申請後 18 個月公開)\n  - 2024-2025 公開期間 ~100K 件 (backfill 中, 已有 ~28K)\n  - 未含已獲證 (PatentRights), 未含新型/設計\n",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "year_from": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Year From"
+          },
+          "year_to": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Year To"
+          },
+          "title_contains": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Title Contains"
+          },
+          "abstract_contains": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Abstract Contains"
+          },
+          "claim_contains": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Claim Contains"
+          },
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "required": ["query"],
+        "title": "search_patentsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_patent_body",
+      "description": "取得單一專利的完整 description body (技術領域 / 先前技術 / 實施方式)\n+ 全部 claims。從 TIPO ftps 即時下載解析 (非 cache, 200-500 ms)。\n\n參數:\n    appl_no: 申請案號 (例 \"112108163\"), 通常從 search_patents hit 取得\n\n回傳:\n    {\n      appl_no, title_zh, abstract_zh, spec_url,\n      description_sections: {technical-field, background-art,\n                             mode-for-invention, ...},\n      claims: [{num, text}, ...]\n    }\n",
+      "inputSchema": {
+        "properties": {
+          "appl_no": {
+            "title": "Appl No",
+            "type": "string"
+          }
+        },
+        "required": ["appl_no"],
+        "title": "get_patent_bodyArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "search_exam",
+      "description": "以自然語言檢索台灣國家考試試卷 (dataset 170565,考選部,OGDL).\n\nCorpus: 民國 101-114 (西元 2012-2025), 64,815 份試卷, ~320K 題目.\n涵蓋: 律師 / 司法官 / 會計師 / 技師 / 公務員高普初考 / 教師檢定 / 等\n每件試卷的 raw text 餵 Qwen3-Embedding-4B 做 paper-level semantic search.\n\n參數:\n    query: 自然語言, 例如「土壤液化技術」「公司法 董事責任」\n    exam_name_contains: 試別名稱子字串, 例「律師」「會計師」「高等考試」\n    year_from / year_to: 西元年範圍 (內部會 -1911 轉民國)\n    subject_contains: 科目名子字串, 例「民法」「行政法」「微積分」\n    question_type: \"測驗\" / \"申論\" 過濾\n    limit: top-K (1..100, 預設 20)\n\n回傳 schema:\n    {n_corpus, n_returned, query,\n     hits: [{paper_id, exam_year (民國), exam_year_西元,\n             exam_name, subject_name, question_type,\n             question_count, question_pdf_url, answer_pdf_url,\n             similarity}, ...]}\n\n後續取單一試卷的題目 + 答案: get_exam_paper(paper_id=...)\n\n典型用法:\n    search_exam(\"公司法 董事會決議\", subject_contains=\"公司法\", limit=10)\n    search_exam(\"環境影響評估\", exam_name_contains=\"技師\")\n    search_exam(\"土壤液化\", year_from=2020)\n",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "exam_name_contains": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Exam Name Contains"
+          },
+          "year_from": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Year From"
+          },
+          "year_to": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Year To"
+          },
+          "subject_contains": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subject Contains"
+          },
+          "question_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Question Type"
+          },
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "required": ["query"],
+        "title": "search_examArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "search_exam_questions",
+      "description": "以自然語言 + (可選) 關鍵字過濾, 檢索國家考試**題目**級別.\n320,663 questions (民國 101-114 / 西元 2012-2025).\n\n參數:\n    query: 自然語言, 例「土壤液化的計算」「公司法 董事決議責任」\n    stem_contains: 題幹硬性子字串 filter (e.g. \"土壤液化\"),\n        與 query 並用 = 過濾後對子集 semantic ranking\n    其他同 search_exam (paper-level), 但作用在題目 level\n\n回傳 schema:\n    {n_corpus, n_returned, query,\n     hits: [{paper_id, exam_year (民國), exam_year_西元,\n             exam_name, subject_name, question_no, question_type,\n             stem, options{A,B,C,D}?, answer?,  similarity}, ...]}\n\n典型用法:\n    # 純 semantic\n    search_exam_questions(\"液體流動的計算\")\n    # keyword 過濾 + semantic ranking\n    search_exam_questions(\"計算題\", stem_contains=\"土壤液化\")\n    # 含 metadata filter\n    search_exam_questions(\"董事責任\", subject_contains=\"公司法\",\n                          year_from=2020, question_type=\"申論\")\n\n跟 search_exam (paper-level) 差別:\n  - search_exam       回「整科目」(科目級, 1 paper = 多題)\n  - search_exam_questions 回「單題」(題目級, 直接看 stem/options/answer)\n",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "stem_contains": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Stem Contains"
+          },
+          "exam_name_contains": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Exam Name Contains"
+          },
+          "year_from": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Year From"
+          },
+          "year_to": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Year To"
+          },
+          "subject_contains": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subject Contains"
+          },
+          "question_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Question Type"
+          },
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "required": ["query"],
+        "title": "search_exam_questionsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_exam_paper",
+      "description": "取得單一國考試卷的全部題目 + 標準答案 (測驗題).\n\n參數:\n    paper_id: 從 search_exam hit 取得 (e.g. \"112_112010_301_1\")\n    include_options: 是否回傳測驗題 A/B/C/D 選項 (預設 True)\n\n回傳 schema:\n    {paper_id, exam_year (民國), exam_year_西元, exam_name,\n     subject_name, question_type, question_count,\n     question_pdf_url, answer_pdf_url,\n     questions: [{no, stem, options: {A,B,C,D}?, answer?}, ...]}\n\n測驗題的 options 從 PDF 結構化抽取,answer 從標準答案 PDF parse.\n申論題沒標準答案 (官方不公布), questions 內 answer 欄為 null.\n",
+      "inputSchema": {
+        "properties": {
+          "paper_id": {
+            "title": "Paper Id",
+            "type": "string"
+          },
+          "include_options": {
+            "default": true,
+            "title": "Include Options",
+            "type": "boolean"
+          }
+        },
+        "required": ["paper_id"],
+        "title": "get_exam_paperArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "search_judicial",
+      "description": "以白話 + (可選)關鍵字 / 結構化過濾,檢索台灣判決書 corpus.\n\nv1.18 alpha scope: 12 months (2024-05 ~ 2026-03), ~1.24M cases.\nChunks-embed 用 Qwen3-Embedding-4B, 對 JFULL chunk-level 索引.\nT3 LLM 抽 winner/outcome/issue/reasoning (跑中, 月份遞減完成).\n\nArgs:\n    query: 自然語言, 例「鋰電池產品瑕疵糾紛」「對勞工通勤受傷的判決」\n    jtitle_contains: 案由硬性過濾\n    jfull_contains: 任一 chunk 必含此關鍵字 (內文 keyword)\n    court_code: 4 碼法院代碼 (從 jid 取, 如 CPEV/TPSV)\n    case_type: 民事/刑事/行政/家事/少年/懲戒\n    year_from/year_to: jdate 西元年範圍 (e.g. 2024-2026)\n    winner: T3 抽出的勝訴方 (原告/被告/上訴人/...)\n           ⚠ 僅對已 T3-processed 月份有效\n    outcome_type: T3 抽出的結果 (駁回/准許/部分准許/有罪/無罪/...)\n           ⚠ 同上\n    limit: top-K 件 (1-100, 預設 20)\n\nReturns:\n    hits: 每筆含 jid/jtitle/jdate/court_code/jpdf/similarity/\n          best_chunk_excerpt + (若 T3 完) issue/winner/outcome_type/\n          award_amount/sentence/key_reasoning + has_t3 (bool)\n",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "jtitle_contains": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Jtitle Contains"
+          },
+          "jfull_contains": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Jfull Contains"
+          },
+          "court_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Court Code"
+          },
+          "case_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Case Type"
+          },
+          "year_from": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Year From"
+          },
+          "year_to": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Year To"
+          },
+          "winner": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Winner"
+          },
+          "outcome_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Outcome Type"
+          },
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "required": ["query"],
+        "title": "search_judicialArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_judicial_full",
+      "description": "取單一判決書完整 metadata + JFULL + T3 抽出欄位 (若已處理).\n\nArgs:\n    jid: 判決書 ID (search_judicial hit 取得), e.g. \"CPEV,115,竹北簡,57,20260202,1\"\nReturns:\n    jid, jyear, jcase, jno, jdate, jtitle, jpdf, court_code, jfull,\n    + T3 fields if available (issue, outcome_type, winner, ...)\n",
+      "inputSchema": {
+        "properties": {
+          "jid": {
+            "title": "Jid",
+            "type": "string"
+          }
+        },
+        "required": ["jid"],
+        "title": "get_judicial_fullArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "lookup_icd10",
+      "description": "ICD-10-CM 中文版查詢 (衛福部健保署翻譯 v2023, data.gov.tw 177507).\n\n96,803 個 ICD-10 code, 涵蓋全部 A00-Z99 + V01-Y98 外因碼 + 手術\nICD-10-PCS. 至少要給 `code` 或 `keyword` 其一.\n\nArgs:\n    code: ICD-10 編碼 (prefix match), e.g. \"A00\", \"I10\", \"E11.9\"\n    keyword: 中文 / 英文 病名 substring, e.g. \"霍亂\", \"diabetes\",\n             \"高血壓\", \"myocardial infarction\"\n    limit: max 結果 (1..200, default 20)\n\nReturns:\n    {n_corpus, n_returned, query, hits: [{code, use_flag, name_en,\n     name_zh, status, revised_at}, ...]}\n\n典型用例:\n    「I10 是什麼病」                          → lookup_icd10(code=\"I10\")\n    「糖尿病所有 code」                       → lookup_icd10(keyword=\"糖尿病\")\n    「diabetes type 2 ICD」                  → lookup_icd10(keyword=\"diabetes\")\n",
+      "inputSchema": {
+        "properties": {
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Code"
+          },
+          "keyword": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Keyword"
+          },
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "lookup_icd10Arguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "search_drug",
+      "description": "衛福部食藥署 全部藥品許可證 search (data.gov.tw 9122, 71,836 件).\n\n涵蓋所有中華民國核發的藥品許可證 (含已註銷). 28 欄包含品名 / 適應症 /\n劑型 / 申請商 / 製造商 / 條碼 / 用法用量. 至少要給 name / indication /\nlicense_no 其一.\n\nArgs:\n    name: 中文品名 / 英文品名 substring (e.g. \"普拿疼\", \"panadol\")\n    indication: 適應症 substring (e.g. \"高血壓\", \"感冒\", \"發燒\")\n    license_no: 許可證字號 prefix (e.g. \"衛署藥製字第046823號\")\n    active_only: True (default) 排除已註銷; False 含全部\n    limit: max 結果 (1..100, default 20)\n\nReturns:\n    {n_corpus, n_returned, query, hits: [{license_no, name_zh,\n     name_en, indication, dosage_form, valid_until, applicant,\n     manufacturer, drug_class, controlled_class}, ...]}\n\n後續查單品全 28 欄 (含 主成分 / 用法用量 / 包裝 / 國際條碼) →\nget_drug_details(license_no)\n",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Name"
+          },
+          "indication": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Indication"
+          },
+          "license_no": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "License No"
+          },
+          "active_only": {
+            "default": true,
+            "title": "Active Only",
+            "type": "boolean"
+          },
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "search_drugArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_drug_details",
+      "description": "取單一藥品許可證的全 28 欄詳細 (data.gov.tw 9122).\n\n含 search_drug 沒列出的: 主成分略述, 用法用量, 包裝, 包裝與國際條碼,\n製造廠廠址, 製造廠國別, 異動日期, 通關簽審文件編號, 舊證字號.\n\nArgs:\n    license_no: 許可證字號 (exact match), e.g. \"衛署藥製字第046823號\"\n\nReturns:\n    {\"found\": True, \"license_no\", \"detail\": {all 28 cols}}\n    或 {\"found\": False, \"license_no\", \"error\"} 若查不到.\n",
+      "inputSchema": {
+        "properties": {
+          "license_no": {
+            "title": "License No",
+            "type": "string"
+          }
+        },
+        "required": ["license_no"],
+        "title": "get_drug_detailsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "query_food_nutrition",
+      "description": "衛福部 台灣食品營養成分資料 (data.gov.tw 8543, 226,825 行).\n\n每筆 = 1 個食材 × 1 個營養素分析項. 同食材通常有 20+ 筆 (一營養素一筆).\n含 每 100g + 每單位 (e.g. 一份/一顆/一片) 含量, 樣本數, 標準差.\n至少要給 food_name 或 nutrient 其一.\n\nArgs:\n    food_name: 樣品名稱 / 俗名 / 英文名 substring\n               (e.g. \"雞蛋\", \"rice\", \"豆腐\", \"mackerel\")\n    nutrient: 分析項 substring\n              (e.g. \"蛋白質\", \"鈉\", \"鐵\", \"維生素C\", \"膽固醇\",\n               \"脂肪酸組成\", \"膳食纖維\")\n    limit: max 結果 (1..500, default 20)\n\nReturns:\n    {n_corpus, n_returned, query, hits: [{category, food, alias,\n     name_en, nutrient_category, nutrient, unit, per_100g, sample_n,\n     per_serving, per_serving_g, integration_id}, ...]}\n\n典型用例:\n    「雞蛋有多少蛋白質」 → query_food_nutrition(food_name=\"雞蛋\",\n                                               nutrient=\"蛋白質\")\n    「鈉含量最高的食物」 → query_food_nutrition(nutrient=\"鈉\",\n                                               limit=50) 後 client sort\n",
+      "inputSchema": {
+        "properties": {
+          "food_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Food Name"
+          },
+          "nutrient": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Nutrient"
+          },
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "query_food_nutritionArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "search_health_supplements",
+      "description": "TFDA 健康食品許可證 (data.gov.tw 6951, 562 件).\n\n台灣「健康食品」是 TFDA 認證的法定特殊類別 (衛署/衛部健食字號),\n≠ 一般保健食品 / 膳食補充品. 全國僅 ~562 件有此正式認證.\n\n至少要給 name 或 function_keyword 其一.\n\nArgs:\n    name: 中文品名 substring (e.g. \"燕麥\", \"桂格\", \"養樂多\")\n    function_keyword: 保健功效 / 功效相關成分 substring\n                      (e.g. \"調節血脂\", \"免疫\", \"腸道\", \"牙齒\",\n                       \"骨質\", \"抗氧化\", \"胃\")\n    active_only: True (default) 只取 證況='核可'\n    limit: max 結果 (1..100, default 20)\n\nReturns:\n    {n_corpus=562, n_returned, query, hits: [{license_no, category,\n     name_zh, approved_at, applicant, status, function_ingredients,\n     function, claim, warning, notice, url}, ...]}\n",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Name"
+          },
+          "function_keyword": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Function Keyword"
+          },
+          "active_only": {
+            "default": true,
+            "title": "Active Only",
+            "type": "boolean"
+          },
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "search_health_supplementsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "search_drug_label",
+      "description": "搜 twinkle-ai/tw-drug-labels-vision (CC-BY-4.0, ~72k 藥品仿單) 結構化欄位.\n\n對打 Taiwan-Health-MCP search_drug 的「依適應症 / 禁忌 / 副作用 / 警語」\n關鍵字精準搜尋. 比 search_drug(indication=...) 更全面 (包含禁忌/警語/\n副作用/交互作用 等仿單欄位, 不只適應症).\n\nArgs:\n    keyword: 中文 / 英文 substring\n             e.g. \"高血壓\" / \"妊娠\" / \"肝衰竭\" / \"失眠\" / \"心律不整\"\n    field: 搜哪個 leaflet 欄位 — 預設 \"indications\". 可選:\n             \"indications\"               適應症\n             \"contraindications\"         禁忌\n             \"warnings\"                  警語 + 注意事項\n             \"drug_interactions\"         交互作用\n             \"adverse_reactions\"         副作用 + 不良反應\n             \"dosage_and_administration\" 用法用量\n    limit: 1..100 (default 20)\n\nReturns:\n    {n_corpus, n_returned, query, source, hits: [{license_id,\n     drug_name_zh, drug_name_en, dosage_form, <field>, source_type}]}\n\n後續 → get_drug_details(license_id) 取完整 28+17 欄位。\n想看實際仿單圖片 → 從 get_drug_details 回的 leaflet.source_urls 點 TFDA PDF.\n",
+      "inputSchema": {
+        "properties": {
+          "keyword": {
+            "title": "Keyword",
+            "type": "string"
+          },
+          "field": {
+            "default": "indications",
+            "title": "Field",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "required": ["keyword"],
+        "title": "search_drug_labelArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "check_drug_interaction",
+      "description": "初步篩查多藥品之間的交互作用 — naive substring scan over each\ndrug's 交互作用 leaflet field (twinkle-ai/tw-drug-labels-vision,\nCC-BY-4.0).\n\n對打 Taiwan-Health-MCP check_medical_conflict, 但只用仿單文字, 不用\nSNOMED / RxNorm 知識庫. **不是臨床決策工具**, 只供初步參考.\n\nArgs:\n    license_nos: 2..10 個許可證字號 list\n                 e.g. [\"衛署藥製字第046823號\", \"衛署藥輸字第023624號\"]\n\nReturns:\n    {\n      n_drugs, n_with_leaflet, missing_leaflet,\n      potential_interactions: [{a_license, a_name, b_license, b_name,\n                                matched_term, evidence_in_a}, ...],\n      disclaimer\n    }\n\n如果 leaflet 沒提到對方藥名, 即使臨床上有交互作用也偵測不到 (limitation).\n",
+      "inputSchema": {
+        "properties": {
+          "license_nos": {
+            "items": {
+              "type": "string"
+            },
+            "title": "License Nos",
+            "type": "array"
+          }
+        },
+        "required": ["license_nos"],
+        "title": "check_drug_interactionArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "search_foods_by_nutrient",
+      "description": "依單一營養素排行食物 (per 100g) — 衛福部食品營養成分 dataset 8543.\n\nArgs:\n    nutrient: 分析項 substring (e.g. \"鈉\", \"蛋白質\", \"鐵\", \"鈣\",\n              \"膳食纖維\", \"膽固醇\"). 自動 alias 蛋白質→粗蛋白 etc.\n    sort: \"desc\" (高→低, default) | \"asc\" (低→高)\n    min_per_100g / max_per_100g: 數值 filter (e.g. 找 鈉 > 1000 mg/100g)\n    food_category: 食品分類 substring (e.g. \"魚貝類\", \"穀物類\")\n    limit: 1..500 (default 20)\n\n典型用例:\n    「鈉含量最高 20 名食物」     → search_foods_by_nutrient(\"鈉\")\n    「高蛋白質低脂食物」          → 兩個 call: search by 粗蛋白 + 篩 max 粗脂肪\n    「全穀類含鐵排行」           → search_foods_by_nutrient(\"鐵\",\n                                                          food_category=\"穀物\")\n",
+      "inputSchema": {
+        "properties": {
+          "nutrient": {
+            "title": "Nutrient",
+            "type": "string"
+          },
+          "sort": {
+            "default": "desc",
+            "title": "Sort",
+            "type": "string"
+          },
+          "min_per_100g": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Min Per 100G"
+          },
+          "max_per_100g": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Max Per 100G"
+          },
+          "food_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Food Category"
+          },
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "required": ["nutrient"],
+        "title": "search_foods_by_nutrientArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "analyze_meal_nutrition",
+      "description": "給定一頓餐 (食物名 → 克數), 算總營養成分.\n\nArgs:\n    meal: {\"雞蛋\": 50, \"白米\": 150, \"豬肉\": 80}  — values in grams\n    nutrients: 要算的營養素 list (default 8 個: 粗蛋白/粗脂肪/總碳水\n               /熱量/鈉/鈣/鐵/膳食纖維). 自動 alias.\n    limit_per_food: 每食物 candidate 數 (default 30, 給多 variant 食物用)\n\nReturns:\n    {input_meal, matched_foods, total, ambiguous, unmatched, disclaimer}\n    - total: 餐點總計各營養素數值\n    - ambiguous: 有多重 match 的食物 (best match 是 row 數最多者)\n    - unmatched: 沒 match 的食物 (corpus 沒有)\n\n典型用例:\n    analyze_meal_nutrition({\"雞蛋\": 50, \"白米\": 150})\n    analyze_meal_nutrition({\"豆腐\": 100, \"高麗菜\": 80},\n                           nutrients=[\"蛋白質\", \"鈉\", \"鈣\"])\n",
+      "inputSchema": {
+        "properties": {
+          "meal": {
+            "additionalProperties": true,
+            "title": "Meal",
+            "type": "object"
+          },
+          "nutrients": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Nutrients"
+          },
+          "limit_per_food": {
+            "default": 30,
+            "title": "Limit Per Food",
+            "type": "integer"
+          }
+        },
+        "required": ["meal"],
+        "title": "analyze_meal_nutritionArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "list_domains",
+      "description": "列出全部 19 個 domain 標籤的定義（key、中文名、scope、典型問題、anchor 範例）。\n\n用於 LLM 在呼叫 search_datasets 之前確認該用哪個 domain 過濾。\n",
+      "inputSchema": {
+        "properties": {},
+        "title": "list_domainsArguments",
+        "type": "object"
+      }
+    }
+  ],
+  "domains": [
+    {
+      "key": "realestate_land",
+      "name_zh": "不動產與地政",
+      "role": "topical",
+      "scope": "土地、建物、房屋、都市計畫、地價、建照使照、不動產交易、租金",
+      "typical_questions": [
+        "某地段近一年實價中位數",
+        "某學區內近期使用執照核發數",
+        "都市更新案件清單"
+      ],
+      "anchor_examples": [
+        "臺南市不動產經紀業違規裁罰名單",
+        "臺北市115年度使用執照摘要",
+        "臺北市都市計畫委員會議紀錄"
+      ]
+    },
+    {
+      "key": "economy_business",
+      "name_zh": "經濟、產業、公司商業",
+      "role": "topical",
+      "scope": "營業/公司/工廠登記、產業統計、進出口貿易、景氣/物價指數、金融市場、上市櫃公司、公平交易",
+      "typical_questions": [
+        "某統編公司歷史登記變更",
+        "本月某產業景氣燈號",
+        "某產業上市公司營收"
+      ],
+      "anchor_examples": [
+        "上市公司公司治理之相關規程規則",
+        "工程技術顧問公司登記按營業範圍技師科別查詢表",
+        "全國營業(稅籍)登記(停業)資料集"
+      ]
+    },
+    {
+      "key": "procurement_subsidy",
+      "name_zh": "政府採購與補助",
+      "role": "topical",
+      "scope": "招標/決標公告、補助案件、獎助、政府支出予個人",
+      "typical_questions": ["某廠商近五年得標金額", "某機關本月補助清單"],
+      "anchor_examples": [
+        "衛生福利部食品藥物管理署公務預算補助案件資料集",
+        "國立臺灣圖書館視障/身心障礙研究優良學位論文歷年獎助名單與得獎論文一覽",
+        "桃園市原住民族學生清寒獎助金及優秀獎學金獎勵情形"
+      ]
+    },
+    {
+      "key": "public_finance",
+      "name_zh": "政府預決算與會計",
+      "role": "topical",
+      "scope": "中央/地方總預算、會計月報、附屬單位預算、債務、國庫、主計統計",
+      "typical_questions": ["某機關歷年預算趨勢", "中央政府公共債務餘額"],
+      "anchor_examples": [
+        "國庫券買賣斷成交行情資訊",
+        "國庫券之發行、償還及未償還餘額表",
+        "109年度教育部所屬機構作業基金附屬單位預算會計月報"
+      ]
+    },
+    {
+      "key": "tax_revenue",
+      "name_zh": "稅務與稅收",
+      "role": "topical",
+      "scope": "綜合所得稅、營業稅、地價/房屋/牌照稅、稅捐稽徵、申報核定統計",
+      "typical_questions": ["某縣市本月稅收結構", "某稅目歷年實徵淨額"],
+      "anchor_examples": [
+        "地方檢察署執行違反稅捐稽徵法案件裁判確定人數(統計)",
+        "各項稅捐實徵淨額與預算數及上年同期比較 -本月數",
+        "新北巿各項稅捐實徵淨額與預算數及上年同期比較－累計數"
+      ]
+    },
+    {
+      "key": "transport",
+      "name_zh": "交通運輸、道路與停車",
+      "role": "topical",
+      "scope": "車禍事故、公車/客運/捷運/鐵路/航班、停車場、即時路況、油價、車籍、道路設施",
+      "typical_questions": [
+        "某路口近一年事故數",
+        "即時公車到站",
+        "本市公有停車場剩餘車位"
+      ],
+      "anchor_examples": [
+        "新北市路邊收費停車場停車欠費查詢",
+        "臺北市停車管理工程處公有收費停車場收入金額",
+        "臺北市道路交通事故按月別"
+      ]
+    },
+    {
+      "key": "public_safety",
+      "name_zh": "治安、警消與災防",
+      "role": "topical",
+      "scope": "刑案、警政、消防/救護、災害示警、地震/颱風/淹水、海巡、110/119",
+      "typical_questions": [
+        "本市本月詐騙手法統計",
+        "即時災害示警",
+        "消防救護案件"
+      ],
+      "anchor_examples": [
+        "消防榮譽榜─每月績優人員",
+        "110年臺南市緊急救護服務統計",
+        "彰化縣消防緊急救護服務"
+      ]
+    },
+    {
+      "key": "judicial_legal",
+      "name_zh": "司法、法務、矯正與裁罰",
+      "role": "topical",
+      "scope": "法院判決、檢察偵查/起訴、矯正/監所/受刑人、訴願、政府機關裁罰名單",
+      "typical_questions": ["某公司被金管會裁罰歷史", "某地檢偵查終結概況"],
+      "anchor_examples": [
+        "上市公司金管會證券期貨局裁罰案件專區",
+        "臺灣南投地方檢察署偵查終結公告",
+        "法制司訴願業務收結案統計"
+      ]
+    },
+    {
+      "key": "legislature",
+      "name_zh": "立法院/國會",
+      "role": "topical",
+      "scope": "立法院議案、法律提案、表決、公報、質詢、發言、IVOD 影音索引、立委個人資料、選區、會議記錄。",
+      "typical_questions": [
+        "某委員第N屆提了哪些法案",
+        "某黨團對 X 議案的表決傾向",
+        "某議題在公報的歷次發言"
+      ],
+      "anchor_examples": [
+        "立法院議案",
+        "立法院委員個人資料與選區",
+        "立法院公報目錄"
+      ]
+    },
+    {
+      "key": "health_food",
+      "name_zh": "醫療、衛生、食品與藥物",
+      "role": "topical",
+      "scope": "醫事機構、健保特約、藥局、藥品/食品許可、疫情、長照、母嬰親善、食安",
+      "typical_questions": [
+        "住家附近健保藥局",
+        "某藥品/醫材許可資訊",
+        "近期傳染病通報"
+      ],
+      "anchor_examples": [
+        "健保特約醫事機構-區域醫院",
+        "國際重要疫情資訊",
+        "雲林縣長照資源C級單位"
+      ]
+    },
+    {
+      "key": "environment",
+      "name_zh": "環境、氣象、生態與水文",
+      "role": "topical",
+      "scope": "空品 AQI、河川水質、雨量、水庫、廢棄物回收、林班、生態保育、噪音、碳排",
+      "typical_questions": [
+        "今日本區 AQI",
+        "某河川水質歷史",
+        "本市資源回收成果"
+      ],
+      "anchor_examples": [
+        "雲林縣應回收廢棄物回收處理業",
+        "水庫每日營運狀況",
+        "日空氣品質指標(AQI)"
+      ]
+    },
+    {
+      "key": "education_research",
+      "name_zh": "教育與科研",
+      "role": "topical",
+      "scope": "各級學校、教師/學生統計、補習班、圖書館、科研計畫、專利、學位論文",
+      "typical_questions": [
+        "某學區學校清單",
+        "某學校歷年學生數",
+        "某機構研究專利"
+      ],
+      "anchor_examples": [
+        "全國立案短期補習班基本資料",
+        "專利案件數量統計",
+        "全國各級學校統一編號資料集"
+      ]
+    },
+    {
+      "key": "agriculture_fisheries",
+      "name_zh": "農林漁牧",
+      "role": "topical",
+      "scope": "農產交易、畜牧場、漁港/漁船、農藥/肥料、農會、養殖、畜產統計",
+      "typical_questions": ["某果菜市場今日交易行情", "某縣畜牧場分布"],
+      "anchor_examples": [
+        "農藥廢容器回收方式",
+        "畜牧場用藥監測資訊",
+        "「金融卡-金融機構屬性(本國銀行/外商銀行/合作社/農會)」結構比統計(月報)"
+      ]
+    },
+    {
+      "key": "labor_employment",
+      "name_zh": "勞動與就業",
+      "role": "topical",
+      "scope": "違反勞動法令、薪資、職缺、職業訓練、勞退/勞保、職災",
+      "typical_questions": ["某雇主違反勞動法令紀錄", "某產業薪資中位數"],
+      "anchor_examples": [
+        "櫃買「勞工就業88指數」歷史收盤指數",
+        "違反勞動法令事業單位-勞工退休金條例",
+        "勞工體格及健康檢查認可醫療機構"
+      ]
+    },
+    {
+      "key": "social_population",
+      "name_zh": "社會福利、戶政、人口、選舉與公務人事",
+      "role": "topical",
+      "scope": "人口/戶籍/出生/死亡/結婚/離婚、低收入戶、身心障礙、原住民/新住民、選舉投票、公務員人事",
+      "typical_questions": [
+        "某選區歷次得票結構",
+        "某縣身心障礙人口",
+        "本市本月人口變動"
+      ],
+      "anchor_examples": [
+        "地方檢察署辦理違反公職人員選舉罷免法案件偵查終結人數(統計)",
+        "農民健康保險生效中身心障礙被保險人人數統計表",
+        "臺北市低收入戶及補助按月別"
+      ]
+    },
+    {
+      "key": "culture_tourism_sport",
+      "name_zh": "文化、觀光與體育",
+      "role": "topical",
+      "scope": "景點、博物館、古蹟、寺廟、活動行事曆、體育場館、運動賽事",
+      "typical_questions": ["本週某縣市活動", "某博物館館藏"],
+      "anchor_examples": [
+        "臺北市道路申請活動使用管制圖資",
+        "雲林縣政府全球資訊網活動行事曆",
+        "臺北市市政網站整合平台之熱門活動"
+      ]
+    },
+    {
+      "key": "foreign_affairs",
+      "name_zh": "外交、領事與兩岸",
+      "role": "topical",
+      "scope": "外交部公告、領事/簽證/護照、駐外館處、兩岸貿易/政策/案件、僑務、國際合作、新南向、邦交國",
+      "typical_questions": [
+        "某國家近年我國進出口金額",
+        "近期外交部聲明 / 兩岸政策談話",
+        "簽證 / 護照申辦規定",
+        "駐外館處清單與聯絡資訊"
+      ],
+      "anchor_examples": [
+        "外交部全球資訊網-中文版-最新消息",
+        "對中國大陸及香港出口－按主要貨品分",
+        "兩岸貿易金額統計"
+      ]
+    },
+    {
+      "key": "gov_publication",
+      "name_zh": "政府公告與檔案",
+      "role": "meta",
+      "scope": "機關新聞稿、公報、最新消息、電子公布欄、公文範本、檔案目錄、施政方針、資訊公開申請、公共政策參與",
+      "typical_questions": [
+        "本週某機關新聞稿",
+        "行政院公報全文檢索",
+        "某類公文 / 表單範本",
+        "政府資訊公開申請統計"
+      ],
+      "anchor_examples": [
+        "全國政府機關電子公布欄公告資訊",
+        "政府資料開放平臺「最新消息」刊登清單",
+        "公共政策網路參與平臺-提點子(行政院版本)"
+      ]
+    },
+    {
+      "key": "geo_basemap",
+      "name_zh": "地理底圖（橫向層）",
+      "role": "horizontal",
+      "scope": "行政區界、村里界、門牌、坐標、路網、河系、土地利用",
+      "typical_questions": ["作為其他資料集的 join 來源；空間查詢"],
+      "anchor_examples": [
+        "環保餐廳環境即時通地圖資料",
+        "新北市門牌位置數值資料",
+        "臺中市114年GIS門牌號碼各月份版本"
+      ]
+    },
+    {
+      "key": "utilities_telecom",
+      "name_zh": "能源、水電瓦斯與電信（橫向層）",
+      "role": "horizontal",
+      "scope": "電力供需、加油站、自來水、瓦斯、再生能源、電信與寬頻、無線網路",
+      "typical_questions": [
+        "即時電力負載",
+        "某行政區自來水水質",
+        "某地加油站清單"
+      ],
+      "anchor_examples": [
+        "自來水管承裝商狀態統計",
+        "公司登記(依營業項目別)－加油站業",
+        "臺北市自來水及天然氣供應按月別"
+      ]
+    }
+  ],
+  "showcase_datasets": [
+    {
+      "dataset_id": "10859",
+      "name": "台灣電力公司近10年核能發電績效及減碳效益",
+      "agency": "台灣電力股份有限公司",
+      "primary_domain": "environment",
+      "domains": ["environment", "utilities_telecom"],
+      "quality_tier": "白金",
+      "update_freq": "每1年",
+      "formats": ["CSV"],
+      "license": "政府資料開放授權條款-第1版",
+      "actual_columns": [
+        "年度",
+        "核能發電量(億度)",
+        "容量因數平均值(%)",
+        "減碳量(萬噸)"
+      ],
+      "join_keys": [],
+      "join_keys_domain_hint": [
+        "測站代碼",
+        "河川代碼",
+        "行政區代碼",
+        "經緯度",
+        "事業編號"
+      ],
+      "data_volume_total": 16,
+      "description": "提供近10年各年度核能發電量、容量因數平均值及減碳效益。",
+      "metadata_updated": "2024-06-21 15:47:37"
+    },
+    {
+      "dataset_id": "10858",
+      "name": "台灣電力公司核能發電廠位置及機組設備",
+      "agency": "台灣電力股份有限公司",
+      "primary_domain": "utilities_telecom",
+      "domains": ["utilities_telecom"],
+      "quality_tier": "白金",
+      "update_freq": "不定期更新",
+      "formats": ["CSV"],
+      "license": "政府資料開放授權條款-第1版",
+      "actual_columns": [
+        "電廠名稱",
+        "地址",
+        "連絡電話",
+        "傳真電話",
+        "機組名稱",
+        "商轉日期",
+        "裝置容量MWe"
+      ],
+      "join_keys": [],
+      "join_keys_domain_hint": ["行政區代碼", "經緯度", "事業編號"],
+      "data_volume_total": 8,
+      "description": "提供核能發電廠及機組相關資訊。",
+      "metadata_updated": "2024-07-17 08:36:02"
+    },
+    {
+      "dataset_id": "133848",
+      "name": "核能發電後端營運基金放射性廢棄物貯存及核電廠除役完成前回饋要點",
+      "agency": "台灣電力股份有限公司",
+      "primary_domain": "utilities_telecom",
+      "domains": ["utilities_telecom", "gov_publication"],
+      "quality_tier": "白金",
+      "update_freq": "不定期更新",
+      "formats": ["CSV"],
+      "license": "政府資料開放授權條款-第1版",
+      "actual_columns": ["檔案名稱", "檔案格式", "下載網址"],
+      "join_keys": [],
+      "join_keys_domain_hint": [
+        "行政區代碼",
+        "經緯度",
+        "事業編號",
+        "機關代碼",
+        "發布日期"
+      ],
+      "data_volume_total": 1,
+      "description": "本資料集係核能發電後端營運基金管理會為推動核能發電放射性廢棄物貯存作業與完成核電廠除役作業，增進放射性廢棄物貯存設施及核電廠地方周遭居民福祉，訂定本要點。",
+      "metadata_updated": "2025-10-27 13:18:30"
+    },
+    {
+      "dataset_id": "121267",
+      "name": "臺北市國民住宅配售(租)情形",
+      "agency": "臺北市政府都市發展局",
+      "primary_domain": "realestate_land",
+      "domains": ["realestate_land"],
+      "quality_tier": "白金",
+      "update_freq": "不定期更新",
+      "formats": ["CSV"],
+      "license": "政府資料開放授權條款-第1版",
+      "actual_columns": [
+        "項次",
+        "國宅別",
+        "興建戶數/A",
+        "數量",
+        "出售承購戶數",
+        "出售簽約戶數",
+        "出租承租戶數",
+        "出租簽約戶數",
+        "待售戶數/B1",
+        "待租戶數/B2",
+        "累計配售租戶數/A-B1-B2",
+        "備註"
+      ],
+      "join_keys": [],
+      "join_keys_domain_hint": [
+        "行政區代碼",
+        "地段地號",
+        "門牌地址",
+        "統一編號（建商）"
+      ],
+      "data_volume_total": 1,
+      "description": "年度臺北市國民住宅配售(租)統計表",
+      "metadata_updated": "2026-03-26 17:29:30"
+    },
+    {
+      "dataset_id": "155779",
+      "name": "臺北市政府社會住宅包租代管媒合統計資料",
+      "agency": "臺北市政府都市發展局",
+      "primary_domain": "realestate_land",
+      "domains": ["realestate_land"],
+      "quality_tier": "白金",
+      "update_freq": "每1年",
+      "formats": ["CSV"],
+      "license": "政府資料開放授權條款-第1版",
+      "actual_columns": [
+        "項次",
+        "統計年度",
+        "行政區",
+        "行政區代碼",
+        "媒合戶數"
+      ],
+      "join_keys": ["行政區代碼"],
+      "join_keys_domain_hint": [
+        "行政區代碼",
+        "地段地號",
+        "門牌地址",
+        "統一編號（建商）"
+      ],
+      "data_volume_total": 0,
+      "description": "本府歷年社會住宅包租代管媒合統計資料",
+      "metadata_updated": "2026-01-07 15:03:34"
+    },
+    {
+      "dataset_id": "lvr-trades",
+      "name": "不動產買賣 全國實價登錄 (內政部地政司)",
+      "agency": "內政部地政司 不動產交易實價查詢服務系統",
+      "primary_domain": "realestate_land",
+      "domains": ["realestate_land"],
+      "quality_tier": "未檢測",
+      "update_freq": "每3月",
+      "formats": ["CSV"],
+      "license": "政府網站資料開放宣告 (≈ OGDL v1) — 內政部地政司. 「無償、非專屬，得再授權之方式提供公眾使用」, 須註明出處。",
+      "actual_columns": [
+        "city",
+        "season",
+        "iso_trade_date",
+        "土地位置建物門牌_半形",
+        "city_code",
+        "town_code",
+        "鄉鎮市區",
+        "交易標的",
+        "土地位置建物門牌",
+        "土地移轉總面積平方公尺",
+        "都市土地使用分區",
+        "非都市土地使用分區",
+        "非都市土地使用編定",
+        "交易年月日",
+        "交易筆棟數",
+        "移轉層次",
+        "總樓層數",
+        "建物型態",
+        "主要用途",
+        "主要建材",
+        "建築完成年月",
+        "建物移轉總面積平方公尺",
+        "建物現況格局-房",
+        "建物現況格局-廳",
+        "建物現況格局-衛",
+        "建物現況格局-隔間",
+        "有無管理組織",
+        "總價元",
+        "單價元平方公尺",
+        "車位類別",
+        "車位移轉總面積(平方公尺)",
+        "車位總價元",
+        "備註",
+        "編號",
+        "主建物面積",
+        "附屬建物面積",
+        "陽台面積",
+        "電梯",
+        "移轉編號",
+        "車位移轉總面積平方公尺"
+      ],
+      "join_keys": [
+        "編號",
+        "city",
+        "season",
+        "iso_trade_date",
+        "鄉鎮市區",
+        "土地位置建物門牌_半形"
+      ],
+      "join_keys_domain_hint": [
+        "編號",
+        "city",
+        "season",
+        "iso_trade_date",
+        "鄉鎮市區",
+        "土地位置建物門牌_半形"
+      ],
+      "data_volume_total": 0,
+      "description": "57 季 (101S1 起) × 22 縣市買賣案件，從 plvr.land.moi.gov.tw 每季 ZIP 主檔 concat 而成。含交易日期、地址 (門牌)、總價、單價、面積、用途、車位、格局、建物型態 等核心欄位。已加入 city (中文)、season、iso_trade_date、土地位置建物門牌_半形 (NFKC + 中文段樓層轉 arabic) 共 4 欄方便篩選。**地址 LIKE 搜尋務必用 \"土地位置建物門牌_半形\" 欄位**（原欄位是內政部全形數字，半形 LIKE 撈不到）。同義詞：實價登錄 / 實價登陸 / 不動產交易 / 房價 / 買賣價格 / 租金 / 預售屋 / 房地產。",
+      "metadata_updated": ""
+    },
+    {
+      "dataset_id": "20254",
+      "name": "全民健康保險保險對象人數按類別性別年齡層統計",
+      "agency": "衛生福利部中央健康保險署",
+      "primary_domain": "health_food",
+      "domains": ["health_food", "social_population"],
+      "quality_tier": "銀",
+      "update_freq": "每3月",
+      "formats": ["CSV", "CSV", "CSV", "CSV", "CSV", "CSV", "CSV", "CSV"],
+      "license": "政府資料開放授權條款-第1版",
+      "actual_columns": [
+        "年月",
+        "投保類目",
+        "性別",
+        "年齡層",
+        "投保人數",
+        "被保險人數",
+        "眷屬人數"
+      ],
+      "join_keys": [],
+      "join_keys_domain_hint": [
+        "醫事機構代碼",
+        "GLN",
+        "健保特約代號",
+        "行政區代碼",
+        "村里代碼",
+        "選區代碼"
+      ],
+      "data_volume_total": 0,
+      "description": "'\n全民健康保險對象基礎統計資料",
+      "metadata_updated": "2026-05-14 09:55:01"
+    },
+    {
+      "dataset_id": "7554",
+      "name": "衛生福利部全民健康保險會委員會議議事錄",
+      "agency": "衛生福利部全民健康保險會",
+      "primary_domain": "health_food",
+      "domains": ["health_food", "social_population"],
+      "quality_tier": "金",
+      "update_freq": "每1月",
+      "formats": ["CSV"],
+      "license": "政府資料開放授權條款-第1版",
+      "actual_columns": [
+        "會議名稱",
+        "URL",
+        "日期",
+        "時間",
+        "地點",
+        "主持人",
+        "委員"
+      ],
+      "join_keys": [],
+      "join_keys_domain_hint": [
+        "醫事機構代碼",
+        "GLN",
+        "健保特約代號",
+        "行政區代碼",
+        "村里代碼",
+        "選區代碼"
+      ],
+      "data_volume_total": 152,
+      "description": "依據全民健康保險會組成及議事辦法第12條，本會委員會議應依發言作成會議實錄，載明下列事項(如次項欄位：主要欄位說明)，於會議後十日內公開，本會爰公開於衛生福利部網站本會網頁。",
+      "metadata_updated": "2026-05-12 10:59:35"
+    },
+    {
+      "dataset_id": "23719",
+      "name": "全民健康保險各級政府補助弱勢保險對象統計資料",
+      "agency": "衛生福利部中央健康保險署",
+      "primary_domain": "health_food",
+      "domains": ["health_food", "procurement_subsidy"],
+      "quality_tier": "金",
+      "update_freq": "每1月",
+      "formats": [
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV"
+      ],
+      "license": "政府資料開放授權條款-第1版",
+      "actual_columns": [
+        "保費年月",
+        "縣市",
+        "鄉鎮",
+        "性別（男1女2）",
+        "補助項目",
+        "年齡區間",
+        "補助人數",
+        "補助金額"
+      ],
+      "join_keys": [],
+      "join_keys_domain_hint": [
+        "醫事機構代碼",
+        "GLN",
+        "健保特約代號",
+        "行政區代碼",
+        "統一編號（廠商）",
+        "機關代碼"
+      ],
+      "data_volume_total": 0,
+      "description": "按保費年月、縣市、鄉鎮、性別等提供由本署協辦各級政府機關補助保險對象健保費之補助人數及金額資料",
+      "metadata_updated": "2026-04-22 16:00:02"
+    },
+    {
+      "dataset_id": "10918",
+      "name": "攤販經營概況調查",
+      "agency": "行政院主計總處",
+      "primary_domain": "public_finance",
+      "domains": ["public_finance"],
+      "quality_tier": "白金",
+      "update_freq": "每5年",
+      "formats": ["XML", "XML", "XML"],
+      "license": "政府資料開放授權條款-第1版",
+      "actual_columns": [
+        "資料項目",
+        "連結",
+        "民國年",
+        "西元年",
+        "提供機關",
+        "備註"
+      ],
+      "join_keys": [],
+      "join_keys_domain_hint": ["機關代碼", "會計年度", "科目代碼"],
+      "data_volume_total": 148,
+      "description": "為掌握攤販數、攤販分布、經營概況及意願等所辦理之攤販經營概況調查",
+      "metadata_updated": "2024-08-29 15:10:06"
+    },
+    {
+      "dataset_id": "85028",
+      "name": "臺中市列管夜市",
+      "agency": "臺中市政府經濟發展局",
+      "primary_domain": "geo_basemap",
+      "domains": ["geo_basemap"],
+      "quality_tier": "白金",
+      "update_freq": "不定期更新",
+      "formats": ["JSON", "CSV", "XML"],
+      "license": "政府資料開放授權條款-第1版",
+      "actual_columns": [
+        "縣市別代碼",
+        "行政區",
+        "名稱",
+        "位址",
+        "攤販數",
+        "營業頻率",
+        "早",
+        "午",
+        "晚",
+        "備註"
+      ],
+      "join_keys": [],
+      "join_keys_domain_hint": ["行政區代碼", "村里代碼", "TWD97 X/Y"],
+      "data_volume_total": 0,
+      "description": "臺中市列管夜市行政區、名稱、位址、攤販數、營業時間",
+      "metadata_updated": "2026-03-18 17:39:36"
+    },
+    {
+      "dataset_id": "14208",
+      "name": "機動車輛登記數統計",
+      "agency": "交通部公路局",
+      "primary_domain": "transport",
+      "domains": ["transport"],
+      "quality_tier": "金",
+      "update_freq": "每1月",
+      "formats": ["CSV"],
+      "license": "政府資料開放授權條款-第1版",
+      "actual_columns": ["<script>"],
+      "join_keys": [],
+      "join_keys_domain_hint": ["路線代碼", "站點 ID", "行政區代碼", "經緯度"],
+      "data_volume_total": 0,
+      "description": "本資料集主要提供機動車輛登記數相關資料",
+      "metadata_updated": "2026-05-05 11:03:52"
+    },
+    {
+      "dataset_id": "25932",
+      "name": "桃園市A1及A2類道路交通事故每年統計-傷亡人數統計(91至114年)",
+      "agency": "桃園市政府警察局",
+      "primary_domain": "transport",
+      "domains": ["transport"],
+      "quality_tier": "白金",
+      "update_freq": "每1年",
+      "formats": ["CSV", "CSV", "CSV", "CSV"],
+      "license": "政府資料開放授權條款-第1版",
+      "actual_columns": ["year", "breau", "type", "class", "p_count"],
+      "join_keys": [],
+      "join_keys_domain_hint": ["路線代碼", "站點 ID", "行政區代碼", "經緯度"],
+      "data_volume_total": 0,
+      "description": "1、桃園市警政統計資料，提供A1及A2道路交通事故發生區域及傷亡人數之統計。\n2、自104年起，區域之劃分方式改為採用行政區。\n3、110年復興區無發生A1事故。",
+      "metadata_updated": "2026-05-16 10:05:47"
+    },
+    {
+      "dataset_id": "27491",
+      "name": "選舉人數",
+      "agency": "中央選舉委員會",
+      "primary_domain": "social_population",
+      "domains": ["social_population"],
+      "quality_tier": "白金",
+      "update_freq": "每4年",
+      "formats": [
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV",
+        "CSV"
+      ],
+      "license": "政府資料開放授權條款-第1版",
+      "actual_columns": [
+        "省市代碼",
+        "縣市代碼",
+        "鄉鎮市區代碼",
+        "縣市名稱",
+        "鄉鎮市區名稱",
+        "投開票所別",
+        "總統副總統選舉選舉人數",
+        "立委選舉區域選舉人數",
+        "立委選舉平地原住民選舉人數",
+        "立委選舉山地原住民選舉人數",
+        "立委選舉不分區政黨代表選舉人數"
+      ],
+      "join_keys": [],
+      "join_keys_domain_hint": ["行政區代碼", "村里代碼", "選區代碼"],
+      "data_volume_total": 11000,
+      "description": "選舉人數資料",
+      "metadata_updated": "2024-08-06 15:41:31"
+    },
+    {
+      "dataset_id": "15035",
+      "name": "地方檢察署執行違反公職人員選舉罷免法案件裁判確定人數(統計)",
+      "agency": "法務部統計處",
+      "primary_domain": "judicial_legal",
+      "domains": ["judicial_legal", "social_population"],
+      "quality_tier": "白金",
+      "update_freq": "每1月",
+      "formats": ["CSV"],
+      "license": "政府資料開放授權條款-第1版",
+      "actual_columns": ["刑名", "性別", "民國年", "月份", "人"],
+      "join_keys": [],
+      "join_keys_domain_hint": [
+        "案號",
+        "法院/地檢代碼",
+        "統一編號（裁罰對象）",
+        "行政區代碼",
+        "村里代碼",
+        "選區代碼"
+      ],
+      "data_volume_total": 1000,
+      "description": "地方檢察署執行違反公職人員選舉罷免法案件裁判確定人數-按刑名及性別分，相關定義請參閱法務統計資訊網\\其他服務\\統計用詞解釋",
+      "metadata_updated": "2025-06-25 11:51:48"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+# Taiwan.md remote MCP endpoint — Cloudflare Worker config.
+#
+# Deploy (needs a free Cloudflare account — see README.md):
+#   cd workers/mcp && npx wrangler login && npx wrangler deploy
+#
+# Default deploy target: https://taiwanmd-mcp.<your-subdomain>.workers.dev
+# To serve at mcp.taiwan.md instead, taiwan.md's DNS must be on Cloudflare;
+# then uncomment the [[routes]] block (or add a Custom Domain in the dashboard).
+
+name = "taiwanmd-mcp"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+# Branded custom domain. Works because taiwan.md's DNS zone lives in this same
+# Cloudflare account — `wrangler deploy` auto-creates the DNS record + TLS cert.
+# The *.workers.dev URL keeps working too; the Worker answers on both.
+[[routes]]
+pattern = "mcp.taiwan.md"
+custom_domain = true

@@ -1,0 +1,94 @@
+{
+  "generated": "2026-07-28T17:07:13Z",
+  "max_total": 2172,
+  "modules": [
+    {
+      "name": "home",
+      "langs": {
+        "zh-TW": 108,
+        "en": 108
+      }
+    },
+    {
+      "name": "about",
+      "langs": {
+        "zh-TW": 269,
+        "en": 269
+      }
+    },
+    {
+      "name": "contribute",
+      "langs": {
+        "zh-TW": 326,
+        "en": 326
+      }
+    },
+    {
+      "name": "changelog",
+      "langs": {
+        "zh-TW": 12,
+        "en": 12
+      }
+    },
+    {
+      "name": "dashboard",
+      "langs": {
+        "zh-TW": 79,
+        "en": 79
+      }
+    },
+    {
+      "name": "data",
+      "langs": {
+        "zh-TW": 326,
+        "en": 326
+      }
+    },
+    {
+      "name": "resources",
+      "langs": {
+        "zh-TW": 361,
+        "en": 361
+      }
+    },
+    {
+      "name": "map",
+      "langs": {
+        "zh-TW": 455,
+        "en": 455
+      }
+    },
+    {
+      "name": "assets",
+      "langs": {
+        "zh-TW": 34,
+        "en": 34
+      }
+    },
+    {
+      "name": "notfound",
+      "langs": {
+        "zh-TW": 29,
+        "en": 29
+      }
+    },
+    {
+      "name": "taiwanShape",
+      "langs": {
+        "zh-TW": 46,
+        "en": 46
+      }
+    },
+    {
+      "name": "semiont",
+      "langs": {
+        "zh-TW": 127,
+        "en": 127
+      }
+    }
+  ],
+  "lang_totals": {
+    "zh-TW": { "keys": 2172, "coverage_pct": 100.0 },
+    "en": { "keys": 2172, "coverage_pct": 100.0 }
+  }
+}

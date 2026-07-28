@@ -1,0 +1,283 @@
+---
+import {
+  useTranslations,
+  getLangFromUrl,
+  useTranslatedPath,
+} from '../i18n/utils';
+import { defaultLang } from '../i18n/ui';
+import { getCategoryConfigs } from '../utils/categoryConfig';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+const categoryConfigs = getCategoryConfigs(t);
+
+// Count articles dynamically from knowledge/ directory
+function countArticles(categorySlug: string): number {
+  const categoryMap: Record<string, string> = {
+    history: 'History',
+    geography: 'Geography',
+    culture: 'Culture',
+    food: 'Food',
+    art: 'Art',
+    music: 'Music',
+    technology: 'Technology',
+    nature: 'Nature',
+    people: 'People',
+    society: 'Society',
+    economy: 'Economy',
+    lifestyle: 'Lifestyle',
+    politics: 'Politics',
+  };
+  const dirName = categoryMap[categorySlug] || categorySlug;
+  const dirPath = path.join(
+    process.cwd(),
+    'knowledge',
+    lang === defaultLang ? '/' : lang,
+    dirName,
+  );
+  try {
+    const files = fs.readdirSync(dirPath);
+    return files.filter((f) => f.endsWith('.md') && !f.startsWith('_')).length;
+  } catch {
+    return 0;
+  }
+}
+
+// TODO(2026-07-06 token-convergence wave): every `gradient` value below is a
+// DIFFERENT palette from src/utils/categoryConfig.ts / the --cat-{slug}-gradient
+// tokens in src/styles/tokens.css (0/12 byte-match — e.g. history here is
+// #f59e0b→#ea580c vs categoryConfig's #92400e→#d97706). This looks like an
+// intentional bespoke "waterfall" palette introduced in f41a6e5e3 (Tailwind
+// migration), not stale drift from a shared source — but flagging for an
+// explicit decision: keep as its own palette, or converge to the --cat-*
+// SSOT (would change rendered colors here). Not swapped this wave per the
+// zero-visual-change invariant.
+//
+// Each category carries its own header height (waterfall rhythm) and
+// gradient endpoints. Previously these lived in scoped CSS as
+// :nth-child() and [data-color=...] attribute selectors; moving them
+// into data is cleaner and eliminates the need for scoped styles.
+// 2026-04-11 heartbeat fix: removed all `cover:` fields pointing to
+// /images/wiki/*.jpg — those images never existed in public/images/wiki/,
+// causing 550+ req/day of 404s across 11 distinct files (Cloudflare logs).
+// The component already has a graceful fallback to emoji icons via
+// onerror → nextElementSibling display:flex, so visual UX stays identical.
+// If we want category covers back, place real images at /images/categories/{slug}.jpg
+// and re-add cover fields; don't resurrect the phantom wiki/ hash names.
+const categories = [
+  {
+    name: categoryConfigs['history'].name,
+    slug: 'history',
+    description: categoryConfigs['history'].description,
+    icon: '📜',
+    gradient: 'linear-gradient(135deg, #f59e0b, #ea580c)',
+    headerHeight: 200,
+    mobileHeaderHeight: 112,
+  },
+  {
+    name: categoryConfigs['geography'].name,
+    slug: 'geography',
+    description: categoryConfigs['geography'].description,
+    icon: '🗺️',
+    gradient: 'linear-gradient(135deg, #10b981, #0d9488)',
+    headerHeight: 110,
+    mobileHeaderHeight: 112,
+  },
+  {
+    name: categoryConfigs['culture'].name,
+    slug: 'culture',
+    description: categoryConfigs['culture'].description,
+    icon: '🎭',
+    gradient: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+    headerHeight: 160,
+    mobileHeaderHeight: 112,
+  },
+  {
+    name: categoryConfigs['food'].name,
+    slug: 'food',
+    description: categoryConfigs['food'].description,
+    icon: '🍜',
+    gradient: 'linear-gradient(135deg, #f43f5e, #db2777)',
+    headerHeight: 185,
+    mobileHeaderHeight: 112,
+  },
+  {
+    name: categoryConfigs['art'].name,
+    slug: 'art',
+    description: categoryConfigs['art'].description,
+    icon: '🎨',
+    gradient: 'linear-gradient(135deg, #06b6d4, #2563eb)',
+    headerHeight: 105,
+    mobileHeaderHeight: 112,
+  },
+  {
+    name: categoryConfigs['music'].name,
+    slug: 'music',
+    description: categoryConfigs['music'].description,
+    icon: '🎵',
+    gradient: 'linear-gradient(135deg, #6366f1, #9333ea)',
+    headerHeight: 165,
+    mobileHeaderHeight: 112,
+  },
+  {
+    name: categoryConfigs['technology'].name,
+    slug: 'technology',
+    description: categoryConfigs['technology'].description,
+    icon: '💻',
+    gradient: 'linear-gradient(135deg, #64748b, #4b5563)',
+    headerHeight: 115,
+    mobileHeaderHeight: 112,
+  },
+  {
+    name: categoryConfigs['nature'].name,
+    slug: 'nature',
+    description: categoryConfigs['nature'].description,
+    icon: '🌿',
+    gradient: 'linear-gradient(135deg, #22c55e, #059669)',
+    headerHeight: 195,
+    mobileHeaderHeight: 112,
+  },
+  {
+    name: categoryConfigs['people'].name,
+    slug: 'people',
+    description: categoryConfigs['people'].description,
+    icon: '👥',
+    gradient: 'linear-gradient(135deg, #f97316, #dc2626)',
+    headerHeight: 175,
+    mobileHeaderHeight: 112,
+  },
+  {
+    name: categoryConfigs['society'].name,
+    slug: 'society',
+    description: categoryConfigs['society'].description,
+    icon: '🏛️',
+    gradient: 'linear-gradient(135deg, #3b82f6, #4f46e5)',
+    headerHeight: 108,
+    mobileHeaderHeight: 112,
+  },
+  {
+    name: categoryConfigs['economy'].name,
+    slug: 'economy',
+    description: categoryConfigs['economy'].description,
+    icon: '📊',
+    gradient: 'linear-gradient(135deg, #eab308, #d97706)',
+    headerHeight: 150,
+    mobileHeaderHeight: 112,
+  },
+  {
+    name: categoryConfigs['lifestyle'].name,
+    slug: 'lifestyle',
+    description: categoryConfigs['lifestyle'].description,
+    icon: '🏠',
+    gradient: 'linear-gradient(135deg, #14b8a6, #0891b2)',
+    headerHeight: 155,
+    mobileHeaderHeight: 112,
+  },
+  {
+    name: categoryConfigs['politics'].name,
+    slug: 'politics',
+    description: categoryConfigs['politics'].description,
+    icon: '🗳️',
+    gradient: 'linear-gradient(135deg, #7c2d12, #ea580c)',
+    headerHeight: 140,
+    mobileHeaderHeight: 112,
+  },
+];
+---
+
+<!--
+  Phase 4 leaf migration #13: CategoryGrid.astro
+  ──────────────────────────────────────────────
+  - Scoped <style> block removed entirely (~327 lines CSS deleted)
+  - Per-category header heights previously applied via
+    :nth-child() CSS selectors are now passed via inline style
+    style="height: {headerHeight}px" directly from the data array
+  - Per-category gradients previously applied via [data-color=...]
+    attribute selectors are now passed via inline style
+    style="background: {gradient}" directly from the data array
+  - This eliminates 12 nth-child rules + 12 attribute selector rules
+  - `group` + `group-hover:` for hover state propagation on title,
+    cover image, explore arrow, and gradient opacity
+-->
+<section
+  class="mx-auto my-12 max-w-[var(--container-wide)] columns-3 gap-x-6 px-[clamp(1.5rem,5vw,5rem)] max-lg:columns-2 max-[768px]:mx-4 max-[768px]:my-8 max-[768px]:columns-1"
+  aria-label={t('CategoryGrid.aria-section')}
+>
+  {
+    categories.map((category) => {
+      const count = countArticles(category.slug);
+
+      return (
+        <article class="mb-6 flex break-inside-avoid">
+          <a
+            href={translatePath(`/${category.slug}`)}
+            data-ga-section="category_grid"
+            data-ga-label={category.slug}
+            class="group relative flex w-full flex-col overflow-hidden rounded-3xl border border-[rgba(226,232,240,0.9)] bg-white/[0.98] text-inherit no-underline shadow-[0_12px_30px_rgba(15,23,42,0.06)] transition-all duration-[280ms] ease hover:-translate-y-1.5 hover:border-[rgba(148,163,184,0.5)] hover:shadow-[0_24px_50px_rgba(15,23,42,0.18),0_8px_16px_rgba(0,0,0,0.06)] max-[768px]:min-h-[272px]"
+            aria-label={`${t('CategoryGrid.aria-explore')} ${category.name}${t('CategoryGrid.aria-explore-suffix')}`}
+          >
+            {/* category-card-gradient 這個 class 只是給 dark-polish.css 抓的
+                掛鉤（暗色降飽和 saturate(0.85)，OBSERVER-QUEUE #12 (b)）；
+                亮色下不掛任何樣式，移除它會讓暗色降飽和靜默失效。 */}
+            <div
+              class="category-card-gradient absolute inset-0 z-0 opacity-100 transition-opacity duration-[280ms] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,0.15)_0%,rgba(0,0,0,0)_70%)] [-webkit-mask-image:linear-gradient(to_bottom,rgba(0,0,0,0.15)_0%,rgba(0,0,0,0)_70%)] group-hover:opacity-[0.35]"
+              style={`background: ${category.gradient};`}
+            />
+            <div
+              class="relative z-[1] flex flex-shrink-0 items-center justify-center overflow-hidden max-[768px]:!h-28"
+              style={`height: ${category.headerHeight}px;`}
+            >
+              {category.cover ? (
+                <img
+                  src={category.cover}
+                  alt={`${category.name} ${t('CategoryGrid.alt-category-image-suffix')}`}
+                  class="h-full w-full object-cover transition-transform duration-500 ease group-hover:scale-[1.04]"
+                  loading="lazy"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+                />
+              ) : null}
+              <div
+                class="relative z-[2] text-[3.25rem] transition-transform duration-[280ms] ease [filter:drop-shadow(0_4px_8px_rgba(0,0,0,0.15))] group-hover:scale-[1.04] max-[768px]:text-[2.8rem]"
+                style={category.cover ? 'display:none' : ''}
+              >
+                {category.icon}
+              </div>
+            </div>
+            <div class="relative z-[1] flex flex-1 flex-col px-[1.35rem] pb-5 pt-[1.35rem]">
+              <div class="mb-2 flex items-baseline justify-between gap-2">
+                <h3 class="mb-[0.6rem] font-['Noto_Serif_TC',serif] text-[1.6rem] font-extrabold leading-tight -tracking-[0.02em] text-[#1a3c34] transition-colors duration-[250ms] ease group-hover:text-[#006d77] max-[768px]:text-[1.2rem]">
+                  {category.name}
+                </h3>
+                <span class="flex flex-shrink-0 items-baseline gap-[0.2rem]">
+                  <span class="font-['Noto_Serif_TC','Georgia',serif] text-[1.1rem] font-semibold leading-none -tracking-[0.01em] text-[#a8634a] max-[768px]:text-[1.6rem]">
+                    {count}
+                  </span>{' '}
+                  <span class="font-['Noto_Sans_TC',sans-serif] text-[0.7rem] font-medium tracking-[0.03em] text-[#a8634a]">
+                    {count > 1
+                      ? t('CategoryGrid.articles')
+                      : t('CategoryGrid.article')}
+                  </span>
+                </span>
+              </div>
+              <p class="mb-[1.1rem] line-clamp-3 flex-1 text-[0.93rem] leading-relaxed text-[#4a6560] max-[768px]:text-[0.9rem]">
+                {category.description}
+              </p>
+              <div class="mt-auto flex justify-start">
+                <span class="flex items-center gap-1 text-[0.875rem] font-semibold text-[#006d77] transition-colors duration-200 ease group-hover:text-[#1d4ed8]">
+                  {t('CategoryGrid.explore')}
+                  <span class="inline-block transition-transform duration-[250ms] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] group-hover:translate-x-1">
+                    →
+                  </span>
+                </span>
+              </div>
+            </div>
+          </a>
+        </article>
+      );
+    })
+  }
+</section>

@@ -1,0 +1,219 @@
+---
+/**
+ * EventTracker.astro — site-wide GA4 engagement tracker (2026-06-14)
+ *
+ * Generalized from HomeEventTracker (homepage-only, 2026-05-26). One shared
+ * tracker mounted on any page type, so reader engagement is understandable
+ * across the whole site — start with article pages (哲宇 directive 2026-06-14:
+ * 「真的有滑到延伸閱讀 / footnote 沒？整頁的高度殘留率？所有頁面都要懂」).
+ *
+ * Six signals, all carrying a `page_type` param so GA4 segments by surface
+ * (home / article / category / latest / …) instead of needing a separate event
+ * family per page:
+ *
+ *   content_click   — link/button clicks on tracked elements (data-ga-section)
+ *   outbound_click  — clicks leaving computex.md, recorded separately
+ *   form_submit     — form submission (data-ga-form)
+ *   section_view    — first viewport entry of a landmark (data-ga-view), once
+ *   scroll_depth    — 25 / 50 / 75 / 100% height-retention thresholds
+ *   time_milestone  — 30 / 60 / 180 / 600s engaged time
+ *
+ * The scroll_depth + section_view pair answers "is the bottom-of-page stuff
+ * (延伸閱讀, CTAs) actually seen?" — scroll_depth gives the retention curve,
+ * section_view catches the landmark regardless of where article length puts it.
+ *
+ * Markup contract (same as the homepage tracker it replaces):
+ *   data-ga-section="<id>"  + data-ga-label="<id>"  — clickable items
+ *   data-ga-form="<id>"                              — form binding
+ *   data-ga-view="<id>"                              — landmark, once on view
+ *
+ * gtag bootstrap is global in src/layouts/Layout.astro (G-JGC5W00N7T). Silent
+ * no-op when gtag is missing (ad blocker / private). All gtag calls best-effort
+ * try/catch so a GA failure never blocks a user action.
+ *
+ * Migration note: replaces homepage_* events with generic names + page_type.
+ * Saved GA4 explorations that referenced homepage_click / homepage_scroll_depth
+ * / homepage_section_view need re-pointing to the generic events filtered by
+ * page_type=home (raw event data is unaffected).
+ */
+interface Props {
+  /** GA4 page_type dimension: home | article | category | latest | … */
+  pageType: string;
+}
+const { pageType } = Astro.props;
+---
+
+<script define:vars={{ pageType }}>
+  (function () {
+    var PAGE_TYPE = pageType || 'unknown';
+    var SAME_ORIGIN_HOSTS = ['computex.md', 'localhost', '127.0.0.1'];
+
+    function _isOutbound(href) {
+      if (!href) return false;
+      if (href.charAt(0) === '#' || href.charAt(0) === '/') return false;
+      try {
+        var url = new URL(href, document.location.href);
+        if (url.origin === document.location.origin) return false;
+        var host = url.hostname.replace(/^www\./, '');
+        for (var i = 0; i < SAME_ORIGIN_HOSTS.length; i++) {
+          if (
+            host === SAME_ORIGIN_HOSTS[i] ||
+            host.endsWith('.' + SAME_ORIGIN_HOSTS[i])
+          ) {
+            return false;
+          }
+        }
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function _fire(name, params) {
+      if (typeof gtag !== 'function') return;
+      try {
+        params.page_type = PAGE_TYPE;
+        gtag('event', name, params);
+      } catch (_) {
+        /* never block navigation on GA failure */
+      }
+    }
+
+    function _lang() {
+      return document.documentElement.lang || 'unknown';
+    }
+
+    // ── (1) click + (2) outbound click ──────────────────────────────────
+    function _onClick(e) {
+      var target =
+        e.target && e.target.closest
+          ? e.target.closest('[data-ga-section]')
+          : null;
+      if (!target) return;
+      var section = target.getAttribute('data-ga-section');
+      var label = target.getAttribute('data-ga-label') || '';
+      var href = target.getAttribute('href') || '';
+      if (!label && href && href !== '#') {
+        try {
+          var path = href.split('?')[0].split('#')[0];
+          var parts = path.split('/').filter(Boolean);
+          if (parts.length) label = decodeURIComponent(parts[parts.length - 1]);
+        } catch (_) {}
+      }
+      _fire(_isOutbound(href) ? 'outbound_click' : 'content_click', {
+        section: section,
+        label: label,
+        link_url: href,
+        page_lang: _lang(),
+      });
+    }
+
+    // ── (3) form submit ─────────────────────────────────────────────────
+    function _onSubmit(e) {
+      var form = e.target;
+      if (!form || !form.matches || !form.matches('[data-ga-form]')) return;
+      _fire('form_submit', {
+        section: form.getAttribute('data-ga-form'),
+        label: form.getAttribute('data-ga-label') || 'submit',
+        page_lang: _lang(),
+      });
+    }
+
+    // ── (4) section visibility (IntersectionObserver) ───────────────────
+    function _initSectionView() {
+      if (typeof IntersectionObserver !== 'function') return;
+      var seen = Object.create(null);
+      var io = new IntersectionObserver(
+        function (entries) {
+          for (var i = 0; i < entries.length; i++) {
+            var entry = entries[i];
+            if (!entry.isIntersecting) continue;
+            var view = entry.target.getAttribute('data-ga-view');
+            if (!view || seen[view]) continue;
+            seen[view] = true;
+            _fire('section_view', {
+              section: view,
+              page_lang: _lang(),
+              elapsed_ms: Math.round(performance.now()),
+            });
+            io.unobserve(entry.target);
+          }
+        },
+        // Fire when the landmark's top scrolls ~10% into the viewport — robust
+        // for ANY section height (a tall footnotes/body block can never have 40%
+        // of itself on screen at once, so a fixed visibility ratio would miss it).
+        { threshold: 0, rootMargin: '0px 0px -10% 0px' },
+      );
+      var nodes = document.querySelectorAll('[data-ga-view]');
+      for (var i = 0; i < nodes.length; i++) io.observe(nodes[i]);
+    }
+
+    // ── (5) scroll depth — 25 / 50 / 75 / 100% (once each) ──────────────
+    function _initScrollDepth() {
+      var thresholds = [25, 50, 75, 100];
+      var hit = {};
+      function _measure() {
+        var doc = document.documentElement;
+        var bodyHeight = doc.scrollHeight - doc.clientHeight;
+        if (bodyHeight <= 0) return;
+        var pct = Math.min(100, (window.scrollY / bodyHeight) * 100);
+        for (var i = 0; i < thresholds.length; i++) {
+          var t = thresholds[i];
+          if (pct >= t && !hit[t]) {
+            hit[t] = true;
+            _fire('scroll_depth', {
+              depth_pct: t,
+              page_lang: _lang(),
+              elapsed_ms: Math.round(performance.now()),
+            });
+          }
+        }
+      }
+      var raf;
+      window.addEventListener(
+        'scroll',
+        function () {
+          if (raf) return;
+          raf = requestAnimationFrame(function () {
+            raf = 0;
+            _measure();
+          });
+        },
+        { passive: true },
+      );
+      _measure(); // in case the page loads already scrolled
+    }
+
+    // ── (6) time milestones — 30 / 60 / 180 / 600s engaged ──────────────
+    function _initTimeMilestones() {
+      var stops = [30, 60, 180, 600];
+      var t0 = performance.now();
+      var idx = 0;
+      function _tick() {
+        if (idx >= stops.length) return;
+        var elapsed = (performance.now() - t0) / 1000;
+        while (idx < stops.length && elapsed >= stops[idx]) {
+          _fire('time_milestone', { seconds: stops[idx], page_lang: _lang() });
+          idx++;
+        }
+        if (idx < stops.length)
+          setTimeout(_tick, (stops[idx] - elapsed) * 1000 + 100);
+      }
+      setTimeout(_tick, stops[0] * 1000);
+    }
+
+    function _init() {
+      document.addEventListener('click', _onClick, { capture: true });
+      document.addEventListener('submit', _onSubmit, { capture: true });
+      _initSectionView();
+      _initScrollDepth();
+      _initTimeMilestones();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', _init);
+    } else {
+      _init();
+    }
+  })();
+</script>

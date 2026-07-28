@@ -1,0 +1,21 @@
+/* dashboard/index.css — replaces the old monolithic src/styles/dashboard.css
+   (split into per-section files 2026-07-24; verbatim move, zero rule changes).
+   Import order preserves the original file's cascade order —
+   responsive.css MUST stay last so its media-query overrides win. */
+
+@import './base.css';
+@import './vitals.css';
+@import './registry.css';
+@import './organism.css';
+@import './translation.css';
+@import './immune.css';
+@import './growth.css';
+@import './health-distribution.css';
+@import './next-steps.css';
+@import './content-analysis.css';
+@import './activity.css';
+@import './spores.css';
+@import './analytics.css';
+@import './contributors.css';
+@import './ops-status.css';
+@import './responsive.css';

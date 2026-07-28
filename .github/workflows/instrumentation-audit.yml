@@ -1,0 +1,35 @@
+name: Instrumentation Audit
+
+# GA4 event-param ↔ custom-dimension 漂移偵測器（免疫 Layer 1）。
+#
+# 防的 bug class：埋 gtag event param 但忘了把它加進 register-ga4-custom-dimensions.py
+# 的 SSOT（→ query 端永遠瞎掉）。2026-05-29 D+2 watch 一次抓到 3 個歷史 instance
+# (pct 名字對不上 / link_url 沒註冊 / failed_path 沒註冊)，外加 404 的 5 個 param
+# 全沒 codify。詳見 reports/homepage-evolution-D+2-watch-2026-05-29.md。
+#
+# 這裡只跑 --static（code params ↔ register script SSOT）：純 stdlib，不需 GA4 creds，
+# 不需 node。SSOT ↔ GA4 live 那層需 Admin API creds，跑在本機 / 手動（見 tool --live）。
+#
+# 觸發：任何動 tracker 原始檔或 register/audit script 的 PR。
+
+on:
+  pull_request:
+    paths:
+      - 'src/components/home/HomeEventTracker.astro'
+      - 'src/layouts/Layout.astro'
+      - 'src/pages/404.astro'
+      - 'scripts/tools/register-ga4-custom-dimensions.py'
+      - 'scripts/tools/instrumentation-audit.py'
+
+jobs:
+  instrumentation-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Audit instrumentation (code params ↔ register SSOT)
+        run: python3 scripts/tools/instrumentation-audit.py --static

@@ -1,0 +1,275 @@
+---
+/**
+ * TextToSpeech — Browser SpeechSynthesis TTS button for articles
+ * Language-aware: BCP-47 utterance.lang + best matching SpeechSynthesisVoice
+ */
+import { useTranslations, getLangFromUrl } from '../i18n/utils';
+import type { Locale } from '../i18n/ui';
+
+interface Props {
+  lang?: Locale;
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const speechLangMap: Record<string, string> = {
+  'zh-TW': 'zh-TW',
+  en: 'en-US',
+  es: 'es-419',
+  ja: 'ja-JP',
+  ko: 'ko-KR',
+  fr: 'fr-FR',
+  vi: 'vi-VN',
+  id: 'id-ID',
+  pt: 'pt-BR',
+  hi: 'hi-IN',
+  ar: 'ar-SA',
+  ru: 'ru-RU',
+  // ⚠️ 元件私有語言表：新語言出生不會自動出現——vi/id/pt/hi 出生後一週、
+  // ar/ru 開站日（2026-07-25）才發現這裡漏了，期間六語頁面全用英語語音朗讀。
+};
+const speechLang = speechLangMap[lang] || 'en-US';
+---
+
+<!--
+  Phase 4 leaf migration #7: TextToSpeech.astro
+  ─────────────────────────────────────────────
+  - Scoped <style> block removed entirely
+  - `.tts-hidden` helper class replaced with Tailwind's `hidden` class
+  - Script updated to toggle `hidden` instead of `tts-hidden`
+  - Button uses inline-flex + gap utilities instead of .btn-ghost
+    (note: the site has a global nav/button font rule in @layer base
+    which already handles font-family)
+-->
+<div
+  class="flex items-center gap-2"
+  id="tts-controls"
+  data-speech-lang={speechLang}
+  data-label-pause={t('article.tts.pause')}
+  data-label-resume={t('article.tts.resume')}
+>
+  <button
+    class="inline-flex cursor-pointer items-center gap-[0.4rem] border-none bg-transparent p-0 text-[0.82rem] text-inherit"
+    id="tts-play"
+    aria-label={t('article.tts.play')}
+    title={t('article.tts.play')}
+  >
+    <svg
+      class="h-4 w-4 flex-shrink-0"
+      id="tts-icon-play"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+      ></path>
+    </svg>
+    <svg
+      class="hidden h-4 w-4 flex-shrink-0"
+      id="tts-icon-pause"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <span id="tts-label">{t('article.tts.play')}</span>
+  </button>
+  <button
+    class="hidden cursor-pointer items-center gap-[0.4rem] border-none bg-transparent p-0 text-[0.82rem] text-inherit"
+    id="tts-stop"
+    aria-label={t('article.tts.stop')}
+    title={t('article.tts.stop')}
+  >
+    <svg
+      class="h-4 w-4 flex-shrink-0"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
+      ></path>
+    </svg>
+  </button>
+</div>
+
+<script is:inline>
+  (function () {
+    if (!('speechSynthesis' in window)) {
+      var controls = document.getElementById('tts-controls');
+      if (controls) controls.style.display = 'none';
+      return;
+    }
+
+    var synth = window.speechSynthesis;
+    var playBtn = document.getElementById('tts-play');
+    var stopBtn = document.getElementById('tts-stop');
+    var iconPlay = document.getElementById('tts-icon-play');
+    var iconPause = document.getElementById('tts-icon-pause');
+    var label = document.getElementById('tts-label');
+    var controls = document.getElementById('tts-controls');
+    var speechLang = controls
+      ? controls.getAttribute('data-speech-lang')
+      : 'en-US';
+    var labelPause =
+      (controls && controls.getAttribute('data-label-pause')) || 'Pause';
+    var labelResume =
+      (controls && controls.getAttribute('data-label-resume')) || 'Resume';
+    var utterance = null;
+    var isPlaying = false;
+
+    function normLang(l) {
+      return (l || '').replace(/_/g, '-').toLowerCase();
+    }
+
+    // #280: 朗讀語音不適。原本只回傳第一個語言相符的 voice，但多數 OS（macOS/iOS/
+    // Android）會把最機械的預設音色排在前面，使用者裝的 enhanced / Siri 高品質語音
+    // 反而被跳過。改成在語言相符的 voice 中「評分挑最好」。
+    function scoreVoice(v) {
+      var n = (v.name || '').toLowerCase();
+      var s = 0;
+      if (/enhanced|premium|natural|neural/.test(n)) s += 4; // 高品質神經語音
+      if (/siri/.test(n)) s += 3; // Apple Siri 音色通常最自然
+      if (/compact|eloquence|fred|albert|zarvox|低|robot/.test(n)) s -= 3; // 低保真變體
+      if (v.default) s += 1;
+      return s;
+    }
+
+    function pickVoice(bcp47) {
+      var voices = synth.getVoices();
+      if (!voices || !voices.length) return null;
+      var want = normLang(bcp47);
+      var primary = want.split('-')[0];
+      var i, vl;
+      var matches = [];
+      for (i = 0; i < voices.length; i++) {
+        if (normLang(voices[i].lang) === want) matches.push(voices[i]);
+      }
+      if (!matches.length) {
+        for (i = 0; i < voices.length; i++) {
+          vl = normLang(voices[i].lang);
+          if (vl === primary || vl.indexOf(primary + '-') === 0)
+            matches.push(voices[i]);
+        }
+      }
+      if (!matches.length) return null;
+      var best = matches[0];
+      var bestScore = scoreVoice(matches[0]);
+      for (i = 1; i < matches.length; i++) {
+        var sc = scoreVoice(matches[i]);
+        if (sc > bestScore) {
+          best = matches[i];
+          bestScore = sc;
+        }
+      }
+      return best;
+    }
+
+    function getArticleText() {
+      var article =
+        document.querySelector('[data-pagefind-body]') ||
+        document.querySelector('article') ||
+        document.querySelector('.prose');
+      if (!article) return '';
+      return article.innerText || article.textContent || '';
+    }
+
+    function setState(state) {
+      isPlaying = state === 'playing';
+      if (state === 'playing') {
+        iconPlay.classList.add('hidden');
+        iconPause.classList.remove('hidden');
+        stopBtn.classList.remove('hidden');
+        stopBtn.classList.add('inline-flex');
+        label.textContent = labelPause;
+      } else if (state === 'paused') {
+        iconPlay.classList.remove('hidden');
+        iconPause.classList.add('hidden');
+        label.textContent = labelResume;
+      } else {
+        iconPlay.classList.remove('hidden');
+        iconPause.classList.add('hidden');
+        stopBtn.classList.add('hidden');
+        stopBtn.classList.remove('inline-flex');
+        label.textContent = playBtn ? playBtn.getAttribute('aria-label') : '';
+      }
+    }
+
+    if (playBtn) {
+      playBtn.addEventListener('click', function () {
+        if (synth.speaking && !synth.paused) {
+          synth.pause();
+          setState('paused');
+          return;
+        }
+        if (synth.paused) {
+          synth.resume();
+          setState('playing');
+          return;
+        }
+        var text = getArticleText();
+        if (!text) return;
+
+        utterance = new SpeechSynthesisUtterance(text.substring(0, 5000));
+        utterance.lang = speechLang;
+        utterance.rate = 0.95;
+        utterance.pitch = 1;
+
+        utterance.onend = function () {
+          setState('idle');
+        };
+        utterance.onerror = function () {
+          setState('idle');
+        };
+
+        var speakStarted = false;
+        function doSpeak() {
+          if (speakStarted) return;
+          speakStarted = true;
+          var v = pickVoice(speechLang);
+          if (v) utterance.voice = v;
+          synth.speak(utterance);
+          setState('playing');
+        }
+
+        if (synth.getVoices().length > 0) {
+          doSpeak();
+        } else {
+          var onceVoices = function () {
+            synth.removeEventListener('voiceschanged', onceVoices);
+            clearTimeout(fallbackTimer);
+            doSpeak();
+          };
+          var fallbackTimer = setTimeout(function () {
+            synth.removeEventListener('voiceschanged', onceVoices);
+            doSpeak();
+          }, 750);
+          synth.addEventListener('voiceschanged', onceVoices);
+        }
+      });
+    }
+
+    if (stopBtn) {
+      stopBtn.addEventListener('click', function () {
+        synth.cancel();
+        setState('idle');
+      });
+    }
+  })();
+</script>

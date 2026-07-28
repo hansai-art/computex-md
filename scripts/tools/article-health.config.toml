@@ -1,0 +1,199 @@
+# article-health.config.toml — SSOT 文章健檢工具的 declarative config.
+#
+# 設計提案：reports/article-health-ssot-design-2026-05-04.md
+# Canonical 寫作品質規則：docs/editorial/EDITORIAL.md
+#
+# Phases 1-7 shipped 2026-05-04. Initial 13 plugins; 19 plugins as of 2026-05-23:
+#   cjk-punct / cross-reference / footnote-density / footnote-format /
+#   footnote-url / format-structure / frontmatter-format /
+#   frontmatter-title / image-health / link-target / prose-health /
+#   terminology / wikilink-target / chronicle-lead / word-count /
+#   spore-writing / image-alt (NEW 2026-05-16) / seo-meta (NEW 2026-05-16) /
+#   rationale-presence (NEW 2026-05-23, per issue #851 No2+No3 Build 3)
+#
+# rationale-presence added 2026-05-23 — issue #851 No2+No3 Phase 5 ship.
+# Checks frontmatter rationale block has 4 required keys (why_this_hook /
+# whats_excluded / where_it_hedges / whos_pushing_back) + 1 optional
+# (which_framing). WARN for strict categories (People/History/Society/Politics);
+# INFO for advisory categories (Music/Food/Nature/etc). HARD for typo'd key
+# names. Plugin only checks key presence, NOT content depth (簡填 OK per
+# 主人 awareness 哲學). Canonical spec: docs/editorial/RATIONALE-SPEC.md.
+#
+# image-alt + seo-meta added 2026-05-16 215434-manual session — Phase 4-5 of
+# immune-score-redesign. P0 缺口 from TOOL-INVENTORY §🕳️. Both default WARN
+# (soft-launch for legacy heal): image-alt 抓 empty/generic/filename alt；
+# seo-meta 抓 frontmatter title/desc 長度 + brand-prefix + title-desc 重複
+# (canonical EDITORIAL §Description 四原則 120-160 字)。
+#
+# link-target added 2026-05-04 jovial-feistel session — Phase 1 (casing,
+# HARD, auto-fix) caught 649 `]( /lang/UpperCase/...)` broken-routing
+# violations across 209 files; Phase 2 (existence, WARN) cross-checks
+# every link target against `knowledge/{lang}/{Category}/*.md` filesystem.
+# Source-layer counterpart of post-build `verify-internal-links.sh`.
+
+[meta]
+version = 1
+canonical_doc = "docs/editorial/EDITORIAL.md"
+phase = "7-pre-commit-wired"
+
+# ── Per-check severity / options ─────────────────────────────────────────────
+# Plugin defaults are set in each module (DEFAULT_SEVERITY). Override here.
+# (No overrides currently — plugin defaults are appropriate.)
+
+# ── Stage profiles ───────────────────────────────────────────────────────────
+
+[profiles.pre-commit]
+# Pre-commit hook gate. HARD violations block; WARN reported but allowed.
+# 2026-05-11 admiring-cohen: 對齊 ci-deploy profile — 用 `*` 跑全部 13
+# plugins，避免「pre-commit 過、ci-deploy fail」這種 asymmetric ship
+# (root cause of 2026-05-11 CI emergency PR #1025 — 雜誌.md missing
+# featured + MTV包廂.md missing subcategory 兩個檔不在原 pre-commit
+# 7-check list 但在 ci-deploy * 範圍，contributor PR squash merge 不跑
+# pre-commit，maintainer 本地 heal commit 跑 pre-commit 也沒抓到)。
+#
+# 對稱原則：本地 commit 跟 main 自動 CI 該跑同一份 check set，避免
+# false-positive ship。WARN 仍 advisory（不擋），HARD 才擋 commit。
+#
+# 歷史 — pre-commit 原本 7 checks 是 legacy inline-check 對應，Phase
+# 1-10 一次升一個 plugin。現在所有 13 plugins 都穩定，pre-commit 對齊
+# ci-deploy 沒有額外風險（fail_on=hard 不變，只是擴大 scope）。
+checks = "*"
+fail_on = "hard"
+
+# ── 破折號/分號「觸檔即硬」gate（2026-07-19 哲宇選項3）───────────────────────────
+# 只在 pre-commit（--staged，只查你 commit 的檔）把惡性超量破折號/分號升 HARD →
+# 你新寫 or 編輯的檔破折號 > 15 或全形分號 > 12 就擋 commit，逼「觸檔即清」。
+# ci-deploy 全站掃描【刻意不設】這兩個 override → legacy 144 篇維持 WARN、不 brick
+# push/deploy。這是分階段 legacy-grandfather 路徑（全站升 hard 需先跑 legacy 清理
+# campaign，見 reports/prose-instrument-upgrade-2026-07-19.md）。
+#
+# 對「對稱原則」（上方 2026-05-11 註解）的但書：那條防的是 pre-commit【比 ci-deploy 鬆】
+# （pass local → fail CI 的 asymmetric ship）。這裡 pre-commit【比 ci-deploy 嚴】方向相反，
+# 是安全的：過了 pre-commit（嚴）必然過 ci-deploy（鬆），不會 pass-local-fail-CI。
+[profiles.pre-commit.options_overrides.prose-health]
+emdash_hard_over = 15
+semicolon_hard_over = 12
+
+[profiles."rewrite-stage-3"]
+# REWRITE-PIPELINE Stage 3 (Verify): quality-scan ≤ 3 budget.
+checks = ["prose-health"]
+fail_on = "score-budget"
+
+[profiles."rewrite-stage-3-5"]
+# Stage 3.5 FactCheck — citation health + 校正焦慮掃描 (v6.2) + 引語逐字保真 (v7.0).
+# correction-meta WARN default (advisory in gate)；callout-triggered EVOLVE 由
+# REWRITE Step 3.2-bis 視為 must-fix（surface here，人/agent 判斷）。
+# quote-fidelity added 2026-06-10 嘻哈饒舌 (REWRITE v7.0 Step 3.6.1 儀器化) —
+# QF1 引語逐字比對 researchReport SSOT（writer 縮寫/改句型 drift），QF2 superlative
+# 清單 INFO。Soft-launch WARN（legacy report 缺引語庫會誤報）；vc≥3 後評估升 HARD。
+checks = ["footnote-format", "footnote-density", "correction-meta", "quote-fidelity"]
+fail_on = "hard"
+
+[profiles."rewrite-stage-4"]
+# Stage 4 Format.
+# chronicle-lead added 2026-05-09 brave-kirch (REWRITE v3.0 D Wave 1) —
+# new articles 跑 stage-4 profile 會 hard-fail；legacy soft-launch via WARN
+# default + 後續 follow-up heal commits 修 17 個既存 violation 後升 HARD default.
+# word-count added 2026-05-10 sad-shockley — depth threshold 4500 CJK chars，
+# 觸發：台灣無人機產業 EVOLVE 後仍 3273 字 = 虎頭蛇尾，觀察者 mandate 升 plugin gate.
+# Soft-launch: WARN default；rewrite-stage-4 升 HARD（new article must pass）。
+# image-health (count gate) added 2026-05-11 kind-mirzakhani — NMTH 文章 ship
+# 後哲宇 callout「為什麼圖片用那麼少」揭露 Step 4.3.1 三段敘事節奏沒儀器化進
+# article-health (DNA #15 第 N 次驗證)。min_images=3 對齊 depth article 理想
+# hero + 1-2 scene-mid，rewrite-stage-4 升 HARD。
+# media-richness added 2026-06-04 哲宇 directive「提升媒體素材要求 + 圖文配比更精妙」—
+# paragraph-rhythm 升級為媒體密度 band (floor 0.7 media-poor / ceiling 1.2 / hard 1.5+median<55，
+# 從富媒體範本 設研院 0.91 / 天下 0.92 / 黃魚鴞 0.82 校準)；media-richness 補 length-scaled
+# count target (圖+影片 ~1/1.1k 字，長文朝 ≥8，INFO) + 多模態 nudge (People/Music/Nature 補影片)。
+# Legacy heal 路徑：以下 sub-list 累積 audit 後分批 heal commit。
+checks = ["frontmatter-format", "format-structure", "wikilink-target", "link-target", "cjk-punct", "chronicle-lead", "word-count", "image-health", "paragraph-rhythm", "media-richness", "viz-health"]
+fail_on = "hard"
+
+[profiles."rewrite-stage-4".severity_overrides]
+frontmatter-format = "hard"
+chronicle-lead = "hard"
+word-count = "hard"
+# viz-health 升 HARD (2026-06-06 哲宇 directive)：含 tw-* 資料圖表的新文必須標來源 +
+# 不得用「如上圖」AI-blind 指示語。對 rewrite-stage-4 (新文自檢) HARD；pre-commit /
+# legacy 仍走 default WARN (目前 國宅 + 視覺化模組型錄 用模組，皆已 viz-health hard=0)。
+viz-health = "hard"
+# paragraph-rhythm: soft launch - stays at default WARN. Will upgrade to HARD
+# via severity_override here after vc≥3 cases collected from production
+# (per chronicle-lead / word-count / image-health staged promotion pattern).
+
+# Options overrides — 2026-05-11 kind-mirzakhani 修正既有 typo:
+# `check_options` → `options_overrides` (per config.py:127 ProfileConfig schema)。
+# 既存 word-count min_chars=4500 跟 plugin DEFAULT_MIN_CHARS 一致所以 typo 沒
+# 顯性暴露，但 image-health 新加的 min_images_severity=hard 必須 reach
+# 才能 promote 預設 WARN → HARD，所以一併修正命名。
+[profiles."rewrite-stage-4".options_overrides.word-count]
+min_chars = 4500
+
+[profiles."rewrite-stage-4".options_overrides.image-health]
+# 2026-06-07 哲宇 directive (REWRITE v6.8 媒體完整度低標提升)：length_scaled —
+# effective_min = max(3, round(prose-CJK / 1200)) → 4500→4 / 7000→6 / 9000→8；base 3 是
+# 短 depth floor (黃魚鴞 3635 字/3 媒體 全過)。named 富媒體範本 (設研院 5 / 天下 6 / 複雜 13)
+# 全過、text-only (雜學校 0) 失格。prose-CJK 排除 參考資料 footnote 段。深掃協議見 Step 1.9.0。
+min_images = 3
+length_scaled = true
+cjk_per_media = 1200
+min_images_severity = "hard"
+zero_images_severity = "hard"
+
+[profiles."rewrite-stage-4-5"]
+# Stage 4.5 Media — 保留 ad-hoc 入口，便於只跑 image-health 單獨檢查
+# (rewrite-stage-4 已含 image-health 跟 count gate)。
+checks = ["image-health"]
+fail_on = "hard"
+
+[profiles."rewrite-stage-4-5".options_overrides.image-health]
+min_images = 3
+length_scaled = true
+cjk_per_media = 1200
+min_images_severity = "hard"
+zero_images_severity = "hard"
+
+[profiles.release-pr]
+# 全跑、嚴格 (both HARD and WARN trigger fail). 用於人工 release review。
+checks = "*"
+fail_on = "warn"
+
+[profiles.ci-deploy]
+# CI 自動部署 gate — 全跑、只擋 HARD violations。WARN 是 advisory（dashboard
+# + human review 看），不應擋 deploy。2026-05-04 加入：release-pr 對既存
+# 4,378 個 advisory WARN 無法在 CI 觸發點修完，需要分離 strict release
+# review (release-pr) 跟 deploy gate (ci-deploy) 兩個用途。
+checks = "*"
+fail_on = "hard"
+
+# ── 破折號/分號全站升 hard（2026-07-19 完整選項3）───────────────────────────────
+# legacy 清理 campaign 已把 144 篇 legacy 全清乾淨（worklist 歸零，143 篇實改 + 手路菜
+# 經 gate precision 修正後達標），此刻全站 0 篇 emdash>15 或分號>12（可編輯正文計數）。
+# 因此把 pre-commit 的觸檔即硬 override 同步到 ci-deploy，全站升 hard = 新舊文章都硬性
+# 擋超量破折號/分號。計數只算可編輯正文（blockquote/腳註/書名/圖說/參考裝置不計，
+# _uneditable_punct_predicate SSOT）。campaign 收官：reports/prose-instrument-upgrade-2026-07-19.md。
+[profiles.ci-deploy.options_overrides.prose-health]
+emdash_hard_over = 15
+semicolon_hard_over = 12
+
+[profiles.dashboard]
+# 全跑、不擋、JSON output for site dashboards.
+checks = "*"
+fail_on = "never"
+
+[profiles."memory-diary"]
+# memory/diary 專用寬鬆 profile — 2026-07-16 新增。
+# memory/diary 必填的 checklist/handoff 清單結構會觸發 prose-health 的
+# LIST-DUMP (#12) 與 THIN (#13) 維度（清單堆砌 + 稀薄段落是這兩種文體的
+# 結構本質，不是灌水）；且 memory/diary 不要求腳註來源（citation-desert
+# #16 對這兩種文體是雜訊，不是訊號）。用單一 prose-health check +
+# score-budget fail_on，budget 從預設 3 放寬到 8。
+#
+# 8 這個數字是從近期 memory 檔實測分佈 7-12 校準的過渡值（soft-launch，
+# 非最終定案）：checklist 密集的 handoff 段落常規落在這個帶，不代表寫作
+# 品質差，只是文體結構跟 knowledge/ 敘事文不同。之後累積更多樣本可再調。
+checks = ["prose-health"]
+fail_on = "score-budget"
+
+[profiles."memory-diary".options_overrides.prose-health]
+score_budget = 8

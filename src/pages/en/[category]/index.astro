@@ -1,0 +1,13 @@
+---
+import CategoryHubTemplate from '../../../templates/category-hub.template.astro';
+import { getCategoryHubStaticPaths } from '../../../utils/category-static-paths';
+
+export async function getStaticPaths() {
+  return await getCategoryHubStaticPaths('en');
+}
+
+const { category } = Astro.params;
+const props = Astro.props;
+---
+
+<CategoryHubTemplate {...props} category={category!} />

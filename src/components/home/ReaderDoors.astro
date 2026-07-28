@@ -1,0 +1,138 @@
+---
+/**
+ * ReaderDoors.astro — Homepage Evolution Wave 1 / B1 (2026-05-26)
+ *
+ * 4 doors right after Hero, addressing the four reader cohorts the original
+ * single-narrative homepage assumed away:
+ *
+ *  1. 🚪 first-timer  → scroll to #cover-story (CoverStory)
+ *  2. 🔍 searcher     → /explore (search-first UX, ship 2026-05-10)
+ *  3. 🎲 explorer     → scroll to #random-discovery (RandomDiscovery)
+ *  4. 🧬 researcher   → /semiont (organism ecosystem, ship 2026-05-25)
+ *
+ * Why this exists — see reports/homepage-evolution-2026-05-26.md §Gap 1
+ * + §B1 proposal. GA4 28d: homepage 75.9s engagement vs /semiont 178.9s,
+ * /dashboard 172.3s — readers who go deeper engage 2.0-2.4× longer, but
+ * homepage has no signage telling them where to go.
+ *
+ * Layout: 4-col on desktop, 2×2 on tablet, single-col on mobile.
+ */
+import {
+  useTranslations,
+  getLangFromUrl,
+  useTranslatedPath,
+} from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+interface Door {
+  icon: string;
+  href: string;
+  title: string;
+  sub: string;
+  /** GA4 event label (stable enum — do not rename casually) */
+  gaLabel: 'first' | 'search' | 'random' | 'organism';
+  /** Tone of the accent — maps to a Tailwind color class group */
+  tone: 'green' | 'blue' | 'amber' | 'plum';
+}
+
+const doors: Door[] = [
+  {
+    icon: '🚪',
+    href: '#cover-story',
+    title: t('home.doors.first.title'),
+    sub: t('home.doors.first.sub'),
+    gaLabel: 'first',
+    tone: 'green',
+  },
+  {
+    icon: '🔍',
+    href: translatePath('/explore'),
+    title: t('home.doors.search.title'),
+    sub: t('home.doors.search.sub'),
+    gaLabel: 'search',
+    tone: 'blue',
+  },
+  {
+    icon: '🎲',
+    href: '#random-discovery',
+    title: t('home.doors.random.title'),
+    sub: t('home.doors.random.sub'),
+    gaLabel: 'random',
+    tone: 'amber',
+  },
+  {
+    icon: '🧬',
+    // /semiont is zh-TW canonical (no per-lang routes yet — see semiont-landing
+    // template). Link straight to it regardless of current lang. The page itself
+    // i18ns via useTranslations.
+    href: '/semiont',
+    title: t('home.doors.organism.title'),
+    sub: t('home.doors.organism.sub'),
+    gaLabel: 'organism',
+    tone: 'plum',
+  },
+];
+
+const TONE_BG: Record<Door['tone'], string> = {
+  green: 'hover:bg-[rgba(45,80,22,0.06)] hover:border-[rgba(45,80,22,0.35)]',
+  blue: 'hover:bg-[rgba(59,130,246,0.06)] hover:border-[rgba(59,130,246,0.35)]',
+  amber: 'hover:bg-[rgba(245,158,11,0.08)] hover:border-[rgba(245,158,11,0.4)]',
+  plum: 'hover:bg-[rgba(124,58,237,0.06)] hover:border-[rgba(124,58,237,0.35)]',
+};
+
+const TONE_ICON_BG: Record<Door['tone'], string> = {
+  green: 'bg-[rgba(45,80,22,0.08)]',
+  blue: 'bg-[rgba(59,130,246,0.08)]',
+  amber: 'bg-[rgba(245,158,11,0.1)]',
+  plum: 'bg-[rgba(124,58,237,0.08)]',
+};
+---
+
+<!--
+  ReaderDoors — 4 reader-intent entries (homepage evolution wave 1 / B1)
+  Inline Tailwind throughout (matches Phase 7.6 home-component convention).
+  Anchor links (#cover-story / #random-discovery) require the respective
+  sections to expose those ids — wired in home.template.astro.
+-->
+<section
+  class="mx-auto my-12 max-w-[1100px] px-8 max-[768px]:my-8 max-[480px]:px-4"
+  aria-label="Reader intent quick navigation"
+>
+  <div
+    class="grid grid-cols-4 gap-3 max-[900px]:grid-cols-2 max-[900px]:gap-4 max-[480px]:grid-cols-1"
+  >
+    {
+      doors.map((door) => (
+        <a
+          href={door.href}
+          data-ga-section="reader_door"
+          data-ga-label={door.gaLabel}
+          class:list={[
+            'group flex flex-col items-start gap-3 rounded-xl border border-[#e2e8f0] bg-white p-5 no-underline shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_6px_18px_rgba(0,0,0,0.08)] max-[480px]:flex-row max-[480px]:items-center max-[480px]:gap-4 max-[480px]:p-4',
+            TONE_BG[door.tone],
+          ]}
+        >
+          <div
+            class:list={[
+              'flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg text-[1.7rem] leading-none transition-transform duration-300 group-hover:scale-110 max-[480px]:h-11 max-[480px]:w-11 max-[480px]:text-[1.5rem]',
+              TONE_ICON_BG[door.tone],
+            ]}
+          >
+            {door.icon}
+          </div>
+          <div class="flex flex-col gap-1">
+            <span class="text-[1rem] font-bold leading-tight text-[#1f2937] max-[768px]:text-[0.95rem]">
+              {door.title}
+            </span>
+            <span class="text-[0.82rem] leading-snug text-[#6b7280] max-[768px]:text-[0.8rem]">
+              {door.sub}
+            </span>
+          </div>
+        </a>
+      ))
+    }
+  </div>
+</section>

@@ -1,0 +1,93 @@
+---
+/**
+ * TimelineDay — 共用「日節點」外殼，/latest 與 /changelog 兩條時間軸的同一具骨架。
+ *
+ * 2026-06-10 從 CommitLog.astro timeline variant + latest.template v2 抽出：
+ * 左欄是漸層 dot + 連接線（不是最後一天才畫線），右欄是日標題 + 數量 badge +
+ * <slot/>（/latest 放 ArticleCard、/changelog 放 commit 卡）。
+ *
+ * Consumer 腳本 hooks（不要改名，兩頁的 filter / IntersectionObserver 都靠它們）：
+ * - `.timeline-day`        — 日 group 根節點
+ * - `.timeline-day-badge`  — 數量 badge（篩選後更新計數用）
+ * - `extraClass`           — 頁面自有 hook（latest-day / changelog-day-group）
+ */
+interface Props {
+  /** 錨點 id（latest-day-2026-06-10 / day-2026-06-10）*/
+  id: string;
+  /** 日標題（呼叫端先格式化好，含星期）*/
+  title: string;
+  /** 數量 badge 文字（"7 篇" / "12 筆更新"）；空字串不顯示 */
+  badge?: string;
+  /** 最後一天不畫連接線 */
+  isLast?: boolean;
+  /** 主題色（dot 漸層 / 線 / badge）*/
+  accent?: 'emerald' | 'blue';
+  /** 日標題字體 */
+  titleStyle?: 'serif' | 'sans';
+  /** 頁面自有 hook class */
+  extraClass?: string;
+  /** 透傳 data-*（filter 腳本的 data-day 等）*/
+  dataAttrs?: Record<string, string | undefined>;
+}
+
+const {
+  id,
+  title,
+  badge,
+  isLast = false,
+  accent = 'emerald',
+  titleStyle = 'serif',
+  extraClass = '',
+  dataAttrs = {},
+} = Astro.props;
+
+// line 用 solid 淡色（不漸層）：每天一段、視覺上連成一條連續軸
+const ACCENTS = {
+  emerald: {
+    dot: 'bg-[linear-gradient(135deg,#10b981,#059669)] ring-4 ring-[#ecfdf5]',
+    line: 'bg-[#6ee7b7]',
+    badge: 'bg-[#f0fdf4] text-[#059669]',
+  },
+  blue: {
+    dot: 'bg-[linear-gradient(135deg,#3b82f6,#8b5cf6)] ring-4 ring-[#eff6ff]',
+    line: 'bg-[#93c5fd]',
+    badge: 'bg-[#f1f5f9] text-[#64748b]',
+  },
+}[accent];
+
+const titleClass =
+  titleStyle === 'serif'
+    ? "font-['Noto_Serif_TC',serif] text-[1.05rem] font-bold text-[#1a3c34] max-[768px]:text-[0.98rem]"
+    : 'text-[1.15rem] font-extrabold text-[#1e293b] max-[768px]:text-[1.05rem]';
+---
+
+<section
+  id={id}
+  class={`timeline-day grid scroll-mt-[176px] grid-cols-[26px_1fr] gap-x-4 max-[768px]:grid-cols-[18px_1fr] max-[768px]:gap-x-3 ${extraClass}`}
+  {...dataAttrs}
+>
+  <div class="flex flex-col items-center">
+    <div
+      class={`mt-[0.4rem] h-3 w-3 flex-shrink-0 rounded-full ${ACCENTS.dot}`}
+    >
+    </div>
+    {!isLast && <div class={`mt-2 w-[2px] flex-1 ${ACCENTS.line}`} />}
+  </div>
+  <div class="pb-8 max-[768px]:pb-6">
+    <div class="mb-3 flex flex-wrap items-center gap-2">
+      <h2 class={`m-0 ${titleClass}`}>{title}</h2>
+      {
+        badge && (
+          <span
+            class={`timeline-day-badge rounded-full px-2.5 py-[0.2rem] text-[0.72rem] font-semibold ${ACCENTS.badge}`}
+          >
+            {badge}
+          </span>
+        )
+      }
+    </div>
+    <div class="flex flex-col gap-3">
+      <slot />
+    </div>
+  </div>
+</section>

@@ -1,0 +1,213 @@
+# build output
+dist/
+# generated types
+.astro/
+# generated spore images (produced by scripts/tools/generate-spore-image.mjs)
+public/spore-images/
+# generated OG images (produced by scripts/core/generate-og-images.mjs)
+# CI 或本地按需產生，不入 repo — 避免 500+ 文章 × 4 語言 × binary 膨脹
+public/og-images/
+
+# dependencies
+node_modules/
+
+# Python virtual envs（防禦性，實際 venv 在 ~/.config/taiwan-md/venv/ repo 外）
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# environment variables
+.env
+.env.*
+!.env.example
+
+# ═══ 感知資料源憑證（2026-04-11 session α 新增）═══════
+# 絕對不能 commit：GA4 / Search Console / Cloudflare 的 API 憑證
+# 正確位置是 ~/.config/taiwan-md/credentials/，repo 內這些路徑是雙層保護
+#
+# ⚠️ 如果你看到這些檔案意外出現在 git status，停下來檢查
+# 憑證應該放在 ~/.config/taiwan-md/ 而不是 repo 裡
+.credentials/
+credentials/
+secrets/
+*.service-account.json
+*-credentials.json
+*-service-account*.json
+google-credentials*.json
+cloudflare-token*
+.sense-cache/
+
+# macOS-specific files
+.DS_Store
+
+# Obsidian workspace metadata
+.obsidian/
+
+# jetbrains setting folder
+.idea/
+public/api/random.json
+public/api/random.json
+public/api/search-index.json
+public/api/search-minisearch.json
+public/api/search-minisearch-*.json
+
+# ═══ 自動生成的資料檔案（由 npm run prebuild 在 CI 重生，不該進 git）═══
+# 對應 PR #551 洞察（dreamline2 誤 commit auto-generated JSON）：
+# 所有下列檔案都是每次 prebuild 重新產生，commit 會造成：
+#   (a) 無謂的 diff 污染
+#   (b) 貢獻者 fork 跑 build 產生假 PR noise
+#   (c) merge conflict 機率大增（每日衡量級異動）
+# 仍保留追蹤的：src/data/{map-markers,changelog-feed}.json（build-time import，
+# 讓 npm run dev 從 fresh clone 能直接跑）
+public/api/article-index.json
+public/api/articles.json
+public/api/dashboard-articles.json
+public/api/dashboard-vitals.json
+public/api/dashboard-translations.json
+public/api/dashboard-organism.json
+# public/_redirects — 由 scripts/core/generate-redirects.mjs 從
+# config/redirects-manual.txt（committed source）+ reports/404-monitor/latest.json
+# 重新產生，CF Pages 讀 build 輸出根目錄的這份檔案；不進 git
+public/_redirects
+# 2026-04-26 β8: contributors.json 從 .gitignore 移除（保留作為 CI fallback baseline）
+# 觸發：CF Pages CI 共享 IP 撞 GitHub anon rate limit (60/hr) → writeFallback wipe → Dashboard 顯示 0
+# 修正：commit 一份 good baseline + generator 在 API 失敗時 preserve 上一筆好的資料
+# 永久解：Cloudflare Pages 加 GH_TOKEN env var（5,000/hr limit，從此不再撞 anon 上限）
+# public/api/contributors.json
+# dashboard-spores.json 不列入：由 scripts/tools/generate-dashboard-spores.py 產出，
+# 該 script 只在 refresh-data.sh 跑（不在 npm run prebuild 內），需要保留在 git 才能讓 CI deploy 有資料
+
+meetings/
+memory/
+!docs/semiont/memory/
+
+# Visual refactor: track manifest only, regenerate PNGs locally.
+# Why: baseline PNGs are ~30-130 MB. Instead we commit the manifest
+# (which records the baseline commit SHA), and any contributor runs
+# `git checkout <baseline-sha> && npm run build && npm run preview &
+#  npm run visual:baseline` to reproduce the exact reference set.
+reports/visual/baseline/*.png
+reports/visual/current/
+reports/visual/diff/
+reports/visual/diff-report.html
+reports/visual/diff-summary.json
+
+# POC / scratch reports (per reports-archival-audit-2026-05-27.md Layer 1)
+# 暫存實驗檔不該追蹤；改寫到 reports/scratch/ 視同 .gitignored workspace。
+reports/scratch/
+
+# Semiont worktree 多 session 隔離（2026-04-20 δ）
+.worktrees/
+
+# Claude Code worktree 隔離區（BABEL / 平行 session SOP 用）
+# 每個子目錄是獨立 git worktree（內含 .git 檔指向 .git/worktrees/<name>/）—
+# 在 worktree 內的 commit/push 與此忽略無關，這只讓主 repo `git status` 乾淨
+.claude/worktrees/
+
+# ═══ src/content/{lang}/ 投影層（2026-05-12 admiring-montalcini-post-finale）═══
+# knowledge/ 是 SSOT，src/content/{lang}/ 由 scripts/core/sync.sh 從 knowledge/ regen
+# 接進 npm prebuild 自動跑（CF build / dev / routine 都 cover）
+#
+# 為什麼 ignore：
+#   - Derived state in git = drift / silent missing / zombie 三類問題的源頭
+#   - MANIFESTO §6 鐵律「永遠不要直接改蛋白質」從 self-discipline 升架構強制
+#   - PR diff 大幅變乾淨（只剩 knowledge/ 內容）
+#
+# 留下：src/content/config.ts (Astro content collection schema, human-written)
+# 對應：reports/sync-architecture-evolution-2026-05-12.md v2.0 Ship 3
+src/content/zh-TW/
+src/content/en/
+src/content/ja/
+src/content/ko/
+src/content/fr/
+src/content/es/
+src/content/vi/
+src/content/id/
+src/content/pt/
+src/content/hi/
+src/content/ar/
+src/content/ru/
+
+# Local batch scratch space and logs. Everything here is disposable/recoverable.
+/tmp/
+
+# Contributor profile：個人化 Taiwan.md 互動設定
+# `.example.yml` 是模板，入 git；`.local.yml` 是每個 contributor 自己的 profile，不 commit
+# 詳見 .taiwanmd/README.md
+.taiwanmd/contributor.local.yml
+
+# babel-pulse 常駐儀器的本機 runtime log（launchd stdout/stderr + 自己的跳動紀錄）
+# 儀器產出本身（public/api/babel-live.json + reports/babel/）才入 git
+.taiwanmd/babel-pulse.log
+.taiwanmd/babel-pulse.out
+.taiwanmd/babel-pulse.err
+
+# Claude Code 本機啟動設定 / cron lock（2026-04-27 β heartbeat 加入）
+# launch.json = IDE 啟動設定（單機）；scheduled_tasks.lock = cron 執行 PID lock
+.claude/launch.json
+.claude/scheduled_tasks.lock
+
+# ═══ Harvest engine（2026-04-27 γ Phase 1 MVP）═══════════════════════════
+# Runtime task folders, session logs, SQLite — 不入 repo
+# Strategy: reports/harvest-engine-strategy-2026-04-27.md §8
+.harvest/
+docs/semiont/harvest/backend/node_modules/
+docs/semiont/harvest/backend/dist/
+docs/semiont/harvest/backend/*.db
+docs/semiont/harvest/backend/*.db-journal
+docs/semiont/harvest/backend/*.db-wal
+docs/semiont/harvest/backend/*.db-shm
+docs/semiont/harvest/backend/.env
+docs/semiont/harvest/ui/node_modules/
+docs/semiont/harvest/ui/dist/
+docs/semiont/harvest/ui/.astro/
+docs/semiont/harvest/ui/.env
+
+# lang-sync workflow intermediate briefs (refresh.sh output)
+.lang-sync-tasks/
+
+# Peer partnership MOU PDFs — 含對方聯繫資訊 / 統編 / 個資，per MOU §6 保密義務不入 public repo
+# 操作層級的授權清單（Excel / JSON）仍 commit
+data/*/_authorization/*.pdf
+public/carousel-images/
+
+# Research transcript audio — 13MB+ 逐字稿音源不入 git（audit 2026-06-10 A-5）
+# 轉錄後的 .json/.md 逐字稿照常 commit；音檔本體留本機（raw 不刪除，只是不進版本庫）
+reports/research/**/*.mp3
+reports/research/**/*.m4a
+reports/research/**/*.wav
+# 2026-06-10 spore data 解耦：public 靜態 API 由 prebuild:spores 重生（CI 自帶），
+# canonical 記錄層 src/data/spores.json 保留 git 追蹤（build-time import + diff 落點）
+public/api/spores.json
+public/api/random-index-*.json
+
+# git provenance, regenerated by prebuild:gitinfo (1.5MB, churns every knowledge/ commit)
+src/data/git-info.json
+.taiwanmd/MACHINE.local.md
+# wake-context 完整輸出落檔（每次甦醒重生，per BECOME §1.3 完整讀取鐵律）
+.taiwanmd/wake-context.latest.md
+
+# Semantic index (RAG Phase 1) — fleet bge-m3 build-output, regenerable via
+# scripts/core/build-embeddings.mjs. Deploy/steady-state architecture pending (見
+# reports/research/2026-06/p0-compute-experiments-2026-06-14.md): commit-snapshot vs
+# fleet-routine vs CI-e5-small. bge-m3 cannot build in CI (no fleet GPU).
+public/api/rag/
+public/api/related/
+public/api/dashboard-newsroom.json
+
+# 節點名（machine-local，prepare-commit-msg 用；機器細節不進公開 repo）
+.taiwanmd/node-name.local
+
+# 翻譯引擎的診斷副產物（patch-translate / structured-translate 的 metrics）。
+# 寫在譯文旁邊方便對照，但不該進版控——會污染 knowledge/ 的 git status，
+# 干擾 rescue-orphans 的孤兒盤點與 verify-commit-scope 的檔數比對。
+knowledge/**/*.metrics.json
+knowledge/**/*.patch-metrics.json

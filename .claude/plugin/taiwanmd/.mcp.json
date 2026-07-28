@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "taiwanmd": {
+      "command": "npx",
+      "args": ["-y", "taiwanmd@latest", "mcp", "serve"]
+    }
+  }
+}

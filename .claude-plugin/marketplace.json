@@ -1,0 +1,32 @@
+{
+  "name": "taiwan-md",
+  "owner": {
+    "name": "Taiwan.md",
+    "email": "cheyu.wu@monoame.com"
+  },
+  "metadata": {
+    "description": "Taiwan.md — the open-source, AI-native knowledge base about Taiwan. Connect it to your AI for citation-backed answers, or turn your machine into one of its working nodes."
+  },
+  "plugins": [
+    {
+      "name": "taiwanmd",
+      "description": "Ask Taiwan.md anything about Taiwan and get source-backed answers instead of guesses — 860+ curated, citation-backed articles across 12 languages, served by a local MCP server with no API key. Includes the contributor-node skill, which turns a scheduled Claude Code run on your own machine into a working node: it picks one open task (a missing translation, a broken link, a metadata gap), does it, and opens a pull request. Merge always stays with a human.",
+      "author": {
+        "name": "CheYu Wu",
+        "email": "cheyu.wu@monoame.com"
+      },
+      "category": "knowledge",
+      "keywords": [
+        "taiwan",
+        "knowledge-base",
+        "rag",
+        "citations",
+        "anti-hallucination",
+        "open-source"
+      ],
+      "source": "./.claude/plugin/taiwanmd",
+      "homepage": "https://taiwan.md",
+      "license": "MIT"
+    }
+  ]
+}

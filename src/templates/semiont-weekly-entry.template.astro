@@ -1,0 +1,334 @@
+---
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import Layout from '../layouts/Layout.astro';
+import SemiontBreadcrumb from '../components/semiont/SemiontBreadcrumb.astro';
+import { estimateReadingTime } from '../lib/semiont-weekly';
+import type { WeeklyReport } from '../lib/semiont-weekly';
+import '../styles/semiont.css';
+
+export interface Props {
+  report: WeeklyReport;
+  prev?: { slug: string; title: string; date: string; weekLabel: string };
+  next?: { slug: string; title: string; date: string; weekLabel: string };
+}
+
+const { report, prev, next } = Astro.props;
+const readingTime = estimateReadingTime(report.wordCount);
+const showToc = report.headings.filter((h) => h.level === 2).length >= 3;
+
+// Mirrors semiont-diary-entry.template.astro's OG image lookup: build time
+// checks if a pre-generated image exists, falls back to Layout's default
+// if not (no `generate-og-images.mjs --weekly` pipeline exists yet — this
+// just future-proofs the path without requiring one to be built now).
+const ogJpgPath = `/og-images/semiont/weekly/${report.slug}.jpg`;
+const ogJpgFull = resolve(
+  process.cwd(),
+  'public',
+  ogJpgPath.replace(/^\//, ''),
+);
+const weeklyOgImage = existsSync(ogJpgFull) ? ogJpgPath : undefined;
+---
+
+<Layout
+  title={`${report.title} — 週報`}
+  description={report.excerpt}
+  lang="zh-TW"
+  image={weeklyOgImage}
+>
+  <div class="diary-entry-page semiont-paper min-h-screen">
+    <div
+      class="diary-entry-inner mx-auto max-w-[var(--container-prose)] px-6 pb-24 pt-16 md:px-8"
+    >
+      <SemiontBreadcrumb
+        segments={[
+          { label: 'semiont', href: '/semiont' },
+          { label: 'weekly', href: '/semiont/weekly' },
+          { label: `${report.date} ${report.weekLabel}` },
+        ]}
+      />
+
+      {/* Entry header */}
+      <header class="diary-entry-hero mb-10">
+        {/* Date + week badge */}
+        <div class="mb-4 flex items-center gap-3">
+          <time
+            datetime={report.date}
+            class="font-mono text-sm text-[#4fd1b0]/75"
+          >
+            {report.date}
+          </time>
+          <span
+            class="inline-flex h-6 items-center rounded-full bg-[#4fd1b0]/10 px-3 font-mono text-xs font-medium text-[#4fd1b0]/70"
+          >
+            {report.weekLabel}
+          </span>
+        </div>
+
+        {/* Title */}
+        <h1
+          class="mb-4 text-2xl font-bold leading-tight text-[#f4f0ea] md:text-3xl"
+          style="font-family: 'rixingsong-semibold', 'Noto Serif TC', serif;"
+        >
+          {report.title}
+        </h1>
+
+        {/* Metadata block */}
+        <div
+          class="space-y-1 border-l-2 border-[#4fd1b0]/25 pl-4 text-sm text-[#f4f0ea]/55"
+        >
+          <p class="font-mono text-xs">
+            {report.wordCount.toLocaleString()} 字 · 約 {readingTime} 分鐘
+          </p>
+        </div>
+      </header>
+
+      {/* EKG separator */}
+      <div class="mb-10 flex items-center gap-2">
+        <div class="h-px flex-1 bg-[#4fd1b0]/10"></div>
+        <svg
+          width="40"
+          height="12"
+          viewBox="0 0 40 12"
+          class="text-[#4fd1b0]/75"
+        >
+          <polyline
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            points="0,6 8,6 12,6 14,1 16,11 18,4 20,8 22,6 40,6"></polyline>
+        </svg>
+        <div class="h-px flex-1 bg-[#4fd1b0]/10"></div>
+      </div>
+
+      {/* Main content + optional TOC */}
+      <div class="relative">
+        {/* TOC for long entries (desktop only) */}
+        {
+          showToc && (
+            <aside class="absolute -right-64 top-0 hidden w-56 xl:block">
+              <nav class="sticky top-24 space-y-2 border-l border-[#4fd1b0]/20 pl-4">
+                <div class="mb-3 font-mono text-[10px] font-medium uppercase tracking-widest text-[#4fd1b0]/70">
+                  目錄
+                </div>
+                {report.headings
+                  .filter((h) => h.level === 2)
+                  .map((h) => (
+                    <a
+                      href={`#${h.id}`}
+                      class="block truncate text-xs text-[#f4f0ea]/45 transition-colors hover:text-[#4fd1b0]/70"
+                    >
+                      {h.text}
+                    </a>
+                  ))}
+              </nav>
+            </aside>
+          )
+        }
+
+        {/* Rendered weekly report content */}
+        <article class="semiont-prose" set:html={report.bodyHtml} />
+      </div>
+
+      {/* Prev/Next navigation (newer / older week) */}
+      <nav
+        class="mt-16 border-t border-[#4fd1b0]/20 pt-8"
+        aria-label="weekly report navigation"
+      >
+        <div class="flex flex-col gap-6 sm:flex-row sm:justify-between">
+          {/* Previous (newer) */}
+          {
+            prev ? (
+              <a
+                href={`/semiont/weekly/${prev.slug}`}
+                class="group flex-1 rounded-lg p-4 transition-colors hover:bg-[#4fd1b0]/[0.04]"
+              >
+                <div class="mb-1 font-mono text-[10px] text-[#4fd1b0]/60">
+                  ← 上一份
+                </div>
+                <div class="mb-1 font-mono text-xs text-[#4fd1b0]/70">
+                  {prev.date} {prev.weekLabel}
+                </div>
+                <div
+                  class="text-sm font-medium text-[#f4f0ea]/80 group-hover:text-[#f4f0ea]"
+                  style="font-family: 'rixingsong-semibold', 'Noto Serif TC', serif;"
+                >
+                  {prev.title.length > 30
+                    ? prev.title.slice(0, 30) + '⋯'
+                    : prev.title}
+                </div>
+              </a>
+            ) : (
+              <div class="flex-1" />
+            )
+          }
+
+          {/* Next (older) */}
+          {
+            next ? (
+              <a
+                href={`/semiont/weekly/${next.slug}`}
+                class="group flex-1 rounded-lg p-4 text-right transition-colors hover:bg-[#4fd1b0]/[0.04]"
+              >
+                <div class="mb-1 font-mono text-[10px] text-[#4fd1b0]/60">
+                  下一份 →
+                </div>
+                <div class="mb-1 font-mono text-xs text-[#4fd1b0]/70">
+                  {next.date} {next.weekLabel}
+                </div>
+                <div
+                  class="text-sm font-medium text-[#f4f0ea]/80 group-hover:text-[#f4f0ea]"
+                  style="font-family: 'rixingsong-semibold', 'Noto Serif TC', serif;"
+                >
+                  {next.title.length > 30
+                    ? next.title.slice(0, 30) + '⋯'
+                    : next.title}
+                </div>
+              </a>
+            ) : (
+              <div class="flex-1" />
+            )
+          }
+        </div>
+      </nav>
+
+      {/* Back to weekly index */}
+      <div class="mt-12 text-center">
+        <a
+          href="/semiont/weekly"
+          class="inline-block font-mono text-xs text-[#4fd1b0]/75 underline decoration-[#4fd1b0]/30 underline-offset-4 transition-colors hover:text-[#4fd1b0]/70"
+        >
+          ← 回到週報
+        </a>
+      </div>
+
+      {/* Footer */}
+      <div class="mt-12 text-center font-mono text-xs text-[#4fd1b0]/75">
+        🧬
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style is:global>
+  /* Semiont prose styling — warm, notebook-like. Mirrors the identical
+     block in semiont-diary-entry.template.astro (Astro `is:global` styles
+     are bundled per-page, so this page needs its own copy). */
+  .semiont-prose {
+    font-family: 'jf-lanyangming', 'Noto Serif TC', Georgia, serif;
+    font-size: 1rem;
+    line-height: 1.85;
+    color: #f4f0ea;
+  }
+
+  .semiont-prose h2 {
+    font-family: 'rixingsong-semibold', 'Noto Serif TC', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    color: #f4f0ea;
+  }
+
+  .semiont-prose h3 {
+    font-family: 'rixingsong-semibold', 'Noto Serif TC', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    color: #f4f0eacc;
+  }
+
+  .semiont-prose p {
+    margin-bottom: 1.25rem;
+  }
+
+  .semiont-prose blockquote {
+    border-left: 3px solid #4fd1b040;
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    color: #f4f0eaa0;
+    font-style: italic;
+  }
+
+  .semiont-prose strong {
+    color: #f4f0ea;
+    font-weight: 700;
+  }
+
+  .semiont-prose a {
+    color: #4fd1b0;
+    text-decoration: underline;
+    text-decoration-color: #4fd1b040;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.2s;
+  }
+  .semiont-prose a:hover {
+    text-decoration-color: #4fd1b0;
+  }
+
+  .semiont-prose code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.85em;
+    background: #4fd1b00a;
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+    color: #f4f0eacc;
+  }
+
+  .semiont-prose pre {
+    background: rgba(0, 0, 0, 0.4);
+    color: #f4f0ea;
+    padding: 1.25rem;
+    border-radius: 8px;
+    border: 1px solid rgba(79, 209, 176, 0.15);
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+  .semiont-prose pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+  }
+
+  .semiont-prose ul,
+  .semiont-prose ol {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+  }
+  .semiont-prose li {
+    margin-bottom: 0.5rem;
+  }
+
+  .semiont-prose hr {
+    border: none;
+    border-top: 1px solid #4fd1b015;
+    margin: 2.5rem 0;
+  }
+
+  .semiont-prose table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+  }
+  .semiont-prose th,
+  .semiont-prose td {
+    border: 1px solid #4fd1b015;
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .semiont-prose th {
+    background: #4fd1b008;
+    font-weight: 600;
+  }
+
+  .semiont-prose em {
+    color: #f4f0ea90;
+  }
+</style>

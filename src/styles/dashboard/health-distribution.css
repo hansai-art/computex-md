@@ -1,0 +1,23 @@
+/* ── Health Distribution ── */
+.health-chart {
+  overflow-x: auto;
+}
+.health-svg {
+  display: block;
+}
+.health-svg-label {
+  font-size: 11px;
+  fill: rgba(0, 0, 0, 0.4);
+  font-family: inherit;
+}
+.health-bar-count {
+  font-size: 12px;
+  font-weight: 700;
+  fill: #1e293b;
+  font-family: inherit;
+}
+.health-summary {
+  font-size: 0.9rem;
+  margin-top: 0.8rem;
+  font-weight: 500;
+}

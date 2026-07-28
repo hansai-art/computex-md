@@ -1,0 +1,402 @@
+---
+/**
+ * SupporterTimeline.astro — Dashboard 頁面「贊助時間軸」view
+ *
+ * 資料來源：public/api/dashboard-supporters.json（由 scripts/core/generate-supporters-data.js 派生）
+ * 顯示：總額 / 交易數 / 時間軸每筆金額 / 累計曲線 / 月份 rollup
+ * 隱私：不顯示名稱 / 留言（那些在 About）
+ *
+ * v1.0 | 2026-04-20
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+
+const DATA_PATH = path.join(
+  process.cwd(),
+  'public/api/dashboard-supporters.json',
+);
+
+type TimelineEntry = {
+  date: string;
+  timestamp: string;
+  amount: number;
+  currency: string;
+  type: 'monthly' | 'one-time';
+  anonymous: boolean;
+  running_total: number;
+};
+
+type DashboardData = {
+  schema_version: number;
+  last_updated: string;
+  last_fetched: string | null;
+  totals: {
+    total_received_twd: number;
+    transaction_count: number;
+    supporter_count: number;
+    monthly_subscriptions: number;
+    one_time: number;
+    anonymous_ratio: number;
+  };
+  first_date: string | null;
+  latest_date: string | null;
+  by_month: Record<string, number>;
+  timeline: TimelineEntry[];
+};
+
+let data: DashboardData = {
+  schema_version: 1,
+  last_updated: new Date().toISOString(),
+  last_fetched: null,
+  totals: {
+    total_received_twd: 0,
+    transaction_count: 0,
+    supporter_count: 0,
+    monthly_subscriptions: 0,
+    one_time: 0,
+    anonymous_ratio: 0,
+  },
+  first_date: null,
+  latest_date: null,
+  by_month: {},
+  timeline: [],
+};
+
+try {
+  data = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));
+} catch {
+  /* empty */
+}
+
+const timelineDesc = [...data.timeline].reverse(); // newest first 顯示
+const maxAmount = data.timeline.reduce((m, t) => Math.max(m, t.amount), 0);
+const maxRunning = data.totals.total_received_twd || 1;
+
+const formatTwd = (n: number) => `NT$${n.toLocaleString()}`;
+
+// 月份 bar 排序
+const monthEntries = Object.entries(data.by_month).sort(([a], [b]) =>
+  a.localeCompare(b),
+);
+const maxMonthAmount = monthEntries.reduce((m, [, v]) => Math.max(m, v), 1);
+---
+
+<section class="supporter-timeline">
+  <header class="supporter-timeline-header">
+    <h3 class="supporter-timeline-title">💚 贊助時間軸</h3>
+    <p class="supporter-timeline-subtitle">
+      {formatTwd(data.totals.total_received_twd)} · {
+        data.totals.transaction_count
+      }
+      筆交易 · {data.totals.supporter_count} 位支持者
+      {
+        data.totals.monthly_subscriptions > 0 && (
+          <span class="supporter-monthly-hint">
+            （其中 {data.totals.monthly_subscriptions} 筆每月定額 ♻︎）
+          </span>
+        )
+      }
+    </p>
+  </header>
+
+  {
+    data.timeline.length === 0 ? (
+      <p class="supporter-timeline-empty">尚未收到公開的贊助資料。</p>
+    ) : (
+      <>
+        <div class="supporter-stats-row">
+          <div class="supporter-stat">
+            <span class="supporter-stat-num">
+              {formatTwd(data.totals.total_received_twd)}
+            </span>
+            <span class="supporter-stat-label">累計收到</span>
+          </div>
+          <div class="supporter-stat">
+            <span class="supporter-stat-num">
+              {data.totals.transaction_count}
+            </span>
+            <span class="supporter-stat-label">交易筆數</span>
+          </div>
+          <div class="supporter-stat">
+            <span class="supporter-stat-num">
+              {data.totals.monthly_subscriptions}
+            </span>
+            <span class="supporter-stat-label">每月定額</span>
+          </div>
+          <div class="supporter-stat">
+            <span class="supporter-stat-num">{data.totals.one_time}</span>
+            <span class="supporter-stat-label">一次性</span>
+          </div>
+        </div>
+
+        {monthEntries.length > 1 && (
+          <div class="supporter-months">
+            <p class="supporter-section-label">每月收款</p>
+            <ul class="supporter-month-bars" role="list">
+              {monthEntries.map(([ym, amount]) => (
+                <li class="supporter-month-row">
+                  <span class="supporter-month-label">{ym}</span>
+                  <span
+                    class="supporter-month-bar"
+                    style={`--pct: ${(amount / maxMonthAmount) * 100}%;`}
+                  >
+                    <span class="supporter-month-bar-fill" />
+                  </span>
+                  <span class="supporter-month-amount">
+                    {formatTwd(amount)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div class="supporter-tx-list-wrap">
+          <p class="supporter-section-label">每筆交易（新 → 舊）</p>
+          <ul class="supporter-tx-list" role="list">
+            {timelineDesc.map((t) => (
+              <li class="supporter-tx">
+                <span class="supporter-tx-date">{t.date}</span>
+                <span
+                  class="supporter-tx-bar"
+                  style={`--pct: ${(t.amount / maxAmount) * 100}%;`}
+                  data-type={t.type}
+                >
+                  <span class="supporter-tx-bar-fill" />
+                </span>
+                <span class="supporter-tx-amount">
+                  {formatTwd(t.amount)}
+                  {t.type === 'monthly' ? (
+                    <span class="supporter-tx-type" title="每月定額">
+                      ♻︎
+                    </span>
+                  ) : null}
+                  {t.anonymous ? (
+                    <span class="supporter-tx-anon" title="匿名支持者">
+                      ·匿名
+                    </span>
+                  ) : null}
+                </span>
+                <span class="supporter-tx-running">
+                  累計 {formatTwd(t.running_total)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </>
+    )
+  }
+
+  {
+    /* 透明度語境的低調贊助入口：看著這張時間軸的人就是在考慮支持的人。
+      中性一句話，不賣慘（啟維原則，reports/support-cta-signature-design-2026-07-16.md） */
+  }
+  <p class="supporter-cta-line">
+    這些數字全部公開。想加入的話：
+    <a
+      href="https://portaly.cc/taiwanmd/support?utm_source=computex.md&utm_medium=dashboard_supporters&utm_campaign=support"
+      target="_blank"
+      rel="noopener noreferrer"
+      data-ga-section="dashboard_supporters"
+      data-ga-label="sponsor"
+    >
+      到 Portaly 贊助維護 →
+    </a>
+  </p>
+</section>
+
+<style>
+  .supporter-timeline {
+    padding: 1.25rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #ffffff;
+  }
+  .supporter-timeline-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+  }
+  .supporter-timeline-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .supporter-timeline-subtitle {
+    margin: 0;
+    color: #475569;
+    font-size: 0.92rem;
+  }
+  .supporter-monthly-hint {
+    color: #64748b;
+    font-size: 0.85rem;
+  }
+  .supporter-timeline-empty {
+    color: #64748b;
+    font-style: italic;
+    padding: 1rem 0;
+  }
+  .supporter-cta-line {
+    margin: 1.25rem 0 0;
+    padding-top: 0.9rem;
+    border-top: 1px dashed #e2e8f0;
+    color: #64748b;
+    font-size: 0.85rem;
+  }
+  .supporter-cta-line a {
+    color: #0f766e;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(15, 118, 110, 0.35);
+  }
+  .supporter-cta-line a:hover {
+    text-decoration-color: rgba(15, 118, 110, 0.9);
+  }
+  .supporter-stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin: 0.75rem 0 1.25rem;
+  }
+  .supporter-stat {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .supporter-stat-num {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.1;
+  }
+  .supporter-stat-label {
+    font-size: 0.78rem;
+    color: #64748b;
+  }
+  .supporter-section-label {
+    margin: 0 0 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .supporter-months {
+    margin-bottom: 1.25rem;
+  }
+  .supporter-month-bars,
+  .supporter-tx-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .supporter-month-row {
+    display: grid;
+    grid-template-columns: 78px 1fr 90px;
+    gap: 0.6rem;
+    align-items: center;
+    font-size: 0.88rem;
+  }
+  .supporter-month-label {
+    color: #64748b;
+    font-variant-numeric: tabular-nums;
+  }
+  .supporter-month-bar {
+    position: relative;
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 4px;
+    overflow: hidden;
+    display: block;
+  }
+  .supporter-month-bar-fill {
+    position: absolute;
+    inset: 0;
+    width: var(--pct, 0%);
+    background: linear-gradient(90deg, #a7c957, #8fb85e);
+  }
+  .supporter-month-amount {
+    color: #0f172a;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    font-weight: 600;
+  }
+  .supporter-tx {
+    display: grid;
+    grid-template-columns: 78px 1fr 140px 110px;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 0.88rem;
+    padding: 0.3rem 0;
+    border-bottom: 1px dashed #f1f5f9;
+  }
+  .supporter-tx:last-child {
+    border-bottom: none;
+  }
+  .supporter-tx-date {
+    color: #64748b;
+    font-variant-numeric: tabular-nums;
+  }
+  .supporter-tx-bar {
+    position: relative;
+    height: 10px;
+    background: #f1f5f9;
+    border-radius: 5px;
+    overflow: hidden;
+    display: block;
+  }
+  .supporter-tx-bar-fill {
+    position: absolute;
+    inset: 0;
+    width: var(--pct, 0%);
+    background: #a7c957;
+  }
+  .supporter-tx-bar[data-type='one-time'] .supporter-tx-bar-fill {
+    background: #6fa28a;
+  }
+  .supporter-tx-amount {
+    color: #0f172a;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+  }
+  .supporter-tx-type,
+  .supporter-tx-anon {
+    font-size: 0.72rem;
+    color: #64748b;
+    font-weight: 400;
+  }
+  .supporter-tx-running {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  @media (max-width: 640px) {
+    .supporter-stats-row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .supporter-tx {
+      grid-template-columns: 70px 1fr;
+      row-gap: 0.2rem;
+    }
+    .supporter-tx-amount,
+    .supporter-tx-running {
+      grid-column: 1 / -1;
+      text-align: left;
+    }
+  }
+</style>

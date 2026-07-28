@@ -1,0 +1,40 @@
+#!/usr/bin/env sh
+# prepare-commit-msg — 每筆 commit 自動蓋上「這是哪個節點做的」。
+#
+# 為什麼：routine 飛輪 2026-07-24 遷到 mouhouse 之後，origin/main 上同時有營運機的
+# 自動 commit、指揮部的手動 commit、未來還有分靈節點的 PR。commit 訊息偶爾會手寫
+# 「(mouhouse-macmini)」但不成慣例，所以「這筆是誰做的」得靠猜。同一個病在 2026-07-25
+# 的存證檔撞名上出現過一次（REFLEXES #51）：缺 canonical 的來源標記。
+#
+# 節點名來源：`.taiwanmd/node-name.local`（gitignored，一行一個名字），沒有就退回
+# hostname 的 slug。放 machine-local 而不寫進 repo，是因為機器細節不該進公開版本庫
+# （2026-07-25 已有一次把機器細節換成佔位的清理）。
+#
+# 查詢用法：
+#   git log --format='%h %s%n  %(trailers:key=Semiont-Node,valueonly)'
+#   git log --grep='Semiont-Node: mouhouse' --format='%h %ai %s'
+
+MSG_FILE="$1"
+SOURCE="$2"
+
+# merge / squash / 既有 message 的改寫一律不碰（避免污染 merge commit 與 rebase）
+case "$SOURCE" in
+  merge | squash) exit 0 ;;
+esac
+
+# 已經有 trailer 就不重複蓋（amend / cherry-pick 會再跑一次）
+if grep -q '^Semiont-Node:' "$MSG_FILE" 2>/dev/null; then
+  exit 0
+fi
+
+NODE_FILE=".taiwanmd/node-name.local"
+if [ -f "$NODE_FILE" ]; then
+  NODE="$(head -1 "$NODE_FILE" | tr -d '[:space:]')"
+fi
+if [ -z "$NODE" ]; then
+  NODE="$(hostname | tr '[:upper:]' '[:lower:]' | sed 's/\.local$//; s/[^a-z0-9]\{1,\}/-/g; s/^-//; s/-$//')"
+fi
+[ -z "$NODE" ] && NODE="unknown-node"
+
+# trailer 前面留一個空行才符合 git trailer 慣例（git interpret-trailers 才認）
+printf '\nSemiont-Node: %s\n' "$NODE" >> "$MSG_FILE"

@@ -1,0 +1,227 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    # 2026-05-04: ubuntu-latest → ubuntu-24.04-arm. Free for public repos
+    # (4 vCPU / 16 GB), and arm64 is reported 1.3-1.7× faster on Node + Sharp
+    # workloads. Playwright Chromium binary supports linux/arm64 since 1.40.
+    # If perf regresses, revert to ubuntu-latest in a hotfix.
+    # 2026-06-01 hotfix: ubuntu-24.04-arm pool 在 09:25–11:15 window 連 6 次把 build job
+    # 在隨機步驟（apt read 53s / sync 3min / build render）SIGTERM(143) 反覆 reclaim，
+    # 無競爭 push、本地 build exit 0、GitHub Status 全綠 = ARM runner pool 不穩。
+    # 切 x86 ubuntu-latest（deploy job 本來就用）避開該 pool。穩定後可評估切回 arm。
+    runs-on: ubuntu-latest
+    # 2026-04-22 β post-mortem: run 24782448133 `npx playwright install --with-deps`
+    # silent hang 6 小時才被 default 360 min timeout 殺掉。加上限避免重演。
+    # 2026-05-02 γ: 35 → 60 — article volume grew (641 zh × 6 langs ≈ 3800 pages)
+    # 加 OG generation，到 2411/2520 才被 35 min timeout 砍。
+    # 2026-05-03 cross-lang-baseline: 60 → 120 — PR #797 rename 902 lang files
+    # cache miss 全 regen ~4500 OG images = 40 min OG step + 20 min Build = 60 min hit。
+    # og-rename-sync.mjs (PR #805) + jpg mtime touch (PR #806) 修補後預期回 ~21 min，
+    # 但 timeout cushion 加倍給穩定性緩衝（避免再撞 cache miss 場景 timeout 又 cancel）。
+    timeout-minutes: 120
+    env:
+      # 防 apt-get 互動 prompt（Playwright --with-deps 會呼叫 sudo apt-get）
+      DEBIAN_FRONTEND: noninteractive
+      # 2026-05-04: bump heap to 12 GB. Default 4 GB has been close to the
+      # ceiling at 4,393 pages × 6 langs (max RSS ~3.4 GB observed locally).
+      # Headroom prevents GC thrashing as content grows.
+      NODE_OPTIONS: --max-old-space-size=12288
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      # 把檔案 mtime 從 git log 還原（修「每次 CI 都全量重產 OG」bug）
+      # git checkout 會把所有檔案 mtime 設成 checkout 當下，這步讓 mtime 改回
+      # 最後 commit 該檔的時間，讓 og:generate 的 mtime incremental 能正確運作
+      - name: Restore file mtimes from git history
+        # History: chetan action (archive 404) → apt git-restore-mtime (2026-05-26
+        # heal) → 2026-06-10 audit 發現 apt 版內部用 `git whatchanged`，runner
+        # git ≥ 2.51 已廢除該指令 → 12,343/12,352 檔案靜默沒還原 → OG 每 build
+        # 全量重產 3,325 張（+66s, 05-27 起）。改用 repo 自有零依賴實作 +
+        # ratio guard（再壞會 fail loud，不准靜默壞第二次）。
+        # reports/build-pipeline-audit-2026-06-10.md 熱點 #1。
+        run: python3 scripts/ci/restore-mtime.py --verify-min-ratio 0.9
+      - name: Setup Node (with npm cache)
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: 'npm' # Tier 1-2: 快取 npm 下載（不是 node_modules 本體）
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+      - name: Validate frontmatter (changed files)
+        run: node scripts/core/test-frontmatter.mjs --ci
+
+      # SSOT article-health validation — full sweep on CI.
+      # Phase 10 promoted from shadow → hard gate. 2026-05-04 cleanup-1-4 promoted
+      # CI to hard fail (no observation period needed; pre-commit gate already
+      # caught drift, full sweep on main is the final safety net).
+      - name: Validate article health (SSOT, full sweep)
+        # ci-deploy profile: full sweep, blocks on HARD only. WARN is advisory
+        # surface (dashboard + human review). release-pr profile is the strict
+        # one for explicit release review (fails on WARN too).
+        run: python3 scripts/tools/article-health.py --all --profile=ci-deploy --quiet
+
+      # （2026-06-10 audit 熱點 #7：原 Tier 1-3 .astro content-collection cache
+      # 已移除 — repo 零 getCollection 呼叫（文章走 fs 直讀），cache 實測僅
+      # 4.5KB，restore/save 兩步是死重。若未來真的遷 content collections 再加回。）
+
+      # ── OG 圖片生成（2026-05-03 musing-chaplygin v4 inline-HTML batch）──
+      # v4 結構性最佳化：原 v3 為每篇文章開新 page navigation，~17 min / 1731 篇。
+      # v4 改為「單頁 frontend + JS 動態替換 + screenshot loop」，~30s / 2754 篇。
+      # 不再需要 Astro dev server（v4 inline HTML self-contained）。
+      # 視覺保真：favicon embed base64、Noto Serif TC + JP + KR 字體 link、
+      # 真實 i18n breadcrumb labels、frontmatter title + description 直讀。
+      # Incremental cache key 改 track v4 visual canonical：generate-og-images.mjs
+      # + favicon.png（content 變動由 mtime 增量檢查，restore-keys 撿最新快取）。
+      # 2026-06-13 refactor-article session（audit §⑤ cache churn 項）：
+      # actions/cache@v5 的 key 含 run_id = 每 run 必存新 186MB cache，
+      # ~15 run/天 ≈ 2.8GB/天 quota churn 會 LRU 擠掉 npm/playwright cache。
+      # 拆成 restore（每 run 都要）+ save（只在 OG generation 真的跑過時）。
+      # 功能等價：needed=false 時 cache 內容不變，存回去是純浪費；
+      # og-rename-sync 的 mv 冪等，skip save 最壞情況 = 下一 run 重做 mv。
+      - name: Restore OG image cache
+        uses: actions/cache/restore@v5
+        with:
+          path: public/og-images
+          key: og-images-${{ hashFiles('scripts/core/generate-og-images.mjs', 'public/favicon.png') }}-${{ github.run_id }}
+          restore-keys: |
+            og-images-${{ hashFiles('scripts/core/generate-og-images.mjs', 'public/favicon.png') }}-
+            og-images-
+
+      # ── Tier 1-1: Playwright chromium binary cache ─────────────────────
+      # `npx playwright install chromium` 每次會下載 ~130 MB（~90-120s）。
+      # Cache 依 playwright 版本決定 key，版本沒變就直接用。
+      #
+      # 2026-04-22 β post-mortem（run 24782448133 silent hang）:
+      # 原本 `--with-deps` 把 apt-get install 塞在同一步 → 偶發 silent hang。
+      # 拆成 install-deps（系統套件、always run、短）+ install chromium
+      # （binary、conditional），觀察 log 時能更精確定位問題。
+      - name: Restore Playwright cache
+        uses: actions/cache@v5
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          # runner.arch in key: runner.os 對 arm64/x64 ubuntu 都是 "Linux"，少了 arch
+          # → 切 runner 架構時會 restore 錯架構的 browser cache 且 cache-hit=true 跳過安裝
+          # → 找不到對應架構的 chrome-headless-shell。2026-06-01 ARM→x86 hotfix 暴露此 latent bug。
+          key: playwright-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}
+      # ── OG image regeneration is the ONLY consumer of Playwright in this build.
+      # So DETECT whether anything OG-relevant changed FIRST, then gate the (slow,
+      # occasionally flaky) Playwright install on it. Builds that touch no OG
+      # content/template skip apt + fonts + browser binary entirely — immune to
+      # runner apt/mirror hiccups, and faster. 2026-06-18 (哲宇)：both of that
+      # day's CI breaks were inside this install, on builds (memory / diary / code)
+      # that needed no OG regen at all. ──
+
+      # Cache prep (git-only, no Playwright): mv OG cache for renamed articles so a
+      # rename is a cache hit, not a ~900-image re-render.
+      - name: Sync OG cache for renamed articles
+        timeout-minutes: 2
+        run: node scripts/tools/og-rename-sync.mjs --since '30 days ago'
+
+      # v4 canonical: generate-og-images.mjs (template inline) + favicon.png;
+      # md / diary content by git diff. No OG-relevant change → every Playwright
+      # step below is skipped via this step's `needed` output.
+      - name: Detect OG-relevant changes
+        id: og-changes
+        run: |
+          CHANGED=$(git diff --name-only HEAD~1 HEAD -- 'knowledge/**/*.md' \
+            'docs/semiont/diary/*.md' \
+            'scripts/core/generate-og-images.mjs' \
+            'public/favicon.png' 2>/dev/null | head -1)
+          if [ -n "$CHANGED" ]; then
+            echo "needed=true" >> $GITHUB_OUTPUT
+            echo "✓ OG-relevant change — installing Playwright + regenerating OG images"
+          else
+            echo "needed=false" >> $GITHUB_OUTPUT
+            echo "⏭️  No OG-relevant change — skipping Playwright install entirely"
+          fi
+
+      # apt hygiene (only when we actually install): the runner's pre-installed
+      # azure-cli source (packages.microsoft.com) intermittently 403s / "no longer
+      # signed", failing apt-get update inside install-deps. PW deps come from the
+      # ubuntu archive, so removing it is safe. 2026-06-18 run 27723873289.
+      - name: Remove broken Microsoft apt source
+        if: steps.og-changes.outputs.needed == 'true'
+        run: |
+          sudo grep -rl packages.microsoft.com /etc/apt/sources.list.d/ 2>/dev/null \
+            | sudo xargs -r rm -f || true
+      # timeout 10 (was 5): azure.archive.ubuntu.com mirror occasionally crawls →
+      # CJK/emoji fonts blow a 5-min budget (run 27724128010). Fonts are load-
+      # bearing for OG CJK rendering, so wait them out. Normal speed <1 min.
+      - name: Install Playwright system deps
+        if: steps.og-changes.outputs.needed == 'true'
+        timeout-minutes: 10
+        run: npx --no-install playwright install-deps chromium
+      - name: Install Playwright Chromium binary
+        if: steps.og-changes.outputs.needed == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
+        timeout-minutes: 5
+        run: npx --no-install playwright install chromium
+      - name: Generate OG images (v4 inline-HTML batch)
+        if: steps.og-changes.outputs.needed == 'true'
+        # 4-core ubuntu-latest free runner: OG_WORKERS=4 (default) optimal.
+        # v4 不需要 dev server（inline HTML self-contained），CI 簡化：
+        # 直接跑 npm run og:generate，Playwright 只開 4 個 page，每 page setContent 一次。
+        env:
+          OG_WORKERS: 4
+        run: |
+          set -o pipefail
+          # 失敗不 block deploy — SEO.astro fallback 會退回預設圖
+          npm run og:generate || {
+            echo "⚠️  OG generation partial failure — SEO fallback kicks in"
+          }
+
+      # 只在 OG generation 真的跑過時才存 cache（對應上方 restore/save 拆分註解）
+      - name: Save OG image cache
+        if: steps.og-changes.outputs.needed == 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: public/og-images
+          key: og-images-${{ hashFiles('scripts/core/generate-og-images.mjs', 'public/favicon.png') }}-${{ github.run_id }}
+
+      - name: Build
+        # Feedback widget config (2026-06-01). Unset → empty → resolveBackendKind()
+        # falls back to 'github-only' (static GitHub-issue button), so the build is
+        # safe before Supabase is provisioned. Set these as repo Variables to go live.
+        env:
+          PUBLIC_FEEDBACK_MODE: ${{ vars.PUBLIC_FEEDBACK_MODE }}
+          PUBLIC_SUPABASE_URL: ${{ vars.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ vars.PUBLIC_SUPABASE_ANON_KEY }}
+          PUBLIC_FEEDBACK_PROVIDERS: ${{ vars.PUBLIC_FEEDBACK_PROVIDERS }}
+          # Lets prebuild generators (contributors + dashboard stars/forks) call the
+          # GitHub API authenticated (5000 req/hr) instead of the 60/hr anonymous cap.
+          # Without it, the stats fetch was rate-limited and stars went None → about
+          # hero showed "0+" (2026-06-13 regression root-cause fix).
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

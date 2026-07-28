@@ -1,0 +1,309 @@
+---
+/**
+ * EconCharts.astro — 經濟數據 hub 的手刻 SVG 折線圖 render script
+ *
+ * 2026-07-11 從 category-hub.template.astro 抽出。script + CSS 只在
+ * category === 'economy' && lang === 'zh-TW'（isEconomy）那一頁用得到，
+ * 但原本跟其他 hub 共用的 <style>/<script> 綁在同一份 template 裡，隨
+ * 78 個 hub 頁面一起出貨。
+ *
+ * 只搬 script + CSS，markup 留在原地：econ-chart-wrapper 那組 SVG 圖表
+ * 外殼是穿插在 hubSections.map(...) essay 迴圈裡（每個 <h2> 段落後面接
+ * 對應的 chart wrapper），結構上屬於 category-hub.template.astro 自己
+ * 的 essay 排版邏輯，不是可以獨立搬走的一塊——所以繼續留在模板裡；本
+ * 元件只負責「把資料畫進那些 wrapper 裡已經存在的 <svg class="econ-
+ * chart-svg">」，不渲染任何自己的 markup。
+ *
+ * 資料流：taiexData/cpiData/salaryData/housingData 由模板 frontmatter 的
+ * conditional dynamic import 讀（taiex-yearly.json 等），透過 props 傳進
+ * 這裡，再用 define:vars 序列化進 inline script（跟原本一樣的手法，只
+ * 是從「模板的 <script define:vars>」搬成「元件的 <script
+ * define:vars>」）。
+ *
+ * isEconomy 簡化：原本 script 收 isEconomy 當 define:vars 的一員、結尾用
+ * `if (isEconomy) init();` 判斷要不要跑。現在本元件只會在模板端
+ * `{isEconomy && <EconCharts ... />}` 為真時才被 render，isEconomy 這個
+ * 判斷已經在「要不要 render 這個元件」這一層做過了，元件內部不需要再
+ * 收一次 isEconomy prop 或再判斷一次——直接無條件 `init()`。
+ *
+ * CSS scoping：<style is:global>，而且這裡是「必要」而非「保守選擇」—
+ * 本元件不 render 任何 markup（見上），.econ-chart-wrapper /
+ * .econ-chart-container / .econ-chart-svg 等這些 class 選到的元素全部
+ * 活在 category-hub.template.astro 的模板樹裡（chart-shell markup 留在
+ * 原地，見上），不是本檔案自己寫出來的元素。Astro 的 scoped <style> 只
+ * 幫「自己模板裡靜態寫出來的元素」加 data-astro-cid-* 屬性；本元件的
+ * 模板是空的，一般 scoped <style> 在這裡 100% 比對不到任何東西，形同
+ * 沒寫。is:global 不是加分項，是唯一能動的寫法。（.econ-milestone-label
+ * / .econ-milestone-dot 更進一步是 render script 用
+ * document.createElementNS + setAttribute('class', ...) 在 runtime 生出
+ * 來的 SVG 節點，即便真的能拿到 astro-cid，這兩條規則也還是需要
+ * unscoped 才吃得到。）
+ *
+ * Collision 檢查：econ-chart-* / econ-milestone-* 這兩組 class 名稱對
+ * 整個 src/ grep 過，除了本檔（原模板）以外沒有第二個消費者，沒有跨頁
+ * 撞名風險。
+ */
+interface Props {
+  taiexData: any[];
+  cpiData: any[];
+  salaryData: any[];
+  housingData: any[];
+}
+const { taiexData, cpiData, salaryData, housingData } = Astro.props;
+---
+
+<script define:vars={{ taiexData, cpiData, salaryData, housingData }}>
+  function init() {
+    document.addEventListener('DOMContentLoaded', () => {
+      const chartConfigs = {
+        taiex: {
+          data: taiexData,
+          color: '#dc2626',
+          yKey: 'close',
+          label: '加權指數',
+          format: (v) => v.toLocaleString() + ' 點',
+        },
+        cpi: {
+          data: cpiData,
+          color: '#2563eb',
+          yKey: 'value',
+          label: 'CPI',
+          format: (v) => v.toFixed(1),
+        },
+        salary: {
+          data: salaryData,
+          color: '#059669',
+          yKey: 'value',
+          label: '月薪',
+          format: (v) => 'NT$ ' + v.toLocaleString(),
+        },
+        housing: {
+          data: housingData,
+          color: '#7c3aed',
+          yKey: 'value',
+          label: '房價指數',
+          format: (v) => v.toFixed(1),
+        },
+      };
+
+      document.querySelectorAll('.econ-chart-wrapper').forEach((wrapper) => {
+        const chartType = wrapper.dataset.chart;
+        const config = chartConfigs[chartType];
+        if (!config || !config.data || config.data.length === 0) return;
+
+        const svg = wrapper.querySelector('.econ-chart-svg');
+        const tooltip = wrapper.querySelector('.econ-chart-tooltip');
+        const data = config.data;
+        const ns = 'http://www.w3.org/2000/svg';
+
+        const W = 800,
+          H = 300;
+        const pad = { top: 30, right: 20, bottom: 40, left: 65 };
+        const cw = W - pad.left - pad.right;
+        const ch = H - pad.top - pad.bottom;
+
+        const years = data.map((d) => d.year);
+        const values = data.map((d) => d[config.yKey]);
+        const minY = Math.min(...values) * 0.9;
+        const maxY = Math.max(...values) * 1.1;
+
+        const xScale = (year) =>
+          pad.left +
+          ((year - years[0]) / (years[years.length - 1] - years[0])) * cw;
+        const yScale = (val) =>
+          pad.top + ch - ((val - minY) / (maxY - minY)) * ch;
+
+        // Grid lines
+        const gridCount = 5;
+        for (let i = 0; i <= gridCount; i++) {
+          const yVal = minY + (maxY - minY) * (i / gridCount);
+          const y = yScale(yVal);
+          const line = document.createElementNS(ns, 'line');
+          line.setAttribute('x1', pad.left);
+          line.setAttribute('x2', W - pad.right);
+          line.setAttribute('y1', y);
+          line.setAttribute('y2', y);
+          line.setAttribute('stroke', '#e2e8f0');
+          line.setAttribute('stroke-width', '1');
+          svg.appendChild(line);
+          const label = document.createElementNS(ns, 'text');
+          label.setAttribute('x', pad.left - 8);
+          label.setAttribute('y', y + 4);
+          label.setAttribute('text-anchor', 'end');
+          label.setAttribute('fill', '#94a3b8');
+          label.setAttribute('font-size', '10');
+          label.textContent =
+            chartType === 'salary'
+              ? Math.round(yVal / 1000) + 'K'
+              : chartType === 'taiex'
+                ? Math.round(yVal).toLocaleString()
+                : yVal.toFixed(0);
+          svg.appendChild(label);
+        }
+
+        // X axis labels
+        const yearStep = Math.max(1, Math.floor(years.length / 8));
+        for (let i = 0; i < years.length; i += yearStep) {
+          const x = xScale(years[i]);
+          const label = document.createElementNS(ns, 'text');
+          label.setAttribute('x', x);
+          label.setAttribute('y', H - 8);
+          label.setAttribute('text-anchor', 'middle');
+          label.setAttribute('fill', '#94a3b8');
+          label.setAttribute('font-size', '10');
+          label.textContent = years[i];
+          svg.appendChild(label);
+        }
+
+        // Area fill
+        let areaPath = `M ${xScale(years[0])} ${yScale(values[0])}`;
+        for (let i = 1; i < data.length; i++) {
+          areaPath += ` L ${xScale(years[i])} ${yScale(values[i])}`;
+        }
+        areaPath += ` L ${xScale(years[years.length - 1])} ${pad.top + ch} L ${xScale(years[0])} ${pad.top + ch} Z`;
+        const area = document.createElementNS(ns, 'path');
+        area.setAttribute('d', areaPath);
+        area.setAttribute('fill', config.color);
+        area.setAttribute('opacity', '0.08');
+        svg.appendChild(area);
+
+        // Line
+        let linePath = `M ${xScale(years[0])} ${yScale(values[0])}`;
+        for (let i = 1; i < data.length; i++) {
+          linePath += ` L ${xScale(years[i])} ${yScale(values[i])}`;
+        }
+        const line = document.createElementNS(ns, 'path');
+        line.setAttribute('d', linePath);
+        line.setAttribute('fill', 'none');
+        line.setAttribute('stroke', config.color);
+        line.setAttribute('stroke-width', '2.5');
+        line.setAttribute('stroke-linejoin', 'round');
+        svg.appendChild(line);
+
+        // Milestones & interactive dots
+        data.forEach((d, i) => {
+          const x = xScale(d.year);
+          const y = yScale(d[config.yKey]);
+
+          if (d.milestone) {
+            const dot = document.createElementNS(ns, 'circle');
+            dot.setAttribute('cx', x);
+            dot.setAttribute('cy', y);
+            dot.setAttribute('r', '5');
+            dot.setAttribute('fill', config.color);
+            dot.setAttribute('stroke', 'white');
+            dot.setAttribute('stroke-width', '2');
+            dot.setAttribute('class', 'econ-milestone-dot');
+            svg.appendChild(dot);
+            const mlabel = document.createElementNS(ns, 'text');
+            mlabel.setAttribute('x', x);
+            mlabel.setAttribute('y', y - 12);
+            mlabel.setAttribute('class', 'econ-milestone-label');
+            mlabel.textContent = d.milestone;
+            svg.appendChild(mlabel);
+          }
+
+          // Invisible hover area
+          const hover = document.createElementNS(ns, 'rect');
+          const barW = cw / data.length;
+          hover.setAttribute('x', x - barW / 2);
+          hover.setAttribute('y', pad.top);
+          hover.setAttribute('width', barW);
+          hover.setAttribute('height', ch);
+          hover.setAttribute('fill', 'transparent');
+          hover.setAttribute('cursor', 'crosshair');
+
+          hover.addEventListener('mouseenter', () => {
+            tooltip.style.display = 'block';
+            tooltip.innerHTML = `<strong>${d.year}</strong>　${config.label}：${config.format(d[config.yKey])}`;
+          });
+          hover.addEventListener('mousemove', (e) => {
+            const rect = wrapper
+              .querySelector('.econ-chart-svg-wrap')
+              .getBoundingClientRect();
+            tooltip.style.left = e.clientX - rect.left + 'px';
+            tooltip.style.top = e.clientY - rect.top + 'px';
+          });
+          hover.addEventListener('mouseleave', () => {
+            tooltip.style.display = 'none';
+          });
+          svg.appendChild(hover);
+        });
+      });
+    });
+  }
+
+  init();
+</script>
+
+<style is:global>
+  /* Economic Charts */
+  .econ-chart-wrapper {
+    margin: 2.5rem 0;
+    padding: 0;
+  }
+  .econ-chart-container {
+    background: linear-gradient(135deg, #fafbfc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+  .econ-chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .econ-chart-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+  }
+  .econ-chart-source {
+    font-size: 0.75rem;
+    color: #94a3b8;
+  }
+  .econ-chart-svg-wrap {
+    position: relative;
+    width: 100%;
+  }
+  .econ-chart-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .econ-chart-tooltip {
+    position: absolute;
+    display: none;
+    background: rgba(15, 23, 42, 0.9);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translate(-50%, -120%);
+  }
+  .econ-milestone-label {
+    font-size: 9px;
+    fill: #64748b;
+    text-anchor: middle;
+  }
+  .econ-milestone-dot {
+    cursor: pointer;
+  }
+
+  /* Responsive (econ-chart only — wrapper rules migrated to inline
+     Tailwind `max-[768px]:` variants) */
+  @media (max-width: 768px) {
+    .econ-chart-container {
+      padding: 1rem;
+    }
+  }
+</style>

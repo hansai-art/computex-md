@@ -1,0 +1,838 @@
+---
+/**
+ * /mcp — COMPUTEX.md Connector + CLI landing/docs page (multilingual).
+ *
+ * Single authoritative entry point for the MCP server and the taiwanmd CLI:
+ * what it is, install per client, the 6 MCP tools, the CLI commands, how it
+ * works + privacy, FAQ. Language-aware via getLangFromUrl() — prose comes from
+ * src/data/mcp-content.ts (zh-TW / en / ja / ko / es / fr); code, commands,
+ * tool names, CLI signatures and examples stay SHARED here (identical across
+ * languages) and are zipped with the per-lang description arrays by index.
+ *
+ * Design language borrows the Semiont palette (warm paper #f4f0ea on #03080a,
+ * mint #4fd1b0 accent, EKG separator, 🧬) — fitting, because this page is
+ * COMPUTEX.md offering its body to other AIs (the reproduction organ's
+ * developer-session surface). Real CLI source: `taiwanmd --help`; MCP server:
+ * cli/src/lib/mcp-server.js.
+ */
+import Layout from '../layouts/Layout.astro';
+import { getLangFromUrl } from '../i18n/utils';
+import { MCP_CONTENT, type McpLang } from '../data/mcp-content';
+
+const lang = getLangFromUrl(Astro.url) as McpLang;
+const c = MCP_CONTENT[lang] ?? MCP_CONTENT['zh-TW'];
+
+// ── SHARED structural data (identical across languages) ────────────────────
+const oneLiner = 'claude mcp add taiwanmd -- npx -y taiwanmd mcp serve';
+
+const toolNames = [
+  'taiwanmd_search',
+  'taiwanmd_read',
+  'taiwanmd_rag',
+  'taiwanmd_cite',
+  'taiwanmd_organs',
+  'taiwanmd_stats',
+];
+const toolInputs = [
+  '{ "query": "半導體", "limit": 5 }',
+  '{ "slug": "珍珠奶茶" }',
+  '{ "query": "台灣健保", "limit": 3 }',
+  '{ "query": "台積電", "limit": 3 }',
+  '{}',
+  '{}',
+];
+const tools = toolNames.map((name, i) => ({
+  name,
+  input: toolInputs[i],
+  desc: c.toolDescs[i],
+  returns: c.toolReturns[i],
+  highlight: i === 3, // taiwanmd_cite
+}));
+
+const installCodes = [
+  oneLiner,
+  c.installDesktopCode,
+  'command: npx\nargs: ["-y", "taiwanmd", "mcp", "serve"]',
+  'npx -y taiwanmd mcp serve',
+];
+// Optional remote endpoint (Cloudflare Worker) — thin-client path. Local-first
+// stays primary; this is the secondary entry for clients that can't run Node.
+const remoteUrl = 'https://mcp.computex.md';
+const installs = [
+  ...c.installClientLabels.map((client, i) => ({
+    client,
+    badge: c.installBadges[i],
+    code: installCodes[i],
+    note: c.installNotes[i],
+    // Claude Desktop (i===1) gets a real .mcpb download button.
+    download:
+      i === 1
+        ? { href: '/downloads/taiwanmd.mcpb', label: c.downloadLabel }
+        : null,
+  })),
+  {
+    client: 'Remote · any MCP client',
+    badge: 'mcp-remote',
+    code: `npx mcp-remote ${remoteUrl}`,
+    note: c.remoteNote,
+    download: null,
+  },
+];
+
+// CLI command signatures + examples are SHARED; descriptions come from content.
+// Order MUST match mcp-content.ts cliDescs + cliGroupTitles/cliGroupSizes.
+const cliSig = [
+  'search <query>',
+  'read <slug>',
+  'list [category]',
+  'random',
+  'today',
+  'quiz',
+  'explore',
+  'graph <slug>',
+  'diff',
+  'terminology',
+  'rag <query>',
+  'cite <query>',
+  'mcp serve',
+  'contribute <topic>',
+  'validate <slug>',
+  'audit <slug>',
+  'inbox',
+  'sync',
+  'organs',
+  'stats',
+  'sense',
+  'spore',
+  'supporters',
+  'profile',
+  'mailmap',
+];
+const cliEx = [
+  'taiwanmd search 珍珠奶茶',
+  'taiwanmd read 珍珠奶茶 --raw',
+  'taiwanmd list food',
+  'taiwanmd random --category nature',
+  'taiwanmd today',
+  'taiwanmd quiz',
+  'taiwanmd explore',
+  'taiwanmd graph 珍珠奶茶',
+  'taiwanmd diff',
+  'taiwanmd term 滑鼠',
+  'taiwanmd rag "台灣經濟"',
+  'taiwanmd cite 台積電',
+  'taiwanmd mcp serve',
+  'taiwanmd contribute 阿里山',
+  'taiwanmd validate 珍珠奶茶',
+  'taiwanmd audit 王新仁',
+  'taiwanmd inbox --state pending',
+  'taiwanmd sync',
+  'taiwanmd organs',
+  'taiwanmd stats',
+  'taiwanmd sense',
+  'taiwanmd spore log',
+  'taiwanmd supporters',
+  'taiwanmd profile',
+  'taiwanmd mailmap',
+];
+const cliGroupSizes = [10, 3, 5, 5, 2];
+const cliGroupEmojis = ['🔍', '🤖', '✍️', '🧬', '🔧'];
+const cliGroups = (() => {
+  const groups = [];
+  let idx = 0;
+  for (let g = 0; g < c.cliGroupTitles.length; g++) {
+    const size = cliGroupSizes[g];
+    const cmds = [];
+    for (let k = 0; k < size; k++) {
+      const j = idx + k;
+      cmds.push([cliSig[j], c.cliDescs[j], cliEx[j]]);
+    }
+    idx += size;
+    groups.push({ title: c.cliGroupTitles[g], emoji: cliGroupEmojis[g], cmds });
+  }
+  return groups;
+})();
+---
+
+<Layout
+  title={`${c.heroTitle} — COMPUTEX.md`}
+  description={c.heroSubtitle}
+  lang={lang}
+  readerSettings={true}
+>
+  <main class="mcp-paper min-h-screen">
+    <div class="mx-auto max-w-[920px] px-6 pb-28 pt-16 md:px-8">
+      {/* ── Hero ─────────────────────────────────────── */}
+      <header class="text-center">
+        <div class="mb-4 font-mono text-xs tracking-widest text-[#4fd1b0]/80">
+          {c.heroEyebrow}
+        </div>
+        <h1
+          class="mcp-title mx-auto max-w-[16ch] text-3xl font-bold leading-tight text-[#f4f0ea] md:text-5xl"
+        >
+          {c.heroTitle}
+        </h1>
+        <p
+          class="mx-auto mt-5 max-w-[44ch] text-base leading-relaxed text-[#f4f0ea]/65 md:text-lg"
+        >
+          {c.heroSubtitle}
+        </p>
+
+        <div class="mt-7 flex flex-wrap justify-center gap-2">
+          {
+            c.badges.map((b) => (
+              <span class="rounded-full border border-[#4fd1b0]/30 bg-[#4fd1b0]/8 px-3 py-1 font-mono text-xs text-[#4fd1b0]">
+                {b}
+              </span>
+            ))
+          }
+        </div>
+
+        <div class="mcp-code-hero mx-auto mt-8 max-w-[640px]">
+          <button class="copy-btn" data-copy={oneLiner} aria-label={c.copyLabel}
+            >{c.copyLabel}</button
+          >
+          <pre><code>{oneLiner}</code></pre>
+        </div>
+        <p class="mt-3 font-mono text-xs text-[#f4f0ea]/45">{c.heroNote}</p>
+      </header>
+
+      <div class="ekg" aria-hidden="true"></div>
+
+      {/* ── What / Why ───────────────────────────────── */}
+      <section>
+        <h2 class="mcp-h2">{c.whatTitle}</h2>
+        <p class="mcp-lead" set:html={c.whatLeadHtml} />
+        <p class="mcp-lead">{c.whatLead2}</p>
+        <div class="mcp-table-wrap">
+          <table class="mcp-table">
+            <thead>
+              <tr>
+                <th>{c.compareHead[0]}</th>
+                <th>{c.compareHead[1]}</th>
+                <th>{c.compareHead[2]}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                c.compareRows.map((row) => (
+                  <tr>
+                    <td class="mcp-td-key">{row[0]}</td>
+                    <td class="mcp-td-good">{row[1]}</td>
+                    <td class="mcp-td-muted">{row[2]}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="ekg" aria-hidden="true"></div>
+
+      {/* ── Install ──────────────────────────────────── */}
+      <section>
+        <h2 class="mcp-h2">{c.installTitle}</h2>
+        <p class="mcp-lead">{c.installLead}</p>
+        <div class="mcp-grid">
+          {
+            installs.map((it) => (
+              <div class="mcp-card">
+                <div class="mcp-card-head">
+                  <span class="mcp-card-title">{it.client}</span>
+                  <span class="mcp-pill">{it.badge}</span>
+                </div>
+                <div class="mcp-code">
+                  <button
+                    class="copy-btn"
+                    data-copy={it.code}
+                    aria-label={c.copyLabel}
+                  >
+                    {c.copyLabel}
+                  </button>
+                  <pre>
+                    <code>{it.code}</code>
+                  </pre>
+                </div>
+                {it.download && (
+                  <a class="mcp-download" href={it.download.href} download>
+                    ⬇ {it.download.label}
+                  </a>
+                )}
+                <p class="mcp-card-note">{it.note}</p>
+              </div>
+            ))
+          }
+        </div>
+        <p
+          class="mcp-lead mt-5 text-sm text-[#f4f0ea]/50"
+          set:html={c.installFootnoteHtml}
+        />
+      </section>
+
+      <div class="ekg" aria-hidden="true"></div>
+
+      {/* ── MCP tools ────────────────────────────────── */}
+      <section>
+        <h2 class="mcp-h2">{c.toolsTitle} <span class="mcp-count">6</span></h2>
+        <p class="mcp-lead" set:html={c.toolsLeadHtml} />
+        <div class="mcp-tools">
+          {
+            tools.map((tool) => (
+              <div class={`mcp-tool${tool.highlight ? ' mcp-tool-hl' : ''}`}>
+                <div class="mcp-tool-name">
+                  {tool.name}
+                  {tool.highlight && (
+                    <span class="mcp-tool-tag">{c.toolTag}</span>
+                  )}
+                </div>
+                <p class="mcp-tool-desc">{tool.desc}</p>
+                <div class="mcp-tool-io">
+                  <span class="mcp-io-label">{c.ioInput}</span>
+                  <code>{tool.input}</code>
+                </div>
+                <div class="mcp-tool-io">
+                  <span class="mcp-io-label">{c.ioReturn}</span>
+                  <span class="mcp-io-text">{tool.returns}</span>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      <div class="ekg" aria-hidden="true"></div>
+
+      {/* ── CLI ──────────────────────────────────────── */}
+      <section>
+        <h2 class="mcp-h2">{c.cliTitle} <span class="mcp-count">26</span></h2>
+        <p class="mcp-lead">{c.cliLead}</p>
+        <div class="mcp-code mx-auto max-w-[620px]">
+          <button
+            class="copy-btn"
+            data-copy="npm install -g taiwanmd"
+            aria-label={c.copyLabel}>{c.copyLabel}</button
+          >
+          <pre><code>npm install -g taiwanmd   {c.cliInstallComment}</code></pre>
+        </div>
+
+        <div class="mt-8 space-y-9">
+          {
+            cliGroups.map((g) => (
+              <div>
+                <h3 class="mcp-h3">
+                  <span class="mr-2">{g.emoji}</span>
+                  {g.title}
+                </h3>
+                <div class="mcp-table-wrap">
+                  <table class="mcp-table mcp-cli-table">
+                    <tbody>
+                      {g.cmds.map((cmd) => (
+                        <tr>
+                          <td class="mcp-cli-cmd">
+                            <code>{cmd[0]}</code>
+                          </td>
+                          <td class="mcp-cli-desc">{cmd[1]}</td>
+                          <td class="mcp-cli-ex">
+                            <code>{cmd[2]}</code>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      <div class="ekg" aria-hidden="true"></div>
+
+      {/* ── How it works + privacy ───────────────────── */}
+      <section>
+        <h2 class="mcp-h2">{c.howTitle}</h2>
+        <ul class="mcp-bullets">
+          {c.howBulletsHtml.map((b) => <li set:html={b} />)}
+        </ul>
+      </section>
+
+      <div class="ekg" aria-hidden="true"></div>
+
+      {/* ── FAQ ──────────────────────────────────────── */}
+      <section>
+        <h2 class="mcp-h2">{c.faqTitle}</h2>
+        <div class="mt-5 space-y-4">
+          {
+            c.faqs.map((f) => (
+              <details class="mcp-faq">
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
+            ))
+          }
+        </div>
+      </section>
+
+      <div class="ekg" aria-hidden="true"></div>
+
+      {/* ── Open source / fork ───────────────────────── */}
+      <section class="text-center">
+        <h2 class="mcp-h2 justify-center">{c.osTitle}</h2>
+        <p
+          class="mcp-lead mx-auto max-w-[46ch] text-center"
+          set:html={c.osParaHtml}
+        />
+        <div class="mt-6 flex flex-wrap justify-center gap-3">
+          <a
+            class="mcp-btn"
+            href="https://github.com/frank890417/taiwan-md"
+            target="_blank"
+            rel="noopener">GitHub</a
+          >
+          <a
+            class="mcp-btn"
+            href="https://www.npmjs.com/package/taiwanmd"
+            target="_blank"
+            rel="noopener">npm</a
+          >
+          <a
+            class="mcp-btn"
+            href="https://github.com/frank890417/taiwan-md/blob/main/cli/CONNECTOR.md"
+            target="_blank"
+            rel="noopener">{c.btnDocs}</a
+          >
+          <a class="mcp-btn" href="/contribute">{c.btnContribute}</a>
+        </div>
+        <div class="mt-10 font-mono text-xs text-[#4fd1b0]/75">🧬</div>
+      </section>
+    </div>
+  </main>
+</Layout>
+
+<script define:vars={{ copiedLabel: c.copiedLabel }}>
+  // Copy-to-clipboard for all .copy-btn buttons.
+  document.querySelectorAll('.copy-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const text = btn.getAttribute('data-copy') || '';
+      try {
+        await navigator.clipboard.writeText(text);
+        const prev = btn.textContent;
+        btn.textContent = copiedLabel;
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = prev;
+          btn.classList.remove('copied');
+        }, 1400);
+      } catch {
+        /* clipboard blocked — no-op */
+      }
+    });
+  });
+</script>
+
+<style>
+  .mcp-paper {
+    background-color: #03080a;
+    background-image:
+      radial-gradient(
+        circle at 20% 10%,
+        rgba(79, 209, 176, 0.06),
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 85% 30%,
+        rgba(79, 209, 176, 0.04),
+        transparent 45%
+      );
+    background-attachment: fixed;
+    color: #f4f0ea;
+  }
+  .mcp-title {
+    font-family: 'jf-lanyanghei-extraheavy', 'Noto Sans TC', sans-serif;
+    letter-spacing: -0.01em;
+  }
+
+  /* EKG separator (Semiont heartbeat signature) */
+  .ekg {
+    height: 1px;
+    margin: 3.5rem 0;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(79, 209, 176, 0.25) 15%,
+      rgba(79, 209, 176, 0.25) 85%,
+      transparent
+    );
+    position: relative;
+  }
+  .ekg::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 44px;
+    height: 12px;
+    transform: translate(-50%, -50%);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='12' viewBox='0 0 44 12'%3E%3Cpolyline fill='none' stroke='%23000' stroke-width='1.4' points='0,6 10,6 14,1 17,11 20,4 23,8 26,6 44,6'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='12' viewBox='0 0 44 12'%3E%3Cpolyline fill='none' stroke='%23000' stroke-width='1.4' points='0,6 10,6 14,1 17,11 20,4 23,8 26,6 44,6'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    background: #4fd1b0;
+  }
+
+  .mcp-h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'rixingsong-semibold', 'Noto Serif TC', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #f4f0ea;
+    margin-bottom: 1rem;
+  }
+  .mcp-h2.justify-center {
+    justify-content: center;
+  }
+  .mcp-count {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.8rem;
+    color: #4fd1b0;
+    background: rgba(79, 209, 176, 0.12);
+    border: 1px solid rgba(79, 209, 176, 0.3);
+    border-radius: 999px;
+    padding: 0.1rem 0.55rem;
+  }
+  .mcp-h3 {
+    font-family: 'rixingsong-semibold', 'Noto Serif TC', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: rgba(244, 240, 234, 0.9);
+    margin-bottom: 0.75rem;
+  }
+  .mcp-lead {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: rgba(244, 240, 234, 0.7);
+    margin-bottom: 1rem;
+  }
+  .mcp-lead strong {
+    color: #f4f0ea;
+    font-weight: 700;
+  }
+  .mcp-link,
+  .mcp-lead a {
+    color: #4fd1b0;
+    text-decoration: underline;
+    text-decoration-color: rgba(79, 209, 176, 0.4);
+    text-underline-offset: 3px;
+  }
+
+  /* Code blocks */
+  .mcp-code,
+  .mcp-code-hero {
+    position: relative;
+  }
+  .mcp-code pre,
+  .mcp-code-hero pre {
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(79, 209, 176, 0.18);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    overflow-x: auto;
+    margin: 0;
+  }
+  .mcp-code-hero pre {
+    padding: 1.25rem 1.25rem;
+    box-shadow: 0 0 40px rgba(79, 209, 176, 0.08);
+  }
+  .mcp-code code,
+  .mcp-code-hero code {
+    font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: #d7f5ec;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .mcp-code-hero code {
+    font-size: 0.95rem;
+    color: #eafbf5;
+  }
+  .copy-btn {
+    position: absolute;
+    top: 0.55rem;
+    right: 0.55rem;
+    z-index: 2;
+    font-family: 'SF Mono', monospace;
+    font-size: 0.68rem;
+    color: rgba(244, 240, 234, 0.6);
+    background: rgba(79, 209, 176, 0.1);
+    border: 1px solid rgba(79, 209, 176, 0.25);
+    border-radius: 6px;
+    padding: 0.2rem 0.5rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover {
+    color: #4fd1b0;
+    background: rgba(79, 209, 176, 0.18);
+  }
+  .copy-btn.copied {
+    color: #4fd1b0;
+    border-color: #4fd1b0;
+  }
+  .mcp-inline {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.82em;
+    background: rgba(79, 209, 176, 0.1);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+    color: #d7f5ec;
+    word-break: break-word;
+  }
+
+  /* Comparison + CLI tables */
+  .mcp-table-wrap {
+    overflow-x: auto;
+    margin: 1.25rem 0;
+  }
+  .mcp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  .mcp-table th,
+  .mcp-table td {
+    border: 1px solid rgba(79, 209, 176, 0.18);
+    padding: 0.6rem 0.8rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  .mcp-table th {
+    background: rgba(79, 209, 176, 0.08);
+    font-weight: 600;
+    color: #f4f0ea;
+  }
+  .mcp-td-key {
+    color: rgba(244, 240, 234, 0.6);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .mcp-td-good {
+    color: #d7f5ec;
+  }
+  .mcp-td-muted {
+    color: rgba(244, 240, 234, 0.45);
+  }
+  .mcp-cli-table td {
+    font-size: 0.85rem;
+  }
+  .mcp-cli-cmd code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #4fd1b0;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+  .mcp-cli-desc {
+    color: rgba(244, 240, 234, 0.72);
+  }
+  .mcp-cli-ex code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: rgba(244, 240, 234, 0.5);
+    font-size: 0.78rem;
+  }
+
+  /* Install + tool cards */
+  .mcp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+  .mcp-card {
+    border: 1px solid rgba(79, 209, 176, 0.18);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 1.1rem;
+  }
+  .mcp-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .mcp-card-title {
+    font-weight: 700;
+    color: #f4f0ea;
+    font-size: 0.95rem;
+  }
+  .mcp-pill {
+    font-family: 'SF Mono', monospace;
+    font-size: 0.66rem;
+    color: #4fd1b0;
+    border: 1px solid rgba(79, 209, 176, 0.3);
+    border-radius: 999px;
+    padding: 0.1rem 0.5rem;
+    white-space: nowrap;
+  }
+  .mcp-card-note {
+    margin-top: 0.7rem;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: rgba(244, 240, 234, 0.55);
+  }
+  .mcp-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.7rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    background: #4fd1b0;
+    color: #03080a;
+    font-size: 0.82rem;
+    font-weight: 700;
+    transition: filter 0.15s;
+  }
+  .mcp-download:hover {
+    filter: brightness(1.1);
+  }
+
+  .mcp-tools {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+  .mcp-tool {
+    border: 1px solid rgba(79, 209, 176, 0.16);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 1.1rem;
+  }
+  .mcp-tool-hl {
+    border-color: rgba(79, 209, 176, 0.5);
+    background: rgba(79, 209, 176, 0.05);
+  }
+  .mcp-tool-name {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #4fd1b0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .mcp-tool-tag {
+    font-size: 0.64rem;
+    color: #03080a;
+    background: #4fd1b0;
+    border-radius: 999px;
+    padding: 0.1rem 0.5rem;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 700;
+  }
+  .mcp-tool-desc {
+    margin: 0.6rem 0 0.8rem;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: rgba(244, 240, 234, 0.75);
+  }
+  .mcp-tool-io {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+    margin-top: 0.4rem;
+    font-size: 0.78rem;
+  }
+  .mcp-io-label {
+    flex-shrink: 0;
+    font-family: 'SF Mono', monospace;
+    font-size: 0.68rem;
+    color: rgba(79, 209, 176, 0.7);
+    min-width: 2.4rem;
+  }
+  .mcp-tool-io code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #d7f5ec;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    word-break: break-word;
+  }
+  .mcp-io-text {
+    color: rgba(244, 240, 234, 0.6);
+  }
+
+  .mcp-bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .mcp-bullets li {
+    position: relative;
+    padding-left: 1.4rem;
+    margin-bottom: 0.9rem;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: rgba(244, 240, 234, 0.72);
+  }
+  .mcp-bullets li::before {
+    content: '▹';
+    position: absolute;
+    left: 0;
+    color: #4fd1b0;
+  }
+  .mcp-bullets strong {
+    color: #f4f0ea;
+  }
+
+  .mcp-faq {
+    border: 1px solid rgba(79, 209, 176, 0.16);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 0.4rem 1rem;
+  }
+  .mcp-faq summary {
+    cursor: pointer;
+    padding: 0.6rem 0;
+    font-weight: 600;
+    color: #f4f0ea;
+    font-size: 0.95rem;
+    list-style: none;
+  }
+  .mcp-faq summary::-webkit-details-marker {
+    display: none;
+  }
+  .mcp-faq summary::before {
+    content: '＋';
+    color: #4fd1b0;
+    margin-right: 0.6rem;
+    font-family: monospace;
+  }
+  .mcp-faq[open] summary::before {
+    content: '－';
+  }
+  .mcp-faq p {
+    padding: 0 0 0.8rem 1.5rem;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: rgba(244, 240, 234, 0.65);
+  }
+
+  .mcp-btn {
+    display: inline-block;
+    border: 1px solid rgba(79, 209, 176, 0.35);
+    border-radius: 999px;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.88rem;
+    color: #4fd1b0;
+    transition: all 0.15s;
+  }
+  .mcp-btn:hover {
+    background: rgba(79, 209, 176, 0.12);
+    border-color: #4fd1b0;
+  }
+</style>

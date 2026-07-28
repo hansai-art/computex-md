@@ -1,0 +1,222 @@
+/* ── 🩺 Operational Status (2026-07-24) ──────────────────────────────
+ * source: public/api/dashboard-status.json (scripts/core/generate-dashboard-status.mjs)
+ * design report: reports/design-dashboard-status-section-2026-07-24.md
+ * Only SSG section on this page — rendered server-side in dashboard.template.astro
+ * frontmatter, no client JS. Uses var(--surface-glass)/var(--color-border) for
+ * card chrome so it auto-flips with the existing `:root[data-theme='dark'] .dashboard`
+ * base rule; status/coverage dots keep saturated literal colors (legible on both
+ * themes by the same convention as --status-vital-* / --status-tier-*). */
+.ops-stale-note {
+  font-size: 0.8rem;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 6px;
+  padding: 0.5rem 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.ops-routine-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.ops-routine-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.7rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  background: var(--surface-glass);
+  border: 1px solid var(--color-border, rgba(0, 0, 0, 0.06));
+}
+.ops-routine-id {
+  flex: 1 1 170px;
+  min-width: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ops-routine-cadence {
+  flex: 0 0 auto;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ops-routine-lastfire {
+  flex: 0 0 auto;
+  opacity: 0.55;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+.ops-grid14 {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(14, 8px);
+  gap: 2px;
+}
+.ops-cell {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+.ops-cell-fired {
+  background: #22c55e;
+}
+.ops-cell-missed {
+  background: #ef4444;
+}
+.ops-cell-idle {
+  background: var(--color-border, rgba(0, 0, 0, 0.1));
+}
+
+.ops-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ops-dot-operational {
+  background: #22c55e;
+}
+.ops-dot-degraded {
+  background: #f59e0b;
+}
+.ops-dot-down {
+  background: #ef4444;
+}
+.ops-dot-disabled {
+  background: #94a3b8;
+}
+
+.ops-disabled-note {
+  font-size: 0.78rem;
+  opacity: 0.6;
+  margin-top: 0.6rem;
+}
+
+/* ── Babel coverage bars ── */
+.ops-babel-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.ops-babel-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+}
+.ops-babel-lang {
+  flex: 0 0 64px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.ops-bar-track {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 80px;
+  height: 14px;
+  border-radius: 4px;
+  background: var(--color-border, rgba(0, 0, 0, 0.08));
+  overflow: hidden;
+  display: flex;
+}
+.ops-bar-fresh {
+  height: 100%;
+  background: #22c55e;
+}
+.ops-bar-stale {
+  height: 100%;
+  background: #fbbf24;
+}
+.ops-babel-pct {
+  flex: 0 0 48px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+.ops-babel-summary {
+  margin-top: 0.7rem;
+  font-size: 0.82rem;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+.ops-babel-nodes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+.ops-node {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: var(--surface-glass);
+  border: 1px solid var(--color-border, rgba(0, 0, 0, 0.06));
+}
+.ops-node-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ops-node-alive {
+  background: #22c55e;
+}
+.ops-node-dead {
+  background: #ef4444;
+}
+.ops-node-counts {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+  white-space: nowrap;
+}
+.ops-node-name {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ── Incidents + deploys ── */
+.ops-incidents,
+.ops-deploys {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.ops-incident-row,
+.ops-deploy-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0;
+  font-size: 0.82rem;
+  border-bottom: 1px solid var(--color-border, rgba(0, 0, 0, 0.05));
+}
+.ops-incident-text,
+.ops-deploy-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ops-incident-ts,
+.ops-deploy-ts {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  opacity: 0.5;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ops-empty {
+  font-size: 0.85rem;
+  opacity: 0.55;
+}

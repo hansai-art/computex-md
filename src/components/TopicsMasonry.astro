@@ -1,0 +1,102 @@
+---
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import TopicCard from './TopicCard.astro';
+import {
+  getLangFromUrl,
+  useTranslations,
+  useTranslatedPath,
+} from '../i18n/utils';
+import { defaultLang } from '../i18n/ui';
+import { getCategoryConfigs } from '../utils/categoryConfig';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+const categoryConfigs = getCategoryConfigs(t);
+
+// Count articles from knowledge/ directory
+function countArticles(categorySlug: string): number {
+  const categoryMap: Record<string, string> = {
+    history: 'History',
+    geography: 'Geography',
+    culture: 'Culture',
+    food: 'Food',
+    art: 'Art',
+    music: 'Music',
+    technology: 'Technology',
+    nature: 'Nature',
+    people: 'People',
+    society: 'Society',
+    economy: 'Economy',
+    lifestyle: 'Lifestyle',
+  };
+  const dirName = categoryMap[categorySlug] || categorySlug;
+  const langDir = lang === defaultLang ? '' : lang;
+  const dirPath = path.join(process.cwd(), 'knowledge', langDir, dirName);
+  try {
+    const files = fs.readdirSync(dirPath);
+    return files.filter((f) => f.endsWith('.md') && !f.startsWith('_')).length;
+  } catch {
+    return 0;
+  }
+}
+
+const articleLabel = t('CategoryGrid.articles');
+const ctaLabel = t('CategoryGrid.explore');
+
+// Intentionally interleaved heights for visual balance across 3 columns:
+// Col 1: history(tall), food(short), technology(tall), people(short)
+// Col 2: geography(med), art(med), nature(med), society(med)
+// Col 3: culture(tall), music(short), economy(tall), lifestyle(short)
+const categories: { slug: string; height: 'tall' | 'medium' | 'short' }[] = [
+  { slug: 'history', height: 'tall' },
+  { slug: 'geography', height: 'medium' },
+  { slug: 'culture', height: 'tall' },
+  { slug: 'food', height: 'short' },
+  { slug: 'art', height: 'medium' },
+  { slug: 'music', height: 'short' },
+  { slug: 'technology', height: 'tall' },
+  { slug: 'nature', height: 'medium' },
+  { slug: 'economy', height: 'tall' },
+  { slug: 'people', height: 'short' },
+  { slug: 'society', height: 'medium' },
+  { slug: 'lifestyle', height: 'short' },
+];
+---
+
+<!--
+  Phase 4 leaf migration #8: TopicsMasonry.astro
+  ──────────────────────────────────────────────
+  - Scoped <style> block removed entirely
+  - CSS Multi-Column Layout via Tailwind utilities:
+    - columns-1 / sm:columns-2 / lg:columns-3
+    - gap-x-12 for column-gap
+    - break-inside-avoid on each item
+  - Padding uses the design token via arbitrary var() syntax
+-->
+<section
+  class="mx-auto max-w-[90rem] columns-1 gap-x-12 [padding-inline:var(--space-page-x,2rem)] sm:columns-2 lg:columns-3"
+  aria-label={t('CategoryGrid.aria-section')}
+>
+  {
+    categories.map(({ slug, height }) => {
+      const count = countArticles(slug);
+      const cfg = categoryConfigs[slug];
+      return (
+        <article class="mb-12 break-inside-avoid">
+          <TopicCard
+            slug={slug}
+            href={translatePath(`/${slug}`)}
+            name={cfg?.name ?? slug}
+            description={cfg?.description ?? ''}
+            count={count}
+            articleLabel={articleLabel}
+            ctaLabel={ctaLabel}
+            height={height}
+          />
+        </article>
+      );
+    })
+  }
+</section>

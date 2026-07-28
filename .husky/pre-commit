@@ -1,0 +1,338 @@
+# 確保 node / bun / 新版 python 在 PATH 中（husky 環境 PATH 比 shell 環境窄）。
+# Homebrew 路徑必須「前置」不是後綴：macOS 內建 /usr/bin/python3 是 3.9，
+# 而本 repo 的檢查腳本用了 `dict | None`（PEP 604，需 3.10+）。後綴會讓 3.9 先中，
+# hook 在 commit 當下才炸。Linux CI 沒有這些路徑，多加無害。
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH:$HOME/.bun/bin"
+
+# ── 多核心 git 協調：parallel-actor 快檢（胼胝體鐵律 / REFLEXES #68，local-only 不 fetch，非阻塞）──
+# 偵測到平行 babel/lang-sync writer 時提醒：husky lint-staged stash 可能跟並行 commit 撞（vc=2）。
+# 刻意只警告不擋——hard-block 會打斷無人值守的 routine commit。
+_twmd_actor="$(pgrep -f 'lang-sync|babel-handoff|i18n-translate|fleet-endpoint|remote-ollama' 2>/dev/null | tr '\n' ' ')"
+if [ -n "${_twmd_actor% }" ]; then
+  echo "🧬 pre-commit: ⚠️ 偵測到平行 writer ($_twmd_actor) — commit 後務必驗範圍："
+  echo "   bash scripts/tools/lib/verify-commit-scope.sh --head <預期檔數>（防 cross-session 污染 / phantom-delete）"
+fi
+
+bunx lint-staged
+
+# Validate frontmatter on staged .md files in knowledge/
+node scripts/core/test-frontmatter.mjs --staged
+
+# ═══ Canonical 文件 frontmatter 擋頭（2026-05-09 funny-buck-8dd2a1 新增）═══
+# per MANIFESTO §進化哲學第六條 — Frontmatter 是品質基礎建設
+# per ANATOMY §Canonical 文件 frontmatter (schema spec)
+#
+# Scope: docs/semiont/, docs/pipelines/, docs/editorial/, docs/factory/ (top-level
+# canonical 檔，不含 memory/ diary/ SPORE-BLUEPRINTS/ SPORE-HARVESTS/) + bootloader
+# (BECOME_TAIWANMD.md / CLAUDE.md)。
+#
+# Verify: 必填七欄齊全 + type/status/apoptosis enum 合法 + archived 三欄一致。
+python3 scripts/tools/check-canonical-frontmatter.py --staged --quiet
+canonical_fm_exit=$?
+if [ "$canonical_fm_exit" != "0" ]; then
+  echo ""
+  echo "💡 Canonical 文件 frontmatter 規範違反"
+  echo "   Schema: docs/semiont/ANATOMY.md §Canonical 文件 frontmatter"
+  echo "   哲學:   docs/semiont/MANIFESTO.md §進化哲學第六條"
+  echo "   全站健檢: python3 scripts/tools/check-canonical-frontmatter.py --all"
+  exit 1
+fi
+
+# ═══ Index row 長度尺（2026-07-05 dna-audit S5 殼核不對稱修補）═══
+# MEMORY.md / DIARY.md 最新 index row 長度 gate（只 enforce 最新列，歷史層不回頭改）
+# per MEMORY-PIPELINE §Index row 寫法 + DIARY-PIPELINE Stage 5 gate
+staged_files=$(git diff --cached --name-only)
+if echo "$staged_files" | grep -q "^docs/semiont/MEMORY.md$"; then
+  python3 scripts/tools/memory-index-lint.py || exit 1
+fi
+if echo "$staged_files" | grep -q "^docs/semiont/DIARY.md$"; then
+  python3 scripts/tools/memory-index-lint.py --diary || exit 1
+fi
+
+# ═══ translatedFrom 強制檢查（2026-04-14 η 新增）═══
+# 規則：所有非 zh-TW 翻譯檔的 frontmatter 必須有 translatedFrom 欄位
+# 為什麼：file-level SSOT 比中央 _translations.json 更可靠
+#   - 即使 _translations.json 漏條目，文件本身仍知道來源
+#   - 重命名原文時可以立即偵測哪些翻譯變孤兒
+#   - 不需要查中央表 = self-documentation
+staged_translations=$(git diff --cached --name-only --diff-filter=AM | grep -E '^knowledge/(en|ja|ko|es|fr)/.*\.md$' || true)
+if [ -n "$staged_translations" ]; then
+  tf_fail=0
+  for f in $staged_translations; do
+    [[ "$(basename "$f")" == _* ]] && continue
+    [ ! -f "$f" ] && continue
+    # Check frontmatter for translatedFrom
+    if ! awk '/^---$/{n++; next} n==1{print} n>=2{exit}' "$f" | grep -q '^translatedFrom:'; then
+      echo "❌ $f: 缺 translatedFrom 欄位"
+      echo "   範例: translatedFrom: 'Music/原中文檔名.md'"
+      tf_fail=1
+    fi
+  done
+  if [ "$tf_fail" = "1" ]; then
+    echo ""
+    echo "💡 翻譯檔必須在 frontmatter 標明來源中文檔，避免成為孤兒"
+    echo "   詳見: docs/community/LANGUAGE-STATUS.md §Orphan prevention"
+    echo "   跳過此檢查（緊急修復）: git commit --no-verify"
+    exit 1
+  fi
+fi
+
+# ═══ frontmatter-format auto-fix on staged (2026-05-08 #884 root-cause fix) ═══
+# Solves the 5/7 #884 conflict storm: when main runs frontmatter formatter
+# bulk repair, all in-flight contributor PRs become CONFLICTING because their
+# frontmatter style differs (list-mode tags / category-after-tags / quoted
+# dates / etc.).
+#
+# By auto-fixing staged knowledge/*.md frontmatter at commit time, contributor
+# branches stay in canonical format from the start — no future bulk repair
+# can produce conflicts because everyone's already in the same shape.
+#
+# Fixes applied (canonical per REWRITE-PIPELINE Stage 4):
+# - Reorder fields per CANONICAL_ORDER (title/desc/date/category/tags/...)
+# - Convert list-mode tags `tags:\n  - a` → flow `tags: ['a']`
+# - Quote unquoted scalars: `category: Society` → `category: 'Society'`
+# - Convert double-quoted to single-quoted (no escapes)
+# - Unquote dates and bools that have stray quotes
+# - Add missing canonical fields with safe defaults
+#
+# If fix() actually modifies a file, we re-stage it so the commit reflects
+# the canonical version. Contributors see one harmless re-staging step
+# instead of fighting bulk repair conflicts later.
+staged_md=$(git diff --cached --name-only --diff-filter=ACM | grep '^knowledge/.*\.md$' | grep -vE '^knowledge/(en|ja|ko|es|fr)/' || true)
+if [ -n "$staged_md" ]; then
+  fix_output=$(python3 scripts/tools/article-health.py --staged --check=frontmatter-format --fix 2>&1)
+  fixed_count=$(echo "$fix_output" | grep -oE 'Modified [0-9]+ file' | grep -oE '[0-9]+' | head -1 || echo "0")
+  if [ -n "$fixed_count" ] && [ "$fixed_count" != "0" ]; then
+    echo "🔧 Auto-fixed frontmatter format on $fixed_count staged file(s); re-staging..."
+    echo "$staged_md" | xargs -I {} git add {}
+  fi
+fi
+
+# ═══ article-health SSOT — pre-commit hard gate (2026-05-04 Phase 10) ═══
+# 11-plugin SSOT 入口跑 staged zh-TW knowledge/*.md.
+# Plugins covered (per scripts/tools/article-health.config.toml `pre-commit`
+# profile): cjk-punct / frontmatter-title / footnote-format /
+# wikilink-target / format-structure.
+# 取代了原本散在各處的 inline checks (wikilink list-residual / wikilink-validate /
+# footnote-format regex / cjk-punct.py). Per SSOT design (reports/
+# article-health-ssot-design-2026-05-04.md), promotes the 30-day shadow-run
+# observation period to canonical hard gate.
+if [ -n "$staged_md" ]; then
+  if ! python3 scripts/tools/article-health.py --staged --profile=pre-commit --quiet; then
+    echo ""
+    echo "💡 看明細：python3 scripts/tools/article-health.py --staged --profile=pre-commit"
+    echo "   單檢查：python3 scripts/tools/article-health.py --staged --check=<name>"
+    echo "   自動修復 (cjk-punct only)：python3 scripts/tools/check-cjk-punct.py --fix knowledge/...md"
+    echo "   跳過此檢查（緊急修復）：git commit --no-verify"
+    exit 1
+  fi
+fi
+
+# ═══ 翻譯 slug 一致性（2026-07-17 新增）═══
+# 翻譯檔名必須與 en sibling 相同（en slug = canonical）。巴別塔模型自作主張
+# 取名累積 98 檔漂移 → hreflang / 切換器死鏈土壤，歷史已清償（unify-translation-
+# slugs.py），本 gate 防再犯。
+if echo "$staged_md" | grep -qE '^knowledge/(ja|ko|es|fr)/'; then
+  if ! python3 scripts/tools/check-slug-consistency.py --staged; then
+    exit 1
+  fi
+fi
+
+# MANIFESTO §11 書寫節制 enforcement 已併入 SSOT pre-commit（prose-health
+# Tier 1-3 在 release-pr profile 跑全 sweep；HARD violations 也會在 SSOT
+# pre-commit gate 上方被擋）。2026-05-04 cleanup-1-4 刪除原 check-manifesto-11.sh
+# 獨立 warn-mode 區塊（grandfathered 殘留違反產生的雜訊已 by-design 不擋 commit，
+# 移到 polish 階段 / REWRITE Stage 3 / DIARY-PIPELINE Stage 3 dedicated review 跑
+# `python3 scripts/tools/article-health.py <file> --check=prose-health` 處理）。
+
+# ═══ Language registry sync check（2026-04-14 η 新增）═══
+# src/config/languages.ts 和 .mjs 必須保持 code 列表同步
+if echo "$staged_any" | grep -qE 'src/config/languages\.(ts|mjs)$'; then
+  if ! bash scripts/tools/check-language-registry-sync.sh; then
+    echo ""
+    echo "💡 編輯 languages.ts 時記得同步編輯 languages.mjs（反之亦然）"
+    exit 1
+  fi
+fi
+
+# ═══ Hardcoded language array detector（2026-04-25 β7 新增）═══
+# 對應 i18n-evolution-roadmap audit B6：違反 LANGUAGES_REGISTRY SSOT
+# 任何 ['en','ja','ko'] 等 hardcoded 語言清單 → 改從 LANGUAGES 動態 derive
+# 警告模式：找到 = exit 1，需明確處理才能 commit
+staged_lang_files=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null \
+  | grep -E '\.(ts|tsx|mjs|cjs|js|astro|sh)$' \
+  | grep -vE '(node_modules|dist|src/config/languages\.|scripts/tools/check-hardcoded-langs)' \
+  || true)
+if [ -n "$staged_lang_files" ]; then
+  if ! bash scripts/tools/check-hardcoded-langs.sh --staged; then
+    echo ""
+    echo "💡 對應 reports/i18n-evolution-roadmap-2026-04-25.md §B6"
+    echo "  跳過此檢查（緊急修復）：git commit --no-verify"
+    exit 1
+  fi
+fi
+
+# ═══ RTL-safe CSS detector（2026-07-26 ar RTL 排版工程新增）═══
+# ar 是站上第一個 RTL 語言（2026-07-25 出生）。`dir="rtl"` 只翻文字流向與
+# grid/flex 主軸，physical 方向屬性（margin-left / border-left /
+# text-align: left / left: / Tailwind pl- ml- border-l text-left）不會鏡像。
+# 症狀只在 /ar/ 現形（色軌跑到行尾、清單兩邊都縮排、進度條反向長），
+# LTR 頁面看起來完全正常 → 肉眼 review 抓不到，必須靠這道 gate。
+# 受守護清單是該 script 的 SURFACE array，清乾淨一個檔就加進去。
+# 找到 = exit 1，需明確處理才能 commit
+if ! bash scripts/tools/check-rtl-safe-css.sh --staged; then
+  echo ""
+  echo "💡 對應 reports/language-birth-2026-07-25.md §RTL findings"
+  echo "  跳過此檢查（緊急修復）：git commit --no-verify"
+  exit 1
+fi
+
+# ═══ Narrative scope pollution detector（2026-04-11 session α）═══
+# 同一個 commit 理論上只該動一個 narrative domain。多 domain 通常表示
+# 並行 agent 互相污染。警告模式（不擋），要求 commit message 聲明。
+# 詳見 docs/semiont/SESSION-SCOPE.md
+staged_for_scope=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null || true)
+if [ -n "$staged_for_scope" ]; then
+  domains_touched=""
+  while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    case "$f" in
+      knowledge/*)                         d="content-ssot" ;;
+      src/content/*)                       d="content-mirror" ;;
+      docs/semiont/*)                      d="cognitive" ;;
+      docs/pipelines/*|docs/editorial/*|docs/prompts/*|docs/factory/*|docs/community/*|docs/taxonomy/*|docs/design/*|docs/refactor/*) d="pipelines" ;;
+      scripts/*|.husky/*)                  d="tooling" ;;
+      .github/*)                           d="ci" ;;
+      data/*)                              d="data" ;;
+      public/api/*|src/data/*.json|scripts/tools/.quality-baseline.json) d="build-output" ;;
+      public/*)                            d="public" ;;
+      src/*|astro.config.mjs|package.json|tsconfig.json|CHANGELOG.md|VERSION) d="code" ;;
+      *)                                   d="other" ;;
+    esac
+    case " $domains_touched " in
+      *" $d "*) ;;
+      *) domains_touched="$domains_touched $d" ;;
+    esac
+  done <<< "$staged_for_scope"
+
+  # 排除 build-output 後算 domain 數
+  non_auto=$(echo "$domains_touched" | tr ' ' '\n' | grep -v '^$' | grep -v '^build-output$' | sort -u)
+  domain_count=$(printf '%s\n' "$non_auto" | grep -c . 2>/dev/null || echo 0)
+
+  if [ "$domain_count" -ge 2 ]; then
+    # 檢查 commit message 是否已聲明 multi-narrative
+    msg_ok=0
+    for msg_file in .git/COMMIT_EDITMSG .git/MERGE_MSG; do
+      [ -f "$msg_file" ] && grep -qiE 'multi-narrative|cross-domain' "$msg_file" && msg_ok=1
+    done
+
+    if [ "$msg_ok" = "0" ]; then
+      echo ""
+      echo "⚠️  NARRATIVE SCOPE WARNING"
+      echo "   這個 commit 橫跨 $domain_count 個 narrative domain:"
+      for d in $non_auto; do echo "     - $d"; done
+      echo ""
+      echo "   通常表示並行 agent 的修改意外被擠進同一個 commit。"
+      echo "   如果是誤觸：取消後 git reset 然後分批 commit"
+      echo "   如果是刻意：commit message 加入 'multi-narrative:' 或 'cross-domain:' 聲明"
+      echo "   緊急繞過：git commit --no-verify（會在 reflog 留痕）"
+      echo "   詳見 docs/semiont/SESSION-SCOPE.md"
+      echo ""
+      # 警告模式 — 不 exit 1，讓 agent 自己決定
+    fi
+  fi
+fi
+
+# ═══ 憑證外洩防護（2026-04-11 session α）═══════
+# 掃描 staged 檔案的 credential pattern。這是 .gitignore 之外的第二層防護——
+# 即使 .gitignore 漏設或有人 git add -f，這裡會擋下
+staged_any=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null || true)
+if [ -n "$staged_any" ]; then
+  cred_fail=0
+  for f in $staged_any; do
+    [ ! -f "$f" ] && continue
+    # Skip binary files
+    case "$f" in
+      *.png|*.jpg|*.jpeg|*.gif|*.webp|*.pdf|*.zip|*.woff*|*.ttf|*.otf|*.ico|*.mp4|*.mp3) continue ;;
+    esac
+    # Google service account JSON
+    if grep -l '"type":[[:space:]]*"service_account"' "$f" > /dev/null 2>&1; then
+      echo "🔴 CREDENTIAL LEAK: $f 看起來是 Google service account JSON"
+      cred_fail=1
+    fi
+    # Private key (PEM)
+    if grep -lE 'BEGIN (RSA )?PRIVATE KEY' "$f" > /dev/null 2>&1; then
+      echo "🔴 CREDENTIAL LEAK: $f 含 private key"
+      cred_fail=1
+    fi
+    # Google API Key (AIza...)
+    if grep -lE 'AIza[0-9A-Za-z_-]{35}' "$f" > /dev/null 2>&1; then
+      echo "🔴 CREDENTIAL LEAK: $f 含可疑的 Google API key (AIza…)"
+      cred_fail=1
+    fi
+    # Cloudflare API token 寫在 = 後面 (40 char base62)
+    if grep -lE '(CF|CLOUDFLARE)_(API_)?TOKEN[[:space:]]*=[[:space:]]*["'"'"']?[A-Za-z0-9_-]{40,}' "$f" > /dev/null 2>&1; then
+      echo "🔴 CREDENTIAL LEAK: $f 含可疑的 Cloudflare API token"
+      cred_fail=1
+    fi
+    # Stripe/OpenAI-style sk_live
+    if grep -lE '(sk|pk)_(live|test)_[A-Za-z0-9]{24,}' "$f" > /dev/null 2>&1; then
+      echo "🔴 CREDENTIAL LEAK: $f 含可疑的 sk_/pk_ API key"
+      cred_fail=1
+    fi
+  done
+  if [ "$cred_fail" = "1" ]; then
+    echo ""
+    echo "🚨 發現可能的憑證洩漏。正確的憑證位置是 ~/.config/taiwan-md/credentials/"
+    echo "   如果是 example/fixture，確認沒有真實 token 後用 --no-verify 通過"
+    exit 1
+  fi
+fi
+
+# ═══ SPORE-LOG URL 硬鐵律檢查（2026-04-18 δ-late 新增）═══
+# 規則：SPORE-LOG.md 新增的孢子列（非空白歷史 row）必須含 URL
+# 為什麼：缺 URL = 未來 harvest 無法跑 = 孢子成效追蹤永久失效
+# 教訓觸發：#1/#2/#3/#12 歷史孢子無 URL → batch harvest 時發現已永久失去追蹤能力
+# SOP canonical：docs/factory/SPORE-HARVEST-PIPELINE.md Step 1
+#
+# 2026-05-04 zen-mendeleev fix：原版只看 `+` 行，prettier auto-format 整個
+# table 時所有 row 都會以 `+/-` pair 重寫一次，誤判已存在 row 為新增。
+# 改成「比對 spore # 是否在 HEAD 已存在」— 已存在的 # 屬於 reformat，跳過；
+# 只有 # 全新才 enforce URL。
+if git diff --cached --name-only | grep -q "^docs/factory/SPORE-LOG.md$"; then
+  # Build set of spore # 在 HEAD 已存在（reformatted rows 不該被 flag）
+  head_nums=$(git show HEAD:docs/factory/SPORE-LOG.md 2>/dev/null \
+    | grep -E '^\|[[:space:]]*[0-9]+[[:space:]]*\|' \
+    | awk -F'\\|' '{ n=$2; gsub(/[[:space:]]/,"",n); print n }' \
+    | sort -u \
+    | tr '\n' ' ')
+  # 抓剛 staged 的新增行（僅加號行，排除 diff header）
+  # 目標：發文紀錄 table row 若含日期(YYYY-MM-DD) + 平台(Threads|X|...)
+  # 但 URL 欄位是 `—` / 空白 / no-data 且該 # **不在** HEAD set → 擋下
+  added_bad=$(git diff --cached --unified=0 docs/factory/SPORE-LOG.md \
+    | grep -E '^\+\|[[:space:]]*[0-9]+[[:space:]]*\|' \
+    | grep -E '\|[[:space:]]*(Threads|X|threads|x)[[:space:]]*\|' \
+    | awk -F'\\|' -v head_nums=" $head_nums " '
+        {
+          n = $2; gsub(/[[:space:]]/, "", n);
+          if (index(head_nums, " " n " ")) next;  # already in HEAD = reformat, skip
+          for (i = NF; i >= 1; i--) {
+            url = $i;
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "", url);
+            if (url != "") break;
+          }
+          if (url == "—" || url == "-" || url == "no-data" || url == "no-url") print $0
+        }' \
+    || true)
+  if [ -n "$added_bad" ]; then
+    echo ""
+    echo "🔴 SPORE-LOG 硬鐵律違反：發文紀錄缺 URL（以下列待處理）"
+    echo "$added_bad"
+    echo ""
+    echo "💡 規則：每則孢子發布紀錄必須含 [→](https://www.threads.com/...) 或 [→](https://x.com/...)"
+    echo "   缺 URL = 未來 harvest 追蹤能力永久失效（canonical: docs/factory/SPORE-HARVEST-PIPELINE.md）"
+    echo "   若此列暫無 URL 待補 → 先別 commit 這行，等拿到 URL 再寫入"
+    echo "   若是歷史資料遷移（SSOT backfill）→ git commit --no-verify + diary 說明"
+    exit 1
+  fi
+fi

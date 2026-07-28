@@ -1,0 +1,913 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import {
+  getLangFromUrl,
+  useTranslations,
+  useTranslatedPath,
+} from '../i18n/utils';
+import {
+  getCompanyConfigs,
+  getFellOffCompanies,
+  sectorColors,
+} from '../utils/dataConfig';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+// Centralized SSOT — shared with the /data 企業地圖 teaser section
+const companies = getCompanyConfigs(t);
+const fellOff = getFellOffCompanies(t);
+const sectors = [...new Set(companies.map((c) => c.sector))];
+---
+
+<Layout
+  lang={lang}
+  title={t('data.companies.meta.title')}
+  description={t('data.companies.meta.description')}
+  readerSettings={true}
+>
+  <main
+    class="companies-page min-h-screen bg-[image:var(--surface-panel-dark)] text-[#e2e8f0]"
+  >
+    <PageHero
+      bgTone="dark"
+      titleVariant="gradient"
+      titleGradient="linear-gradient(135deg,#38bdf8,#818cf8,#c084fc)"
+      titleSize="clamp"
+      containerWidth="wide"
+      title={t('data.companies.hero.title')}
+      subtitle={t('data.companies.hero.subtitle')}
+    >
+      <p
+        class="mx-auto mt-4 max-w-[640px] text-base leading-[1.7] text-[#cbd5e1]"
+      >
+        {t('data.companies.hero.description')}
+      </p>
+      <p
+        class="mx-auto mt-3 max-w-[640px] text-[0.8rem] leading-[1.6] text-[#94a3b8]"
+      >
+        {t('data.companies.snapshot')}
+      </p>
+    </PageHero>
+
+    <!-- Story: the AI repricing -->
+    <section class="story-intro">
+      <h2 class="section-title">{t('data.companies.story.title')}</h2>
+      <div class="story-text">
+        <p>{t('data.companies.story.p1')}</p>
+        <p>{t('data.companies.story.p2')}</p>
+      </div>
+    </section>
+
+    <!-- Bubble chart controls -->
+    <div
+      class="mx-auto mb-6 flex max-w-[var(--container-wide)] flex-col gap-4 px-8"
+    >
+      <div
+        class="flex flex-wrap items-center gap-2 [&>label]:text-[0.9rem] [&>label]:font-semibold [&>label]:text-[#94a3b8]"
+      >
+        <label>{t('data.enterprise.controls.sizeLabel')}</label>
+        <button class="toggle-btn active" data-mode="marketCap">
+          {t('data.enterprise.controls.marketCap')}
+        </button>
+        <button class="toggle-btn" data-mode="revenue">
+          {t('data.enterprise.controls.revenue')}
+        </button>
+        <button class="toggle-btn" data-mode="employees">
+          {t('data.enterprise.controls.employees')}
+        </button>
+      </div>
+      <div class="flex flex-wrap gap-[0.4rem]">
+        <button class="sector-btn active" data-sector="all">
+          {t('data.enterprise.controls.filterAll')}
+        </button>
+        {
+          sectors.map((s) => (
+            <button
+              class="sector-btn"
+              data-sector={s}
+              style={`--sector-color: ${sectorColors[s] || '#888'}`}
+            >
+              <span
+                class="sector-dot"
+                style={`background: ${sectorColors[s] || '#888'}`}
+              />
+              {t(`data.sector.${s}`)}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Bubble chart -->
+    <div id="bubble-chart"></div>
+
+    <!-- Key insights -->
+    <div class="insights">
+      <h2 class="insights-heading">{t('data.companies.insights.heading')}</h2>
+      <div class="insight-grid">
+        <div class="insight-card">
+          <div class="insight-number">
+            {t('data.companies.insights.card1.number')}
+          </div>
+          <div class="insight-label">
+            {t('data.companies.insights.card1.label')}
+          </div>
+          <div class="insight-detail">
+            {t('data.companies.insights.card1.detail')}
+          </div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-number">
+            {t('data.companies.insights.card2.number')}
+          </div>
+          <div class="insight-label">
+            {t('data.companies.insights.card2.label')}
+          </div>
+          <div class="insight-detail">
+            {t('data.companies.insights.card2.detail')}
+          </div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-number">
+            {t('data.companies.insights.card3.number')}
+          </div>
+          <div class="insight-label">
+            {t('data.companies.insights.card3.label')}
+          </div>
+          <div class="insight-detail">
+            {t('data.companies.insights.card3.detail')}
+          </div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-number">
+            {t('data.companies.insights.card4.number')}
+          </div>
+          <div class="insight-label">
+            {t('data.companies.insights.card4.label')}
+          </div>
+          <div class="insight-detail">
+            {t('data.companies.insights.card4.detail')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full ranking table — the machine-readable SSOT behind the bubbles -->
+    <section class="table-section">
+      <h2 class="section-title">{t('data.companies.table.heading')}</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>{t('data.companies.table.rank')}</th>
+              <th>{t('data.companies.table.company')}</th>
+              <th>{t('data.companies.table.sector')}</th>
+              <th class="num">{t('data.companies.table.marketCap')}</th>
+              <th class="num">{t('data.companies.table.revenue')}</th>
+              <th class="num">{t('data.companies.table.employees')}</th>
+              <th class="num">{t('data.companies.table.founded')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              companies.map((c, i) => (
+                <tr>
+                  <td>{i + 1}</td>
+                  <td>
+                    {c.articleUrl ? (
+                      <a
+                        href={translatePath(c.articleUrl)}
+                        class="company-link"
+                      >
+                        {c.name}
+                      </a>
+                    ) : (
+                      <strong>{c.name}</strong>
+                    )}
+                    <span class="ticker">{c.ticker}</span>
+                  </td>
+                  <td>
+                    <span
+                      class="sector-tag"
+                      style={`background: ${sectorColors[c.sector] || '#888'}22; color: ${sectorColors[c.sector] || '#888'}; border: 1px solid ${sectorColors[c.sector] || '#888'}55`}
+                    >
+                      {t(`data.sector.${c.sector}`)}
+                    </span>
+                  </td>
+                  <td class="num">{c.marketCap.toLocaleString()}</td>
+                  <td class="num">{c.revenue.toLocaleString()}</td>
+                  <td class="num">{c.employees.toLocaleString()}</td>
+                  <td class="num">{c.founded}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Who fell off -->
+    <section class="felloff-section">
+      <h2 class="section-title">{t('data.companies.fellOff.title')}</h2>
+      <div class="story-text felloff-intro">
+        <p>{t('data.companies.fellOff.intro')}</p>
+      </div>
+      <div class="felloff-grid">
+        {
+          fellOff.map((c) => (
+            <div class="felloff-card">
+              <div class="felloff-head">
+                <span class="felloff-name">{c.name}</span>
+                <span class="ticker">{c.ticker}</span>
+              </div>
+              <div class="felloff-cap">
+                <span class="felloff-cap-label">
+                  {t('data.companies.fellOff.marketCapNow')}
+                </span>
+                <span class="felloff-cap-value">
+                  {c.marketCapNow.toLocaleString()}{' '}
+                  <span class="felloff-cap-unit">億</span>
+                </span>
+              </div>
+              <p class="felloff-reason">{c.reason}</p>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Method note -->
+    <section class="method-section">
+      <div class="method-box">
+        <h3>{t('data.companies.method.heading')}</h3>
+        <p>{t('data.companies.method.body')}</p>
+      </div>
+    </section>
+
+    <!-- Related -->
+    <footer class="related-footer">
+      <h3 class="related-title">{t('data.companies.related')}</h3>
+      <div class="related-links">
+        <a href={translatePath('/data')} class="related-link">
+          <span class="related-icon">📊</span>
+          <span>{t('nav.data')}</span>
+        </a>
+        <a href={translatePath('/economy')} class="related-link">
+          <span class="related-icon">📈</span>
+          <span>{t('categoryConfig.economy')}</span>
+        </a>
+        <a href={translatePath('/graph')} class="related-link">
+          <span class="related-icon">🕸️</span>
+          <span>{t('nav.graph-view')}</span>
+        </a>
+      </div>
+    </footer>
+  </main>
+
+  <!-- D3 Bubble Chart -->
+  <script define:vars={{ companies, sectorColors, lang }}>
+    const data = companies;
+    const colors = sectorColors;
+    const currentLang = lang;
+
+    const script = document.createElement('script');
+    script.src = 'https://d3js.org/d3.v7.min.js';
+    script.onload = () => initBubbleChart(data, colors, currentLang);
+    document.head.appendChild(script);
+
+    function initBubbleChart(data, colors, lang) {
+      const container = document.getElementById('bubble-chart');
+      const width = container.clientWidth;
+      const height = Math.max(560, window.innerHeight * 0.6);
+
+      let currentMode = 'marketCap';
+      let currentSector = 'all';
+
+      const svg = d3
+        .select('#bubble-chart')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .attr('viewBox', `0 0 ${width} ${height}`);
+
+      const tooltip = d3
+        .select('#bubble-chart')
+        .append('div')
+        .attr('class', 'tooltip')
+        .style('opacity', 0);
+
+      function getValue(d) {
+        return d[currentMode] || 0;
+      }
+
+      function getRadius(d) {
+        const val = getValue(d);
+        const maxVal = d3.max(data, getValue);
+        const minR = 13;
+        const maxR = Math.min(width, height) * 0.16;
+        return minR + (maxR - minR) * Math.sqrt(val / maxVal);
+      }
+
+      const simulation = d3
+        .forceSimulation(data)
+        .force('center', d3.forceCenter(width / 2, height / 2))
+        .force('charge', d3.forceManyBody().strength(3))
+        .force(
+          'collision',
+          d3
+            .forceCollide()
+            .radius((d) => getRadius(d) + 1.5)
+            .strength(0.85),
+        )
+        .force('x', d3.forceX(width / 2).strength(0.05))
+        .force('y', d3.forceY(height / 2).strength(0.05));
+
+      const nodes = svg
+        .selectAll('g.node')
+        .data(data)
+        .join('g')
+        .attr('class', 'node')
+        .call(
+          d3
+            .drag()
+            .on('start', (e, d) => {
+              if (!e.active) simulation.alphaTarget(0.3).restart();
+              d.fx = d.x;
+              d.fy = d.y;
+            })
+            .on('drag', (e, d) => {
+              d.fx = e.x;
+              d.fy = e.y;
+            })
+            .on('end', (e, d) => {
+              if (!e.active) simulation.alphaTarget(0);
+              d.fx = null;
+              d.fy = null;
+            }),
+        );
+
+      const circles = nodes
+        .append('circle')
+        .attr('r', (d) => getRadius(d))
+        .attr('fill', (d) => colors[d.sector] || '#888')
+        .attr('fill-opacity', 0.82)
+        .attr('stroke', (d) => colors[d.sector] || '#888')
+        .attr('stroke-width', 2)
+        .attr('stroke-opacity', 0.3)
+        .style('cursor', 'grab');
+
+      const labels = nodes
+        .append('text')
+        .attr('text-anchor', 'middle')
+        .attr('dominant-baseline', 'central')
+        .attr('fill', '#fff')
+        .attr('font-weight', '600')
+        .attr('pointer-events', 'none');
+
+      function metricUnit() {
+        if (currentMode === 'employees') return lang === 'zh-TW' ? ' 人' : '';
+        return lang === 'zh-TW' ? ' 億' : 'B';
+      }
+
+      // Redraw each label from the CURRENT mode/sector. Labels used to be
+      // drawn once at init, so switching the size metric (市值/營收/員工數)
+      // or a sector left the old market-cap number frozen on a resized
+      // bubble, so the value stopped matching the bubble it sat on (#1223).
+      function renderLabels() {
+        labels.each(function (d) {
+          const el = d3.select(this);
+          el.selectAll('tspan').remove();
+          el.text(null);
+          if (currentSector !== 'all' && d.sector !== currentSector) return;
+          const r = getRadius(d);
+          const shortName = d.name.split(' ')[0];
+          if (r > 40) {
+            el.append('tspan')
+              .attr('x', 0)
+              .attr('dy', '-0.3em')
+              .attr('font-size', `${Math.min(13, r / 4)}px`)
+              .text(shortName);
+            el.append('tspan')
+              .attr('x', 0)
+              .attr('dy', '1.2em')
+              .attr('font-size', `${Math.min(10, r / 5)}px`)
+              .attr('fill-opacity', 0.8)
+              .text(getValue(d).toLocaleString() + metricUnit());
+          } else if (r > 20) {
+            el.attr('font-size', `${Math.min(10, r / 3)}px`).text(shortName);
+          } else {
+            el.attr('font-size', '8px').text(shortName.slice(0, 2));
+          }
+        });
+      }
+
+      renderLabels();
+
+      const tooltipData = {
+        marketCap: lang === 'zh-TW' ? '市值' : 'Market Cap',
+        revenue: lang === 'zh-TW' ? '營收' : 'Revenue',
+        employees: lang === 'zh-TW' ? '員工' : 'Employees',
+        founded: lang === 'zh-TW' ? '成立' : 'Founded',
+        unit: lang === 'zh-TW' ? '億 TWD' : '億 TWD',
+        people: lang === 'zh-TW' ? '人' : '',
+        year: lang === 'zh-TW' ? '年' : '',
+        link: lang === 'zh-TW' ? '→ 看公司條目' : '→ Read article',
+      };
+
+      nodes
+        .on('mouseover', (e, d) => {
+          tooltip.transition().duration(200).style('opacity', 1);
+          tooltip
+            .html(
+              `
+            <strong>${d.name}</strong><br/>
+            <span style="color:${colors[d.sector] || '#888'}">● ${d.ticker}</span><br/>
+            ${tooltipData.marketCap}：${d.marketCap.toLocaleString()} ${tooltipData.unit}<br/>
+            ${tooltipData.revenue}：${d.revenue.toLocaleString()} ${tooltipData.unit}<br/>
+            ${tooltipData.employees}：${d.employees.toLocaleString()} ${tooltipData.people}<br/>
+            ${tooltipData.founded}：${d.founded} ${tooltipData.year}
+            ${d.articleUrl ? `<br/><span style="color:#7dd3fc">${tooltipData.link}</span>` : ''}
+          `,
+            )
+            .style('left', e.pageX + 15 + 'px')
+            .style('top', e.pageY - 10 + 'px');
+          d3.select(e.currentTarget)
+            .select('circle')
+            .attr('fill-opacity', 1)
+            .attr('stroke-width', 3);
+        })
+        .on('mouseout', (e) => {
+          tooltip.transition().duration(300).style('opacity', 0);
+          d3.select(e.currentTarget)
+            .select('circle')
+            .attr('fill-opacity', 0.82)
+            .attr('stroke-width', 2);
+        })
+        .on('click', (e, d) => {
+          e.stopPropagation();
+          if (d.articleUrl) {
+            const prefix = currentLang === 'zh-TW' ? '' : '/' + currentLang;
+            window.location.href = prefix + d.articleUrl;
+          }
+        })
+        .style('cursor', (d) => (d.articleUrl ? 'pointer' : 'grab'));
+
+      simulation.on('tick', () => {
+        nodes.attr('transform', (d) => {
+          d.x = Math.max(getRadius(d), Math.min(width - getRadius(d), d.x));
+          d.y = Math.max(getRadius(d), Math.min(height - getRadius(d), d.y));
+          return `translate(${d.x},${d.y})`;
+        });
+      });
+
+      document.querySelectorAll('.toggle-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document
+            .querySelectorAll('.toggle-btn')
+            .forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentMode = btn.dataset.mode;
+          updateBubbles();
+        });
+      });
+
+      document.querySelectorAll('.sector-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document
+            .querySelectorAll('.sector-btn')
+            .forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentSector = btn.dataset.sector;
+          updateBubbles();
+        });
+      });
+
+      function updateBubbles() {
+        circles
+          .transition()
+          .duration(600)
+          .attr('r', (d) => {
+            if (currentSector !== 'all' && d.sector !== currentSector) return 0;
+            return getRadius(d);
+          })
+          .attr('fill-opacity', (d) => {
+            if (currentSector !== 'all' && d.sector !== currentSector) return 0;
+            return 0.82;
+          });
+
+        // Re-render labels so the number inside each bubble matches the
+        // active size metric and the current sector filter (#1223).
+        renderLabels();
+
+        simulation
+          .force(
+            'collision',
+            d3
+              .forceCollide()
+              .radius((d) => {
+                if (currentSector !== 'all' && d.sector !== currentSector)
+                  return 0;
+                return getRadius(d) + 1.5;
+              })
+              .strength(0.85),
+          )
+          .alpha(0.6)
+          .restart();
+      }
+    }
+  </script>
+
+  <style>
+    .story-intro {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1rem 2rem 2rem;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #f8fafc;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .story-text {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 2rem;
+    }
+
+    .story-text p {
+      color: #cbd5e1;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    .story-text p:first-child {
+      font-size: 1.1rem;
+      color: #93c5fd;
+      font-weight: 600;
+    }
+
+    .story-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Bubble controls */
+    .toggle-btn {
+      padding: 0.4rem 1rem;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #cbd5e1;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .toggle-btn.active {
+      background: #3b82f6;
+      color: #fff;
+      border-color: #3b82f6;
+    }
+
+    .sector-btn {
+      padding: 0.3rem 0.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #cbd5e1;
+      cursor: pointer;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: all 0.2s;
+    }
+
+    .sector-btn.active {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.4);
+      font-weight: 600;
+    }
+
+    .sector-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    #bubble-chart {
+      position: relative;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto 1rem;
+      min-height: 560px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #1a1a2e;
+    }
+
+    #bubble-chart :global(svg) {
+      display: block;
+    }
+
+    :global(.tooltip) {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.9);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      pointer-events: none;
+      z-index: 100;
+      max-width: 280px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Insights */
+    .insights {
+      max-width: 1400px;
+      margin: 2rem auto 0;
+      padding: 0 2rem;
+    }
+
+    .insights-heading {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .insight-card {
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .insight-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #60a5fa;
+      margin-bottom: 0.3rem;
+    }
+
+    .insight-label {
+      font-weight: 600;
+      color: #e2e8f0;
+      font-size: 0.92rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .insight-detail {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    /* Ranking table */
+    .table-section {
+      max-width: 1100px;
+      margin: 4rem auto 0;
+      padding: 0 2rem;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+    }
+
+    .table-wrap table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      min-width: 640px;
+    }
+
+    .table-wrap th {
+      white-space: nowrap;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 0.7rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: #cbd5e1;
+      position: sticky;
+      top: 0;
+    }
+
+    .table-wrap th.num,
+    .table-wrap td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .table-wrap td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 0.6rem 1rem;
+      color: #e2e8f0;
+    }
+
+    .table-wrap tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .company-link {
+      color: #93c5fd;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .company-link:hover {
+      color: #bfdbfe;
+      text-decoration: underline;
+    }
+
+    .ticker {
+      color: #64748b;
+      font-size: 0.72rem;
+      margin-left: 0.4rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sector-tag {
+      display: inline-block;
+      white-space: nowrap;
+      border-radius: 10px;
+      padding: 0.12rem 0.5rem;
+      font-size: 0.72rem;
+      font-weight: 500;
+    }
+
+    /* Fell-off */
+    .felloff-section {
+      max-width: 1100px;
+      margin: 4rem auto 0;
+      padding: 0 2rem;
+    }
+
+    .felloff-intro {
+      max-width: 760px;
+      margin: 0 auto 2rem;
+    }
+
+    .felloff-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .felloff-card {
+      background: rgba(248, 113, 113, 0.06);
+      border: 1px solid rgba(248, 113, 113, 0.22);
+      border-radius: 14px;
+      padding: 1.3rem;
+    }
+
+    .felloff-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .felloff-name {
+      font-weight: 700;
+      color: #fca5a5;
+      font-size: 1.05rem;
+    }
+
+    .felloff-cap {
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .felloff-cap-label {
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
+
+    .felloff-cap-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .felloff-cap-unit {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: #94a3b8;
+    }
+
+    .felloff-reason {
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    /* Method note */
+    .method-section {
+      max-width: 900px;
+      margin: 3.5rem auto 0;
+      padding: 0 2rem;
+    }
+
+    .method-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .method-box h3 {
+      font-size: 1rem;
+      color: #cbd5e1;
+      margin-bottom: 0.6rem;
+    }
+
+    .method-box p {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    /* Related footer */
+    .related-footer {
+      max-width: 900px;
+      margin: 4rem auto 0;
+      padding: 2rem 2rem 5rem;
+      text-align: center;
+    }
+
+    .related-title {
+      font-size: 1.1rem;
+      color: #f1f5f9;
+      margin-bottom: 1.2rem;
+    }
+
+    .related-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .related-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.3rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: #e2e8f0;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .related-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .related-icon {
+      font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+      .section-title {
+        font-size: 1.5rem;
+      }
+      #bubble-chart {
+        min-height: 440px;
+      }
+    }
+  </style>
+</Layout>

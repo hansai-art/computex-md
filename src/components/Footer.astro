@@ -1,0 +1,392 @@
+---
+import { useTranslations, getLangFromUrl } from '../i18n/utils';
+import { resolveStaticHref } from '../utils/staticRoutes';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+// 2026-07-06 site-map upgrade (design audit §2.8-a P0-2):
+// Footer becomes a full site map. Links use the same existence-aware
+// href helper as Header (navHref) so pages that only exist in zh (e.g.
+// /fork-graph, /lifetree, /semiont/* subpages, /terminology/converter)
+// fall back to the zh path instead of language-prefixing into a 404.
+// translatePath (blind prefix) was retired here for that reason.
+const navHref = (p: string) => resolveStaticHref(lang, p);
+
+// ⚠️ 元件私有語言表——新語言出生不會自動出現在這裡（2026-07-25 ar/ru 開站日
+// 一次補了 vi/id/pt/hi/ar/ru 六語，前四語出生後一直掉回英文沒人發現）。
+// A handful of new site-map labels have no key in src/i18n/ui.ts (which is
+// outside this file's edit territory). They are localized inline for the six
+// supported UI langs, mirroring the existing `lang === 'zh-TW' ? … : …` idiom
+// used for the RSS label below. Falls back to en for any unlisted lang.
+const L = (m: Record<string, string>) => m[lang] ?? m.en;
+const label = {
+  dataRoom: L({
+    'zh-TW': '資料室',
+    en: 'Data',
+    ja: 'データ',
+    ko: '데이터',
+    es: 'Datos',
+    fr: 'Données',
+    vi: 'Dữ liệu',
+    id: 'Data',
+    pt: 'Dados',
+    hi: 'डेटा',
+    ar: 'البيانات',
+    ru: 'Данные',
+  }),
+  organism: L({
+    'zh-TW': '生命體',
+    en: 'Organism',
+    ja: '生命体',
+    ko: '유기체',
+    es: 'Organismo',
+    fr: 'Organisme',
+    vi: 'Cơ thể sống',
+    id: 'Organisme',
+    pt: 'Organismo',
+    hi: 'जीव',
+    ar: 'الكائن الحي',
+    ru: 'Организм',
+  }),
+  participate: L({
+    'zh-TW': '參與',
+    en: 'Participate',
+    ja: '参加',
+    ko: '참여',
+    es: 'Participar',
+    fr: 'Participer',
+    vi: 'Tham gia',
+    id: 'Berpartisipasi',
+    pt: 'Participar',
+    hi: 'भाग लें',
+    ar: 'المشاركة',
+    ru: 'Участвовать',
+  }),
+  converter: L({
+    'zh-TW': '用語轉換器',
+    en: 'Term Converter',
+    ja: '用語コンバーター',
+    ko: '용어 변환기',
+    es: 'Conversor de términos',
+    fr: 'Convertisseur de termes',
+    vi: 'Bộ chuyển đổi thuật ngữ',
+    id: 'Konverter istilah',
+    pt: 'Conversor de termos',
+    hi: 'शब्दावली परिवर्तक',
+    ar: 'محوّل المصطلحات',
+    ru: 'Конвертер терминов',
+  }),
+  companies: L({
+    'zh-TW': '台灣企業',
+    en: 'Companies',
+    ja: '台湾企業',
+    ko: '대만 기업',
+    es: 'Empresas',
+    fr: 'Entreprises',
+    vi: 'Doanh nghiệp Đài Loan',
+    id: 'Perusahaan Taiwan',
+    pt: 'Empresas',
+    hi: 'ताइवानी कंपनियाँ',
+    ar: 'الشركات التايوانية',
+    ru: 'Компании Тайваня',
+  }),
+  forkGraph: L({
+    'zh-TW': '語言分支樹',
+    en: 'Language Branch Tree',
+    ja: '言語分岐ツリー',
+    ko: '언어 분기 트리',
+    es: 'Árbol de ramas lingüísticas',
+    fr: 'Arbre des branches linguistiques',
+    vi: 'Cây nhánh ngôn ngữ',
+    id: 'Pohon cabang bahasa',
+    pt: 'Árvore de ramificações linguísticas',
+    hi: 'भाषा शाखा वृक्ष',
+    ar: 'شجرة فروع اللغات',
+    ru: 'Дерево языковых ветвей',
+  }),
+  lifetree: L({
+    'zh-TW': '生命樹',
+    en: 'Life Tree',
+    ja: '人生の樹',
+    ko: '생명 나무',
+    es: 'Árbol de la vida',
+    fr: 'Arbre de vie',
+    vi: 'Cây sự sống',
+    id: 'Pohon kehidupan',
+    pt: 'Árvore da vida',
+    hi: 'जीवन वृक्ष',
+    ar: 'شجرة الحياة',
+    ru: 'Древо жизни',
+  }),
+  anatomy: L({
+    'zh-TW': '解剖圖',
+    en: 'Anatomy',
+    ja: '解剖図',
+    ko: '해부도',
+    es: 'Anatomía',
+    fr: 'Anatomie',
+    vi: 'Sơ đồ giải phẫu',
+    id: 'Anatomi',
+    pt: 'Anatomia',
+    hi: 'शरीर-रचना',
+    ar: 'التشريح',
+    ru: 'Анатомия',
+  }),
+  diary: L({
+    'zh-TW': '日記',
+    en: 'Diary',
+    ja: '日記',
+    ko: '일기',
+    es: 'Diario',
+    fr: 'Journal',
+    vi: 'Nhật ký',
+    id: 'Buku harian',
+    pt: 'Diário',
+    hi: 'डायरी',
+    ar: 'اليوميات',
+    ru: 'Дневник',
+  }),
+  manifesto: L({
+    'zh-TW': '身份宣言',
+    en: 'Manifesto',
+    ja: '宣言',
+    ko: '선언',
+    es: 'Manifiesto',
+    fr: 'Manifeste',
+    vi: 'Tuyên ngôn',
+    id: 'Manifesto',
+    pt: 'Manifesto',
+    hi: 'घोषणापत्र',
+    ar: 'البيان',
+    ru: 'Манифест',
+  }),
+  // The following five reuse the same wording as the shared nav.* keys but
+  // drop the decorative emoji — design audit §2.4: structural UI positions
+  // (a footer site map) shed emoji. The nav.* keys keep their emoji for the
+  // top nav and live in src/i18n/ui.ts, outside this file's edit territory,
+  // so the emoji-free variants are inlined here instead.
+  explore: L({
+    'zh-TW': '探索',
+    en: 'Explore',
+    ja: '探索',
+    ko: '탐색',
+    es: 'Explorar',
+    fr: 'Explorer',
+    vi: 'Khám phá',
+    id: 'Jelajahi',
+    pt: 'Explorar',
+    hi: 'खोजें',
+    ar: 'استكشاف',
+    ru: 'Обзор',
+  }),
+  map: L({
+    'zh-TW': '地圖',
+    en: 'Map',
+    ja: '地図',
+    ko: '지도',
+    es: 'Mapa',
+    fr: 'Carte',
+    vi: 'Bản đồ',
+    id: 'Peta',
+    pt: 'Mapa',
+    hi: 'मानचित्र',
+    ar: 'الخريطة',
+    ru: 'Карта',
+  }),
+  soundscape: L({
+    'zh-TW': '聲景',
+    en: 'Sound',
+    ja: 'サウンドスケープ',
+    ko: '사운드스케이프',
+    es: 'Paisaje sonoro',
+    fr: 'Paysage sonore',
+    vi: 'Cảnh quan âm thanh',
+    id: 'Lanskap suara',
+    pt: 'Paisagem sonora',
+    hi: 'ध्वनि-परिदृश्य',
+    ar: 'المشهد الصوتي',
+    ru: 'Звуковой ландшафт',
+  }),
+  elections: L({
+    'zh-TW': '2026 選舉',
+    en: '2026 Election',
+    ja: '2026 統一地方選',
+    ko: '2026 지방선거',
+    es: 'Elecciones 2026',
+    fr: 'Élections 2026',
+    vi: 'Bầu cử 2026',
+    id: 'Pemilu 2026',
+    pt: 'Eleições 2026',
+    hi: 'चुनाव 2026',
+    ar: 'انتخابات 2026',
+    ru: 'Выборы 2026',
+  }),
+  semiont: L({
+    'zh-TW': '生命體',
+    en: 'Semiont',
+    ja: '生命体',
+    ko: '세미온트',
+    es: 'Semionte',
+    fr: 'Sémionte',
+    vi: 'Semiont',
+    id: 'Semiont',
+    pt: 'Semionte',
+    hi: 'सेमियोन्ट',
+    ar: 'سيميونت',
+    ru: 'Семионт',
+  }),
+  rss: lang === 'zh-TW' ? 'RSS 訂閱' : 'RSS',
+};
+
+// Shared class chains (kept as consts so the four nav columns stay identical
+// and the file reads as a site map, not four copies of the same Tailwind wall).
+const COL_CLASS =
+  "flex flex-col gap-[0.4rem] [&>a]:relative [&>a]:py-1 [&>a]:text-[0.85rem] [&>a]:text-[#94a3b8] [&>a]:no-underline [&>a]:transition-all [&>a]:duration-200 [&>a]:ease [&>a:hover]:text-[#e2e8f0] [&>a:hover]:after:absolute [&>a:hover]:after:bottom-0 [&>a:hover]:after:inset-x-0 [&>a:hover]:after:h-px [&>a:hover]:after:bg-[#a7c7a7] [&>a:hover]:after:opacity-70 [&>a:hover]:after:content-['']";
+const HEAD_CLASS = 'mb-1 text-[0.85rem] uppercase tracking-[0.05em] text-white';
+---
+
+<!--
+  Phase 5 shell migration #1: Footer.astro
+  ────────────────────────────────────────
+  - Scoped <style> block removed entirely (~150 lines CSS deleted)
+  - Footer uses a dark surface (#1a2e1a) with muted slate text, so the
+    color tokens are expressed inline as arbitrary values
+  - Grid collapses 5→2→1 at 768 / 480 via max-[...] arbitrary breakpoints
+    (brand + 4 site-map columns; 2026-07-06 site-map upgrade grew it from 4)
+    and the brand column spans full width at ≤768 via `max-[768px]:col-span-full`
+  - The animated underline on `.footer-col a:hover::after` is replaced by
+    a `hover:after:*` arbitrary variant chain — same semantic, no CSS
+-->
+<footer
+  role="contentinfo"
+  class="bg-[#1a2e1a] px-0 pb-6 pt-12 text-[#94a3b8] max-[768px]:pb-5 max-[768px]:pt-10"
+>
+  <div
+    class="mx-auto max-w-[var(--container-wide)] px-[var(--space-page-x)] max-[768px]:px-5"
+  >
+    <div
+      class="mb-8 grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-8 max-[768px]:grid-cols-2 max-[768px]:gap-7 max-[480px]:grid-cols-1"
+    >
+      <div class="max-[768px]:col-span-full">
+        <span class="mb-2 block text-[1.2rem] font-bold text-white"
+          >🇹🇼 COMPUTEX.md</span
+        >
+        <p>{t('footer.desc')}</p>
+        <p class="mt-2 text-[#22c55e]">{t('footer.builtWith')}</p>
+        <p class="mt-3">
+          <a
+            href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-tw"
+            target="_blank"
+            rel="noopener"
+            class="inline-flex items-center text-[0.8rem] text-[#a7c7a7] no-underline transition-all duration-200 ease hover:text-[#c7d2c7]"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 496 512"
+              fill="currentColor"
+              class="me-1.5"
+            >
+              <path
+                d="M245.83 214.87l-33.22 17.28c-9.43-19.58-25.24-19.93-27.46-19.93-22.13 0-33.22 14.61-33.22 43.84 0 23.57 9.21 43.84 33.22 43.84 14.47 0 24.65-7.09 30.57-21.26l30.55 15.5c-6.17 11.51-25.69 38.98-65.1 38.98-22.6 0-73.96-10.32-73.96-77.05 0-58.69 43-77.06 72.63-77.06 30.72-.01 52.7 11.95 65.99 35.86zm143.05 0l-32.78 17.28c-9.5-19.77-25.72-19.93-27.9-19.93-22.14 0-33.22 14.61-33.22 43.84 0 23.55 9.23 43.84 33.22 43.84 14.45 0 24.65-7.09 30.54-21.26l31.04 15.5c-6.17 11.51-25.69 38.98-65.09 38.98-22.69 0-73.96-9.87-73.96-77.05 0-58.67 42.97-77.06 72.6-77.06 30.71-.01 52.58 11.95 65.55 35.86zM247.56 8.05C104.74 8.05 0 123.11 0 256.05c0 138.49 113.6 248 247.56 248 129.93 0 248.44-100.87 248.44-248 0-137.87-106.62-248-248.44-248zm.87 450.81c-112.54 0-203.7-93.04-203.7-202.81 0-105.42 85.43-203.27 203.72-203.27 112.53 0 202.82 89.46 202.82 203.26-.01 121.69-99.68 202.82-202.84 202.82z"
+              ></path>
+            </svg>
+            CC BY-SA 4.0
+          </a>
+        </p>
+        <p class="mt-[0.6rem] flex items-center gap-[0.4rem] text-[0.8rem]">
+          <span class="text-[#94a3b8]">{t('footer.support-us')}:</span>
+          <a
+            href="https://portaly.cc/taiwanmd/support?utm_source=computex.md&utm_medium=footer&utm_campaign=support"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-ga-section="footer_support"
+            data-ga-label="sponsor"
+            class="rounded bg-white/[0.06] px-2 py-[0.15rem] text-[0.8rem] tracking-[0.02em] text-[#a7c7a7] no-underline transition-all duration-200 ease hover:bg-white/[0.12] hover:text-[#c7d2c7]"
+            >{t('footer.support-us.cta')} →</a
+          >
+        </p>
+      </div>
+      <!-- 探索 · reading paths -->
+      <div class={COL_CLASS}>
+        <h4 class={HEAD_CLASS}>{t('footer.explore')}</h4>
+        <a href={navHref('/latest')}>{t('nav.latest')}</a>
+        <a href={navHref('/explore')}>{label.explore}</a>
+        <a href={navHref('/map')}>{label.map}</a>
+        <a href={navHref('/soundscape')}>{label.soundscape}</a>
+        <a href={navHref('/terminology')}>{t('nav.terminology')}</a>
+        <a href={navHref('/terminology/converter')}>{label.converter}</a>
+      </div>
+      <!-- 資料室 · data & instruments -->
+      <div class={COL_CLASS}>
+        <h4 class={HEAD_CLASS}>{label.dataRoom}</h4>
+        <a href={navHref('/dashboard')}>{t('footer.dashboardPage')}</a>
+        <a href={navHref('/data')}>{t('footer.dataPage')}</a>
+        <a href={navHref('/opendata')}>{t('nav.data.opendata')}</a>
+        <a href={navHref('/companies')}>{label.companies}</a>
+        <a href={navHref('/graph')}>{t('footer.graph')}</a>
+        <a href={navHref('/fork-graph')}>{label.forkGraph}</a>
+        <a href={navHref('/taiwan-shape')}>{t('nav.data.shape')}</a>
+        <a href={navHref('/lifetree')}>{label.lifetree}</a>
+        <a href={navHref('/bench')}>{t('nav.bench')}</a>
+        <a href={navHref('/elections/2026')}>{label.elections}</a>
+      </div>
+      <!-- 生命體 · the organism -->
+      <div class={COL_CLASS}>
+        <h4 class={HEAD_CLASS}>{label.organism}</h4>
+        <a href={navHref('/semiont')}>{label.semiont}</a>
+        <a href={navHref('/semiont/anatomy')}>{label.anatomy}</a>
+        <a href={navHref('/semiont/diary')}>{label.diary}</a>
+        <a href={navHref('/semiont/manifesto')}>{label.manifesto}</a>
+      </div>
+      <!-- 參與 · participate & connect -->
+      <div class={COL_CLASS}>
+        <h4 class={HEAD_CLASS}>{label.participate}</h4>
+        <a href={navHref('/about')}>{t('footer.about')}</a>
+        <a href={navHref('/contribute')}>{t('footer.contribute')}</a>
+        <a href="https://github.com/frank890417/taiwan-md" target="_blank"
+          >GitHub</a
+        >
+        <a href={navHref('/changelog')}>{t('footer.changelog')}</a>
+        <a href="/rss.xml">{label.rss}</a>
+        <a
+          href="https://github.com/frank890417/taiwan-md/issues"
+          target="_blank">{t('footer.report')}</a
+        >
+        <a
+          href="https://github.com/frank890417/taiwan-md/discussions"
+          target="_blank">{t('footer.discuss')}</a
+        >
+        <a href="https://x.com/computexmd" target="_blank">𝕏 @computexmd</a>
+        <a href="https://www.threads.com/@computexmd" target="_blank"
+          >Threads @computexmd</a
+        >
+        <a href="https://www.instagram.com/computexmd" target="_blank"
+          >IG @computexmd</a
+        >
+        <a href="mailto:taiwanmd@monoame.com">taiwanmd@monoame.com</a>
+      </div>
+    </div>
+    <div
+      class="flex items-center justify-center gap-2 py-[0.8rem] text-[0.78rem] text-[#94a3b8]"
+    >
+      <span>{t('footer.font-sponsor-prefix')}</span>
+      <a
+        href="https://justfont.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group inline-flex items-center !border-none !p-0"
+      >
+        <img
+          src="/images/justfont-logo.svg"
+          alt="justfont"
+          class="h-4 w-auto opacity-70 [filter:brightness(0)_invert(0.7)] transition-[opacity,filter] duration-200 group-hover:opacity-100 group-hover:[filter:brightness(0)_invert(0.85)]"
+        />
+      </a>
+      <span>{t('footer.font-sponsor-suffix')}</span>
+    </div>
+    <div class="border-t border-[#1e293b] pt-6 text-center text-[0.8rem]">
+      &copy; 2026 COMPUTEX.md — {t('footer.desc')}
+    </div>
+  </div>
+</footer>

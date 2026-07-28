@@ -1,0 +1,56 @@
+---
+import { getLangSwitchPath } from '../utils/getLangSwitchPath';
+
+const currentPath = Astro.url.pathname;
+
+const { enLink, hasEn } = await getLangSwitchPath(currentPath);
+---
+
+<!--
+  Phase 4 leaf migration #1: Banner.astro
+  ─────────────────────────────────────────
+  - Converted to Tailwind atomic utilities in HTML
+  - Removed scoped <style> block entirely
+  - Teal brand colors (#007864, #4fd1b0, #7ee8ca) are component-local
+    one-offs, kept as arbitrary values: bg-[#007864] / text-[#4fd1b0]
+  - Later phase may promote these to tokens if the color system picks
+    up a "lang-banner teal" brand identity
+
+  2026-07-06 empty-banner bug fix (design audit §2.9-2):
+  - Pages with no English version (e.g. /semiont/anatomy/, 404) rendered
+    an empty green bar with only a ✕ button, because the div used to
+    render unconditionally regardless of `hasEn`.
+  - Fix: gate the banner div behind `hasEn` so it's absent from the DOM
+    when there's no English version to switch to. The activation script
+    stays top-level (it already no-ops when #lang-banner is absent:
+    `var b = ...; if (b) ...`), and Header.astro's offset script also
+    null-checks `getElementById('lang-banner')`, so its absence is safe.
+-->{
+  hasEn && (
+    <div
+      id="lang-banner"
+      class="relative z-50 hidden items-center justify-center gap-4 bg-[#007864] px-4 py-[0.6rem] text-center text-[0.85rem] leading-snug text-white [&_a]:font-semibold [&_a]:text-[#4fd1b0] [&_a]:underline [&_a:hover]:text-[#7ee8ca]"
+    >
+      <span>
+        🌐 English version available → <a href={enLink}>Switch to English</a>
+      </span>
+      <button
+        class="cursor-pointer border-none bg-transparent px-[0.3rem] text-base text-white/70 hover:text-white"
+        onclick="document.getElementById('lang-banner').style.display='none';localStorage.setItem('lang-banner-dismissed','1');var h=document.getElementById('main-header');if(h)h.style.top='0px';document.documentElement.style.scrollPaddingTop='';"
+        aria-label="Close"
+      >
+        ✕
+      </button>
+    </div>
+  )
+}
+<script is:inline>
+  (function () {
+    if (localStorage.getItem('lang-banner-dismissed')) return;
+    var lang = navigator.language || navigator.userLanguage || '';
+    if (lang.startsWith('zh')) return;
+    if (window.location.pathname.startsWith('/en')) return;
+    var b = document.getElementById('lang-banner');
+    if (b) b.style.display = 'flex';
+  })();
+</script>

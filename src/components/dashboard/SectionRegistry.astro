@@ -1,0 +1,108 @@
+---
+// SectionRegistry — 📚 Article Registry section (#registry): search, filters,
+// sortable table. Ids/classes are a contract with src/scripts/dashboard-client.js
+// and src/styles/dashboard/ — do not rename.
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const isEn = lang === 'en';
+---
+
+<!-- Article Registry -->
+<section class="section" id="registry">
+  <h2 class="section-title">
+    {t('dashboard.registry.title')}
+    <span class="section-timestamp" data-source="articles"></span>
+  </h2>
+  <p class="section-subtitle">{t('dashboard.registry.subtitle')}</p>
+
+  <div class="registry-controls">
+    <input
+      type="text"
+      id="registry-search"
+      class="registry-search"
+      placeholder={t('dashboard.registry.search')}
+    />
+    <div class="registry-filters">
+      <select id="filter-category" class="registry-filter">
+        <option value="">{t('dashboard.registry.filter.all')}</option>
+      </select>
+      <select id="filter-reviewed" class="registry-filter">
+        <option value="">{t('dashboard.registry.filter.reviewed')}</option>
+        <option value="true"
+          >{t('dashboard.registry.filter.reviewed.yes')}</option
+        >
+        <option value="false"
+          >{t('dashboard.registry.filter.reviewed.no')}</option
+        >
+      </select>
+      <select id="filter-featured" class="registry-filter">
+        <option value="">{t('dashboard.registry.filter.featured')}</option>
+        <option value="true">⭐</option>
+        <option value="false">—</option>
+      </select>
+      <select id="filter-translation" class="registry-filter">
+        <option value="">{t('dashboard.registry.filter.translation')}</option>
+        <option value="has-en"
+          >{t('dashboard.registry.filter.translation.has-en')}</option
+        >
+        <option value="missing-en"
+          >{t('dashboard.registry.filter.translation.missing-en')}</option
+        >
+      </select>
+    </div>
+  </div>
+
+  <div class="registry-summary" id="registry-summary"></div>
+
+  <div class="registry-table-controls">
+    <button class="column-toggle-btn" id="column-toggle-btn">
+      {isEn ? '⚙️ Show all columns' : '⚙️ 顯示所有欄位'}
+    </button>
+  </div>
+  <div class="registry-table-wrapper">
+    <table class="registry-table" id="registry-table">
+      <thead>
+        <tr>
+          <th class="sortable" data-sort="title"
+            >{t('dashboard.registry.col.title')}</th
+          >
+          <th class="sortable" data-sort="category"
+            >{t('dashboard.registry.col.category')}</th
+          >
+          <th class="sortable" data-sort="subcategory"
+            >{isEn ? 'Subcategory' : '子分類'}</th
+          >
+          <th class="sortable" data-sort="date"
+            >{t('dashboard.registry.col.date')}</th
+          >
+          <th class="sortable" data-sort="lastModified"
+            >{isEn ? 'Modified' : '最後修改'}</th
+          >
+          <th class="sortable" data-sort="qualityScore"
+            >{isEn ? 'Quality' : '品質'}</th
+          >
+          <th class="sortable" data-sort="formatIssues"
+            >{isEn ? 'Format' : '格式'}</th
+          >
+          <th class="sortable" data-sort="lastHumanReview"
+            >{t('dashboard.registry.col.reviewed')}</th
+          >
+          <th class="sortable" data-sort="wordCount"
+            >{t('dashboard.registry.col.words')}</th
+          >
+          <th class="sortable col-hideable" data-sort="tagCount"
+            >{t('dashboard.registry.col.tags')}</th
+          >
+          <th>{t('dashboard.registry.col.translations')}</th>
+          <th class="sortable col-hideable" data-sort="revision"
+            >{t('dashboard.registry.col.revisions')}</th
+          >
+          <th class="col-edit-header"></th>
+        </tr>
+      </thead>
+      <tbody id="registry-body"></tbody>
+    </table>
+  </div>
+</section>

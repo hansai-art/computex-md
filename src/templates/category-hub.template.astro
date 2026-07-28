@@ -1,0 +1,1660 @@
+---
+/**
+ * category-hub.template.astro — 統一 [category]/index.astro template (6 langs 共用)
+ *
+ * 為什麼：6 個 [category]/index.astro 從 943~3006 行（總 ~9280 行）高度重複，
+ * 各 lang copy-paste 了相同 hub layout / top picks / subcategory grouping 邏輯。
+ * unification 預估 -82% 行數 + 消除 6 處改一個 pattern 的維護負擔。
+ *
+ * 對照 article.template.astro：
+ *   src/pages/[category]/index.astro                  → thin wrapper getStaticPaths
+ *   src/pages/{lang}/[category]/index.astro × 5       → thin wrappers
+ *   src/templates/category-hub.template.astro (本檔)  → 全部 UI 邏輯
+ *
+ * 中文 zh-TW 是 SSOT canonical（含 Economy 特殊 dashboard 等 zh-only feature，
+ * 條件 render 在 lang === 'zh-TW' && category === 'economy' 時才 load）。
+ *
+ * 2026-05-03 sleepy-colden P1 follow-up unification（在 article.template.astro 之後）。
+ */
+import { marked } from 'marked';
+import Layout from '../layouts/Layout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import FoodViz from '../components/FoodViz.astro';
+import EconCharts from '../components/EconCharts.astro';
+import { useTranslations } from '../i18n/utils';
+import {
+  categoryList as categories,
+  getCategoryConfigs,
+  type CategoryKey,
+} from '../utils/categoryConfig';
+import type { Lang } from '../config/languages';
+import type { SubcategoryGroup } from '../utils/category-static-paths';
+import subcatJson from '../data/subcategory-i18n.json';
+
+interface ArticleSummary {
+  slug: string;
+  title: string;
+  description: string;
+  status: string;
+  readingTime: number | null;
+  date: string | null;
+  featured: boolean;
+  tags: string[];
+  lang: string;
+  image: string | null;
+  imageAlt: string;
+  imageCredit: string;
+  subcategory: string;
+  footnotes: number;
+}
+
+interface Props {
+  category: string;
+  hubContent: string;
+  topPicks: ArticleSummary[];
+  articles: ArticleSummary[];
+  groups: SubcategoryGroup[];
+  // categoryUpdated/essayMinutes: wired through for a later task (category
+  // "last updated" badge + hub essay reading-time badge) — not consumed by
+  // this pass yet.
+  categoryUpdated: string | null;
+  essayMinutes: number | null;
+  lang: Lang;
+}
+
+const {
+  category,
+  hubContent,
+  articles,
+  topPicks,
+  groups,
+  categoryUpdated,
+  essayMinutes,
+  lang,
+} = Astro.props;
+
+// ── Lang-derived URL prefix (for cross-page links) ────────────────────────────
+// zh-TW: '' (root URL convention)
+// non-zh: '/{lang}' prefix
+const langUrlPrefix = lang === 'zh-TW' ? '' : `/${lang}`;
+
+// Load economic data for economy category
+let taiexData: any[] = [];
+let cpiData: any[] = [];
+let salaryData: any[] = [];
+let housingData: any[] = [];
+// Economy dashboard 只在 zh-TW 顯示（Economy 系列數據是 zh-only feature；
+// 其他 lang 沒對應翻譯資料源）。其他 lang 看到一般 hub markdown。
+if (category === 'economy' && lang === 'zh-TW') {
+  const [taiexJson, cpiJson, salaryJson, housingJson] = await Promise.all([
+    import('../data/taiex-yearly.json'),
+    import('../data/taiwan-cpi.json'),
+    import('../data/taiwan-salary.json'),
+    import('../data/taiwan-housing.json'),
+  ]);
+  taiexData = taiexJson.data;
+  cpiData = cpiJson.data;
+  salaryData = salaryJson.data;
+  housingData = housingJson.data;
+}
+
+function resolveWikilinks(md: string, currentCategory: string) {
+  if (!md) return md;
+
+  function resolveOne(target: string, display?: string, bold = false) {
+    const label = display || target;
+    if (target.startsWith('_')) {
+      const catName = target
+        .replace(/^_/, '')
+        .replace(/ Hub$/, '')
+        .toLowerCase();
+      return bold
+        ? `<a class="topic-pill" href="${langUrlPrefix}/${catName}"><strong>${label}</strong></a>`
+        : `<a class="topic-pill" href="${langUrlPrefix}/${catName}">${label}</a>`;
+    }
+    const matchArticle = articles.find(
+      (a: any) =>
+        a.title === target ||
+        a.slug === target ||
+        a.slug === encodeURIComponent(target),
+    );
+    if (matchArticle) {
+      const url = `/${currentCategory}/${matchArticle.slug}`;
+      return bold
+        ? `<a class="topic-pill" href="${url}"><strong>${label}</strong></a>`
+        : `<a class="topic-pill" href="${url}">${label}</a>`;
+    }
+    return bold ? `**${label}**` : label;
+  }
+
+  // First pass: **[[X]]** → [**resolved**](/url) (bold inside link for marked CJK compat)
+  md = md.replace(
+    /\*\*\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]\*\*/g,
+    (_, target, display) => resolveOne(target, display, true),
+  );
+  // Second pass: remaining [[X]]
+  md = md.replace(/\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]/g, (_, target, display) =>
+    resolveOne(target, display),
+  );
+  return md;
+}
+
+const resolvedContent = hubContent
+  ? resolveWikilinks(hubContent, category)
+  : '';
+
+// Build set of article URLs for topic-pill detection
+const articleUrlSet = new Set(
+  articles.map((a: any) => `/${category}/${a.slug}`),
+);
+// Also add cross-category hub URLs
+const categoryKeys = Object.keys({
+  history: 1,
+  geography: 1,
+  culture: 1,
+  food: 1,
+  art: 1,
+  music: 1,
+  technology: 1,
+  nature: 1,
+  people: 1,
+  society: 1,
+  economy: 1,
+  lifestyle: 1,
+  politics: 1,
+});
+
+// Broken image fallback + topic-pill link for hub pages
+const hubRenderer = new marked.Renderer();
+hubRenderer.image = ({ href, title, text }) => {
+  const titleAttr = title ? ` title="${title}"` : '';
+  const altText = text || '';
+  return `<img src="${href}" alt="${altText}"${titleAttr} loading="lazy" onerror="this.onerror=null;this.classList.add('img-broken')" />`;
+};
+hubRenderer.link = ({ href, title, text }) => {
+  const titleAttr = title ? ` title="${title}"` : '';
+  const h = href || '';
+  // Check if link points to an article or a hub category page
+  const isArticleLink = articleUrlSet.has(decodeURIComponent(h));
+  const isCategoryLink = categoryKeys.some(
+    (k) => h === `/${k}` || h === `/${k}/`,
+  );
+  if (isArticleLink || isCategoryLink) {
+    return `<a class="topic-pill" href="${h}"${titleAttr}>${text}</a>`;
+  }
+  return `<a href="${h}"${titleAttr}>${text}</a>`;
+};
+const rawHubHtml = resolvedContent
+  ? marked.parse(resolvedContent, { renderer: hubRenderer, breaks: true })
+  : '';
+
+// Post-process: add callout/pull-quote classes to blockquotes
+function enrichBlockquotes(html: string): string {
+  if (!html) return html;
+  const calloutMap: Record<string, string> = {
+    '📝': 'callout-note',
+    '⚠️': 'callout-warning',
+    '💡': 'callout-tip',
+    '📊': 'callout-data',
+  };
+  return (html as string).replace(
+    /<blockquote>([\s\S]*?)<\/blockquote>/g,
+    (match, inner) => {
+      // Pull quote: contains ✦
+      if (inner.includes('✦')) {
+        return `<blockquote class="pull-quote">${inner}</blockquote>`;
+      }
+      // Callout: starts with emoji + bold
+      for (const [emoji, cls] of Object.entries(calloutMap)) {
+        if (inner.includes(emoji) && inner.includes('<strong>')) {
+          return `<blockquote class="${cls}">${inner}</blockquote>`;
+        }
+      }
+      return match;
+    },
+  );
+}
+const hubHtml = enrichBlockquotes(rawHubHtml as string);
+
+// Split hub HTML into a short "hook" (shown in the header bar) and the full
+// essay body. The two MUST be disjoint — the essay section below renders
+// hubFull (essay minus hook), not hubHtml — otherwise the reader sees the
+// opening paragraphs twice (2026-07-10 fix: hubFull was already computed
+// pre-fix but the essay <section> ignored it and rendered raw hubHtml,
+// silently duplicating the hook).
+//
+// Hook sizing is adaptive, not a fixed paragraph count — a fixed "always
+// take the first 3 </p>" cut is essay-structure/lang dependent (e.g.
+// /en/history/ has short paragraphs, so 3 of them totalled 1,885 chars of
+// hook prose sitting in a compact header bar meant for a teaser):
+//   1. Take the first paragraph only.
+//   2. If its (tag-stripped) text is under 200 chars — too short to read
+//      as a hook on its own — fold in the second paragraph too, but only
+//      if doing so keeps the *cumulative* hook text at or under the
+//      600-char hard cap. A hook never truncates mid-paragraph, so a
+//      first paragraph that alone exceeds 600 chars is still used as-is.
+//   3. Sanity guard kept from the original implementation: reject the cut
+//      outright if it would eat >=70% of the whole essay (hubHook stays
+//      '', hubFull falls back to the untouched hubHtml — same fallback
+//      the original "no 3rd </p> found" case already had).
+let hubHook = '';
+let hubFull = hubHtml;
+if (hubHtml) {
+  // Strip leading headings (h1, h2) from the beginning. hubFull is sliced
+  // from this stripped version too (see below), so a stripped leading
+  // heading doesn't resurface duplicated under the essay's own "Curatorial
+  // Reading" <h2> a few lines down in the render.
+  let stripped = (hubHtml as string)
+    .replace(/^(\s*<h[12][^>]*>[\s\S]*?<\/h[12]>\s*)+/i, '')
+    .trim();
+
+  const stripTags = (html: string) => html.replace(/<[^>]+>/g, '').trim();
+
+  // End index (exclusive) of the Nth </p> close tag, 1-indexed; -1 if
+  // fewer than N paragraphs exist in `stripped`.
+  function pCloseEnd(n: number): number {
+    const pCloseRegex = /<\/p>/gi;
+    let count = 0;
+    let m: RegExpExecArray | null;
+    while ((m = pCloseRegex.exec(stripped)) !== null) {
+      count++;
+      if (count === n) return m.index + m[0].length;
+    }
+    return -1;
+  }
+
+  const firstEnd = pCloseEnd(1);
+  let cutIndex = firstEnd;
+  if (firstEnd > 0) {
+    const firstText = stripTags(stripped.slice(0, firstEnd));
+    if (firstText.length < 200) {
+      const secondEnd = pCloseEnd(2);
+      if (secondEnd > 0) {
+        const secondText = stripTags(stripped.slice(0, secondEnd));
+        if (secondText.length <= 600) {
+          cutIndex = secondEnd;
+        }
+        // else: adding the 2nd paragraph would push the hook past the
+        // 600-char hard cap — stop before it, cutIndex stays at the 1st.
+      }
+    }
+  }
+
+  if (cutIndex > 0 && cutIndex < stripped.length * 0.7) {
+    hubHook = stripped.slice(0, cutIndex);
+    hubFull = stripped.slice(cutIndex).trim();
+  }
+  // else: hook extraction failed the sanity guard (or the essay has no
+  // paragraphs at all) — hubHook stays '', hubFull stays the untouched
+  // hubHtml, matching the pre-2026-07-10 fallback behavior.
+}
+
+// Split hub HTML into sections at <h2> boundaries for chart injection (economy only)
+//
+// Known asymmetry (2026-07-10 hook/essay dedup fix): this deliberately still
+// splits the FULL hubHtml, not the hook-truncated hubFull used by the
+// non-economy essay branch below. chartAfter anchor-matching depends on
+// literal zh-TW section header text ('從零到英雄' / '矽島的誕生' / ...)
+// showing up inside hubHtml — feeding it hubFull instead would risk
+// silently losing a chart anchor if that header text happened to fall
+// inside the hook cut. The economy hub is zh-TW-only and its own header
+// hook + essay were left duplicating each other on this pass; only the
+// non-economy branch got the dedup fix here.
+const isEconomy = category === 'economy' && lang === 'zh-TW';
+type HubSection = { html: string; chartAfter?: string };
+let hubSections: HubSection[] = [];
+if (isEconomy && hubHtml) {
+  const parts = (hubHtml as string).split(/(?=<h2>)/);
+  hubSections = parts.map((part) => {
+    let chartAfter: string | undefined;
+    if (part.includes('從零到英雄')) chartAfter = 'cpi';
+    else if (part.includes('矽島的誕生')) chartAfter = 'taiex';
+    else if (part.includes('服務經濟')) chartAfter = 'salary';
+    else if (part.includes('面向未來')) chartAfter = 'housing';
+    return { html: part, chartAfter };
+  });
+}
+
+// lang 已從 props 取得，不再從 URL derive
+const t = useTranslations(lang);
+
+// Subcategory group heading label — grouping key 本身永遠是 zh-TW 原始
+// frontmatter 值（groups 來自 category-static-paths.ts，跨語言共用同一組
+// key）。'__others__' 用固定 i18n 詞；zh-TW 頁直接顯示原始 key；其他語言查
+// subcategory-i18n.json 顯示層對照表，查無對照則 fallback 回原始 key。
+const subcatI18n = (subcatJson as any).map ?? {};
+function groupLabel(key: string): string {
+  if (key === '__others__') return t('category.others');
+  if (lang !== 'zh-TW') return subcatI18n[key]?.[lang] ?? key;
+  return key;
+}
+
+const categoryConfigs = getCategoryConfigs(t);
+const categoryInfo = categoryConfigs[category];
+
+// 其他分類（sidebar 跨分類導航用）
+const otherCategories = categories
+  .filter((cat) => cat !== category)
+  .map((cat) => ({
+    key: cat,
+    ...categoryConfigs[cat as CategoryKey],
+  }));
+---
+
+<Layout
+  lang={lang}
+  title={`${categoryInfo.name} - COMPUTEX.md`}
+  description={categoryInfo.description}
+  category={categoryInfo.name}
+  categorySlug={category}
+  dateModified={categoryUpdated || undefined}
+  collectionTotal={articles.length}
+  collectionItems={articles.slice(0, 100).map((a) => ({
+    name: a.title,
+    url: `${Astro.site?.href?.replace(/\/$/, '') ?? 'https://computex-md.pages.dev'}${langUrlPrefix}/${category}/${encodeURIComponent(a.slug)}`,
+  }))}
+  readerSettings
+>
+  <!--
+    Phase 6 partial migration — [category]/index.astro (zh-TW)
+    ──────────────────────────────────────────────────────────
+    Same wrapper migration as en/ja [category]/index. zh-TW adds
+    two extra conditional sections beyond what en/ja have:
+    (1) Food visualization (when category === 'food') — sunburst
+        + network d3 viz, keeps all .food-viz / .viz-* classes in
+        the scoped <style> because they repeat and are animated
+        by script/index.astro's d3 code.
+    (2) Economy hub with inline charts (when isEconomy) — uses
+        .econ-chart-* classes rendered inline around hubSections,
+        also kept fully scoped.
+  -->
+  <main class="category-page">
+    <!-- Category Header (compact bar + curatorial hook fused) -->
+    <div
+      class="bg-[var(--categoryColorLight)] pb-5 pt-3"
+      style={`border-bottom: 2px solid ${categoryInfo.color};`}
+    >
+      <div class="mx-auto max-w-[var(--container-wide)] px-8 max-[768px]:px-4">
+        <nav
+          aria-label="breadcrumb"
+          class="mb-1 flex items-center gap-2 text-[0.9rem] [&_a:hover]:underline [&_a]:font-medium [&_a]:no-underline"
+        >
+          <ol class="crumb-list m-0 flex list-none items-center gap-2 p-0">
+            <li>
+              <a
+                href={langUrlPrefix === '' ? '/' : langUrlPrefix}
+                style={`color: ${categoryInfo.color};`}>{t('article.home')}</a
+              >
+            </li>
+            <li
+              aria-current="page"
+              class="font-semibold text-[var(--color-ink-soft)]"
+            >
+              {categoryInfo.name}
+            </li>
+          </ol>
+        </nav>
+        <div class="flex flex-wrap items-baseline gap-2">
+          <span class="text-[1.5rem]">{categoryInfo.icon}</span>
+          <h1
+            class="m-0 text-[1.5rem] font-extrabold"
+            style={`color: ${categoryInfo.color}`}
+          >
+            {categoryInfo.name}
+          </h1>
+          <span
+            class="font-light text-[var(--color-ink-soft)] max-[768px]:hidden"
+            >·</span
+          >
+          <span
+            class="max-w-[50%] truncate text-[0.88rem] text-[var(--color-ink-soft)] max-[768px]:max-w-full max-[768px]:basis-full max-[768px]:text-[0.78rem]"
+            >{categoryInfo.description}</span
+          >
+          <span
+            class="ms-auto rounded-[12px] bg-[var(--color-bg-soft)] px-2 py-[0.15rem] text-[0.78rem] text-[var(--color-ink-soft)]"
+            >{
+              t('category.articleCount').replace('{n}', String(articles.length))
+            }</span
+          >
+          {
+            categoryUpdated && (
+              <span class="header-updated max-[768px]:hidden">
+                {t('category.updatedLabel')} {categoryUpdated.slice(0, 10)}
+              </span>
+            )
+          }
+        </div>
+        {
+          hubHook && (
+            <div class="mt-3 max-w-[800px] text-[0.92rem] leading-[1.75] text-[var(--color-ink-soft)] max-[768px]:text-[0.85rem]">
+              <div class="header-hook-prose" set:html={hubHook} />
+              <a
+                href="#hub-essay"
+                class="mt-2 inline-block text-[0.82rem] font-semibold text-[var(--categoryColor)] no-underline transition-all duration-150 hover:underline"
+              >
+                {t('category.readGuide')}
+              </a>
+              {essayMinutes && (
+                <span class="hook-minutes">
+                  📖{' '}
+                  {t('category.essayMinutes').replace(
+                    '{n}',
+                    String(essayMinutes),
+                  )}
+                </span>
+              )}
+            </div>
+          )
+        }
+      </div>
+    </div>
+
+    <div
+      class="mx-auto max-w-[var(--container-wide)] px-8 py-8 max-[768px]:px-4 max-[768px]:py-4"
+    >
+      {
+        /* Main two-column layout: sidebar + content
+           Sticky aside must keep content-height (`self-start` / `h-fit`) so
+           the parent flex (= taller article column) provides the scroll
+           context. Items-start on parent enforces that. */
+      }
+      {
+        articles.length > 0 ? (
+          <div class="mt-4 flex items-start gap-8 max-[768px]:flex-col max-[768px]:gap-0">
+            <aside class="sticky top-[72px] w-[180px] flex-shrink-0 self-start max-[768px]:static max-[768px]:w-full max-[768px]:max-h-none max-[768px]:overflow-visible">
+              {/* Subcategory nav */}
+              {groups.length > 1 && (
+                <nav class="flex flex-col gap-1 max-[768px]:flex-row max-[768px]:flex-wrap max-[768px]:gap-[0.3rem] max-[768px]:border-b max-[768px]:border-[var(--color-border)] max-[768px]:pb-4 max-[768px]:mb-4">
+                  <span class="mb-[0.3rem] border-b border-[var(--color-border)] px-2 pb-[0.4rem] text-[0.7rem] font-bold uppercase tracking-[0.1em] text-[var(--color-ink-soft)] max-[768px]:hidden">
+                    {t('category.topic')}
+                  </span>
+                  {groups.map((group) => (
+                    <a
+                      href={`#sub-${group.key}`}
+                      data-sub-link={group.key}
+                      class="subcat-nav-link flex items-center justify-between rounded border-s-2 border-transparent px-2 py-[0.35rem] text-[0.82rem] text-[var(--color-ink-soft)] no-underline transition-all duration-150 hover:bg-[rgba(45,80,22,0.06)] hover:text-[var(--categoryColor,#2d5016)] max-[768px]:rounded-2xl max-[768px]:border max-[768px]:border-[var(--color-border)] max-[768px]:bg-[var(--color-bg-soft)] max-[768px]:px-[0.6rem] max-[768px]:py-1 max-[768px]:text-[0.78rem]"
+                    >
+                      {groupLabel(group.key)}
+                      <span class="min-w-[1.2rem] rounded-lg bg-[var(--color-bg-soft)] px-[0.35rem] py-[0.1rem] text-center text-[0.7rem] text-[var(--color-ink-soft)]">
+                        {group.count}
+                      </span>
+                    </a>
+                  ))}
+                </nav>
+              )}
+
+              <div class="my-3 h-px bg-[var(--color-border)] max-[768px]:hidden" />
+
+              {/* Essay anchor (2026-07-10) — jump link to the curatorial
+                  essay further down the column, for readers who scrolled
+                  past the header's own "read guide" link already.
+                  Desktop only, same breakpoint as the cross-category nav
+                  below it. */}
+              {hubContent && (
+                <>
+                  <nav class="mb-1 flex flex-col gap-1 max-[768px]:hidden">
+                    <a href="#hub-essay" class="sidebar-essay-link">
+                      📖 {t('hub.essay.heading')}
+                      {essayMinutes && (
+                        <span class="muted">
+                          {t('category.essayMinutes').replace(
+                            '{n}',
+                            String(essayMinutes),
+                          )}
+                        </span>
+                      )}
+                    </a>
+                  </nav>
+                  <div class="my-3 h-px bg-[var(--color-border)] max-[768px]:hidden" />
+                </>
+              )}
+
+              {/* Cross-category nav (replaces bottom explore cards) */}
+              <nav class="flex flex-col gap-1 max-[768px]:hidden">
+                <span class="mb-[0.3rem] border-b border-[var(--color-border)] px-2 pb-[0.4rem] text-[0.7rem] font-bold uppercase tracking-[0.1em] text-[var(--color-ink-soft)]">
+                  {t('category.otherTopics')}
+                </span>
+                {otherCategories.map((cat) => (
+                  <a
+                    href={`${langUrlPrefix}/${cat.key}`}
+                    class="othercat-link flex items-center justify-between rounded px-2 py-[0.35rem] text-[0.78rem] text-[var(--color-ink-soft)] no-underline opacity-75 transition-all duration-150 hover:bg-[rgba(45,80,22,0.06)] hover:text-[var(--categoryColor,#2d5016)] hover:opacity-100"
+                  >
+                    <span>
+                      {cat.icon} {cat.name}
+                    </span>
+                  </a>
+                ))}
+              </nav>
+            </aside>
+
+            <div class="min-w-0 flex-1">
+              {/* Featured shelf — 3-card ArticleCard density="detailed" grid
+                  (2026-07-10 replaces the old horizontal chip strip). */}
+              {topPicks && topPicks.length > 0 && (
+                <section
+                  class="featured-shelf"
+                  aria-label={t('category.featured')}
+                >
+                  <h2 class="shelf-heading">{t('category.featured')}</h2>
+                  <ul class="shelf-grid" role="list">
+                    {topPicks.slice(0, 3).map((article: any, i: number) => (
+                      <li>
+                        <ArticleCard
+                          density="detailed"
+                          titleTag="h3"
+                          href={`${langUrlPrefix}/${category}/${encodeURIComponent(article.slug)}`}
+                          title={article.title}
+                          description={article.description}
+                          categoryColor={categoryInfo.color}
+                          coverImage={article.image || undefined}
+                          imageLoading={i === 0 ? 'eager' : 'lazy'}
+                          footnotes={article.footnotes}
+                          readingTime={
+                            article.readingTime
+                              ? t('category.essayMinutes').replace(
+                                  '{n}',
+                                  String(article.readingTime),
+                                )
+                              : undefined
+                          }
+                          date={
+                            article.updated
+                              ? article.updated.slice(0, 7)
+                              : undefined
+                          }
+                          openIn="same-tab"
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              {/* Articles list */}
+              <div class="articles-main min-w-0 flex-1" id="articlesGrid">
+                <div class="hub-toolbar">
+                  <div class="hub-search">
+                    <label for="articleFilter" class="tw-sr-only">
+                      {t('category.searchLabel')}
+                    </label>
+                    <input
+                      type="text"
+                      id="articleFilter"
+                      placeholder={t('category.searchPlaceholder')}
+                      autocomplete="off"
+                      aria-label={t('category.searchLabel')}
+                    />
+                    <button
+                      type="button"
+                      id="filterClear"
+                      aria-label={t('category.clearSearch')}
+                      hidden
+                    >
+                      ×
+                    </button>
+                  </div>
+                  <div
+                    class="hub-sort"
+                    role="group"
+                    aria-label={t('category.sortLabel')}
+                  >
+                    <button
+                      type="button"
+                      class="sort-btn active"
+                      data-sort="featured"
+                    >
+                      {t('category.sortFeatured')}
+                    </button>
+                    <button type="button" class="sort-btn" data-sort="updated">
+                      {t('category.sortLatest')}
+                    </button>
+                    <button type="button" class="sort-btn" data-sort="fn">
+                      {t('category.sortCited')}
+                    </button>
+                    <button type="button" class="sort-btn" data-sort="reading">
+                      {t('category.sortTime')}
+                    </button>
+                  </div>
+                </div>
+                <p
+                  id="filterStatus"
+                  role="status"
+                  aria-live="polite"
+                  class="filter-status"
+                  data-template={t('category.resultCount')}
+                  hidden
+                />
+
+                {groups.map((group) => (
+                  <section class="subcategory-section" id={`sub-${group.key}`}>
+                    {groups.length > 1 && (
+                      <h2 class="group-heading">
+                        {groupLabel(group.key)}{' '}
+                        <span class="group-count">{group.count}</span>
+                      </h2>
+                    )}
+                    <ul class="hub-rows" role="list">
+                      {group.articles.map((article) => (
+                        <li
+                          class="hub-row"
+                          data-title={article.title}
+                          data-desc={article.description || ''}
+                          data-updated={article.updated || ''}
+                          data-reading={article.readingTime || 0}
+                          data-featured={article.featured ? '1' : '0'}
+                          data-fn={article.footnotes || 0}
+                          data-tags={JSON.stringify(article.tags || [])}
+                          data-subcategory={groupLabel(
+                            article.subcategory || '',
+                          )}
+                        >
+                          <ArticleCard
+                            density="row"
+                            titleTag="h3"
+                            href={`${langUrlPrefix}/${category}/${encodeURIComponent(article.slug)}`}
+                            title={article.title}
+                            description={article.description}
+                            categoryColor={categoryInfo.color}
+                            footnotes={article.footnotes}
+                            readingTime={
+                              article.readingTime
+                                ? t('category.essayMinutes').replace(
+                                    '{n}',
+                                    String(article.readingTime),
+                                  )
+                                : undefined
+                            }
+                            date={
+                              article.updated
+                                ? article.updated.slice(0, 7)
+                                : undefined
+                            }
+                            openIn="same-tab"
+                            extraClass={
+                              article.featured ? 'hub-row-featured' : ''
+                            }
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                ))}
+              </div>
+
+              {/* Food Visualization (zh-TW only — labels & data are zh-curated).
+                  Markup + CSS + script + d3 loader all live in FoodViz.astro
+                  now (2026-07-11 extraction) — see that file's frontmatter
+                  comment for the d3-never-loaded bug fix + is:global CSS
+                  scoping rationale. */}
+              {category === 'food' && lang === 'zh-TW' && <FoodViz />}
+
+              {/* Full Hub Essay (not collapsed — the soul of COMPUTEX.md) */}
+              {hubHtml && !isEconomy && (
+                <section
+                  class="my-8 mb-12 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-10 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+                  id="hub-essay"
+                >
+                  <h2 class="mb-2 mt-12 border-t-2 border-[var(--color-border)] pt-8 text-[1.15rem] font-bold text-[var(--color-ink)]">
+                    {categoryInfo.icon} {t('hub.essay.heading')}
+                  </h2>
+                  <div class="hub-prose" set:html={hubFull} />
+                </section>
+              )}
+
+              {/* Economy with charts */}
+              {isEconomy && hubSections.length > 0 && (
+                <section
+                  class="my-8 mb-12 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-10 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+                  id="hub-essay"
+                >
+                  <h2 class="mb-2 mt-12 border-t-2 border-[var(--color-border)] pt-8 text-[1.15rem] font-bold text-[var(--color-ink)]">
+                    {categoryInfo.icon} {t('hub.essay.heading')}
+                  </h2>
+                  <div class="hub-prose">
+                    {hubSections.map((section) => (
+                      <Fragment>
+                        <div set:html={section.html} />
+                        {section.chartAfter && (
+                          <div
+                            class="econ-chart-wrapper"
+                            data-chart={section.chartAfter}
+                          >
+                            <div class="econ-chart-container">
+                              <div class="econ-chart-header">
+                                <h4 class="econ-chart-title">
+                                  {section.chartAfter === 'taiex' &&
+                                    '📈 歷年台灣加權股價指數 (TAIEX)'}
+                                  {section.chartAfter === 'cpi' &&
+                                    '📊 歷年消費者物價指數 (CPI)'}
+                                  {section.chartAfter === 'salary' &&
+                                    '💰 歷年每月經常性薪資'}
+                                  {section.chartAfter === 'housing' &&
+                                    '🏠 信義房價指數'}
+                                </h4>
+                                <span class="econ-chart-source">
+                                  {section.chartAfter === 'taiex' &&
+                                    '資料來源：臺灣證券交易所'}
+                                  {section.chartAfter === 'cpi' &&
+                                    '資料來源：行政院主計總處'}
+                                  {section.chartAfter === 'salary' &&
+                                    '資料來源：行政院主計總處'}
+                                  {section.chartAfter === 'housing' &&
+                                    '資料來源：信義房屋'}
+                                </span>
+                              </div>
+                              <div class="econ-chart-svg-wrap">
+                                <svg
+                                  class="econ-chart-svg"
+                                  viewBox="0 0 800 300"
+                                  preserveAspectRatio="xMidYMid meet"
+                                />
+                                <div class="econ-chart-tooltip" />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </Fragment>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Econ chart render script + CSS live in EconCharts.astro
+                  (2026-07-11 extraction) — it renders no markup of its own,
+                  it just draws into the .econ-chart-svg shells built above.
+                  Guarded on isEconomy alone (matching the essay section
+                  above): the render script's own per-chart data-length
+                  checks already no-op safely if hubSections ever came back
+                  empty. */}
+              {isEconomy && (
+                <EconCharts
+                  taiexData={taiexData}
+                  cpiData={cpiData}
+                  salaryData={salaryData}
+                  housingData={housingData}
+                />
+              )}
+
+              {/* Cross-category nav, mobile accordion (2026-07-10). The
+                  sidebar's own cross-category <nav> is desktop-only
+                  (max-[768px]:hidden) since the sticky aside itself goes
+                  static/full-width on mobile ahead of the article list —
+                  this gives mobile readers the same "other topics" escape
+                  hatch, tucked at the bottom of the column instead of
+                  competing with the subcategory chips up top. */}
+              <details class="othercats-accordion hidden max-[768px]:block">
+                <summary>{t('category.otherTopics')}</summary>
+                <div class="othercats-chips">
+                  {otherCategories.map((cat) => (
+                    <a
+                      href={`${langUrlPrefix}/${cat.key}`}
+                      class="othercat-chip"
+                    >
+                      <span>{cat.icon}</span> {cat.name}
+                    </a>
+                  ))}
+                </div>
+              </details>
+            </div>
+          </div>
+        ) : (
+          <section class="px-8 py-16 text-center max-[768px]:px-4">
+            <div class="mx-auto max-w-[500px]">
+              <div class="mb-8 text-[5rem] opacity-70">{categoryInfo.icon}</div>
+              <h2 class="mb-4 text-[2.5rem] font-bold text-[var(--color-ink)]">
+                {t('hub.empty.title')}
+              </h2>
+              <p class="mb-6 text-[1.1rem] leading-[1.6] text-[var(--color-ink-soft)]">
+                {t('hub.empty.description')}
+              </p>
+              <p class="!mb-12 text-[1.1rem] font-medium italic text-[var(--categoryColor)]">
+                {t('hub.empty.future')}
+                {categoryInfo.description}
+              </p>
+              <div class="flex flex-wrap justify-center gap-4 max-[768px]:flex-col max-[768px]:items-center">
+                <a
+                  href={langUrlPrefix === '' ? '/' : langUrlPrefix}
+                  class="inline-flex items-center gap-2 rounded-xl bg-[var(--categoryColor)] px-8 py-4 font-semibold text-white no-underline transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_16px_rgba(0,0,0,0.2)]"
+                >
+                  {t('article.backToHome')}
+                </a>
+                <a
+                  href="https://github.com/frank890417/taiwan-md"
+                  target="_blank"
+                  class="inline-flex items-center gap-2 rounded-xl border-2 border-[var(--categoryColor)] bg-[var(--color-surface)] px-8 py-4 font-semibold text-[var(--categoryColor)] no-underline transition-all duration-300 hover:-translate-y-0.5 hover:bg-[var(--categoryColor)] hover:text-white"
+                >
+                  {t('category.contribute')}
+                </a>
+              </div>
+            </div>
+          </section>
+        )
+      }
+    </div>
+  </main>
+</Layout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const grid = document.getElementById('articlesGrid');
+    const filterInput = document.getElementById(
+      'articleFilter',
+    ) as HTMLInputElement;
+    const filterClear = document.getElementById(
+      'filterClear',
+    ) as HTMLButtonElement;
+    const filterStatus = document.getElementById('filterStatus');
+    if (!grid) return;
+
+    const rows = Array.from(
+      grid.querySelectorAll('li.hub-row'),
+    ) as HTMLElement[];
+    const sections = Array.from(
+      grid.querySelectorAll('.subcategory-section'),
+    ) as HTMLElement[];
+
+    // Sort — re-orders each subcategory section's <ul> independently so
+    // grouping never changes, only the order within a group.
+    function sortRows(method: string) {
+      sections.forEach((section) => {
+        const list = section.querySelector('.hub-rows');
+        if (!list) return;
+        const items = Array.from(
+          list.querySelectorAll('li.hub-row'),
+        ) as HTMLElement[];
+        const sorted = items.sort((a, b) => {
+          if (method === 'featured') {
+            const af = a.dataset.featured === '1' ? 1 : 0;
+            const bf = b.dataset.featured === '1' ? 1 : 0;
+            if (af !== bf) return bf - af;
+            return (a.dataset.title || '').localeCompare(b.dataset.title || '');
+          }
+          if (method === 'updated') {
+            // Date.parse, not string compare — content-dates.json timestamps
+            // mix `Z` and `+08:00` offsets, which don't sort correctly as
+            // plain strings. Missing/invalid dates fall back to epoch 0
+            // (sink to the bottom of a "latest first" sort).
+            const at = Date.parse(a.dataset.updated || '') || 0;
+            const bt = Date.parse(b.dataset.updated || '') || 0;
+            return bt - at;
+          }
+          if (method === 'fn') {
+            return (
+              parseInt(b.dataset.fn || '0', 10) -
+              parseInt(a.dataset.fn || '0', 10)
+            );
+          }
+          if (method === 'reading') {
+            // 0/missing reading time sorts last in ascending order.
+            const ar = parseInt(a.dataset.reading || '0', 10) || Infinity;
+            const br = parseInt(b.dataset.reading || '0', 10) || Infinity;
+            return ar - br;
+          }
+          return 0;
+        });
+        sorted.forEach((row) => list.appendChild(row));
+      });
+    }
+
+    document.querySelectorAll('.sort-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document
+          .querySelectorAll('.sort-btn')
+          .forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        sortRows((btn as HTMLElement).dataset.sort || 'featured');
+      });
+    });
+
+    // Filter
+    function applyFilter() {
+      const query = filterInput?.value.toLowerCase() || '';
+      let visible = 0;
+      rows.forEach((row) => {
+        const haystack = [
+          row.dataset.title || '',
+          row.dataset.desc || '',
+          row.dataset.tags || '',
+          row.dataset.subcategory || '',
+        ]
+          .join(' ')
+          .toLowerCase();
+        const show = !query || haystack.includes(query);
+        row.hidden = !show;
+        if (show) visible++;
+      });
+      // Hide subcategory sections with no visible rows
+      sections.forEach((section) => {
+        const sectionRows = section.querySelectorAll(
+          'li.hub-row',
+        ) as NodeListOf<HTMLElement>;
+        const anyVisible = Array.from(sectionRows).some((r) => !r.hidden);
+        section.hidden = !anyVisible;
+      });
+      if (filterClear) filterClear.hidden = !query;
+      if (filterStatus) {
+        if (query) {
+          const template = filterStatus.dataset.template || '{n} / {m}';
+          filterStatus.textContent = template
+            .replace('{n}', String(visible))
+            .replace('{m}', String(rows.length));
+          filterStatus.hidden = false;
+        } else {
+          filterStatus.textContent = '';
+          filterStatus.hidden = true;
+        }
+      }
+    }
+
+    filterInput?.addEventListener('input', () => {
+      applyFilter();
+    });
+    filterClear?.addEventListener('click', () => {
+      if (!filterInput) return;
+      filterInput.value = '';
+      filterInput.dispatchEvent(new Event('input'));
+      filterInput.focus();
+    });
+  });
+</script>
+
+<style
+  define:vars={{
+    categoryColor: categoryInfo.color,
+    categoryColorLight: categoryInfo.colorLight,
+  }}
+>
+  /* 2026-04-27 sticky sidebar highlight 對應 IntersectionObserver
+     用 plain CSS 而非 Tailwind 的 [&.active]: arbitrary variant，原因：
+     Tailwind v4 在 dev/build 時對 `[&.active]:bg-[var(--categoryColor,...)]`
+     的 var() + arbitrary value 組合 JIT 不穩定，部分 production build
+     拿不到該 CSS rule。改用 page-scoped <style> 直接寫 `.active` 規則
+     可保證命中（且 categoryColor 已透過 define:vars 暴露）。 */
+  .subcat-nav-link.active {
+    background-color: rgba(45, 80, 22, 0.08);
+    /* Logical, paired with the `border-s-2` utility on the link itself. */
+    border-inline-start-color: var(--categoryColor, #2d5016);
+    color: var(--categoryColor, #2d5016);
+    font-weight: 600;
+  }
+
+  /* Sidebar essay-anchor link (2026-07-10) — sits between the subcategory
+   * nav and the cross-category nav. Stacked (not inline) label + minutes
+   * hint: the sidebar column is only 180px wide, too narrow to reliably
+   * fit "📖 Curatorial Reading" + "~12 min" on one line in every language. */
+  .sidebar-essay-link {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+    border-radius: 4px;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-ink-soft);
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+  .sidebar-essay-link:hover {
+    background: color-mix(
+      in srgb,
+      var(--categoryColor, #2d5016) 6%,
+      transparent
+    );
+    color: var(--categoryColor, #2d5016);
+  }
+  .sidebar-essay-link .muted {
+    font-weight: 400;
+    font-size: 0.72rem;
+    color: var(--color-ink-soft);
+  }
+
+  /* Focus-visible outlines (2026-07-11 hub a11y sweep) — same convention as
+     .sort-btn/#filterClear further down (3px, category-accent colored).
+     Covers the sidebar's subcategory nav, essay-anchor link, cross-category
+     nav link (desktop) and its mobile accordion chip counterpart. */
+  .subcat-nav-link:focus-visible,
+  .sidebar-essay-link:focus-visible,
+  .othercat-link:focus-visible,
+  .othercat-chip:focus-visible {
+    outline: 3px solid var(--categoryColor, #2d5016);
+    outline-offset: 2px;
+  }
+
+  .category-page {
+    min-height: 100vh;
+  }
+
+  .header-hook-prose :global(p) {
+    margin: 0.4rem 0;
+  }
+  .header-hook-prose :global(p:first-child) {
+    margin-top: 0;
+  }
+  .header-hook-prose :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  /* Breadcrumb (2026-07-10 semantic <nav><ol><li> markup) — the "›"
+     separator is a decorative ::after on every non-last <li> instead of
+     its own list item, so the breadcrumb stays exactly two <li>s (one per
+     actual crumb) while staying visually identical to the old 3-span
+     layout. */
+  .crumb-list li:not(:last-child)::after {
+    content: '›';
+    margin-inline-start: 0.5rem;
+    color: var(--color-ink-soft);
+    font-weight: 400;
+  }
+
+  /* Essay reading-time hint appended after the header hook's "read guide"
+     link (2026-07-10). */
+  .hook-minutes {
+    margin-inline-start: 0.6rem;
+    font-size: 0.78rem;
+    color: var(--color-ink-soft);
+  }
+
+  /* "Updated {date}" badge next to the article-count pill (2026-07-10). */
+  .header-updated {
+    font-size: 0.78rem;
+    color: var(--color-ink-soft);
+    white-space: nowrap;
+  }
+
+  /* Articles Grid */
+  .hub-prose {
+    font-size: 1.05rem;
+    line-height: 2;
+    color: var(--color-ink);
+    max-width: 840px;
+    margin: 0 auto;
+  }
+  .hub-prose :global(h1:first-child) {
+    display: none;
+  }
+  /* linear-gradient() takes no logical direction keyword, and this prose block
+     has five callout variants that all fade away from the rail. One flippable
+     custom property beats five [dir='rtl'] overrides. */
+  .hub-prose {
+    --hub-fade-to: right;
+  }
+  :global([dir='rtl']) .hub-prose {
+    --hub-fade-to: left;
+  }
+  .hub-prose :global(blockquote:first-child) {
+    font-size: 1.15rem;
+    font-style: normal;
+    font-weight: 600;
+    border-inline-start: 4px solid #4a7c28;
+    padding: 1rem 1.5rem;
+    margin: 0 0 2rem 0;
+    background: #f0f7ee;
+    border-start-start-radius: 0;
+    border-start-end-radius: 8px;
+    border-end-end-radius: 8px;
+    border-end-start-radius: 0;
+    color: #2d5016;
+    line-height: 1.9;
+  }
+  .hub-prose :global(blockquote) {
+    border-inline-start: 4px solid #4a7c28;
+    background: linear-gradient(
+      to var(--hub-fade-to),
+      rgba(26, 60, 52, 0.04),
+      transparent
+    );
+    margin: 2.5rem 0;
+    padding: 1.5rem 1.75rem;
+    border-start-start-radius: 0;
+    border-start-end-radius: 12px;
+    border-end-end-radius: 12px;
+    border-end-start-radius: 0;
+    font-style: italic;
+    color: #3a4f44;
+    font-size: 1.05rem;
+  }
+  .hub-prose :global(blockquote p) {
+    margin-bottom: 0;
+  }
+
+  /* Callout blockquotes */
+  .hub-prose :global(blockquote.callout-note) {
+    border-inline-start-color: #3b82f6;
+    background: linear-gradient(
+      to var(--hub-fade-to),
+      rgba(59, 130, 246, 0.06),
+      transparent
+    );
+    font-style: normal;
+  }
+  .hub-prose :global(blockquote.callout-warning) {
+    border-inline-start-color: #f59e0b;
+    background: linear-gradient(
+      to var(--hub-fade-to),
+      rgba(245, 158, 11, 0.06),
+      transparent
+    );
+    font-style: normal;
+  }
+  .hub-prose :global(blockquote.callout-tip) {
+    border-inline-start-color: #10b981;
+    background: linear-gradient(
+      to var(--hub-fade-to),
+      rgba(16, 185, 129, 0.06),
+      transparent
+    );
+    font-style: normal;
+  }
+  .hub-prose :global(blockquote.callout-data) {
+    border-inline-start-color: #8b5cf6;
+    background: linear-gradient(
+      to var(--hub-fade-to),
+      rgba(139, 92, 246, 0.06),
+      transparent
+    );
+    font-style: normal;
+  }
+
+  /* Pull quote */
+  .hub-prose :global(blockquote.pull-quote) {
+    border-inline-start: none;
+    background: none;
+    text-align: center;
+    font-size: 1.35rem;
+    font-weight: 600;
+    font-style: normal;
+    color: #1a3c34;
+    padding: 2rem 2.5rem;
+    margin: 3rem auto;
+    max-width: 680px;
+    line-height: 1.8;
+    position: relative;
+  }
+  .hub-prose :global(blockquote.pull-quote)::before {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: #4a7c28;
+    margin: 0 auto 1.5rem;
+    border-radius: 2px;
+  }
+  .hub-prose :global(blockquote.pull-quote)::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: #4a7c28;
+    margin: 1.5rem auto 0;
+    border-radius: 2px;
+  }
+
+  .hub-prose :global(h2) {
+    font-size: var(--title-subsection-size);
+    font-weight: 800;
+    margin: 4rem 0 1.2rem;
+    color: var(--color-ink);
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid var(--color-border);
+    letter-spacing: var(--title-letter-spacing);
+    line-height: var(--title-line-height);
+    font-family: var(--font-editorial);
+  }
+  .hub-prose :global(h3) {
+    font-size: var(--title-minor-size);
+    font-weight: 700;
+    margin: 3rem 0 0.75rem;
+    color: var(--color-ink);
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    font-family: var(--font-editorial);
+  }
+  .hub-prose :global(p) {
+    margin: 1.1rem 0;
+    text-align: justify;
+    color: var(--color-ink);
+  }
+  .hub-prose :global(ul) {
+    list-style: disc;
+    padding-inline-start: 1.5rem;
+    margin-bottom: 1.1rem;
+  }
+  .hub-prose :global(ol) {
+    list-style: decimal;
+    padding-inline-start: 1.5rem;
+    margin-bottom: 1.1rem;
+  }
+  .hub-prose :global(li) {
+    margin-bottom: 0.3rem;
+    line-height: 1.65;
+  }
+  .hub-prose :global(a) {
+    color: var(--color-ink);
+    text-decoration: none;
+    border-bottom: 1.5px solid var(--color-ink-soft);
+    padding-bottom: 1px;
+    transition: all 0.2s;
+  }
+  .hub-prose :global(a:hover) {
+    color: var(--color-ink);
+    border-bottom-color: var(--color-ink);
+  }
+
+  /* Hub wikilinks as topic-pill */
+  .hub-prose :global(a.topic-pill) {
+    display: inline-block;
+    background: rgba(45, 80, 22, 0.08);
+    border: 1.5px solid rgba(45, 80, 22, 0.2);
+    border-radius: 6px;
+    padding: 0.15rem 0.6rem;
+    font-weight: 700;
+    color: #2d5016;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    border-bottom: none;
+  }
+  .hub-prose :global(a.topic-pill:hover) {
+    background: rgba(45, 80, 22, 0.15);
+    border-color: rgba(45, 80, 22, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(45, 80, 22, 0.15);
+    color: #2d5016;
+  }
+
+  .hub-prose :global(code) {
+    font-family: 'Courier New', monospace;
+    font-size: 0.88em;
+    background: rgba(26, 60, 52, 0.06);
+    color: #1a3c34;
+    padding: 0.15em 0.45em;
+    border-radius: 4px;
+  }
+  .hub-prose :global(pre) {
+    background: #1a3c34;
+    color: #f8f1e9;
+    padding: 1.5rem;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 2rem 0;
+    font-size: 0.875rem;
+  }
+  .hub-prose :global(pre code) {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  .hub-prose :global(img) {
+    width: 100%;
+    max-height: 480px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin: 2rem 0;
+    box-shadow: 0 4px 24px rgba(26, 60, 52, 0.1);
+  }
+  .hub-prose :global(img.img-broken) {
+    min-height: 120px;
+    background: rgba(26, 60, 52, 0.04);
+    border: 2px dashed rgba(26, 60, 52, 0.15);
+    border-radius: 12px;
+  }
+  .hub-prose :global(em) {
+    font-size: 0.85rem;
+    color: var(--color-ink-soft);
+    display: block;
+    text-align: center;
+    margin: -1rem 0 1.5rem;
+  }
+  .hub-prose :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0;
+    font-size: 0.9rem;
+  }
+  .hub-prose :global(th) {
+    background: rgba(26, 60, 52, 0.05);
+    color: #1a3c34;
+    font-weight: 600;
+    text-align: start;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid rgba(26, 60, 52, 0.12);
+  }
+  .hub-prose :global(td) {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid rgba(26, 60, 52, 0.06);
+    color: #3a4f44;
+  }
+  .hub-prose :global(tr:hover td) {
+    background: rgba(26, 60, 52, 0.02);
+  }
+  .hub-prose :global(strong) {
+    font-weight: 700;
+    color: #1a3c34;
+  }
+  .hub-prose :global(hr) {
+    border: none;
+    border-top: 1px solid rgba(26, 60, 52, 0.1);
+    margin: 3rem 0;
+  }
+
+  /* ===== FEATURED SHELF (2026-07-10 replaces the horizontal chip strip) =====
+   * 3-card grid of ArticleCard density="detailed". */
+  .featured-shelf {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .shelf-heading {
+    margin: 0 0 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-ink-soft);
+  }
+  .shelf-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .shelf-grid > li {
+    display: flex;
+    min-width: 0;
+  }
+  /* ArticleCard density="detailed" was built for /latest's full-width
+   * single-column rows (fixed 200px side thumb + text). Squeezed into a
+   * 3-col grid cell (or the 78vw mobile scroll card below) that
+   * fixed-width row layout leaves too little room for the text column, so
+   * the shelf reuses the component's own "thumb on top" mobile layout at
+   * every width here. :global() is required to reach past the ArticleCard
+   * component boundary — its rendered .article-card root never carries
+   * this file's scoped data-attribute, same reason .hub-prose reaches
+   * into marked()-generated HTML via :global() above. */
+  .shelf-grid :global(.article-card.is-detailed) {
+    flex: 1;
+    flex-direction: column;
+  }
+  .shelf-grid :global(.article-card.is-detailed .article-card-thumbwrap) {
+    order: -1;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    align-self: stretch;
+  }
+  .shelf-grid :global(.article-card.is-detailed .article-card-thumb-dropcap) {
+    font-size: 3.4rem;
+  }
+  @media (max-width: 768px) {
+    .shelf-grid {
+      display: flex;
+      grid-template-columns: none;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      gap: 0.75rem;
+      padding-bottom: 0.25rem;
+    }
+    .shelf-grid::-webkit-scrollbar {
+      display: none;
+    }
+    .shelf-grid > li {
+      flex: 0 0 78vw;
+      min-width: 78vw;
+      scroll-snap-align: start;
+    }
+  }
+  /* ===== END FEATURED SHELF ===== */
+
+  /* ===== HUB LIST (2026-07-10 article-list-section rewrite) =====
+   * Rows are now <ArticleCard density="row"> instances (see
+   * src/components/ArticleCard.astro) grouped under semantic
+   * <section>/<h2>/<ul> markup — this block only styles the toolbar
+   * (search + sort) and the group/list scaffolding around them. */
+  .articles-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Toolbar — search grows to fill available space; sort pills form a
+     compact group that scrolls horizontally (nowrap + overflow-x) once
+     it runs out of room, which covers the mobile case without a
+     dedicated breakpoint. */
+  .hub-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+  }
+  .hub-search {
+    position: relative;
+    flex: 1 1 220px;
+    min-width: 160px;
+    max-width: 320px;
+  }
+  .hub-search input {
+    width: 100%;
+    padding: 0.45rem 2rem 0.45rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .hub-search input:focus-visible {
+    border-color: var(--categoryColor, #2d5016);
+    box-shadow: 0 0 0 2px
+      color-mix(in srgb, var(--categoryColor, #2d5016) 15%, transparent);
+  }
+  #filterClear {
+    position: absolute;
+    top: 50%;
+    /* inset-inline-end: the clear button belongs at the trailing edge of the
+       input, which is the left edge in RTL (ar). */
+    inset-inline-end: 0.35rem;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    color: var(--color-ink-soft);
+    font-size: 1.05rem;
+    line-height: 1;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  #filterClear:hover {
+    color: var(--color-ink);
+    background: var(--color-bg-soft);
+  }
+
+  .hub-sort {
+    display: flex;
+    gap: 0.35rem;
+    flex-shrink: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .hub-sort::-webkit-scrollbar {
+    display: none;
+  }
+  .sort-btn {
+    flex-shrink: 0;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    background: var(--color-surface);
+    color: var(--color-ink-soft);
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .sort-btn:hover {
+    border-color: var(--categoryColor, #2d5016);
+    color: var(--color-ink);
+  }
+  .sort-btn.active {
+    background: var(--categoryColorLight);
+    border-color: var(--categoryColor, #2d5016);
+    color: var(--categoryColor, #2d5016);
+  }
+  /* Focus-visible outline on buttons per TopicCard convention (3px,
+     category-accent colored) — src/components/TopicCard.astro. */
+  .sort-btn:focus-visible,
+  #filterClear:focus-visible {
+    outline: 3px solid var(--categoryColor, #2d5016);
+    outline-offset: 2px;
+  }
+
+  .filter-status {
+    margin: 0 0 0.75rem;
+    font-size: 0.78rem;
+    color: var(--color-ink-soft);
+  }
+
+  .hub-rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .group-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1.5rem 0 0.5rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid var(--categoryColor, #e2e8f0);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+  .subcategory-section:first-child .group-heading {
+    margin-top: 0;
+  }
+  .group-count {
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--color-ink-soft);
+  }
+
+  /* ===== END HUB LIST ===== */
+
+  /* ===== CROSS-CATEGORY MOBILE ACCORDION (2026-07-10) =====
+   * The sidebar's own cross-category <nav> is desktop-only
+   * (max-[768px]:hidden); this is its mobile stand-in, placed at the
+   * bottom of the main column. Chip style matches the mobile subcategory
+   * chips (rounded-2xl, bordered, soft background). */
+  .othercats-accordion {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+  }
+  .othercats-accordion summary {
+    cursor: pointer;
+    padding: 0.3rem 0;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-soft);
+  }
+  .othercats-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+  }
+  .othercat-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-soft);
+    color: var(--color-ink-soft);
+    font-size: 0.78rem;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+  .othercat-chip:hover {
+    border-color: var(--categoryColor, #2d5016);
+    color: var(--categoryColor, #2d5016);
+  }
+  /* ===== END CROSS-CATEGORY MOBILE ACCORDION ===== */
+</style>
+
+<!--
+  2026-04-27 sticky sidebar highlight：當使用者捲動到某個 subcategory 區塊
+  （如「音樂與表演」「政治人物」），左側 sticky 主題側邊欄對應連結加 .active
+  class。是 page-scoped <style> 規則（不是 Tailwind 變體）負責視覺效果。
+  is:inline = 不被 Vite 處理，避免 TS/HMR 路徑出錯導致 IIFE 不執行。
+-->
+<script is:inline>
+  (function () {
+    function init() {
+      var links = document.querySelectorAll('.subcat-nav-link[data-sub-link]');
+      if (!links.length) return;
+      var sections = [];
+      for (var i = 0; i < links.length; i++) {
+        var name = links[i].dataset.subLink;
+        var el = name ? document.getElementById('sub-' + name) : null;
+        if (el) sections.push(el);
+      }
+      if (!sections.length) return;
+      function setActive(name) {
+        for (var j = 0; j < links.length; j++) {
+          links[j].classList.toggle(
+            'active',
+            links[j].dataset.subLink === name,
+          );
+        }
+      }
+      var observer = new IntersectionObserver(
+        function (entries) {
+          var intersecting = entries.filter(function (e) {
+            return e.isIntersecting;
+          });
+          if (!intersecting.length) return;
+          // pick the section closest to the top of the trigger zone
+          var top = intersecting.reduce(function (best, e) {
+            return e.boundingClientRect.top < best.boundingClientRect.top
+              ? e
+              : best;
+          });
+          var id = top.target.id; // 'sub-XXX'
+          if (id.indexOf('sub-') === 0) setActive(id.slice(4));
+        },
+        {
+          // 觸發區 = viewport 上 1/4（從頂端 -10% 到底部 -65%）
+          rootMargin: '-10% 0px -65% 0px',
+          threshold: 0,
+        },
+      );
+      sections.forEach(function (s) {
+        observer.observe(s);
+      });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>
