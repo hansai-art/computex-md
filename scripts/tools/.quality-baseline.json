@@ -1,13 +1,13 @@
 {
   "version": "ssot-1.0",
-  "timestamp": "2026-07-28T17:27:43Z",
+  "timestamp": "2026-07-28T17:33:47Z",
   "total": 1,
   "flagged": 1,
   "files": [
     {
       "file": "editions/COMPUTEX 2027.md",
-      "score": 6,
-      "reasons": "僅1個URL; 後段清單堆砌46%; 稀薄段落×4"
+      "score": 7,
+      "reasons": "僅1個URL; 未人工審核; 後段清單堆砌46%; 稀薄段落×4"
     }
   ]
 }

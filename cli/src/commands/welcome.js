@@ -17,7 +17,7 @@ import chalk from 'chalk';
 import { getArticleFiles, getLanguageDirs } from '../lib/knowledge.js';
 import { getDataAgeDays } from '../lib/ensure-data.js';
 
-const UPSTREAM = 'frank890417/taiwan-md';
+const UPSTREAM = 'hansai-art/computex-md';
 
 /** Article count + language count, counted rather than claimed. */
 function vitals() {

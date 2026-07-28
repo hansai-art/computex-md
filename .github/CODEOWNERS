@@ -2,31 +2,31 @@
 # 分類 maintainer 制度 — 每個領域有專人負責品質審核
 
 # 全站（預設）
-* @frank890417
+* @hansai-art
 
 # 核心設定（需 owner 審核）
-astro.config.mjs @frank890417
-.github/ @frank890417
+astro.config.mjs @hansai-art
+.github/ @hansai-art
 
 # Frontend / CSS / Components
-src/layouts/ @frank890417 @fredchu @YenTingWu
-src/components/ @frank890417 @fredchu @YenTingWu
-src/pages/en/ @frank890417 @fredchu @YenTingWu
+src/layouts/ @hansai-art @fredchu @YenTingWu
+src/components/ @hansai-art @fredchu @YenTingWu
+src/pages/en/ @hansai-art @fredchu @YenTingWu
 
 # Templates / i18n
-src/templates/ @frank890417 @YenTingWu
-src/i18n/ @frank890417 @YenTingWu
+src/templates/ @hansai-art @YenTingWu
+src/i18n/ @hansai-art @YenTingWu
 
 # 中文內容
-knowledge/ @frank890417 @fredchu
+knowledge/ @hansai-art @fredchu
 
 # 多語系內容
-knowledge/en/ @frank890417 @fredchu @YenTingWu
-knowledge/es/ @frank890417 @YenTingWu
-knowledge/ja/ @frank890417 @YenTingWu
+knowledge/en/ @hansai-art @fredchu @YenTingWu
+knowledge/es/ @hansai-art @YenTingWu
+knowledge/ja/ @hansai-art @YenTingWu
 
 # 圖片資源
-public/images/ @frank890417 @fredchu
+public/images/ @hansai-art @fredchu
 
 # 腳本與工具
-scripts/ @frank890417 @fredchu
+scripts/ @hansai-art @fredchu

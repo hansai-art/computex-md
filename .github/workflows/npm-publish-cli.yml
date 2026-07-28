@@ -7,7 +7,7 @@ name: Publish CLI to npm
 #   1. Create an npm "automation" access token at
 #      https://www.npmjs.com/settings/YOUR_USER/tokens  (type: Automation)
 #   2. Add it as a repo secret named NPM_TOKEN:
-#      https://github.com/frank890417/taiwan-md/settings/secrets/actions
+#      https://github.com/hansai-art/computex-md/settings/secrets/actions
 #
 # Usage:
 #   cd cli && npm version patch   # bumps package.json + creates git tag 'v0.6.2' (auto)

@@ -41,7 +41,7 @@ describe('collectIdentities', () => {
     // Any identity matching cheyu|frank keywords should resolve to canonical
     const cheyuVariants = identities.filter(
       (id) =>
-        /frank890417|wu che yu/i.test(id.name) || /frank890417/i.test(id.email),
+        /hansai-art|wu che yu/i.test(id.name) || /hansai-art/i.test(id.email),
     );
     if (cheyuVariants.length === 0) return; // repo may not have these yet in fresh clone
     for (const id of cheyuVariants) {

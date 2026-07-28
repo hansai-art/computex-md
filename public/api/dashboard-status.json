@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-28T17:27:46.726Z",
+  "generated_at": "2026-07-28T17:33:50.724Z",
   "routines": null,
   "babel": null,
   "incidents": [
@@ -12,7 +12,7 @@
     {
       "ts": "2026-07-28",
       "level": "red",
-      "text": "🛡️ 免疫系統 器官分數 30 < 50，需要干預",
+      "text": "🛡️ 免疫系統 器官分數 44 < 50，需要干預",
       "source": "dashboard-organism.json"
     },
     {
@@ -29,8 +29,8 @@
     },
     {
       "ts": "2026-07-28",
-      "level": "red",
-      "text": "免疫 v3=30：🔴 危險 — 結構性免疫不足",
+      "level": "yellow",
+      "text": "免疫 v3=44：漂移 — 多維度退化中",
       "source": "dashboard-immune.json"
     }
   ],

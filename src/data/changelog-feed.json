@@ -1,7 +1,19 @@
 {
-  "generatedAt": "2026-07-28T17:27:43.747Z",
+  "generatedAt": "2026-07-28T17:33:47.796Z",
   "source": "git",
   "commits": [
+    {
+      "hash": "cd3fe19a1568b2410ff60069de47c289eeccba85",
+      "date": "2026-07-29T01:33:22+08:00",
+      "author": "Hans",
+      "message": "feat: Stage 2 gate 通過 — build 綠、post-build-check 綠、第一篇內容上線",
+      "articles": [
+        {
+          "url": "/editions/COMPUTEX 2027",
+          "name": "COMPUTEX 2027"
+        }
+      ]
+    },
     {
       "hash": "e2f08ac5994b897b505c72b234967dd1f7465b36",
       "date": "2026-07-29T01:12:10+08:00",

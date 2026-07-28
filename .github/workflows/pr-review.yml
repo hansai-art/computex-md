@@ -40,7 +40,7 @@ jobs:
           # Bug history: 2026-04-21 PR #582 (code-only i18n refactor) failed
           # content review because main had just gained Hello-Nico.md, which
           # 2-dot diff reported as "deleted in PR head". See:
-          # https://github.com/frank890417/taiwan-md/actions/runs/24703099747
+          # https://github.com/hansai-art/computex-md/actions/runs/24703099747
           #
           # 2026-05-06 jovial-feistel fix: for fork PRs, the head SHA isn't in
           # the local clone, so `base.sha...head.sha` returned empty and the

@@ -1,8 +1,8 @@
 {
   "totalArticles": 2,
   "totalCategories": 2,
-  "estimatedContributors": 57,
-  "totalTags": 9,
+  "estimatedContributors": 0,
+  "totalTags": 6,
   "categories": [
     {
       "name": "en",
@@ -16,26 +16,10 @@
   "topTags": [
     {
       "name": "COMPUTEX",
-      "count": 2
+      "count": 1
     },
     {
       "name": "COMPUTEX 2027",
-      "count": 2
-    },
-    {
-      "name": "TAITRA",
-      "count": 2
-    },
-    {
-      "name": "Taipei",
-      "count": 1
-    },
-    {
-      "name": "Nangang Exhibition Center",
-      "count": 1
-    },
-    {
-      "name": "trade show",
       "count": 1
     },
     {
@@ -47,6 +31,10 @@
       "count": 1
     },
     {
+      "name": "TAITRA",
+      "count": 1
+    },
+    {
       "name": "展會資訊",
       "count": 1
     }
@@ -55,11 +43,10 @@
     "zh-TW": 2,
     "en": 0
   },
-  "lastUpdated": "2026-07-28T17:27:43.759Z",
+  "lastUpdated": "2026-07-28T17:33:47.891Z",
   "stars": 0,
   "forks": 0,
   "zhPages": 1,
   "enPages": 1,
-  "totalPages": 1,
-  "_note": "COMPUTEX.md 尚未推上 GitHub，數字歸零。repo 建立後由 prebuild 自動填。"
+  "totalPages": 1
 }

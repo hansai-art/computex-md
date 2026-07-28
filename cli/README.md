@@ -326,7 +326,7 @@ Aim for **90+/100** before submitting.
 git add knowledge/{Category}/{slug}.md
 git commit -m "feat(knowledge): add article on {topic}"
 git push origin your-branch
-# Then open a PR at https://github.com/frank890417/taiwan-md
+# Then open a PR at https://github.com/hansai-art/computex-md
 ```
 
 ### Article Quality Guidelines
@@ -359,5 +359,5 @@ This project includes Claude Code skills in `.claude/skills/`:
 
 - Website: [taiwan.md](https://taiwan.md)
 - Dashboard: [taiwan.md/dashboard](https://taiwan.md/dashboard)
-- GitHub: [frank890417/taiwan-md](https://github.com/frank890417/taiwan-md)
+- GitHub: [hansai-art/computex-md](https://github.com/hansai-art/computex-md)
 - npm: [npmjs.com/package/taiwanmd](https://www.npmjs.com/package/taiwanmd)

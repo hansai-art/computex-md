@@ -1,11 +1,16 @@
 {
-  "generated_at": "2026-07-28T17:27:43.686Z",
+  "generated_at": "2026-07-28T17:33:47.743Z",
   "languages": ["en"],
-  "total_entries": 0,
+  "total_entries": 3,
   "registry": {
     "en": {
-      "toZh": {},
-      "fromZh": {}
+      "toZh": {
+        "/en/editions/computex-2027": "/editions/COMPUTEX%202027"
+      },
+      "fromZh": {
+        "/editions/COMPUTEX%202027": "/en/editions/computex-2027",
+        "/editions/COMPUTEX 2027": "/en/editions/computex-2027"
+      }
     }
   }
 }

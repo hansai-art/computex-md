@@ -30,7 +30,7 @@ prefixed with `cli-v`. GitHub Actions runs tests, verifies the tag matches
 
 ### 2. Add the token to the GitHub repo
 
-1. Go to https://github.com/frank890417/taiwan-md/settings/secrets/actions
+1. Go to https://github.com/hansai-art/computex-md/settings/secrets/actions
 2. **New repository secret**
    - Name: `NPM_TOKEN`
    - Value: the token from step 1
@@ -39,7 +39,7 @@ prefixed with `cli-v`. GitHub Actions runs tests, verifies the tag matches
 ### 3. Verify
 
 Push any `cli-v*` tag — the workflow at `.github/workflows/npm-publish-cli.yml`
-will trigger. Watch at https://github.com/frank890417/taiwan-md/actions.
+will trigger. Watch at https://github.com/hansai-art/computex-md/actions.
 
 ## Releasing a new version
 

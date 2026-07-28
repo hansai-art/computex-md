@@ -63,5 +63,5 @@ git push origin "$TAG"
 
 echo ""
 echo "✅ Release kicked off: $TAG"
-echo "   Watch: https://github.com/frank890417/taiwan-md/actions"
+echo "   Watch: https://github.com/hansai-art/computex-md/actions"
 echo "   Will publish: https://www.npmjs.com/package/taiwanmd"

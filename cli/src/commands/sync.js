@@ -13,7 +13,7 @@ import { homedir } from 'os';
 
 const KNOWLEDGE_DIR = join(homedir(), '.taiwanmd', 'knowledge');
 const CACHE_DIR = join(homedir(), '.taiwanmd', 'cache');
-const REPO_URL = 'https://github.com/frank890417/taiwan-md.git';
+const REPO_URL = 'https://github.com/hansai-art/computex-md.git';
 
 /**
  * Run a shell command and return its output.

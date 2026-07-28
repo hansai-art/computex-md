@@ -1,16 +1,16 @@
 {
-  "lastUpdated": "2026-07-29T01:27:45.630713",
+  "lastUpdated": "2026-07-29T01:33:49.666435",
   "schemaVersion": "v2-2026-05-16",
   "featureFlag": "IMMUNE_V2",
-  "immuneScore": 30,
-  "status": "🔴 危險 — 結構性免疫不足",
+  "immuneScore": 44,
+  "status": "漂移 — 多維度退化中",
   "components": {
     "review_coverage": 0.0,
-    "plugin_pass_rate": 0.0,
+    "plugin_pass_rate": 70.0,
     "plugin_health": 100.0,
     "citation_density": 40.0,
     "tool_freshness": 40,
-    "drift_velocity": 100,
+    "drift_velocity": 90.0,
     "external_rulers": 0.0
   },
   "componentWeights": {
@@ -44,8 +44,8 @@
   },
   "pluginPassDetail": {
     "total_files": 1,
-    "hard_pass_files": 0,
-    "hard_pass_pct": 0.0,
+    "hard_pass_files": 1,
+    "hard_pass_pct": 100.0,
     "warn_pass_files": 0,
     "warn_pass_pct": 0.0,
     "weight_formula": "hard×0.7 + warn×0.3"
@@ -67,8 +67,9 @@
     "source": "git log %ai (not fs mtime — worktree-safe)"
   },
   "driftDetail": {
-    "new_articles_7d": 0,
-    "rate_per_article": 0.0
+    "new_articles_7d": 1,
+    "rate_per_article": 1.0,
+    "note": "v1 heuristic — longitudinal tracking pending (B-line meta-health)"
   },
   "pluginHealthDetail": {
     "schema": "v2-loadable-2026-07-10",

@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-07-28T17:27:46.470Z",
+  "lastUpdated": "2026-07-28T17:33:50.492Z",
   "generator": "scripts/core/generate-dashboard-alerts.mjs",
   "note": "derived 警報層 — CONSCIOUSNESS §警報 的機械接管 (audit 2026-06-10 A-3)",
   "count": 5,
@@ -15,7 +15,7 @@
     {
       "id": "organ-immune",
       "severity": "red",
-      "message": "🛡️ 免疫系統 器官分數 30 < 50，需要干預",
+      "message": "🛡️ 免疫系統 器官分數 44 < 50，需要干預",
       "source": "dashboard-organism.json",
       "owner": "twmd-self-evolve-weekly",
       "firstSeen": "2026-07-28"
@@ -38,8 +38,8 @@
     },
     {
       "id": "immune-status",
-      "severity": "red",
-      "message": "免疫 v3=30：🔴 危險 — 結構性免疫不足",
+      "severity": "yellow",
+      "message": "免疫 v3=44：漂移 — 多維度退化中",
       "source": "dashboard-immune.json",
       "owner": "twmd-self-evolve-weekly",
       "firstSeen": "2026-07-28"

@@ -27,15 +27,15 @@ timezone: Asia/Taipei
     const yaml = `git:
   canonical: Che-Yu Wu <cheyu.wu@monoame.com>
   aliases:
-    - Wu Che Yu <frank890417@gmail.com>
-    - frank890417 <cheyu.wu@monoame.com>
+    - Wu Che Yu <hansai-art@gmail.com>
+    - hansai-art <cheyu.wu@monoame.com>
 `;
     const p = parseProfile(yaml);
     expect(p.git).toBeDefined();
     expect(p.git.canonical).toBe('Che-Yu Wu <cheyu.wu@monoame.com>');
     expect(p.git.aliases).toEqual([
-      'Wu Che Yu <frank890417@gmail.com>',
-      'frank890417 <cheyu.wu@monoame.com>',
+      'Wu Che Yu <hansai-art@gmail.com>',
+      'hansai-art <cheyu.wu@monoame.com>',
     ]);
   });
 
