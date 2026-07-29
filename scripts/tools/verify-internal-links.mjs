@@ -35,26 +35,19 @@ const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const distDir = process.argv[2] || join(repoRoot, 'dist');
 
 /**
- * 已知欠債：取種時帶進來、還沒清掉的母體路由。
+ * 2026-07-29：KNOWN_DEBT 已經清空並刪除。
  *
- * 這份清單**只准變短**。它存在的理由是：這支檢查第一次跑就抓到 33 條死連結，
- * 全部集中在 /about、/explore、/mcp 三頁 —— 那三頁的內容本體還是母體的，
- * 清這些連結等於重寫那三頁，不是這個 commit 的範圍。與其把整支 gate 擱著不接
- * （擱著就等於沒有守門，新的死連結照樣進得來），不如接上並把當下的欠債逐條列
- * 出來：今天之後**新增**的任何一條死連結都會當場擋下。
+ * 它存在過的理由是：這支檢查第一次跑就抓到 33 條死連結，全部集中在 /about、
+ * /explore、/mcp 三頁 —— 那三頁的內容本體還是母體的，清這些連結等於重寫那三頁。
+ * 與其把整支 gate 擱著不接（擱著就等於沒有守門），不如接上並把當下的欠債逐條
+ * 列出來，讓「今天之後新增的死連結」照樣被擋。
  *
- * 紀律：
- *   - NEVER 為了讓 build 過而往這裡加新項目。新的死連結要修連結，不是加豁免。
- *   - 清掉一頁就把對應的行刪掉；清乾淨了就把整個常數與相關分支一起刪掉。
- *   - 已經不再是死連結的項目會被下面的「陳舊豁免」檢查揪出來，逼它退場。
+ * 三頁在同一天全部重寫完，清單也就跟著歸零，整個常數與相關分支一起刪掉 ——
+ * 那本來就是這種豁免清單唯一正確的結局。
+ *
+ * 從現在起這支沒有豁免機制：任何一條死連結都直接擋 build。要修連結，
+ * NEVER 為了讓 build 過而把豁免加回來。
  */
-const KNOWN_DEBT = new Set([
-  // /mcp：母體的 Semiont 生命體頁
-  '/semiont',
-  // 2026-07-29 /about 重寫後退場 12 條（母體 Semiont 器官頁、演講投影片、母體
-  // 自介文章），同日 /explore 改寫後 /map 與 /terminology 四條也退場。清單就是
-  // 這樣縮的：只剩 /semiont，等 /mcp 去母體化就能把整個常數刪掉。
-]);
 
 function walk(dir, out = []) {
   for (const entry of readdirSync(dir)) {
@@ -110,42 +103,18 @@ for (const file of pages) {
   }
 }
 
-/** 一條死連結算不算已知欠債（本身或它的上層路徑在清單裡）。 */
-function isKnownDebt(href) {
-  const clean = href.split(/[?#]/)[0].replace(/\/+$/, '');
-  if (KNOWN_DEBT.has(clean) || KNOWN_DEBT.has(`${clean}/`)) return true;
-  for (const prefix of KNOWN_DEBT) {
-    if (clean.startsWith(`${prefix.replace(/\/+$/, '')}/`)) return true;
-  }
-  return false;
-}
-
-const fresh = [...dead].filter(([href]) => !isKnownDebt(href));
-const debt = [...dead].filter(([href]) => isKnownDebt(href));
-
-// 陳舊豁免：清單裡列了但這一輪根本沒出現的項目。留著會讓清單失去意義
-// （某天有人重新引入同一條死連結，會被一條「歷史遺留」的豁免無聲放行）。
-const stale = [...KNOWN_DEBT].filter(
-  (entry) => !debt.some(([href]) => isKnownDebt(href) && href.includes(entry)),
-);
+const fresh = [...dead];
 
 if (fresh.length === 0) {
   console.log(
-    `✅ [internal-links] ${pages.length} 頁共 ${checked} 條站內連結沒有新的死連結` +
-      (debt.length ? `（已知欠債 ${debt.length} 條，全部在母體殘留頁上）` : ''),
+    `✅ [internal-links] ${pages.length} 頁共 ${checked} 條站內連結沒有死連結`,
   );
-  if (stale.length) {
-    console.log(
-      `ℹ️  [internal-links] KNOWN_DEBT 有 ${stale.length} 條已經不再是死連結，` +
-        `可以從清單刪掉：${stale.join(', ')}`,
-    );
-  }
   process.exit(0);
 }
 
 const totalRefs = fresh.reduce((a, [, refs]) => a + refs.length, 0);
 console.error(
-  `❌ [internal-links] ${fresh.length} 條新的死連結，被引用 ${totalRefs} 次（掃了 ${pages.length} 頁 / ${checked} 條連結）：`,
+  `❌ [internal-links] ${fresh.length} 條死連結，被引用 ${totalRefs} 次（掃了 ${pages.length} 頁 / ${checked} 條連結）：`,
 );
 for (const [href, refs] of fresh.sort((a, b) => b[1].length - a[1].length)) {
   const sample = refs.slice(0, 3).join(', ');
@@ -155,6 +124,6 @@ for (const [href, refs] of fresh.sort((a, b) => b[1].length - a[1].length)) {
 console.error(
   '\n   站內連結只准指向 src/pages/ 真的產得出來的路由。\n' +
     '   要嘛把頁面補上，要嘛把連結拿掉 —— NEVER 留著等使用者點到 404，\n' +
-    '   也 NEVER 為了讓 build 過而把它加進 KNOWN_DEBT。',
+    '   也 NEVER 為了讓 build 過而把豁免清單加回來（2026-07-29 已清空刪除）。',
 );
 process.exit(1);

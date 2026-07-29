@@ -70,8 +70,8 @@ export async function renderRawMarkdown(absPath: string, lang: string) {
   const header = [
     `# Source: knowledge/${relFromKnowledge}`,
     `# Language: ${lang}`,
-    `# License: CC BY-SA 4.0  ·  Editable on GitHub: ${sourceUrl}`,
-    `# Plain-text view of COMPUTEX.md — no JS, no CSS, no images. The source markdown is the SSOT.`,
+    `# License: CC BY 4.0  ·  Editable on GitHub: ${sourceUrl}`,
+    `# Plain-text view of COMPUTEX.md: no JS, no CSS, no images. The source markdown is the SSOT.`,
     '',
     '',
   ].join('\n');

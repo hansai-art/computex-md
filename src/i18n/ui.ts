@@ -10,6 +10,7 @@ import { dashboardUI } from './dashboard';
 import { notFoundUI } from './notfound';
 import { exploreUI } from './explore';
 import { latestUI } from './latest';
+import { mcpUI } from './mcp';
 
 // Single source of truth: src/config/languages.ts
 export const languages = LANGUAGE_DISPLAY_NAMES as Record<Lang, string>;
@@ -38,6 +39,7 @@ export const ui = {
     ...dashboardUI.en,
     ...notFoundUI.en,
     ...exploreUI.en,
+    ...mcpUI.en,
     ...latestUI.en,
     'nav.aria-home': 'COMPUTEX.md Home',
     'nav.aria-img-label': 'COMPUTEX.md logo',
@@ -57,7 +59,7 @@ export const ui = {
     'nav.graph-view': 'Knowledge Graph',
     'nav.contribute': 'Contribute',
     'nav.resources': 'Resources',
-    'nav.mcp': 'MCP',
+    'nav.mcp': 'For machines',
     'nav.dashboard': 'Dashboard',
     'nav.language-switch': 'Language',
     'nav.search-modal.input-placeholder': 'Search articles',
@@ -131,11 +133,6 @@ export const ui = {
     'article.tts.pause': 'Pause',
     'article.tts.resume': 'Resume',
     'article.tts.stop': 'Stop',
-    // LifeTree CTA banner (experimental feature)
-    'article.lifeTree.experimental': 'Experimental feature',
-    'article.lifeTree.protagonistTree':
-      "{name}'s life decision tree ({n} turning points)",
-    'article.lifeTree.viewTree': 'View tree →',
     'article.signature.intro':
       "This article is written and continuously revised by the community. Now that you've read it, you can:",
     'article.signature.share': 'Share it',
@@ -200,6 +197,7 @@ export const ui = {
     ...dashboardUI['zh-TW'],
     ...notFoundUI['zh-TW'],
     ...exploreUI['zh-TW'],
+    ...mcpUI['zh-TW'],
     ...latestUI['zh-TW'],
     'nav.aria-home': 'COMPUTEX.md 首頁',
     'nav.aria-img-label': 'COMPUTEX.md 標誌圖示',
@@ -219,7 +217,7 @@ export const ui = {
     'nav.graph-view': '知識圖譜',
     'nav.contribute': '參與 ✋',
     'nav.resources': '資源 🔗',
-    'nav.mcp': 'MCP',
+    'nav.mcp': '給機器的入口',
     'nav.dashboard': '監測',
     'nav.language-switch': '語言 / Language',
     'nav.search-modal.input-placeholder': '搜尋文章',
@@ -290,10 +288,6 @@ export const ui = {
     'article.tts.pause': '暫停',
     'article.tts.resume': '繼續',
     'article.tts.stop': '停止',
-    'article.lifeTree.experimental': '實驗型功能',
-    'article.lifeTree.protagonistTree':
-      '{name} 的人生分支樹（{n} 個 turning point）',
-    'article.lifeTree.viewTree': '看樹 →',
     'article.signature.intro':
       '這篇文章由社群共同編寫、持續校訂。讀完了，你可以：',
     'article.signature.share': '分享出去',

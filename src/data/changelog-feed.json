@@ -1,7 +1,38 @@
 {
-  "generatedAt": "2026-07-29T05:45:42.865Z",
+  "generatedAt": "2026-07-29T06:03:03.864Z",
   "source": "git",
   "commits": [
+    {
+      "hash": "cae176806465297cf626ee11a33cfee36e13bf07",
+      "date": "2026-07-29T13:48:13+08:00",
+      "author": "Hans",
+      "message": "fix(content): cross-domain: 排行榜數錯人，官方名錄不是只有 COMPUTEX",
+      "articles": [
+        {
+          "url": "/vendors/aaeon",
+          "name": "aaeon"
+        },
+        {
+          "url": "/vendors/accordance-systems",
+          "name": "accordance-systems"
+        },
+        {
+          "url": "/vendors/altek",
+          "name": "altek"
+        },
+        {
+          "url": "/vendors/amax-ky",
+          "name": "amax-ky"
+        }
+      ]
+    },
+    {
+      "hash": "f526daa2fc0ee973d2900e1bc97c3d21248b7858",
+      "date": "2026-07-29T13:47:13+08:00",
+      "author": "Hans",
+      "message": "fix(data): cross-domain: 三支 build script 產出 0 筆卻印成功訊息",
+      "articles": []
+    },
     {
       "hash": "0243444111c6068f01cac64a712d3e458409fabb",
       "date": "2026-07-29T12:57:46+08:00",

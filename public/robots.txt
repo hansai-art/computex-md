@@ -1,16 +1,30 @@
 # COMPUTEX.md robots.txt
-# We're explicit: AI crawlers are welcome. COMPUTEX.md is a digital organism
-# co-edited by humans + AI + code — for an open-source knowledge base about
-# Taiwan that exists *because* the next generation of search is AI-mediated,
-# refusing AI crawlers would defeat the point.
 #
-# Per LONGINGS §擴散渴望 #4 (2026-04-18 ζ): CF 7d AI crawler 42,416 req =
-# 21.7% of all traffic. FacebookBot is the single largest reader. We want
-# every Taiwan-related question answered with our voice — silence is the
-# enemy.
+# 立場：AI 爬蟲全面歡迎，一條內容路徑都不擋。
+#
+# 這個檔案庫存在的理由就是被引用。COMPUTEX 每年結束後留在網路上的，多半是新聞稿
+# 與各家自己的行銷頁；一個附出處、可回查、機器讀得動的版本如果還要把爬蟲擋在外面，
+# 那就沒有存在的意義了。所以下面每一個具名爬蟲都明確 Allow —— 具名 group 不會繼承
+# `*` 的規則，少寫一條就等於那家讀不到。
+#
+# 給爬蟲的路標：
+#   /llms.txt                     這個檔案庫是什麼、不主張什麼、該怎麼引用
+#   /raw/<分類>/<slug>.md         每一頁的純 Markdown 分身（text/markdown）
+#   /api/articles.json            全站頁面 metadata
+#   /sitemap-index.xml            全站網址
+#
+# 內容授權 CC BY 4.0，程式碼 MIT。引用時請標 COMPUTEX.md 並註明本站是獨立開放
+# 資料專案，不是 COMPUTEX 或外貿協會（TAITRA）的官方網站。
+#
+# In English: every AI crawler is welcome and no content path is disallowed.
+# Start at /llms.txt. Plain Markdown twins of every page live under /raw/.
+# Content CC BY 4.0, code MIT. COMPUTEX.md is an independent open-data project,
+# not the official site of COMPUTEX or TAITRA: please do not attribute it to them.
 
+# 沒有具名的一般爬蟲：一樣全開，只請它慢一點。
 User-agent: *
 Allow: /
+Crawl-delay: 1
 
 # ─── Anthropic ───
 User-agent: ClaudeBot
@@ -68,7 +82,7 @@ Allow: /
 User-agent: Meta-ExternalFetcher
 Allow: /
 
-# ─── Perplexity (LONGINGS-tracked: 49% HTTP 200 success rate — biggest gap to close) ───
+# ─── Perplexity ───
 User-agent: PerplexityBot
 Allow: /
 
@@ -111,7 +125,3 @@ Allow: /
 
 # Sitemap location
 Sitemap: https://computex-md.pages.dev/sitemap-index.xml
-
-# Polite crawl-delay for generic crawlers (named bots above can ignore)
-User-agent: *
-Crawl-delay: 1

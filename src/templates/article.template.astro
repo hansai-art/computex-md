@@ -318,39 +318,6 @@ const encodedTitle = encodeURIComponent(title);
 
       <!-- Center: Article content -->
       <article class="min-w-0 [grid-area:body]" data-pagefind-body>
-        <!-- LifeTree CTA banner (experimental feature, links to standalone page) -->
-        {
-          frontmatter.lifeTree && (
-            <a
-              href={`/lifetree/${slug}`}
-              class="lifetree-cta group mb-8 flex items-center justify-between gap-4 rounded-xl border border-dashed border-[rgba(139,92,246,0.4)] bg-gradient-to-r from-[rgba(139,92,246,0.06)] to-[rgba(236,72,153,0.04)] px-5 py-4 no-underline transition-all duration-200 hover:border-solid hover:border-[#8B5CF6] hover:shadow-md"
-              data-experimental
-            >
-              <div class="flex items-center gap-3">
-                <span class="text-2xl" aria-hidden="true">
-                  🌳
-                </span>
-                <div>
-                  <p class="m-0 font-['Inter',system-ui,sans-serif] text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-[#8B5CF6]">
-                    Experimental · {t('article.lifeTree.experimental')}
-                  </p>
-                  <p class="m-0 mt-0.5 font-['Noto_Serif_TC',serif] text-[0.95rem] font-medium text-[#1a3c34]">
-                    {t('article.lifeTree.protagonistTree')
-                      .replace('{name}', frontmatter.lifeTree.protagonist)
-                      .replace(
-                        '{n}',
-                        String(frontmatter.lifeTree.nodes?.length || 0),
-                      )}
-                  </p>
-                </div>
-              </div>
-              <span class="flex items-center gap-1 font-['Inter',system-ui,sans-serif] text-[0.85rem] font-medium text-[#8B5CF6] transition-transform duration-200 group-hover:translate-x-1">
-                {t('article.lifeTree.viewTree')}
-              </span>
-            </a>
-          )
-        }
-
         <!-- Hero image (if frontmatter declares one) — moved out of the
              ArticleHero background and into the article body so its
              credit/license info has visible context. Hero section above

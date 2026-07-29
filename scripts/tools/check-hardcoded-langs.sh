@@ -65,17 +65,18 @@ ALLOWLIST=(
 #   是整頁中文，而路由確實存在（dist/ar/opendata/、dist/ar/mcp/ 都有）。
 # 還清方式二選一：補六語文案，或讓這些路由在缺該語文案時不要產生頁面。
 #
+# 2026-07-29：這三筆全部結清，方式是「檔案不存在了」而不是補文案 ——
+# opendata-content.ts（220KB 母體開放資料策展）與 elections-2026 選舉專頁隨死碼
+# 清掃刪除，mcp-content.ts 隨 /mcp 重寫改成 src/i18n/mcp.ts（zh-TW + en 兩語，
+# 走 registry 不寫死語言表）。DEBT 現在是空的，這正是它該有的樣子。
+#
 # 格式：<path>:<line>|<掛號日>|<理由>
-DEBT=(
-  "src/data/opendata-content.ts:13|2026-07-26|OpendataLang：策展文案每語一份，補齊要寫六語整頁內容；/ar/opendata 現在是 6,051 漢字的中文頁"
-  "src/data/mcp-content.ts:19|2026-07-26|McpLang：同上；/ar/mcp 現在是 1,082 漢字的中文頁"
-  "src/templates/elections-2026.template.astro:122|2026-07-26|electionCopy：選舉專頁文案每語一份，同上"
-)
+DEBT=()
 
 DEBT_SEEN=""
 is_debt() {
   local f="$1" ln="$2"
-  for entry in "${DEBT[@]}"; do
+  for entry in ${DEBT[@]+"${DEBT[@]}"}; do
     if [[ "${entry%%|*}" == "$f:$ln" ]]; then
       local rest="${entry#*|}"
       # ${ln} 要加大括號：變數後面直接接全形字元時，bash 會把全形字元讀進變數名。
@@ -153,7 +154,9 @@ fi
 # 就會全部誤判成「沒命中」，每次 commit 都噴一次假清單。
 STALE=""
 if [[ "$MODE" != "--staged" ]]; then
-  for entry in "${DEBT[@]}"; do
+  # `${DEBT[@]+...}`：DEBT 清空後，set -u 會把 "${DEBT[@]}" 當成 unbound 而中止。
+  # 清單清空是好事（欠債還完了），不該讓 gate 因此變成永遠失敗。
+  for entry in ${DEBT[@]+"${DEBT[@]}"}; do
     target="${entry%%|*}"
     if [[ "$DEBT_SEEN" != *"$target"* ]]; then
       STALE+="\n  $target"

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-29T05:45:48.870Z",
+  "generated_at": "2026-07-29T06:03:09.586Z",
   "routines": null,
   "babel": null,
   "incidents": [
@@ -36,6 +36,11 @@
   ],
   "deploys": [
     {
+      "ts": "2026-07-29T05:48:39Z",
+      "conclusion": "success",
+      "title": "Quality Gene Tests: fix(content): cross-domain: 排行榜數錯人，官方名錄不是只有 COMPUTEX"
+    },
+    {
       "ts": "2026-07-29T02:35:50Z",
       "conclusion": "success",
       "title": "Quality Gene Tests: fix(vendors): 產生器輸出不等於 commit 後的樣子，重跑一次就是 86 檔格式雜訊"
@@ -54,11 +59,6 @@
       "ts": "2026-07-29T00:41:53Z",
       "conclusion": "failure",
       "title": "Deploy to GitHub Pages: fix(hooks): pre-push 在新 repo 第一次 push 時靜默炸掉"
-    },
-    {
-      "ts": "2026-07-29T00:41:26Z",
-      "conclusion": "failure",
-      "title": "Deploy to GitHub Pages: feat: 授權定案 CC BY 4.0，llms.txt 重寫為 COMPUTEX.md 的正門"
     }
   ]
 }
