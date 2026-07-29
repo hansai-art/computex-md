@@ -25,6 +25,8 @@ sources:
 
 # COMPUTEX 2027: June 1-4, 2027, across three Taipei venues
 
+> **30-second overview**: COMPUTEX 2027 runs June 1 to 4, 2027, four days, across Taipei Nangang Exhibition Center Halls 1 and 2 and TWTC Exhibition Hall 1, organized jointly by the Taiwan External Trade Development Council (TAITRA) and the Taipei Computer Association (TCA). Those four items are what the official site has published. The annual theme, exhibitor count, agenda and ticketing dates have not been announced, and this page leaves them blank rather than inferring them.
+
 COMPUTEX 2027 runs **June 1 to June 4, 2027**, four days, in Taipei. That is the schedule currently published on the show's official homepage.
 
 ## What has been announced
@@ -57,8 +59,15 @@ The reason is practical. Trade show details get copied widely, and in the copyin
 
 ## Related
 
-- Past editions: see the Editions category
-- Exhibitor profiles: see the Vendors category
+This site already carries the official fact layer for 86 exhibitors across the two AI
+show areas of COMPUTEX 2026, each with its booth number, official website and full
+exhibiting record. The 2027 directory will be processed the same way once it is published:
+
+- [Wiwynn Corporation: COMPUTEX 2026 exhibitor record](/en/vendors/wiwynn/)
+- [Inventec Corporation: COMPUTEX 2026 exhibitor record](/en/vendors/inventec/)
+- [MiTAC Computing Technology Corp.: COMPUTEX 2026 exhibitor record](/en/vendors/mitac-computing/)
+- [Micro-Star International Co., Ltd.: COMPUTEX 2026 exhibitor record](/en/vendors/micro-star-international/)
+- [Synology Inc.: COMPUTEX 2026 exhibitor record](/en/vendors/synology/)
 
 ---
 

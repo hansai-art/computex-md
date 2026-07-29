@@ -1,7 +1,14 @@
 {
-  "generatedAt": "2026-07-29T06:37:35.468Z",
+  "generatedAt": "2026-07-29T06:59:01.718Z",
   "source": "git",
   "commits": [
+    {
+      "hash": "b9a4ec130db7fee8461a834ff72fc31f8d87550c",
+      "date": "2026-07-29T14:42:11+08:00",
+      "author": "Hans",
+      "message": "chore: 刪掉打不到的母體資產與死 CSS，dist 45M → 32M",
+      "articles": []
+    },
     {
       "hash": "66220361e1fbb8767f136b32dbdce98b0683bf4b",
       "date": "2026-07-29T14:04:08+08:00",

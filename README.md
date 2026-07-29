@@ -59,7 +59,7 @@
 | ------------------------------ | ----- |
 | 📄 Total articles (zh-TW SSOT) | 87    |
 | 🇹🇼 Chinese (zh-TW)             | 87    |
-| 🇺🇸 English (en)                | 1     |
+| 🇺🇸 English (en)                | 87    |
 | 📂 Categories                  | 4     |
 | 👥 Contributors                | 1     |
 | ⭐ GitHub Stars                | 0     |

@@ -1,8 +1,8 @@
 {
-  "lastUpdated": "2026-07-29T06:37:40.269Z",
+  "lastUpdated": "2026-07-29T06:59:06.473Z",
   "generator": "scripts/core/generate-dashboard-alerts.mjs",
   "note": "derived 警報層 — CONSCIOUSNESS §警報 的機械接管 (audit 2026-06-10 A-3)",
-  "count": 5,
+  "count": 4,
   "alerts": [
     {
       "id": "organ-heart",
@@ -24,14 +24,6 @@
       "id": "organ-reproduce",
       "severity": "red",
       "message": "🧫 繁殖系統 器官分數 18 < 50，需要干預",
-      "source": "dashboard-organism.json",
-      "owner": "twmd-self-evolve-weekly",
-      "firstSeen": "2026-07-28"
-    },
-    {
-      "id": "organ-translation",
-      "severity": "red",
-      "message": "🌐 語言器官 器官分數 28 < 50，需要干預",
       "source": "dashboard-organism.json",
       "owner": "twmd-self-evolve-weekly",
       "firstSeen": "2026-07-28"

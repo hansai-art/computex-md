@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-29T06:37:41.471Z",
+  "generated_at": "2026-07-29T06:59:07.633Z",
   "routines": null,
   "babel": null,
   "incidents": [
@@ -19,12 +19,6 @@
       "ts": "2026-07-28",
       "level": "red",
       "text": "🧫 繁殖系統 器官分數 18 < 50，需要干預",
-      "source": "dashboard-organism.json"
-    },
-    {
-      "ts": "2026-07-28",
-      "level": "red",
-      "text": "🌐 語言器官 器官分數 28 < 50，需要干預",
       "source": "dashboard-organism.json"
     },
     {

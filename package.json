@@ -32,7 +32,7 @@
     "build": "astro build",
     "test": "node scripts/core/test-frontmatter.mjs",
     "test:ci": "node scripts/core/test-frontmatter.mjs --ci",
-    "postbuild": "node scripts/tools/check-url-contract.mjs --strict && node scripts/tools/verify-nav-links.mjs && node scripts/tools/verify-internal-links.mjs && node scripts/tools/verify-og-images.mjs && node scripts/tools/verify-machine-doors.mjs",
+    "postbuild": "node scripts/tools/check-url-contract.mjs --strict && node scripts/tools/verify-nav-links.mjs && node scripts/tools/verify-internal-links.mjs && node scripts/tools/verify-og-images.mjs && node scripts/tools/verify-machine-doors.mjs && node scripts/tools/verify-build-size.mjs",
     "postbuild:smoke": "node scripts/core/post-build-check.mjs",
     "postbuild:internal-links": "bash scripts/tools/verify-internal-links.sh",
     "preview": "astro preview",
@@ -65,7 +65,8 @@
     "verify:links": "node scripts/tools/verify-internal-links.mjs",
     "verify:og": "node scripts/tools/verify-og-images.mjs",
     "verify:data": "node scripts/tools/verify-generated-data.mjs",
-    "verify:doors": "node scripts/tools/verify-machine-doors.mjs"
+    "verify:doors": "node scripts/tools/verify-machine-doors.mjs",
+    "verify:size": "node scripts/tools/verify-build-size.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.17",

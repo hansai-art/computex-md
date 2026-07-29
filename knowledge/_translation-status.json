@@ -1,16 +1,16 @@
 {
   "_meta": {
-    "lastUpdated": "2026-07-29T14:37:32+08:00",
-    "zhCommitHead": "6622036",
+    "lastUpdated": "2026-07-29T14:58:59+08:00",
+    "zhCommitHead": "b9a4ec1",
     "totalZh": 87,
     "activeLanguages": ["en"],
     "summary": {
       "en": {
         "total_zh": 87,
         "fresh": 0,
-        "stale": 1,
+        "stale": 87,
         "metadata_stale": 0,
-        "missing": 86,
+        "missing": 0,
         "orphan": 0
       }
     },
@@ -28,7 +28,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/mouser-electronics.md",
+          "translatedFrom": "Vendors/mouser-electronics.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -41,7 +52,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/quettaflow.md",
+          "translatedFrom": "Vendors/quettaflow.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -54,7 +76,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/aptobject.md",
+          "translatedFrom": "Vendors/aptobject.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -67,7 +100,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/qnap-systems.md",
+          "translatedFrom": "Vendors/qnap-systems.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -80,7 +124,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/taiwan-intelligence-research-and-development.md",
+          "translatedFrom": "Vendors/taiwan-intelligence-research-and-development.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -93,7 +148,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/inventec.md",
+          "translatedFrom": "Vendors/inventec.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -106,7 +172,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/southco-asia.md",
+          "translatedFrom": "Vendors/southco-asia.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -119,7 +196,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/richin-tech.md",
+          "translatedFrom": "Vendors/richin-tech.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -132,7 +220,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/micro-star-international.md",
+          "translatedFrom": "Vendors/micro-star-international.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -145,7 +244,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/wiwynn.md",
+          "translatedFrom": "Vendors/wiwynn.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -158,7 +268,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/dongguan-xunling-new.md",
+          "translatedFrom": "Vendors/dongguan-xunling-new.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -171,7 +292,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/palebluedot-ai.md",
+          "translatedFrom": "Vendors/palebluedot-ai.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -184,7 +316,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/liverage.md",
+          "translatedFrom": "Vendors/liverage.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -197,7 +340,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/ezbond-chemical.md",
+          "translatedFrom": "Vendors/ezbond-chemical.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -210,7 +364,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/amazing-chip-semiconductor.md",
+          "translatedFrom": "Vendors/amazing-chip-semiconductor.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -223,7 +388,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/altek.md",
+          "translatedFrom": "Vendors/altek.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -236,7 +412,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/siemens.md",
+          "translatedFrom": "Vendors/siemens.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -249,7 +436,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/roboco.md",
+          "translatedFrom": "Vendors/roboco.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -262,7 +460,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/enbik.md",
+          "translatedFrom": "Vendors/enbik.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -275,7 +484,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/auras.md",
+          "translatedFrom": "Vendors/auras.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -288,7 +508,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/dynatron.md",
+          "translatedFrom": "Vendors/dynatron.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -301,7 +532,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/liteon.md",
+          "translatedFrom": "Vendors/liteon.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -314,7 +556,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/vav-cooling.md",
+          "translatedFrom": "Vendors/vav-cooling.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -327,7 +580,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/faytech-tech.md",
+          "translatedFrom": "Vendors/faytech-tech.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -340,7 +604,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/c-y-intelligence.md",
+          "translatedFrom": "Vendors/c-y-intelligence.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -353,7 +628,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/mitac-computing.md",
+          "translatedFrom": "Vendors/mitac-computing.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -366,7 +652,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/taiwan-cosmo-instruments.md",
+          "translatedFrom": "Vendors/taiwan-cosmo-instruments.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -379,7 +676,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/guchii.md",
+          "translatedFrom": "Vendors/guchii.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -392,7 +700,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/shenzhen-gooxi-digital-intelligence.md",
+          "translatedFrom": "Vendors/shenzhen-gooxi-digital-intelligence.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -405,7 +724,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/innodisk.md",
+          "translatedFrom": "Vendors/innodisk.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -418,7 +748,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/xmems-labs.md",
+          "translatedFrom": "Vendors/xmems-labs.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -431,7 +772,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/senao-networks.md",
+          "translatedFrom": "Vendors/senao-networks.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -444,7 +796,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/rayvatek.md",
+          "translatedFrom": "Vendors/rayvatek.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -457,7 +820,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/amax-ky.md",
+          "translatedFrom": "Vendors/amax-ky.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -470,7 +844,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/fsp.md",
+          "translatedFrom": "Vendors/fsp.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -483,7 +868,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/zoho.md",
+          "translatedFrom": "Vendors/zoho.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -496,7 +892,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/flex.md",
+          "translatedFrom": "Vendors/flex.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -509,7 +916,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/chenbro-micom.md",
+          "translatedFrom": "Vendors/chenbro-micom.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -522,7 +940,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/kentec.md",
+          "translatedFrom": "Vendors/kentec.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -535,7 +964,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/shenzhen-kstar-science-and.md",
+          "translatedFrom": "Vendors/shenzhen-kstar-science-and.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -548,7 +988,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/latticework-taiwan.md",
+          "translatedFrom": "Vendors/latticework-taiwan.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -561,7 +1012,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/elitegroup-computer-systems.md",
+          "translatedFrom": "Vendors/elitegroup-computer-systems.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -574,7 +1036,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/continental.md",
+          "translatedFrom": "Vendors/continental.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -587,7 +1060,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/delos-data.md",
+          "translatedFrom": "Vendors/delos-data.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -600,7 +1084,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/minerva-innovation.md",
+          "translatedFrom": "Vendors/minerva-innovation.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -613,7 +1108,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/leadtek-research.md",
+          "translatedFrom": "Vendors/leadtek-research.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -626,7 +1132,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/jentech-precision-industrial.md",
+          "translatedFrom": "Vendors/jentech-precision-industrial.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -639,7 +1156,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/comino.md",
+          "translatedFrom": "Vendors/comino.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -652,7 +1180,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/accordance-systems.md",
+          "translatedFrom": "Vendors/accordance-systems.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -665,7 +1204,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/powerchip-semiconductor-manufacturing.md",
+          "translatedFrom": "Vendors/powerchip-semiconductor-manufacturing.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -678,7 +1228,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/vaidio.md",
+          "translatedFrom": "Vendors/vaidio.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -691,7 +1252,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/synology.md",
+          "translatedFrom": "Vendors/synology.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -704,7 +1276,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/apaltek.md",
+          "translatedFrom": "Vendors/apaltek.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -717,7 +1300,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/rittal.md",
+          "translatedFrom": "Vendors/rittal.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -730,7 +1324,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/vertiv-taiwan.md",
+          "translatedFrom": "Vendors/vertiv-taiwan.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -743,7 +1348,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/hetone-enterprise.md",
+          "translatedFrom": "Vendors/hetone-enterprise.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -756,7 +1372,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/infortrend.md",
+          "translatedFrom": "Vendors/infortrend.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -769,7 +1396,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/c-media-electronics.md",
+          "translatedFrom": "Vendors/c-media-electronics.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -782,7 +1420,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/anxpert-advanced.md",
+          "translatedFrom": "Vendors/anxpert-advanced.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -795,7 +1444,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/yonyou-taiwan.md",
+          "translatedFrom": "Vendors/yonyou-taiwan.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -808,7 +1468,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/axelera-ai.md",
+          "translatedFrom": "Vendors/axelera-ai.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -821,7 +1492,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/avermedia.md",
+          "translatedFrom": "Vendors/avermedia.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -834,7 +1516,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/kaori-thermal.md",
+          "translatedFrom": "Vendors/kaori-thermal.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -847,7 +1540,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/lengda-xiamen.md",
+          "translatedFrom": "Vendors/lengda-xiamen.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -860,7 +1564,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/carl-zeiss.md",
+          "translatedFrom": "Vendors/carl-zeiss.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -873,7 +1588,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/amphenol.md",
+          "translatedFrom": "Vendors/amphenol.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -886,7 +1612,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/egis.md",
+          "translatedFrom": "Vendors/egis.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -899,7 +1636,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/jpc-connectivity.md",
+          "translatedFrom": "Vendors/jpc-connectivity.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -912,7 +1660,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/formosa-plastics.md",
+          "translatedFrom": "Vendors/formosa-plastics.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -925,7 +1684,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/hi-power-solution.md",
+          "translatedFrom": "Vendors/hi-power-solution.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -938,7 +1708,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/neousys.md",
+          "translatedFrom": "Vendors/neousys.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -951,7 +1732,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/kneron-taiwan.md",
+          "translatedFrom": "Vendors/kneron-taiwan.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -964,7 +1756,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/quadrep-electronics-taiwan.md",
+          "translatedFrom": "Vendors/quadrep-electronics-taiwan.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -977,7 +1780,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/ecolab.md",
+          "translatedFrom": "Vendors/ecolab.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -990,7 +1804,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/voltronic-power.md",
+          "translatedFrom": "Vendors/voltronic-power.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -1003,7 +1828,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/danfoss-power-solutions.md",
+          "translatedFrom": "Vendors/danfoss-power-solutions.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -1016,7 +1852,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/shuttle.md",
+          "translatedFrom": "Vendors/shuttle.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -1029,7 +1876,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/skymizer-taiwan.md",
+          "translatedFrom": "Vendors/skymizer-taiwan.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -1042,7 +1900,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/ambedded.md",
+          "translatedFrom": "Vendors/ambedded.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -1055,7 +1924,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/flotrend.md",
+          "translatedFrom": "Vendors/flotrend.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -1068,7 +1948,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/brinno-incorporated.md",
+          "translatedFrom": "Vendors/brinno-incorporated.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -1081,7 +1972,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/jwipc.md",
+          "translatedFrom": "Vendors/jwipc.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -1094,7 +1996,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/legend-innovation.md",
+          "translatedFrom": "Vendors/legend-innovation.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -1107,7 +2020,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/cht-security.md",
+          "translatedFrom": "Vendors/cht-security.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -1120,7 +2044,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/aaeon.md",
+          "translatedFrom": "Vendors/aaeon.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },
@@ -1133,7 +2068,18 @@
       },
       "translations": {
         "en": {
-          "status": "missing"
+          "path": "en/Vendors/fs-tech.md",
+          "translatedFrom": "Vendors/fs-tech.md",
+          "sourceCommitSha": "",
+          "sourceContentHash": "",
+          "sourceBodyHash": "",
+          "translatedAt": "",
+          "translationLastCommit": "",
+          "translationLastModified": "",
+          "inferred": false,
+          "footnoteDefs": 0,
+          "status": "stale",
+          "reason": "no-source-sha"
         }
       }
     },

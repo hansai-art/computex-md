@@ -1,11 +1,11 @@
 {
   "total_zh": 87,
-  "total_en": 1,
-  "coverage_en": 1.1,
+  "total_en": 87,
+  "coverage_en": 100.0,
   "categories": {
     "Vendors": {
       "zh": 86,
-      "en": 0
+      "en": 86
     },
     "Editions": {
       "zh": 1,

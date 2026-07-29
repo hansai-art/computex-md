@@ -110,7 +110,36 @@ RANGES = {
 PASS = 0
 WARN = 0
 FAIL = 0
+SKIP = 0
 results = []
+
+
+def is_machine_rendered_fact_page(content):
+    """這一頁是不是「同一份事實的另一次渲染」，而不是散文翻譯。
+
+    2026-07-29 起，廠商頁（knowledge/{,en/}Vendors/*.md）由
+    generate-vendor-pages.py 從官方名錄的同一份 Facts 分別渲染中英文，兩邊各寫
+    各的句子，沒有任何一邊是另一邊的翻譯。
+
+    這種頁面過不了本工具的比例帶，而且它過不了是對的：頁面有一半以上是表格
+    （年份、日期、展會名、URL），表格內容在兩種語言裡幾乎一樣長，中文字元又比
+    英文字元密，整頁字元比自然落在 1.3 至 1.9，遠低於散文翻譯的 2.20。
+    86 頁裡 19 頁被判 TRUNCATED，但同一行印的是 secs=6→6 urls=10→10：一個段落
+    一條連結都沒少。
+
+    處置照 CLAUDE.md rule 56：單一檢查對這一類頁面降級（skip），不動比例帶、
+    不刪這支 gate。降比例帶會讓真正的摘要式翻譯溜過去，那才是這支存在的理由。
+
+    這一類頁面的守門在別處，而且更嚴格：
+      tests/article_health/test_vendor_corpus_invariants.py
+      逐頁比對中英文的 COMPUTEX 屆數宣稱，任何一邊被手改到不一致就當場失敗。
+
+    判準用 frontmatter 有沒有 vendor: 區塊。將來出現第二類機器渲染頁時，改成一個
+    明說的 frontmatter 欄位（例如 renderedFrom: 'facts'）比繼續加資料夾名字乾淨。
+    """
+    fm = re.match(r'^---\n(.*?)\n---\n', content, re.DOTALL)
+    return bool(fm and re.search(r'^vendor:\s*$', fm.group(1), re.M))
+
 
 for f in files:
     if not os.path.exists(f):
@@ -125,6 +154,10 @@ for f in files:
 
     with open(f, encoding='utf-8') as fh:
         content = fh.read()
+
+    if is_machine_rendered_fact_page(content):
+        SKIP += 1
+        continue
 
     # Find translatedFrom
     m = re.search(r"translatedFrom:\s*['\"]?([^'\"\n]+)", content)
@@ -216,6 +249,14 @@ for f, verdict, zh_rel, ratio, info in results:
 
 print()
 print(f"\033[0;90m{'─'*120}\033[0m")
+if SKIP:
+    # 跳過的數量一定要印出來。靜默跳過會讓「87 檔全綠」跟「68 檔全綠加 19 檔沒驗」
+    # 長得一模一樣，而那正是這支工具要防的那種失真。
+    print(
+        f"\033[0;90mskip {SKIP} 檔：機器渲染的事實頁（frontmatter 有 vendor:），"
+        f"不是散文翻譯，比例帶不適用。守門在 "
+        f"tests/article_health/test_vendor_corpus_invariants.py\033[0m"
+    )
 total = PASS + WARN + FAIL
 if FAIL > 0:
     print(f"\033[0;31m❌ FAIL\033[0m: {FAIL} / {total}  (TRUNCATED translations require rework)")
