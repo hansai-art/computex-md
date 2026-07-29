@@ -351,7 +351,7 @@ const otherCategories = categories
   collectionTotal={articles.length}
   collectionItems={articles.slice(0, 100).map((a) => ({
     name: a.title,
-    url: `${Astro.site?.href?.replace(/\/$/, '') ?? 'https://computex-md.pages.dev'}${langUrlPrefix}/${category}/${encodeURIComponent(a.slug)}`,
+    url: `${Astro.site?.href?.replace(/\/$/, '') ?? 'https://computex.taiwanai.ngo'}${langUrlPrefix}/${category}/${encodeURIComponent(a.slug)}`,
   }))}
   readerSettings
 >

@@ -5,7 +5,7 @@ import matter from 'gray-matter';
 
 // RSS Feed generation for COMPUTEX.md
 export async function GET() {
-  const siteUrl = 'https://computex-md.pages.dev';
+  const siteUrl = 'https://computex.taiwanai.ngo';
 
   // Category mapping to folder names
   const categoryMapping: Record<string, string> = CATEGORY_MAPPING_SSOT;

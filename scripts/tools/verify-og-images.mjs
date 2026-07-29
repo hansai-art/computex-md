@@ -35,7 +35,7 @@ const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const distDir = process.argv[2] || join(repoRoot, 'dist');
 
 /** SEO.astro 裡宣告的站台網址。改那邊要改這邊（只有兩處，先不抽 SSOT）。 */
-const SITE_URL = 'https://computex-md.pages.dev';
+const SITE_URL = 'https://computex.taiwanai.ngo';
 
 function walk(dir, out = []) {
   for (const entry of readdirSync(dir)) {

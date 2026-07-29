@@ -1,6 +1,6 @@
 {
-  "url": "https://computex-md.pages.dev",
+  "url": "https://computex.taiwanai.ngo",
   "name": "COMPUTEX.md",
   "shortName": "COMPUTEX.md",
-  "note": "暫時位址。Hans 指定正式子網域後跑 `bash scripts/tools/set-site-url.sh <url>` 一次換全站（含 public/CNAME）。授權談成前不註冊 computex.md。"
+  "note": "正式位址（2026-07-29 Hans 指定）。換網域跑 `bash scripts/tools/set-site-url.sh <url>` 一次換全站（含 public/CNAME）。授權談成前不註冊 computex.md。"
 }

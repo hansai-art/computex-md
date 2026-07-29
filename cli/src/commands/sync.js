@@ -111,7 +111,7 @@ export async function runSync(opts = {}) {
   // Download API JSON files to cache (these are build-time generated, not in git)
   mkdirSync(CACHE_DIR, { recursive: true });
 
-  const API_BASE = 'https://computex-md.pages.dev/api';
+  const API_BASE = 'https://computex.taiwanai.ngo/api';
   const API_FILES = [
     'dashboard-articles.json',
     'dashboard-vitals.json',

@@ -65,7 +65,7 @@ check_url() {
     status_code=$(curl -sI -o /dev/null -w '%{http_code}' \
         --connect-timeout "$TIMEOUT" \
         --max-time "$TIMEOUT" \
-        --user-agent "COMPUTEX.md Link Checker (https://computex-md.pages.dev)" \
+        --user-agent "COMPUTEX.md Link Checker (https://computex.taiwanai.ngo)" \
         "$url" 2>/dev/null || echo "000")
     
     # 檢查狀態碼

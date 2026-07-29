@@ -100,7 +100,7 @@ case "$MODE" in
             awk -F'\t' '{print "    " $1}' "$TMP.fakes" | sort | uniq -c | sort -rn | head -10
             echo ""
             echo "  抽樣 fake URL（前 10 個）："
-            head -10 "$TMP.fakes" | awk -F'\t' '{print "    https://computex-md.pages.dev" $2 "  (lang=" $1 ")"}'
+            head -10 "$TMP.fakes" | awk -F'\t' '{print "    https://computex.taiwanai.ngo" $2 "  (lang=" $1 ")"}'
             echo ""
             echo -e "  ${YELLOW}修補：bash scripts/tools/sitemap-prune-hreflang.sh${NC}"
         fi
@@ -123,8 +123,8 @@ case "$MODE" in
         while IFS=$'\t' read -r lang path; do
             [ -z "$path" ] && continue
             # 構造 fake link tag pattern
-            # <xhtml:link rel="alternate" hreflang="LANG" href="https://computex-md.pages.dev/PATH"/>
-            tag_pattern="<xhtml:link rel=\"alternate\" hreflang=\"${lang}\" href=\"https://computex-md.pages.dev${path}\"/>"
+            # <xhtml:link rel="alternate" hreflang="LANG" href="https://computex.taiwanai.ngo/PATH"/>
+            tag_pattern="<xhtml:link rel=\"alternate\" hreflang=\"${lang}\" href=\"https://computex.taiwanai.ngo${path}\"/>"
             # 用 python 處理 (sed 不適合處理 UTF-8 + 特殊字元)
             python3 -c "
 import sys

@@ -61,7 +61,7 @@ SEED_PLAN_UUIDS = [
     "56c6b0e6-55f3-48cf-bd58-f7a2a9f12f64",
 ]
 
-USER_AGENT = "COMPUTEX.md-Semiont/1.0 (https://computex-md.pages.dev; peer-ingestion-pipeline)"
+USER_AGENT = "COMPUTEX.md-Semiont/1.0 (https://computex.taiwanai.ngo; peer-ingestion-pipeline)"
 
 
 def fetch_json(url, retries=3, delay=1.0):

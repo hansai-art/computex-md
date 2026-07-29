@@ -160,7 +160,7 @@ export function sporeCommand(program) {
         const title = frontmatter.title || slugBase;
         const desc = frontmatter.description || '';
         const category = frontmatter.category || 'misc';
-        const url = `https://computex-md.pages.dev/${(category || 'misc').toLowerCase()}/${encodeURIComponent(slugBase)}`;
+        const url = `https://computex.taiwanai.ngo/${(category || 'misc').toLowerCase()}/${encodeURIComponent(slugBase)}`;
         const firstPara = (body.split(/\n\s*\n/)[1] || '').slice(0, 180);
 
         console.log('');

@@ -77,7 +77,7 @@ class OpenRouterProvider(BaseProvider):
             headers={
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json",
-                "HTTP-Referer": "https://computex-md.pages.dev",
+                "HTTP-Referer": "https://computex.taiwanai.ngo",
                 "X-Title": "COMPUTEX.md sovereignty-bench",
             },
             method="POST",

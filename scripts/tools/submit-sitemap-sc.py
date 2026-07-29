@@ -31,10 +31,10 @@ def _site_from_env():
         for line in env.read_text().splitlines():
             if line.startswith("SC_SITE_URL="):
                 return line.split("=", 1)[1].strip().strip("'\"")
-    return "https://computex-md.pages.dev/"
+    return "https://computex.taiwanai.ngo/"
 
 SITE = _site_from_env()  # 與 fetch-search-console.py 同源（.env SC_SITE_URL）
-SITEMAP = "https://computex-md.pages.dev/sitemap-index.xml"
+SITEMAP = "https://computex.taiwanai.ngo/sitemap-index.xml"
 
 
 def find_key():

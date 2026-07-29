@@ -18,13 +18,13 @@
  * 用法：
  *   node scripts/tools/generate-spore-image.mjs --path /people/李洋/
  *   node scripts/tools/generate-spore-image.mjs --path /music/台灣民歌運動/ --size square
- *   node scripts/tools/generate-spore-image.mjs --url https://computex-md.pages.dev/lifestyle/台灣高鐵/ --out /tmp/x.png
+ *   node scripts/tools/generate-spore-image.mjs --url https://computex.taiwanai.ngo/lifestyle/台灣高鐵/ --out /tmp/x.png
  *
  * Options:
  *   --path <articlePath>  文章路徑（/category/slug/），會自動接到 --base
  *   --url <fullUrl>       完整 URL（會蓋過 --path 與 --base）
- *   --base <baseUrl>      預設 http://localhost:4321；production 用 https://computex-md.pages.dev
- *   --prod                捷徑：base = https://computex-md.pages.dev（不用 dev server）
+ *   --base <baseUrl>      預設 http://localhost:4321；production 用 https://computex.taiwanai.ngo
+ *   --prod                捷徑：base = https://computex.taiwanai.ngo（不用 dev server）
  *   --size landscape|square|vertical  預設 landscape (1600×900)
  *   --title <str>         覆蓋文章 title（shot mode 用，不動 SSOT）
  *   --desc <str>          覆蓋文章 description（shot mode 用）
@@ -51,7 +51,7 @@ const fullUrl = getArg('--url');
 const useProd = hasFlag('--prod');
 const base =
   getArg('--base') ||
-  (useProd ? 'https://computex-md.pages.dev' : 'http://localhost:4321');
+  (useProd ? 'https://computex.taiwanai.ngo' : 'http://localhost:4321');
 const size = getArg('--size') || 'landscape';
 const titleOverride = getArg('--title');
 const descOverride = getArg('--desc');

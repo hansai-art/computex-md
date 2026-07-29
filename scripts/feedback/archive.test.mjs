@@ -22,7 +22,7 @@ const row = {
   article_slug: '李安',
   article_title: '李安',
   lang: 'zh-TW',
-  source_url: 'https://computex-md.pages.dev/people/李安#:~:text=1990',
+  source_url: 'https://computex.taiwanai.ngo/people/李安#:~:text=1990',
   quote: '《臥虎藏龍》1990 年得獎',
   correct_info: '正確:2001。來源:https://oscars.org',
   triage_note: '已收到你的勘誤，已轉維護者查核。',

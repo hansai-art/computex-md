@@ -124,4 +124,4 @@ User-agent: Twitterbot
 Allow: /
 
 # Sitemap location
-Sitemap: https://computex-md.pages.dev/sitemap-index.xml
+Sitemap: https://computex.taiwanai.ngo/sitemap-index.xml

@@ -223,7 +223,7 @@ def call_judge(api_key, system, user_msg, max_retries=3):
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
-            "HTTP-Referer": "https://computex-md.pages.dev",
+            "HTTP-Referer": "https://computex.taiwanai.ngo",
             "X-Title": "COMPUTEX.md sovereignty-bench judge",
         },
         method="POST",

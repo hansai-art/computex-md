@@ -12,16 +12,16 @@
  * rest of COMPUTEX.md.
  *
  * Data sources (all public, static):
- *   - https://computex-md.pages.dev/api/articles.json        (metadata, all langs)
- *   - https://computex-md.pages.dev/raw/{category}/{slug}.md  (article bodies, lowercased category)
- *   - https://computex-md.pages.dev/api/dashboard-organism.json (organ vitals)
+ *   - https://computex.taiwanai.ngo/api/articles.json        (metadata, all langs)
+ *   - https://computex.taiwanai.ngo/raw/{category}/{slug}.md  (article bodies, lowercased category)
+ *   - https://computex.taiwanai.ngo/api/dashboard-organism.json (organ vitals)
  *
  * Same 6 tools as the local server: search / read / rag / cite / organs / stats.
  * The local stdio server stays canonical; this mirrors its behaviour against
  * the static API. Deploy: see workers/mcp/README.md (needs a Cloudflare account).
  */
 
-const API_BASE = 'https://computex-md.pages.dev';
+const API_BASE = 'https://computex.taiwanai.ngo';
 const SERVER = { name: 'taiwanmd-remote', version: '0.7.1' };
 const PROTOCOL_VERSION = '2024-11-05';
 
@@ -375,7 +375,7 @@ const INFO_HTML = `<!doctype html><meta charset=utf-8><title>COMPUTEX.md remote 
 <p>Connect any MCP client via <code>mcp-remote</code>:</p>
 <pre style="background:#f4f4f4;padding:1rem;border-radius:8px">npx mcp-remote ${''}&lt;this-url&gt;</pre>
 <p>Prefer <b>local-first</b> (best privacy): <code>claude mcp add taiwanmd -- npx -y taiwanmd mcp serve</code></p>
-<p>Docs: <a href="https://computex-md.pages.dev/mcp">computex.md/mcp</a></p></body>`;
+<p>Docs: <a href="https://computex.taiwanai.ngo/mcp">computex.md/mcp</a></p></body>`;
 
 export default {
   async fetch(request) {

@@ -140,7 +140,7 @@ try {
 }
 
 export default defineConfig({
-  site: 'https://computex-md.pages.dev',
+  site: 'https://computex.taiwanai.ngo',
   integrations: [
     sitemap({
       changefreq: 'weekly',
@@ -151,8 +151,8 @@ export default defineConfig({
       // serialize() from content-dates.json. See SEO plan report §1.1.
       // Customize priority and changefreq for different pages
       customPages: [
-        'https://computex-md.pages.dev/?changefreq=daily&priority=1.0',
-        'https://computex-md.pages.dev/en?changefreq=daily&priority=1.0',
+        'https://computex.taiwanai.ngo/?changefreq=daily&priority=1.0',
+        'https://computex.taiwanai.ngo/en?changefreq=daily&priority=1.0',
       ],
       i18n: {
         defaultLocale: DEFAULT_LANGUAGE.code,

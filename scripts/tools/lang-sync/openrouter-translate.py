@@ -321,7 +321,7 @@ def call_openrouter(_api_key_unused, model, system, user_msg, max_retries=3, max
             headers={
                 "Authorization": f"Bearer {key}",
                 "Content-Type": "application/json",
-                "HTTP-Referer": "https://computex-md.pages.dev",
+                "HTTP-Referer": "https://computex.taiwanai.ngo",
                 "X-Title": "COMPUTEX.md lang-sync",
             },
             method="POST",

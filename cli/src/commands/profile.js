@@ -286,7 +286,7 @@ async function createProfile() {
     console.error(chalk.red('\n❌ 必須在 taiwan-md repo 內執行這個指令。'));
     console.error(
       chalk.gray(
-        '   從 https://computex-md.pages.dev/start.sh 開始 clone，或 cd 到已 clone 的 repo。\n',
+        '   從 https://computex.taiwanai.ngo/start.sh 開始 clone，或 cd 到已 clone 的 repo。\n',
       ),
     );
     process.exit(1);

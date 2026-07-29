@@ -193,7 +193,7 @@ async function fetchRemoteArticles() {
 
   try {
     const response = await fetch(
-      'https://computex-md.pages.dev/api/articles.json',
+      'https://computex.taiwanai.ngo/api/articles.json',
       {
         headers: { Accept: 'application/json' },
         signal: AbortSignal.timeout(10_000),

@@ -32,7 +32,7 @@ while IFS= read -r URL; do
   
   # 下載
   curl -sL -o "$LOCAL" \
-    -H "User-Agent: TaiwanMD/1.0 (https://computex-md.pages.dev; educational project)" \
+    -H "User-Agent: TaiwanMD/1.0 (https://computex.taiwanai.ngo; educational project)" \
     --max-time 15 "$URL" 2>/dev/null
   
   if [ -s "$LOCAL" ]; then

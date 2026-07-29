@@ -20,7 +20,7 @@ const KNOWN_FOLDERS = new Set(Object.values(CATEGORY_MAPPING));
 // 路徑配置
 const KNOWLEDGE_DIR = path.join(__dirname, '../../knowledge');
 const OUTPUT_DIR = path.join(__dirname, '../../public/api');
-const BASE_URL = 'https://computex-md.pages.dev';
+const BASE_URL = 'https://computex.taiwanai.ngo';
 
 // 確保輸出目錄存在
 if (!fs.existsSync(OUTPUT_DIR)) {

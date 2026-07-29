@@ -17,4 +17,7 @@ p='config/site.json'; d=json.load(open(p)); d['url']=sys.argv[1]
 json.dump(d,open(p,'w'),ensure_ascii=False,indent=2); open(p,'a').write('\n')
 PY
 echo "${NEW#https://}" > public/CNAME
-echo "✅ $OLD → $NEW（含 public/CNAME）"
+# `${NEW}` 要加大括號：後面緊接全形括號時，bash 會把 `$NEW（` 整串當成變數名，
+# 在 set -u 下就是 `NEW（: unbound variable` —— 所有工作其實都做完了，只有最後
+# 這行報錯，看起來像整支失敗。2026-07-29 換網域時踩到。
+echo "✅ $OLD → ${NEW}（含 public/CNAME）"

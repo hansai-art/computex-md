@@ -208,7 +208,7 @@ def call_openrouter(model: str, system: str, user: str, timeout: int = 300, max_
             headers={
                 "Authorization": f"Bearer {key}",
                 "Content-Type": "application/json",
-                "HTTP-Referer": "https://computex-md.pages.dev",
+                "HTTP-Referer": "https://computex.taiwanai.ngo",
                 "X-Title": "COMPUTEX.md Diary Babel Sync",
             },
         )

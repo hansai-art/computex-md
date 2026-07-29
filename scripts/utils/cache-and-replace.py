@@ -38,7 +38,7 @@ for url in sorted(all_urls):
     
     try:
         req = urllib.request.Request(url, headers={
-            'User-Agent': 'TaiwanMD/1.0 (https://computex-md.pages.dev; educational project)'
+            'User-Agent': 'TaiwanMD/1.0 (https://computex.taiwanai.ngo; educational project)'
         })
         with urllib.request.urlopen(req, timeout=15) as resp:
             data = resp.read()

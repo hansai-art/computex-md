@@ -167,7 +167,7 @@ async function renderArticleFile(filePath, opts) {
 
   // Handle --web flag: open in browser
   if (opts.web) {
-    const url = `https://computex-md.pages.dev/${fm.category}/${fm.slug}`;
+    const url = `https://computex.taiwanai.ngo/${fm.category}/${fm.slug}`;
     console.log(chalk.gray(`\n  Opening ${url} ...\n`));
     exec(`open "${url}"`);
     return;

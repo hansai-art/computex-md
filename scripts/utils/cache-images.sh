@@ -41,7 +41,7 @@ for URL in $URLS; do
   
   # 下載（加 User-Agent 避免被擋）
   HTTP_CODE=$(curl -s -o "$LOCAL_FILE" -w "%{http_code}" \
-    -H "User-Agent: TaiwanMD/1.0 (https://computex-md.pages.dev; educational open-source project)" \
+    -H "User-Agent: TaiwanMD/1.0 (https://computex.taiwanai.ngo; educational open-source project)" \
     -L --max-time 15 "$URL" 2>/dev/null)
   
   if [ "$HTTP_CODE" = "200" ] && [ -s "$LOCAL_FILE" ]; then

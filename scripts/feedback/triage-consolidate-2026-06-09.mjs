@@ -43,7 +43,7 @@ function ts(s) {
   return (s || '').slice(0, 16).replace('T', ' ');
 }
 const article = spaceRows[0];
-const cleanUrl = 'https://computex-md.pages.dev/technology/國家太空中心';
+const cleanUrl = 'https://computex.taiwanai.ngo/technology/國家太空中心';
 const reader = article.display_name || '匿名讀者';
 
 let body =

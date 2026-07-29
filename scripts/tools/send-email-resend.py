@@ -39,7 +39,7 @@ RESEND_ENDPOINT = "https://api.resend.com/emails"
 
 # 連結改寫預設值（見 --link-base-repo / --site-base / --md-dir）
 DEFAULT_LINK_BASE_REPO = "https://github.com/hansai-art/computex-md/blob/main"
-DEFAULT_SITE_BASE = "https://computex-md.pages.dev"
+DEFAULT_SITE_BASE = "https://computex.taiwanai.ngo"
 DEFAULT_MD_DIR = "reports/weekly"
 
 # Resend 單次 API call 的 BCC 上限（保守值，非官方硬限制）
@@ -55,7 +55,7 @@ AUDIENCE_FOOTER_MD = (
     "_不想再收到週報？直接回覆這封信說一聲，或開 PR 把自己的 GitHub 帳號加進"
     " [weekly-report-optout.json]"
     "(https://github.com/hansai-art/computex-md/blob/main/docs/community/weekly-report-optout.json)。_\n\n"
-    "_🧬 COMPUTEX.md · [computex.md](https://computex-md.pages.dev) ·"
+    "_🧬 COMPUTEX.md · [computex.md](https://computex.taiwanai.ngo) ·"
     " [GitHub](https://github.com/hansai-art/computex-md)_\n"
 )
 
@@ -406,7 +406,7 @@ def send(
             "Content-Type": "application/json",
             # Resend's Cloudflare edge blocks default Python-urllib UA (returns 1010).
             # Identify cleanly so the proxy lets us through.
-            "User-Agent": "taiwan-md-weekly-report/1.0 (+https://computex-md.pages.dev)",
+            "User-Agent": "taiwan-md-weekly-report/1.0 (+https://computex.taiwanai.ngo)",
             "Accept": "application/json",
         },
     )
@@ -520,7 +520,7 @@ def main():
         default=None,
         help="Web edition URL of this email's content; inserted as a "
         "'🌐 在網頁上讀這份週報' line at the top of the email "
-        "(weekly report → https://computex-md.pages.dev/semiont/weekly/YYYY-MM-DD)",
+        "(weekly report → https://computex.taiwanai.ngo/semiont/weekly/YYYY-MM-DD)",
     )
     args = ap.parse_args()
 

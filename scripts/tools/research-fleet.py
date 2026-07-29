@@ -310,7 +310,7 @@ class OpenRouterDigest(DigestProvider):
                 headers={
                     "Authorization": f"Bearer {key}",
                     "Content-Type": "application/json",
-                    "HTTP-Referer": "https://computex-md.pages.dev",
+                    "HTTP-Referer": "https://computex.taiwanai.ngo",
                     "X-Title": "research-fleet digest",
                 },
                 method="POST",

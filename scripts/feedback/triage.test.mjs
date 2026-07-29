@@ -98,9 +98,9 @@ test('issue body carries display_name + feedback id but NEVER email', () => {
 test('scrubSecrets strips OAuth tokens / JWT / email from a Supabase auth callback URL', () => {
   // 完全合成值,不含任何真實憑證/email（否則 test 本身就是 PII 載體,= 它要防的 bug）。
   const toxic =
-    'https://computex-md.pages.dev/people/#access_token=eyJSAMPLE.eyJzdWIiOiJ4In0.eyJzaWci&expires_at=9999999999&provider_token=ya29.FAKEPROVIDER&refresh_token=FAKEREFRESH123&token_type=bearer';
+    'https://computex.taiwanai.ngo/people/#access_token=eyJSAMPLE.eyJzdWIiOiJ4In0.eyJzaWci&expires_at=9999999999&provider_token=ya29.FAKEPROVIDER&refresh_token=FAKEREFRESH123&token_type=bearer';
   const out = scrubSecrets(toxic);
-  assert.equal(out, 'https://computex-md.pages.dev/people/');
+  assert.equal(out, 'https://computex.taiwanai.ngo/people/');
   for (const leak of ['access_token', 'eyJ', 'ya29', 'FAKEREFRESH123']) {
     assert.ok(!out.includes(leak), `scrubSecrets leaked ${leak}`);
   }
@@ -116,7 +116,7 @@ test('buildIssue scrubs a token-bearing source_url before it reaches issue body'
     display_name: 'tester',
     created_at: '2026-06-16T00:00:00Z',
     source_url:
-      'https://computex-md.pages.dev/people/#access_token=eyJabc.eyJdef.sig&refresh_token=secret123&provider_token=ya29.LEAK',
+      'https://computex.taiwanai.ngo/people/#access_token=eyJabc.eyJdef.sig&refresh_token=secret123&provider_token=ya29.LEAK',
   });
   for (const leak of [
     'access_token',
@@ -186,7 +186,7 @@ test('content issue embeds selected quote + text-fragment deep link', () => {
     article_title: '李安',
     article_slug: '李安',
     page_kind: 'article',
-    source_url: 'https://computex-md.pages.dev/people/李安#:~:text=1990',
+    source_url: 'https://computex.taiwanai.ngo/people/李安#:~:text=1990',
     quote: '《臥虎藏龍》1990 年得獎',
     body: '年份錯了，應為 2001。',
   };

@@ -125,7 +125,7 @@ class OpenRouterBackend(TranslationBackend):
                 headers={
                     "Authorization": f"Bearer {key}",
                     "Content-Type": "application/json",
-                    "HTTP-Referer": "https://computex-md.pages.dev",
+                    "HTTP-Referer": "https://computex.taiwanai.ngo",
                     "X-Title": "COMPUTEX.md Babel",
                 },
                 method="POST",

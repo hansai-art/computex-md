@@ -62,7 +62,7 @@ export function printWelcome() {
       n: '1',
       label: '讀',
       en: 'read',
-      cmd: 'https://computex-md.pages.dev',
+      cmd: 'https://computex.taiwanai.ngo',
       note: '網站，十二種語言',
     },
     {

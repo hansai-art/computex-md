@@ -3,7 +3,7 @@
 > Structured, verifiable, machine-readable. Built for language models and search
 > engines as much as for people.
 >
-> Website: https://computex-md.pages.dev
+> Website: https://computex.taiwanai.ngo
 > Source: https://github.com/hansai-art/computex-md
 > Content licence: CC BY 4.0 · Code licence: MIT
 > This file follows the llms.txt convention (https://llmstxt.org/).

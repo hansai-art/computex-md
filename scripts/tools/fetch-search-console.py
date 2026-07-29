@@ -12,7 +12,7 @@ fetch-search-console.py — 抓 Google Search Console 資料
 Site URL:
     ~/.config/taiwan-md/credentials/.env 裡的 SC_SITE_URL
     格式: 'sc-domain:computex.md' (Domain property)
-    或    'https://computex-md.pages.dev/' (URL prefix property)
+    或    'https://computex.taiwanai.ngo/' (URL prefix property)
 
 輸出:
     ~/.config/taiwan-md/cache/search-console-latest.json
@@ -121,7 +121,7 @@ def main():
         fail(
             f"SC_SITE_URL not set in {ENV_FILE}\n"
             f"   Example: SC_SITE_URL='sc-domain:computex.md'\n"
-            f"   or: SC_SITE_URL='https://computex-md.pages.dev/'"
+            f"   or: SC_SITE_URL='https://computex.taiwanai.ngo/'"
         )
 
     cred_path = env.get("GOOGLE_APPLICATION_CREDENTIALS", "").strip()

@@ -28,7 +28,7 @@
     "type": "git",
     "url": "git+https://github.com/hansai-art/computex-md.git"
   },
-  "homepage": "https://computex-md.pages.dev",
+  "homepage": "https://computex.taiwanai.ngo",
   "engines": {
     "node": ">=18.0.0"
   },

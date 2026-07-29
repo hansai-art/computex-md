@@ -59,7 +59,7 @@ from urllib.request import Request, urlopen
 
 SITE_ROOT = "https://www.heath.tw"
 SITEMAP_INDEX = f"{SITE_ROOT}/wp-sitemap.xml"
-USER_AGENT = "COMPUTEX.md-Semiont/1.0 (+https://computex-md.pages.dev; peer-ingestion-pipeline)"
+USER_AGENT = "COMPUTEX.md-Semiont/1.0 (+https://computex.taiwanai.ngo; peer-ingestion-pipeline)"
 TIMEOUT = 30
 RATE_LIMIT = 0.5  # seconds between requests
 RETRY_MAX = 3

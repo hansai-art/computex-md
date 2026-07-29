@@ -41,7 +41,7 @@ import {
 import { LANGUAGES, DEFAULT_LANGUAGE } from '../../src/config/languages.mjs';
 import { join, relative, extname, sep } from 'node:path';
 
-const SITE_ORIGIN = 'https://computex-md.pages.dev';
+const SITE_ORIGIN = 'https://computex.taiwanai.ngo';
 const HEAD_READ_BYTES = 64 * 1024; // 64KB — head 段夠抽完所有 <link> tag
 const MAX_EXAMPLES_PER_SOURCE = 20;
 
@@ -218,7 +218,7 @@ function extractSitemapLocs(xml) {
   return out;
 }
 
-/** 只驗 https://computex-md.pages.dev 開頭或相對路徑；外部域跳過。回傳 pathname 或 null。 */
+/** 只驗 https://computex.taiwanai.ngo 開頭或相對路徑；外部域跳過。回傳 pathname 或 null。 */
 function toPathnameOrNull(href) {
   if (!href) return null;
   let s = href.trim();

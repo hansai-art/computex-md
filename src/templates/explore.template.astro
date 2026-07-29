@@ -535,7 +535,7 @@ const rawSample = longest[0]
               return false;
             }
             var s = a.url
-              .replace('https://computex-md.pages.dev', '')
+              .replace('https://computex.taiwanai.ngo', '')
               .split('/');
             var urlCat = s.length >= 2 ? s[s.length - 2].toLowerCase() : '';
             return routedCats.indexOf(urlCat) !== -1;
@@ -543,7 +543,7 @@ const rawSample = longest[0]
           if (pool.length === 0) throw new Error('empty pool');
           var pick = pool[Math.floor(Math.random() * pool.length)];
           var segs = pick.url
-            .replace('https://computex-md.pages.dev', '')
+            .replace('https://computex.taiwanai.ngo', '')
             .split('/');
           if (segs.length >= 2) {
             segs[segs.length - 2] = segs[segs.length - 2].toLowerCase();

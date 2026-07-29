@@ -68,6 +68,6 @@ fi
 echo ""
 echo "================================================="
 echo "🎉 發布完成！"
-echo "  🌐 https://computex-md.pages.dev"
+echo "  🌐 https://computex.taiwanai.ngo"
 echo "  📊 $PAGE_COUNT pages | $ZH_COUNT zh + $EN_COUNT en articles"
 echo "================================================="
