@@ -1,7 +1,14 @@
 {
-  "generatedAt": "2026-07-29T03:52:53.306Z",
+  "generatedAt": "2026-07-29T04:14:00.005Z",
   "source": "git",
   "commits": [
+    {
+      "hash": "a1f49bfad1333c9be1fa8818104af6d7b2bfe1ed",
+      "date": "2026-07-29T11:54:40+08:00",
+      "author": "Hans",
+      "message": "feat(home): cross-domain: 首頁本體從母體的台灣敘事改寫成 COMPUTEX 事實檔案庫",
+      "articles": []
+    },
     {
       "hash": "74072d9d5fde342fc7b8e5ca53a43c52b644e030",
       "date": "2026-07-29T11:16:06+08:00",

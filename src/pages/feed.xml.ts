@@ -72,11 +72,11 @@ export async function GET() {
     <language>zh-TW</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <pubDate>${new Date().toUTCString()}</pubDate>
-    <managingEditor>taiwanmd@monoame.com (COMPUTEX.md)</managingEditor>
-    <webMaster>taiwanmd@monoame.com (COMPUTEX.md)</webMaster>
+    <managingEditor>hans@groupg.org (COMPUTEX.md)</managingEditor>
+    <webMaster>hans@groupg.org (COMPUTEX.md)</webMaster>
     <atom:link href="${siteUrl}/feed.xml" rel="self" type="application/rss+xml" />
     <image>
-      <url>${siteUrl}/images/taiwan-social.jpg</url>
+      <url>${siteUrl}/og-images/site-card.jpg</url>
       <title>COMPUTEX.md：台灣 AI 硬體產業活體年鑑</title>
       <link>${siteUrl}</link>
     </image>

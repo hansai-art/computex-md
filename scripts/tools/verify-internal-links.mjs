@@ -49,26 +49,15 @@ const distDir = process.argv[2] || join(repoRoot, 'dist');
  *   - 已經不再是死連結的項目會被下面的「陳舊豁免」檢查揪出來，逼它退場。
  */
 const KNOWN_DEBT = new Set([
-  // /about：母體的 Semiont 器官頁、演講投影片、母體自介文章
-  '/semiont/diary',
-  '/semiont/newsroom',
-  '/bench',
-  '/terminology/converter',
-  '/soundscape',
-  '/timeline',
-  '/slides/2026-05-18-taiwan-md-aia-showcase.pdf',
-  '/slides/2026-06-27-taiwan-md-genai-conf-2026.pdf',
-  '/about/文章如何誕生',
-  '/about/視覺化模組型錄',
-  '/about/taiwan-md',
-  '/history/%E5%8F%B0%E7%81%A3%E5%B3%B6%E5%8F%B2%E8%A7%80/',
-  // /mcp
+  // /mcp：母體的 Semiont 生命體頁
   '/semiont',
-  // /explore
+  // /explore：母體的互動地圖與術語對照表
   '/map',
   '/terminology',
   '/en/map',
   '/en/terminology',
+  // 2026-07-29 /about 重寫後退場的 12 條（母體 Semiont 器官頁、演講投影片、
+  // 母體自介文章）已從這裡刪掉。清單就是這樣縮的。
 ]);
 
 function walk(dir, out = []) {

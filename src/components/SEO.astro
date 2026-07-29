@@ -42,12 +42,24 @@ interface Props {
 }
 
 const { lang = 'zh-TW' } = Astro.props;
+
+// 站台預設社交卡。沒有對應文章的頁面（首頁、/about、分類索引、/explore…）全部用它。
+//
+// 2026-07-29：這裡原本寫死母體的 `/images/taiwan-social.jpg`，而這個 repo 連
+// `public/images/` 這個資料夾都不存在 —— 86 篇廠商頁以外的每一頁，對外宣告的
+// og:image 都是 404。純靠 build 綠燈看不出來（沒有任何一支檢查在驗 meta 裡的
+// 圖片路徑），所以同一個 commit 補了 `scripts/tools/verify-og-images.mjs`。
+const siteCard =
+  lang === DEFAULT_LANGUAGE.code
+    ? '/og-images/site-card.jpg'
+    : `/og-images/${lang}/site-card.jpg`;
+
 const {
   title,
   description = lang === 'zh-TW'
     ? `COMPUTEX 與台灣 AI 硬體產業的開放檔案庫，目前收錄 ${_liveArticleCount} 頁。每一項事實附出處連結與查證日期，官方沒公布的一律留白，不推測。`
     : `An open archive of COMPUTEX and the Taiwan AI hardware industry, currently ${_liveArticleCount} pages. Every fact carries a source link and a checked date; what the organiser has not published is left blank, never inferred.`,
-  image = '/images/taiwan-social.jpg',
+  image = siteCard,
   url = Astro.url.href,
   type = 'website',
   datePublished,
@@ -120,12 +132,7 @@ const emitHreflang = hreflangTags.length >= 2;
 //   - 用 existsSync 在 build time 檢查檔案，若不存在退回預設 social card
 //     （避免 og:image URL 404 被社群平台抓空）
 let finalImage = image;
-if (
-  type === 'article' &&
-  categorySlug &&
-  slug &&
-  image === '/images/taiwan-social.jpg'
-) {
+if (type === 'article' && categorySlug && slug && image === siteCard) {
   const isDefaultLang = lang === 'zh-TW';
   const pathPrefix = isDefaultLang
     ? `/og-images/${categorySlug}`
@@ -144,7 +151,7 @@ if (
   if (existsSync(jpgFull)) {
     finalImage = `${urlBase}.jpg`;
   }
-  // else: finalImage 維持 /images/taiwan-social.jpg 預設值
+  // else: finalImage 維持站台預設卡
 }
 
 const fullImageUrl = new URL(finalImage, siteUrl).href;
@@ -199,7 +206,7 @@ const generateJSONLD = () => {
         url: siteUrl,
         logo: {
           '@type': 'ImageObject',
-          url: `${siteUrl}/images/taiwan-social.jpg`,
+          url: `${siteUrl}${siteCard}`,
           width: 1200,
           height: 630,
         },
@@ -243,7 +250,7 @@ const generateJSONLD = () => {
       url: siteUrl,
       logo: {
         '@type': 'ImageObject',
-        url: `${siteUrl}/images/taiwan-social.jpg`,
+        url: `${siteUrl}${siteCard}`,
         width: 1200,
         height: 630,
       },

@@ -16,7 +16,7 @@
  *
  *   Trade-off：失去 Astro page rendering 的「設計即源碼」DRY。template 在
  *   本檔內 inline。為避免漂移：本檔自身列入 TEMPLATE_FILES，git mtime 改動
- *   觸發全量 regen；favicon embed 為 base64 確保視覺保真。
+ *   觸發全量 regen。
  *
  * 架構（與 v3 對比）：
  *   1. 渲染源：inline HTML（v3：Astro `?shot=1` page）
@@ -75,7 +75,6 @@ const repoRoot = join(__dirname, '..', '..');
 const knowledgeDir = join(repoRoot, 'knowledge');
 const outDir = join(repoRoot, 'public', 'og-images');
 const translationsPath = join(knowledgeDir, '_translations.json');
-const faviconPath = join(repoRoot, 'public', 'favicon.png');
 
 // 資料夾名 → URL slug。吃 src/config/categories.mjs 正本。
 //
@@ -103,6 +102,22 @@ const HOME_LABEL = {
   en: 'Home',
 };
 
+// 站台預設社交卡的文案。首頁、/about、分類索引這些沒有對應文章的頁面共用它。
+//
+// 2026-07-29：在這之前，`SEO.astro` 的預設 og:image 是母體的
+// `/images/taiwan-social.jpg`，而這個 repo 連 `public/images/` 這個資料夾都
+// 沒有 —— 也就是說除了 86 張廠商卡以外，每一頁對外宣告的社交圖都是 404。
+// 對一個「被引用」就是全部價值的專案，這是實打實的破洞。
+//
+// 文案刻意不放任何數字。這張卡只在 template 改動時重產，放「目前收錄 N 頁」
+// 就等於排定一次過期；數字要嘛現算（頁面上的 meta description 有做），
+// 要嘛不寫。
+const SITE_CARD_TEXT = {
+  'zh-TW':
+    'COMPUTEX 與台灣 AI 硬體產業的開放檔案庫。每一項事實附出處連結與查證日期，官方沒公布的一律留白，不推測。',
+  en: 'An open archive of COMPUTEX and the Taiwan AI hardware industry. Every fact carries a source link and a checked date; what the organiser has not published is left blank, never inferred.',
+};
+
 const CATEGORY_LABEL = Object.fromEntries(
   LANGUAGES.map((lang) => [
     lang,
@@ -116,12 +131,13 @@ const CATEGORY_LABEL = Object.fromEntries(
 );
 
 // 影響 OG 視覺輸出的檔案 — 任一 mtime 比 JPG 新 → 全量重產。
-// v4：本檔自身（template inline）+ favicon。若本檔修 visual rendering 邏輯
-// 或 favicon 改了，所有 OG 重 generate。
-const TEMPLATE_FILES = [
-  'scripts/core/generate-og-images.mjs',
-  'public/favicon.png',
-];
+// template 完全 inline 在本檔，所以清單只有本檔自己。
+//
+// 2026-07-29：原本還有 `public/favicon.png`，因為浮水印會把它 base64 內嵌進
+// 每一張卡。那個 favicon 是母體的台灣地形圖 —— 等於 86 張廠商 OG 圖每一張的
+// 右下角都掛著別的專案的島。標記本身要等 TAITRA 給官方素材（brand-spec.md
+// 已列在待索取清單），在那之前浮水印只用字標，不放任何圖形。
+const TEMPLATE_FILES = ['scripts/core/generate-og-images.mjs'];
 
 const DIARY_TEMPLATE_FILES = TEMPLATE_FILES; // 共用（v4 single template owner）
 const DIARY_SOURCE_DIR = 'docs/semiont/diary';
@@ -356,6 +372,10 @@ function outputPathFor(entry) {
     const dir = join(outDir, 'semiont', 'diary');
     return { dir, jpg: join(dir, `${entry.urlSlug}.jpg`) };
   }
+  if (entry.kind === 'site') {
+    const dir = entry.lang === DEFAULT_LANG ? outDir : join(outDir, entry.lang);
+    return { dir, jpg: join(dir, 'site-card.jpg') };
+  }
   const isDefault = entry.lang === DEFAULT_LANG;
   const langPath = isDefault ? '' : entry.lang;
   const categoryOutDir = join(outDir, langPath, entry.categorySlug);
@@ -377,7 +397,7 @@ function getTemplateMtimeMs() {
 
 // ── HTML Template (inline) ──────────────────────────────────────────────────
 
-function buildTemplateHtml(faviconDataUri) {
+function buildTemplateHtml() {
   return `<!doctype html>
 <html lang="zh-TW">
 <head>
@@ -390,15 +410,17 @@ function buildTemplateHtml(faviconDataUri) {
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body {
   width: 1200px; height: 630px;
-  background: #1a3c34; color: #f4f0ea;
+  background: #252126;
+  background-image: linear-gradient(to bottom, #141315 0%, #252126 100%);
+  color: #f5f4f4;
   font-family: 'Noto Serif TC', 'Source Han Serif TC', serif;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 body[data-diary='1'] {
-  background: #03080a;
-  background-image: linear-gradient(to bottom, #03080a 0%, #0a1612 100%);
+  background: #141315;
+  background-image: linear-gradient(to bottom, #0d0c0e 0%, #1c1a1d 100%);
 }
 
 .frame {
@@ -411,7 +433,7 @@ body[data-diary='1'] .frame { padding: 18vh 6vw 8vh; }
 
 .breadcrumb {
   font-size: 1.05rem;
-  color: rgba(244, 240, 234, 0.65);
+  color: rgba(245, 244, 244, 0.62);
   margin-bottom: 1.6rem;
   font-family: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
   font-weight: 400;
@@ -424,7 +446,7 @@ body[data-diary='1'] .frame { padding: 18vh 6vw 8vh; }
 body[data-diary='1'] .breadcrumb { display: none; }
 
 .breadcrumb .crumb-sep {
-  color: rgba(244, 240, 234, 0.45);
+  color: rgba(245, 244, 244, 0.40);
   font-size: 0.95em;
   flex-shrink: 0;
 }
@@ -447,7 +469,7 @@ h1.hero-title {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  color: #f4f0ea;
+  color: #f5f4f4;
   letter-spacing: 0.01em;
 }
 body[data-diary='1'] h1.hero-title {
@@ -466,7 +488,7 @@ p.description {
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  color: rgba(244, 240, 234, 0.85);
+  color: rgba(245, 244, 244, 0.82);
 }
 html[lang='ja'] p.description { font-family: 'Noto Serif JP', 'Noto Serif TC', serif; }
 html[lang='ko'] p.description { font-family: 'Noto Serif KR', 'Noto Serif TC', serif; }
@@ -475,41 +497,72 @@ html[lang='ko'] p.description { font-family: 'Noto Serif KR', 'Noto Serif TC', s
   position: absolute;
   right: 48px; bottom: 40px;
   display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
+  align-items: baseline;
   font-family: 'Noto Serif TC', serif;
   font-weight: 700;
   font-size: 1.3rem;
+  letter-spacing: 0.02em;
   color: #ffffff;
   line-height: 1;
-}
-.watermark img {
-  width: 1.4rem; height: 1.4rem;
-  vertical-align: middle;
 }
 .watermark .brand-text { color: #ffffff; }
 .watermark .brand-dot {
   font-family: 'Noto Sans TC', sans-serif;
   font-weight: 600;
-  color: #00d4aa;
+  color: #E4007E;
+}
+body[data-site='1'] .watermark { display: none; }
+
+/* 站台預設卡（kind: 'site'）。首頁、/about、分類索引這種沒有對應文章的頁面
+   共用這一張。版面刻意跟文章卡不同：文章卡的主角是標題，站台卡的主角是字標
+   本身，所以字標從角落浮水印升成 hero。 */
+body[data-site='1'] .frame {
+  padding: 0 6vw;
+  justify-content: center;
+}
+body[data-site='1'] .breadcrumb,
+body[data-site='1'] h1.hero-title { display: none; }
+
+.site-mark {
+  display: none;
+  font-family: 'Noto Serif TC', 'Source Han Serif TC', serif;
+  font-weight: 900;
+  font-size: 5rem;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: #ffffff;
+  margin-bottom: 1.75rem;
+}
+body[data-site='1'] .site-mark { display: block; }
+.site-mark .brand-dot {
+  font-family: 'Noto Sans TC', sans-serif;
+  font-weight: 600;
+  color: #E4007E;
+}
+body[data-site='1'] p.description {
+  font-size: 1.35rem;
+  max-width: min(920px, 82%);
+  -webkit-line-clamp: 3;
 }
 </style>
 </head>
 <body>
 <div class="frame">
   <nav class="breadcrumb" id="breadcrumb"></nav>
+  <span class="site-mark">COMPUTEX<span class="brand-dot">.md</span></span>
   <h1 class="hero-title" id="title"></h1>
   <p class="description" id="description"></p>
   <span class="watermark">
-    <img src="${faviconDataUri}" alt="" aria-hidden="true">
     <span class="brand-text">COMPUTEX<span class="brand-dot">.md</span></span>
   </span>
 </div>
 <script>
 window.__renderOG = ({ kind, lang, title, description, breadcrumb }) => {
   document.documentElement.lang = lang || 'zh-TW';
+  document.body.removeAttribute('data-diary');
+  document.body.removeAttribute('data-site');
   if (kind === 'diary') document.body.setAttribute('data-diary', '1');
-  else document.body.removeAttribute('data-diary');
+  else if (kind === 'site') document.body.setAttribute('data-site', '1');
 
   const bc = document.getElementById('breadcrumb');
   bc.innerHTML = '';
@@ -565,7 +618,26 @@ function buildBreadcrumb(entry) {
   return [homeLabel, catLabel, entry.title || entry.urlSlug];
 }
 
+/** 每個啟用語言一張站台預設卡。mtimeMs 給 0，交給 template mtime 判斷重產。 */
+function buildSiteEntries() {
+  return LANGUAGES.map((lang) => ({
+    kind: 'site',
+    lang,
+    urlSlug: 'site-card',
+    mtimeMs: 0,
+  }));
+}
+
 async function buildRenderPayload(entry) {
+  if (entry.kind === 'site') {
+    return {
+      kind: 'site',
+      lang: entry.lang,
+      title: '',
+      description: SITE_CARD_TEXT[entry.lang] || SITE_CARD_TEXT[DEFAULT_LANG],
+      breadcrumb: [],
+    };
+  }
   if (entry.kind === 'diary') {
     const meta = await readDiaryMeta(entry.filePath);
     return {
@@ -631,7 +703,9 @@ async function workerLoop(
       const label =
         entry.kind === 'diary'
           ? `[${idx}/${total}] w${id} diary/${entry.urlSlug}`
-          : `[${idx}/${total}] w${id} ${entry.lang}/${entry.categorySlug}/${entry.urlSlug}`;
+          : entry.kind === 'site'
+            ? `[${idx}/${total}] w${id} ${entry.lang}/site-card`
+            : `[${idx}/${total}] w${id} ${entry.lang}/${entry.categorySlug}/${entry.urlSlug}`;
 
       try {
         const payload = await buildRenderPayload(entry);
@@ -733,24 +807,25 @@ async function main() {
   if (force) console.log(`   mode        : --force`);
   console.log('');
 
-  // Load favicon → base64 (embed once into template)
-  if (!existsSync(faviconPath)) {
-    // throw（非 process.exit）→ 走 main().catch 的非致命 handler，不擋 build
-    throw new Error(`favicon not found: ${faviconPath}`);
-  }
-  const faviconB64 = readFileSync(faviconPath).toString('base64');
-  const faviconDataUri = `data:image/png;base64,${faviconB64}`;
-  const templateHtml = buildTemplateHtml(faviconDataUri);
+  const templateHtml = buildTemplateHtml();
 
   // Discovery
   const articleEntries = onlyDiary
     ? []
     : await findMarkdownFiles(filterLang, filterCategory);
   const diaryEntries = includeDiary ? await findDiaryEntries(filterSlug) : [];
-  const entries = [...articleEntries, ...diaryEntries];
+  // 站台預設卡跟文章卡走同一條 queue：同樣吃 incremental mtime 判斷、同樣
+  // 走 worker。沒有理由為一張圖開特例分支（特例分支就是下一個「產出 0 筆
+  // 但印成功」的溫床）。
+  const siteEntries =
+    onlyDiary || filterCategory || filterSlug
+      ? []
+      : buildSiteEntries().filter((e) => !filterLang || e.lang === filterLang);
+  const entries = [...articleEntries, ...diaryEntries, ...siteEntries];
 
   const byLang = entries.reduce((acc, e) => {
-    const key = e.kind === 'diary' ? 'diary' : e.lang;
+    const key =
+      e.kind === 'diary' ? 'diary' : e.kind === 'site' ? 'site' : e.lang;
     acc[key] = (acc[key] || 0) + 1;
     return acc;
   }, {});
@@ -844,10 +919,6 @@ main().catch((err) => {
     );
     console.error(
       '❌   3) 本地重現：rm -rf ~/.cache/ms-playwright && npx playwright install chromium',
-    );
-  } else if (/favicon not found/i.test(msg)) {
-    console.error(
-      '❌ 分類：favicon 缺失 — 確認 public/favicon.png 存在於 repo',
     );
   } else {
     console.error('❌ 分類：未分類 OG 生成錯誤 — 完整 stack 如下供診斷：');

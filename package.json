@@ -32,7 +32,7 @@
     "build": "astro build",
     "test": "node scripts/core/test-frontmatter.mjs",
     "test:ci": "node scripts/core/test-frontmatter.mjs --ci",
-    "postbuild": "node scripts/tools/check-url-contract.mjs --strict && node scripts/tools/verify-nav-links.mjs && node scripts/tools/verify-internal-links.mjs",
+    "postbuild": "node scripts/tools/check-url-contract.mjs --strict && node scripts/tools/verify-nav-links.mjs && node scripts/tools/verify-internal-links.mjs && node scripts/tools/verify-og-images.mjs",
     "postbuild:smoke": "node scripts/core/post-build-check.mjs",
     "postbuild:internal-links": "bash scripts/tools/verify-internal-links.sh",
     "preview": "astro preview",
@@ -62,7 +62,8 @@
     "prebuild:redirects": "node scripts/core/generate-redirects.mjs",
     "check:url-contract": "node scripts/tools/check-url-contract.mjs",
     "verify:nav": "node scripts/tools/verify-nav-links.mjs",
-    "verify:links": "node scripts/tools/verify-internal-links.mjs"
+    "verify:links": "node scripts/tools/verify-internal-links.mjs",
+    "verify:og": "node scripts/tools/verify-og-images.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.17",
