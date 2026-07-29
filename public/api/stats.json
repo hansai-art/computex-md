@@ -1,7 +1,7 @@
 {
   "totalArticles": 88,
-  "totalCategories": 3,
-  "estimatedContributors": 0,
+  "totalCategories": 2,
+  "estimatedContributors": 1,
   "totalTags": 5,
   "categories": [
     {
@@ -9,12 +9,8 @@
       "count": 86
     },
     {
-      "name": "en",
-      "count": 1
-    },
-    {
       "name": "Editions",
-      "count": 1
+      "count": 2
     }
   ],
   "topTags": [
@@ -43,7 +39,7 @@
     "zh-TW": 88,
     "en": 0
   },
-  "lastUpdated": "2026-07-29T04:53:44.074Z",
+  "lastUpdated": "2026-07-29T05:45:42.968Z",
   "stars": 0,
   "forks": 0,
   "zhPages": 87,

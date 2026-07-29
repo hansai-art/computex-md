@@ -27,27 +27,20 @@
 import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve, join, basename } from 'node:path';
 import matter from 'gray-matter';
+import { CATEGORY_MAPPING } from '../../src/config/categories.mjs';
+import { ENABLED_LANGUAGE_CODES } from '../../src/config/languages.mjs';
 
 const ROOT = process.cwd();
-const LANGS = ['zh-TW', 'en', 'ja', 'ko', 'fr', 'es'];
+
+// 2026-07-29：語言與分類原本都寫死在這裡（6 語 + 母體 13 分類），兩份都不對。
+// 分類不對 → `latest.json` 的每一個語言桶都是空陣列；語言不對 → 還多印四個
+// 本站沒開的語言。它一樣印綠色的成功訊息（「✓ latest.json: 0 entries across
+// 6 langs」，數字是 0 但前面有勾）。兩份都改吃正本。
+const LANGS = [...ENABLED_LANGUAGE_CODES];
 const PER_LANG = 30;
 
 // category slug (lowercase, matches URL + content-dates key) → knowledge/ folder
-const CATEGORIES = {
-  history: 'History',
-  geography: 'Geography',
-  culture: 'Culture',
-  food: 'Food',
-  art: 'Art',
-  music: 'Music',
-  technology: 'Technology',
-  nature: 'Nature',
-  people: 'People',
-  society: 'Society',
-  economy: 'Economy',
-  lifestyle: 'Lifestyle',
-  politics: 'Politics',
-};
+const CATEGORIES = { ...CATEGORY_MAPPING };
 
 // content-dates.json key: zh-TW → `/${cat}/${slug}/`, else `/${lang}/${cat}/${slug}/`
 function urlKey(lang, cat, slug) {

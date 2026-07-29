@@ -51,13 +51,9 @@ const distDir = process.argv[2] || join(repoRoot, 'dist');
 const KNOWN_DEBT = new Set([
   // /mcp：母體的 Semiont 生命體頁
   '/semiont',
-  // /explore：母體的互動地圖與術語對照表
-  '/map',
-  '/terminology',
-  '/en/map',
-  '/en/terminology',
-  // 2026-07-29 /about 重寫後退場的 12 條（母體 Semiont 器官頁、演講投影片、
-  // 母體自介文章）已從這裡刪掉。清單就是這樣縮的。
+  // 2026-07-29 /about 重寫後退場 12 條（母體 Semiont 器官頁、演講投影片、母體
+  // 自介文章），同日 /explore 改寫後 /map 與 /terminology 四條也退場。清單就是
+  // 這樣縮的：只剩 /semiont，等 /mcp 去母體化就能把整個常數刪掉。
 ]);
 
 function walk(dir, out = []) {

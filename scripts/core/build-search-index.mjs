@@ -23,22 +23,14 @@ import {
   ENABLED_LANGUAGE_CODES,
   DEFAULT_LANGUAGE,
 } from '../../src/config/languages.mjs';
+import { CATEGORY_MAPPING } from '../../src/config/categories.mjs';
 
-const CATEGORY_MAP = {
-  history: 'History',
-  geography: 'Geography',
-  culture: 'Culture',
-  food: 'Food',
-  art: 'Art',
-  music: 'Music',
-  technology: 'Technology',
-  nature: 'Nature',
-  people: 'People',
-  politics: 'Politics',
-  society: 'Society',
-  economy: 'Economy',
-  lifestyle: 'Lifestyle',
-};
+// 2026-07-29：這裡原本是母體 13 分類的第十份寫死副本，資料夾名一個都對不上，
+// 所以搜尋索引從取種那天起就是 `0 docs, 0 KB` —— 而且它印的是綠色成功訊息。
+// 後果比其他幾份都嚴重：/explore 是「搜尋優先」的頁面，全站搜尋框、搜尋 modal、
+// 熱門詞 chip 全部連到一個空索引，打什麼都是「找不到結果」。
+// 分類表只准有一份，任何新的 build script 都 import 這支。
+const CATEGORY_MAP = { ...CATEGORY_MAPPING };
 
 // ── CJK bigram tokenizer ──
 

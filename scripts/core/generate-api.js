@@ -9,9 +9,13 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { CATEGORY_MAPPING } from '../../src/config/categories.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+/** 正本分類表的資料夾名（`Vendors` / `Products` / …）。分類表只准有一份。 */
+const KNOWN_FOLDERS = new Set(Object.values(CATEGORY_MAPPING));
 
 // 路徑配置
 const KNOWLEDGE_DIR = path.join(__dirname, '../../knowledge');
@@ -114,12 +118,23 @@ function getAllMarkdownFiles(dir, baseDir = dir) {
 }
 
 /**
- * 從檔案路徑推導分類
+ * 從檔案路徑推導分類。
+ *
+ * 2026-07-29：原本取 `pathParts[0]`，那是**第一段**。zh-TW 的路徑是
+ * `Vendors/foo.md`（第一段剛好是分類，看起來對），但譯文路徑是
+ * `en/Vendors/foo.md` —— 第一段是語言碼，於是 `stats.json` 長出一個叫
+ * `en` 的分類（`{"name":"en","count":1}`），而那篇英文廠商頁也就沒被算進
+ * Vendors。同一支檔案的 `generateArticleUrl()` 早就寫對了（`parts.length - 2`），
+ * 兩個函式對同一條路徑的解讀不一致。
+ *
+ * 改成跟 URL 那支同一個取法，並且拿正本分類表驗證：資料夾名不在表上就記
+ * 'Misc'，而不是把任意一段路徑當成分類名放進公開 API。
  */
 function getCategoryFromPath(filePath) {
   const relativePath = path.relative(KNOWLEDGE_DIR, filePath);
-  const pathParts = relativePath.split(path.sep);
-  return pathParts[0] || 'Misc';
+  const parts = relativePath.split(path.sep);
+  const folder = parts[parts.length - 2];
+  return folder && KNOWN_FOLDERS.has(folder) ? folder : 'Misc';
 }
 
 /**
@@ -258,22 +273,13 @@ function generateArticleIndex() {
       `   ⚠️  Skipped ${_staleEntries} stale _translations.json entries (zh file missing)`,
     );
   }
-  const categoryFolderToSlug = {
-    History: 'history',
-    Geography: 'geography',
-    Culture: 'culture',
-    Food: 'food',
-    Art: 'art',
-    Music: 'music',
-    Technology: 'technology',
-    Nature: 'nature',
-    People: 'people',
-    Society: 'society',
-    Economy: 'economy',
-    Lifestyle: 'lifestyle',
-    About: 'about',
-    Resources: 'resources',
-  };
+  // 2026-07-29：這裡原本是母體 14 分類的第十二份寫死副本（History / Geography /
+  // Food …）。它沒炸掉純粹是因為下面有 `.toLowerCase()` 當 fallback，本站的
+  // `Vendors` 剛好轉出 `vendors` 就對了 —— 也就是說這張表從取種起就完全沒作用，
+  // 只是躺在那裡等一個資料夾名跟 slug 不同的分類出生時無聲出錯。改吃正本。
+  const categoryFolderToSlug = Object.fromEntries(
+    Object.entries(CATEGORY_MAPPING).map(([slug, folder]) => [folder, slug]),
+  );
 
   // Reverse maps: zhFile → jaFile / koFile
   //
