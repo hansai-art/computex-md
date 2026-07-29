@@ -66,15 +66,25 @@ const currentLangOption =
 const normalizedPath = currentPath.replace(/\/$/, '') || '/';
 const isHome = normalizedPath === '/' || normalizedPath === '/en';
 
+// 導覽列 = 這個物種真的有的東西。
+//
+// 2026-07-29：這裡原本整份是母體 taiwan.md 的（主權公測 / 2026 選舉 / 地理台灣 /
+// 台灣的形狀 / 台灣 vs 世界 / 聲景…）。實測 44 條導覽與頁尾連結裡 **28 條是 404**，
+// 出現在全部 127 頁上，而 build 的死連結檢查只驗 canonical / sitemap / hreflang，
+// 不驗導覽列，所以一路報 0 dead。另有 13 個分類 label 查不到字串，直接把
+// `categoryConfig.history` 這種變數名印在畫面上。
+//
+// 現在的規則：導覽只准指向 src/pages/ 真的存在的路由，
+// scripts/tools/verify-nav-links.mjs 每次 build 後掃 dist 驗證。
 const navConfig = [
-  { path: '/about', label: t('nav.about') },
+  { path: '/vendors', label: t('categoryConfig.vendors') },
+  { path: '/products', label: t('categoryConfig.products') },
+  { path: '/editions', label: t('categoryConfig.editions') },
+  { path: '/topics', label: t('categoryConfig.topics') },
   { path: '/explore', label: t('nav.explore') },
-  { path: '/map', label: t('nav.map') },
-  { path: '/data', label: t('nav.data') },
-  { path: '/soundscape', label: t('nav.soundscape') },
-  { path: '/resources', label: t('nav.resources') },
-  { path: '/semiont', label: t('nav.semiont') },
+  { path: '/dashboard', label: t('nav.dashboard') },
   { path: '/contribute', label: t('nav.contribute') },
+  { path: '/about', label: t('nav.about') },
 ].map((item) => {
   const fullPath = navHref(item.path);
   const pathWithoutHash = fullPath.replace(/#.*$/, '');
@@ -82,45 +92,21 @@ const navConfig = [
     pathWithoutHash !== fullPath
       ? false
       : currentPath.startsWith(pathWithoutHash);
-  // Semiont covers both the cognitive layer and dashboard.
-  if (item.path === '/semiont') {
-    const semiontPath = navHref('/semiont');
-    const dashboardPath = navHref('/dashboard');
-    active =
-      currentPath.startsWith('/semiont') ||
-      currentPath.startsWith(semiontPath) ||
-      currentPath.startsWith('/dashboard') ||
-      currentPath.startsWith(dashboardPath);
-  }
-  // 2026-06-05: /elections moved under 探索 subnav, /mcp under 資源 subnav —
-  // keep the parent nav item highlighted when on those pages.
+  // /latest 與 /graph 掛在「探索」底下，/mcp 掛在「監測」底下：
+  // 人在那些頁面時，父項要跟著亮。
   if (item.path === '/explore') {
-    active = active || currentPath.startsWith('/elections');
-  }
-  if (item.path === '/resources') {
-    const mcpPath = navHref('/mcp');
+    const latest = navHref('/latest');
+    const graph = navHref('/graph');
     active =
-      active ||
-      currentPath.startsWith('/mcp') ||
-      currentPath.startsWith(mcpPath);
+      active || currentPath.startsWith(latest) || currentPath.startsWith(graph);
   }
-  // 2026-06-10: /opendata（OpenData 策展）lives under 數據 subnav.
-  // 2026-06-23: /companies（企業地圖完整版）also lives under 數據 subnav.
-  if (item.path === '/data') {
-    const opendataPath = navHref('/opendata');
-    const companiesPath = navHref('/companies');
-    active =
-      active ||
-      currentPath.startsWith('/opendata') ||
-      currentPath.startsWith(opendataPath) ||
-      currentPath.startsWith('/companies') ||
-      currentPath.startsWith(companiesPath);
+  if (item.path === '/dashboard') {
+    active = active || currentPath.startsWith(navHref('/mcp'));
   }
-  return {
-    ...item,
-    fullPath,
-    active,
-  };
+  if (item.path === '/about') {
+    active = active || currentPath.startsWith(navHref('/changelog'));
+  }
+  return { ...item, fullPath, active };
 });
 
 // Mobile drawer sub-links per group（2026-07-24 mobile-nav redesign）：
@@ -129,95 +115,13 @@ const navConfig = [
 const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
   '/explore': [
     { href: navHref('/latest'), label: `🆕 ${t('nav.latest')}` },
-    { href: navHref('/timeline'), label: `⏳ ${t('nav.timeline')}` },
     { href: navHref('/graph'), label: `🕸️ ${t('nav.graph-view')}` },
-    { href: navHref('/terminology'), label: `📖 ${t('nav.terminology')}` },
-    // nav.elections 的 i18n 字串已內含字首 🗳️，不重複加
-    { href: navHref('/elections/2026'), label: t('nav.elections') },
   ],
-  '/map': [
-    { href: navHref('/taiwan-shape'), label: `🗺️ ${t('nav.data.shape')}` },
-  ],
-  '/data': [
-    { href: navHref('/opendata'), label: `🗂️ ${t('nav.data.curation')}` },
-    { href: navHref('/companies'), label: `🏢 ${t('nav.data.enterprise')}` },
-  ],
-  '/resources': [{ href: navHref('/mcp'), label: `🔌 ${t('nav.mcp')}` }],
-  '/semiont': [
-    // cognitive / newsroom 的 i18n 字串已內含字尾 emoji，不重複加
-    { href: navHref('/semiont'), label: t('nav.semiont.cognitive') },
-    { href: navHref('/semiont/newsroom'), label: t('nav.semiont.newsroom') },
-    { href: navHref('/dashboard'), label: `🔬 ${t('nav.dashboard')}` },
+  '/dashboard': [{ href: navHref('/mcp'), label: `🔌 ${t('nav.mcp')}` }],
+  '/about': [
+    { href: navHref('/changelog'), label: `📝 ${t('nav.about.changelog')}` },
   ],
 };
-
-const categoryList = [
-  {
-    path: navHref('/history'),
-    label: t('categoryConfig.history'),
-    emoji: '📜',
-  },
-  {
-    path: navHref('/geography'),
-    label: t('categoryConfig.geography'),
-    emoji: '🗺️',
-  },
-  {
-    path: navHref('/culture'),
-    label: t('categoryConfig.culture'),
-    emoji: '🎭',
-  },
-  {
-    path: navHref('/food'),
-    label: t('categoryConfig.food'),
-    emoji: '🍜',
-  },
-  {
-    path: navHref('/art'),
-    label: t('categoryConfig.art'),
-    emoji: '🎨',
-  },
-  {
-    path: navHref('/music'),
-    label: t('categoryConfig.music'),
-    emoji: '🎵',
-  },
-  {
-    path: navHref('/technology'),
-    label: t('categoryConfig.technology'),
-    emoji: '💻',
-  },
-  {
-    path: navHref('/nature'),
-    label: t('categoryConfig.nature'),
-    emoji: '🌿',
-  },
-  {
-    path: navHref('/people'),
-    label: t('categoryConfig.people'),
-    emoji: '👥',
-  },
-  {
-    path: navHref('/society'),
-    label: t('categoryConfig.society'),
-    emoji: '🏛️',
-  },
-  {
-    path: navHref('/economy'),
-    label: t('categoryConfig.economy'),
-    emoji: '📊',
-  },
-  {
-    path: navHref('/lifestyle'),
-    label: t('categoryConfig.lifestyle'),
-    emoji: '🏠',
-  },
-  {
-    path: navHref('/politics'),
-    label: t('categoryConfig.politics'),
-    emoji: '🗳️',
-  },
-];
 ---
 
 <div id="header-container" class="fixed inset-x-0 top-0 z-[1001] w-full">
@@ -239,7 +143,9 @@ const categoryList = [
         <nav class="nav-desktop" aria-label={t('nav.aria-main-navigation')}>
           {
             navConfig.map((item, index) => {
-              const showSep = index === 3 || index === 6;
+              // 分隔線切三組：四個內容分類 / 探索與監測 / 參與與關於。
+              const showSep = index === 4 || index === 6;
+              const subLinks = mobileSubLinks[item.path];
 
               if (item.path === '/about') {
                 return (
@@ -254,7 +160,7 @@ const categoryList = [
                       </a>
                       <div class="dropdown-menu">
                         <a
-                          href={navHref('/about')}
+                          href={item.fullPath}
                           class="dropdown-item dropdown-section-header"
                         >
                           {t('nav.about')}
@@ -273,12 +179,6 @@ const categoryList = [
                           🧬 {t('nav.about.organism')}
                         </a>
                         <a
-                          href={`${navHref('/about')}#team`}
-                          class="dropdown-item"
-                        >
-                          👥 {t('nav.about.team')}
-                        </a>
-                        <a
                           href={`${navHref('/about')}#faq`}
                           class="dropdown-item"
                         >
@@ -286,218 +186,6 @@ const categoryList = [
                         </a>
                         <a href={navHref('/changelog')} class="dropdown-item">
                           📝 {t('nav.about.changelog')}
-                        </a>
-                      </div>
-                    </div>
-                  </Fragment>
-                );
-              }
-              if (item.path === '/explore') {
-                return (
-                  <Fragment>
-                    {showSep && <span class="nav-sep" />}
-                    <div class="nav-dropdown">
-                      <a
-                        href={item.fullPath}
-                        class:list={['nav-link', { active: item.active }]}
-                      >
-                        {item.label} <span class="dropdown-arrow">▾</span>
-                      </a>
-                      <div class="dropdown-menu">
-                        <a
-                          href={item.fullPath}
-                          class="dropdown-item dropdown-section-header"
-                        >
-                          {t('nav.explore')}
-                        </a>
-                        <a
-                          href={navHref('/latest')}
-                          class="dropdown-item dropdown-section-header"
-                        >
-                          🆕 {t('nav.latest')}
-                        </a>
-                        <a
-                          href={navHref('/timeline')}
-                          class="dropdown-item dropdown-section-header"
-                        >
-                          ⏳ {t('nav.timeline')}
-                        </a>
-                        <div class="dropdown-divider" />
-                        <a
-                          href={navHref('/graph')}
-                          class="dropdown-item dropdown-section-header"
-                        >
-                          {t('nav.graph-view')} 🕸️
-                        </a>
-                        <a
-                          href={navHref('/terminology')}
-                          class="dropdown-item dropdown-section-header"
-                        >
-                          {t('nav.terminology')} 📖
-                        </a>
-                        <a
-                          href={navHref('/bench')}
-                          class="dropdown-item dropdown-section-header"
-                        >
-                          {t('nav.bench')} 🧬
-                        </a>
-                        <a
-                          href={navHref('/elections/2026')}
-                          class="dropdown-item dropdown-section-header"
-                        >
-                          {t('nav.elections')}
-                        </a>
-                        <div class="dropdown-divider" />
-                        {categoryList.map((category) => (
-                          <a href={category.path} class="dropdown-item">
-                            {category.emoji} {category.label}
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  </Fragment>
-                );
-              }
-              if (item.path === '/map') {
-                return (
-                  <Fragment>
-                    {showSep && <span class="nav-sep" />}
-                    <div class="nav-dropdown">
-                      <a
-                        href={item.fullPath}
-                        class:list={['nav-link', { active: item.active }]}
-                      >
-                        {item.label} <span class="dropdown-arrow">▾</span>
-                      </a>
-                      <div class="dropdown-menu">
-                        <a
-                          href={navHref('/map')}
-                          class="dropdown-item dropdown-section-header"
-                        >
-                          📍 {t('nav.map.explore')}
-                        </a>
-                        <div class="dropdown-divider" />
-                        <a
-                          href={navHref('/taiwan-shape')}
-                          class="dropdown-item"
-                        >
-                          {t('nav.data.shape')} 🗺️
-                        </a>
-                      </div>
-                    </div>
-                  </Fragment>
-                );
-              }
-              if (item.path === '/data') {
-                return (
-                  <Fragment>
-                    {showSep && <span class="nav-sep" />}
-                    <div class="nav-dropdown">
-                      <a
-                        href={item.fullPath}
-                        class:list={['nav-link', { active: item.active }]}
-                      >
-                        {item.label} <span class="dropdown-arrow">▾</span>
-                      </a>
-                      <div class="dropdown-menu">
-                        <a
-                          href={navHref('/data')}
-                          class="dropdown-item dropdown-section-header"
-                        >
-                          {t('nav.data')}
-                        </a>
-                        <a
-                          href={navHref('/opendata')}
-                          class="dropdown-item dropdown-section-header"
-                        >
-                          🗂️ {t('nav.data.curation')}
-                        </a>
-                        <a
-                          href={navHref('/companies')}
-                          class="dropdown-item dropdown-section-header"
-                        >
-                          🏢 {t('nav.data.enterprise')}
-                        </a>
-                        <div class="dropdown-divider" />
-                        <a
-                          href={`${navHref('/data')}#global`}
-                          class="dropdown-item"
-                        >
-                          🌏 {t('nav.data.global')}
-                        </a>
-                        <a
-                          href={`${navHref('/data')}#democracy`}
-                          class="dropdown-item"
-                        >
-                          📡 {t('nav.data.democracy')}
-                        </a>
-                        <a
-                          href={`${navHref('/data')}#opendata`}
-                          class="dropdown-item"
-                        >
-                          📊 {t('nav.data.opendata')}
-                        </a>
-                      </div>
-                    </div>
-                  </Fragment>
-                );
-              }
-              if (item.path === '/resources') {
-                return (
-                  <Fragment>
-                    {showSep && <span class="nav-sep" />}
-                    <div class="nav-dropdown">
-                      <a
-                        href={item.fullPath}
-                        class:list={['nav-link', { active: item.active }]}
-                      >
-                        {item.label} <span class="dropdown-arrow">▾</span>
-                      </a>
-                      <div class="dropdown-menu">
-                        <a
-                          href={navHref('/resources')}
-                          class="dropdown-item dropdown-section-header"
-                        >
-                          {t('nav.resources')}
-                        </a>
-                        <div class="dropdown-divider" />
-                        <a href={navHref('/mcp')} class="dropdown-item">
-                          🔌 {t('nav.mcp')}
-                        </a>
-                      </div>
-                    </div>
-                  </Fragment>
-                );
-              }
-              if (item.path === '/semiont') {
-                return (
-                  <Fragment>
-                    {showSep && <span class="nav-sep" />}
-                    <div class="nav-dropdown">
-                      <a
-                        href={item.fullPath}
-                        class:list={['nav-link', { active: item.active }]}
-                      >
-                        {item.label} <span class="dropdown-arrow">▾</span>
-                      </a>
-                      <div class="dropdown-menu">
-                        <a
-                          href={navHref('/semiont')}
-                          class="dropdown-item dropdown-section-header"
-                        >
-                          {t('nav.semiont.cognitive')}
-                        </a>
-                        <a
-                          href={navHref('/semiont/newsroom')}
-                          class="dropdown-item dropdown-section-header"
-                        >
-                          {t('nav.semiont.newsroom')}
-                        </a>
-                        <a
-                          href={navHref('/dashboard')}
-                          class="dropdown-item dropdown-section-header"
-                        >
-                          {t('nav.dashboard')} 🔬
                         </a>
                       </div>
                     </div>
@@ -517,7 +205,7 @@ const categoryList = [
                       </a>
                       <div class="dropdown-menu">
                         <a
-                          href={navHref('/contribute')}
+                          href={item.fullPath}
                           class="dropdown-item dropdown-section-header"
                         >
                           {t('nav.contribute')}
@@ -528,18 +216,6 @@ const categoryList = [
                           class="dropdown-item"
                         >
                           📝 {t('nav.contribute.submit')}
-                        </a>
-                        <a
-                          href={`${navHref('/contribute')}#token-donation`}
-                          class="dropdown-item"
-                        >
-                          🪙 {t('nav.contribute.tokens')}
-                        </a>
-                        <a
-                          href={`${navHref('/contribute')}#organism`}
-                          class="dropdown-item"
-                        >
-                          🧬 {t('nav.contribute.why')}
                         </a>
                         <a
                           href={`${navHref('/contribute')}#cli`}
@@ -554,6 +230,35 @@ const categoryList = [
                         >
                           🐙 GitHub
                         </a>
+                      </div>
+                    </div>
+                  </Fragment>
+                );
+              }
+              if (subLinks) {
+                return (
+                  <Fragment>
+                    {showSep && <span class="nav-sep" />}
+                    <div class="nav-dropdown">
+                      <a
+                        href={item.fullPath}
+                        class:list={['nav-link', { active: item.active }]}
+                      >
+                        {item.label} <span class="dropdown-arrow">▾</span>
+                      </a>
+                      <div class="dropdown-menu">
+                        <a
+                          href={item.fullPath}
+                          class="dropdown-item dropdown-section-header"
+                        >
+                          {item.label}
+                        </a>
+                        <div class="dropdown-divider" />
+                        {subLinks.map((link) => (
+                          <a href={link.href} class="dropdown-item">
+                            {link.label}
+                          </a>
+                        ))}
                       </div>
                     </div>
                   </Fragment>

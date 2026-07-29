@@ -1,7 +1,38 @@
 {
-  "generatedAt": "2026-07-29T02:33:35.327Z",
+  "generatedAt": "2026-07-29T03:12:00.787Z",
   "source": "git",
   "commits": [
+    {
+      "hash": "da670af5069bac0bd600cb1fa3d5211e01178508",
+      "date": "2026-07-29T10:37:15+08:00",
+      "author": "Hans",
+      "message": "chore(dates): 廠商頁 commit 之後 content-dates 補齊 3 → 89 筆",
+      "articles": []
+    },
+    {
+      "hash": "2206fd1ddbef9a26f7f1f688c563d3a23b14401b",
+      "date": "2026-07-29T10:35:20+08:00",
+      "author": "Hans",
+      "message": "fix(vendors): 產生器輸出不等於 commit 後的樣子，重跑一次就是 86 檔格式雜訊",
+      "articles": [
+        {
+          "url": "/vendors/aaeon",
+          "name": "aaeon"
+        },
+        {
+          "url": "/vendors/accordance-systems",
+          "name": "accordance-systems"
+        },
+        {
+          "url": "/vendors/altek",
+          "name": "altek"
+        },
+        {
+          "url": "/vendors/amax-ky",
+          "name": "amax-ky"
+        }
+      ]
+    },
     {
       "hash": "23fa2125ee631ae6fbf019a48c86ca00e567a69a",
       "date": "2026-07-29T10:29:34+08:00",

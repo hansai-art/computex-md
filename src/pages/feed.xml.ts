@@ -66,8 +66,8 @@ export async function GET() {
   const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>COMPUTEX.md - 台灣知識庫</title>
-    <description>讓全世界完整認識台灣 - 開源台灣知識庫，蒐集關於台灣的政治、經濟、文化、歷史、地理等各方面知識。</description>
+    <title>COMPUTEX.md：台灣 AI 硬體產業活體年鑑</title>
+    <description>COMPUTEX 參展廠商、產品與歷屆展會的開放檔案庫。事實層機械抽取自官方名錄，逐項附出處連結與查證日期；官方沒公布的一律留白。</description>
     <link>${siteUrl}</link>
     <language>zh-TW</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
@@ -77,7 +77,7 @@ export async function GET() {
     <atom:link href="${siteUrl}/feed.xml" rel="self" type="application/rss+xml" />
     <image>
       <url>${siteUrl}/images/taiwan-social.jpg</url>
-      <title>COMPUTEX.md - 台灣知識庫</title>
+      <title>COMPUTEX.md：台灣 AI 硬體產業活體年鑑</title>
       <link>${siteUrl}</link>
     </image>
 ${latestArticles

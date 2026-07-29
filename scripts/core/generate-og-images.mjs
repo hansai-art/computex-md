@@ -502,7 +502,7 @@ html[lang='ko'] p.description { font-family: 'Noto Serif KR', 'Noto Serif TC', s
   <p class="description" id="description"></p>
   <span class="watermark">
     <img src="${faviconDataUri}" alt="" aria-hidden="true">
-    <span class="brand-text">Taiwan<span class="brand-dot">.md</span></span>
+    <span class="brand-text">COMPUTEX<span class="brand-dot">.md</span></span>
   </span>
 </div>
 <script>

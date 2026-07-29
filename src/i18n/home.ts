@@ -114,9 +114,10 @@ export const homeUI = {
     'home.readingPath.footer.minutesUnit': 'minutes',
     'home.readingPath.footer.domainsLabel': 'domains',
     'home.readingPath.footer.getToKnow': 'Get to know Taiwan',
-    'home.meta.title': 'Open-Source Taiwan Knowledge Base',
+    'home.meta.title':
+      'COMPUTEX.md: a living archive of the Taiwan AI hardware industry',
     'home.meta.description':
-      'Open-source, AI-friendly comprehensive knowledge base about Taiwan. 87+ pages of in-depth content covering history, culture, food, music, technology and 12 major topics, co-edited by the community to introduce the real Taiwan to the world.',
+      'An open archive of COMPUTEX exhibitors, products and editions. The fact layer is extracted mechanically from the official directory, every item carrying a source link and a checked date; what the organiser has not published is left blank.',
     'home.miniGraph.heading': '🕸️ Knowledge Graph',
     'home.miniGraph.subtitle':
       "Every article is connected — click to explore Taiwan's knowledge network",
@@ -1462,9 +1463,9 @@ export const homeUI = {
     'home.readingPath.footer.minutesUnit': '分鐘',
     'home.readingPath.footer.domainsLabel': '大領域',
     'home.readingPath.footer.getToKnow': '完整認識台灣',
-    'home.meta.title': '開源台灣知識庫',
+    'home.meta.title': 'COMPUTEX.md：台灣 AI 硬體產業活體年鑑',
     'home.meta.description':
-      '開源、AI-friendly 的台灣完整知識庫。87+ 頁深度內容涵蓋歷史、文化、美食、音樂、科技等 12 大主題，由社群共同編撰，讓全世界認識真正的台灣。',
+      'COMPUTEX 參展廠商、產品與歷屆展會的開放檔案庫。事實層機械抽取自官方名錄，逐項附出處連結與查證日期；官方沒公布的一律留白。',
     'home.miniGraph.heading': '🕸️ 知識圖譜',
     'home.miniGraph.subtitle': '每篇文章都不是孤島——點擊探索台灣知識的連結網絡',
     'home.features.cta.graph': '🔗 知識圖譜 — 探索文章之間的連結',

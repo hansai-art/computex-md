@@ -47,8 +47,9 @@ export async function GET(context) {
   articles.sort((a, b) => b.pubDate - a.pubDate);
 
   return rss({
-    title: 'COMPUTEX.md — 開源台灣知識庫',
-    description: '用 Markdown 策展台灣，讓世界看見這座島嶼的故事',
+    title: 'COMPUTEX.md：台灣 AI 硬體產業活體年鑑',
+    description:
+      'COMPUTEX 參展廠商、產品與歷屆展會的開放檔案庫。事實層機械抽取自官方名錄，逐項附出處連結與查證日期；官方沒公布的一律留白。',
     site: context.site || 'https://computex-md.pages.dev',
     items: articles.slice(0, 50),
     customData: '<language>zh-TW</language>',

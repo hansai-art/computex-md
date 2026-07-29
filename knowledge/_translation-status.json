@@ -1,7 +1,7 @@
 {
   "_meta": {
-    "lastUpdated": "2026-07-29T10:33:33+08:00",
-    "zhCommitHead": "23fa212",
+    "lastUpdated": "2026-07-29T11:11:58+08:00",
+    "zhCommitHead": "da670af",
     "totalZh": 87,
     "activeLanguages": ["en"],
     "summary": {
@@ -21,8 +21,8 @@
   "byArticle": {
     "Vendors/mouser-electronics.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:835eb1e18f16c76b",
         "bodyHash": "sha256:fdac32a6b3a9d524"
       },
@@ -34,8 +34,8 @@
     },
     "Vendors/quettaflow.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:7ff2d3f6fda7d2e6",
         "bodyHash": "sha256:c5839be6eefdaee7"
       },
@@ -47,8 +47,8 @@
     },
     "Vendors/aptobject.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:2a8ba41d06fe9fc6",
         "bodyHash": "sha256:e70ea5fb69f22384"
       },
@@ -60,8 +60,8 @@
     },
     "Vendors/qnap-systems.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:85056d977669094a",
         "bodyHash": "sha256:6d3c4ec433137ee6"
       },
@@ -73,8 +73,8 @@
     },
     "Vendors/taiwan-intelligence-research-and-development.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:3db0b589ebf647c3",
         "bodyHash": "sha256:11c88e37362f316c"
       },
@@ -86,8 +86,8 @@
     },
     "Vendors/inventec.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:ab701e254da314a1",
         "bodyHash": "sha256:7c477cdd0143eeba"
       },
@@ -99,8 +99,8 @@
     },
     "Vendors/southco-asia.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:dd9a146a030b15b7",
         "bodyHash": "sha256:3ff2b73c10a5b7a0"
       },
@@ -112,8 +112,8 @@
     },
     "Vendors/richin-tech.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:9e36b66b90af32aa",
         "bodyHash": "sha256:3faf6033f5c7e032"
       },
@@ -125,8 +125,8 @@
     },
     "Vendors/micro-star-international.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:8d81e2b61471ac70",
         "bodyHash": "sha256:7ee7b5fdc26faba6"
       },
@@ -138,8 +138,8 @@
     },
     "Vendors/wiwynn.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:b20bf2359210cfc9",
         "bodyHash": "sha256:5a930ae7c9ada35f"
       },
@@ -151,8 +151,8 @@
     },
     "Vendors/dongguan-xunling-new.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:4aa2756ff71cf56c",
         "bodyHash": "sha256:50a42bbbe09e2c8f"
       },
@@ -164,8 +164,8 @@
     },
     "Vendors/palebluedot-ai.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:8b9a419208af458f",
         "bodyHash": "sha256:ff332c795d1b3df9"
       },
@@ -177,8 +177,8 @@
     },
     "Vendors/liverage.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:69c3525781908b45",
         "bodyHash": "sha256:656dfda855d60839"
       },
@@ -190,8 +190,8 @@
     },
     "Vendors/ezbond-chemical.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:9240b7dec029c212",
         "bodyHash": "sha256:685299a1033f16af"
       },
@@ -203,8 +203,8 @@
     },
     "Vendors/amazing-chip-semiconductor.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:c5c8c2e22262fdc2",
         "bodyHash": "sha256:020edcccc004f43b"
       },
@@ -216,8 +216,8 @@
     },
     "Vendors/altek.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:54a2e8b5d6b73fc5",
         "bodyHash": "sha256:db3198ea4eac2c6c"
       },
@@ -229,8 +229,8 @@
     },
     "Vendors/siemens.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:6508833e1bbb745a",
         "bodyHash": "sha256:8205ce90e3aeab56"
       },
@@ -242,8 +242,8 @@
     },
     "Vendors/roboco.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:0a536c99cd33a2ed",
         "bodyHash": "sha256:0bdfe72e39731784"
       },
@@ -255,8 +255,8 @@
     },
     "Vendors/enbik.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:e0b0f32295dcd08d",
         "bodyHash": "sha256:70045f478c24ef7b"
       },
@@ -268,8 +268,8 @@
     },
     "Vendors/auras.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:0d53958515ee2b66",
         "bodyHash": "sha256:dda46a13826be6d7"
       },
@@ -281,8 +281,8 @@
     },
     "Vendors/dynatron.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:51fd00885636556d",
         "bodyHash": "sha256:8007e1646c41f153"
       },
@@ -294,8 +294,8 @@
     },
     "Vendors/liteon.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:4b46e1eb5d5790bf",
         "bodyHash": "sha256:42c0673e7f58bb88"
       },
@@ -307,8 +307,8 @@
     },
     "Vendors/vav-cooling.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:1a97774819151168",
         "bodyHash": "sha256:5ce823753de2f806"
       },
@@ -320,8 +320,8 @@
     },
     "Vendors/faytech-tech.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:ec31d817052d92f3",
         "bodyHash": "sha256:4fdc984455376a4e"
       },
@@ -333,8 +333,8 @@
     },
     "Vendors/c-y-intelligence.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:5763809ba393625d",
         "bodyHash": "sha256:1af0ad286f091164"
       },
@@ -346,8 +346,8 @@
     },
     "Vendors/mitac-computing.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:3d9da2fd7fd1a326",
         "bodyHash": "sha256:e7e3b3d7a952ed3d"
       },
@@ -359,8 +359,8 @@
     },
     "Vendors/taiwan-cosmo-instruments.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:e60a92357a41c3d2",
         "bodyHash": "sha256:2d2ff607bfdc2c98"
       },
@@ -372,8 +372,8 @@
     },
     "Vendors/guchii.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:613a478ff3952ce1",
         "bodyHash": "sha256:9ced02639cc57518"
       },
@@ -385,8 +385,8 @@
     },
     "Vendors/shenzhen-gooxi-digital-intelligence.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:39baa078b4881a77",
         "bodyHash": "sha256:4715653d16d539c4"
       },
@@ -398,8 +398,8 @@
     },
     "Vendors/innodisk.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:84e5eec210a76782",
         "bodyHash": "sha256:2b455125ff07aeb6"
       },
@@ -411,8 +411,8 @@
     },
     "Vendors/xmems-labs.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:2dc7cc1abac016d1",
         "bodyHash": "sha256:0246880b08e864de"
       },
@@ -424,8 +424,8 @@
     },
     "Vendors/senao-networks.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:c970f5bfb30e5026",
         "bodyHash": "sha256:fb4c558c0c362c42"
       },
@@ -437,8 +437,8 @@
     },
     "Vendors/rayvatek.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:795c6fb5d59a2443",
         "bodyHash": "sha256:2aa7fb259bddba79"
       },
@@ -450,8 +450,8 @@
     },
     "Vendors/amax-ky.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:695787a6c5507961",
         "bodyHash": "sha256:c292cd328cffe05c"
       },
@@ -463,8 +463,8 @@
     },
     "Vendors/fsp.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:e45dddfeb70e554f",
         "bodyHash": "sha256:ab831618ad7f27b2"
       },
@@ -476,8 +476,8 @@
     },
     "Vendors/zoho.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:9cc7d83e8998a3d3",
         "bodyHash": "sha256:f6fe20b3c0f97b2b"
       },
@@ -489,8 +489,8 @@
     },
     "Vendors/flex.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:3ef4c5c1c85b4063",
         "bodyHash": "sha256:4248c65a96ffea4a"
       },
@@ -502,8 +502,8 @@
     },
     "Vendors/chenbro-micom.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:475de56517baa904",
         "bodyHash": "sha256:1519d1e838562e7b"
       },
@@ -515,8 +515,8 @@
     },
     "Vendors/kentec.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:7fae2a870fed6bfe",
         "bodyHash": "sha256:a5706891baa0710c"
       },
@@ -528,8 +528,8 @@
     },
     "Vendors/shenzhen-kstar-science-and.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:e0943a8f463caedf",
         "bodyHash": "sha256:df43daa4629ead9a"
       },
@@ -541,8 +541,8 @@
     },
     "Vendors/latticework-taiwan.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:35241a9536f73462",
         "bodyHash": "sha256:4dae94f92d163501"
       },
@@ -554,8 +554,8 @@
     },
     "Vendors/elitegroup-computer-systems.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:3c87b7139ab559c4",
         "bodyHash": "sha256:9a013ef019042411"
       },
@@ -567,8 +567,8 @@
     },
     "Vendors/continental.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:b2ec320d3c5ed719",
         "bodyHash": "sha256:a67957b19472abc9"
       },
@@ -580,8 +580,8 @@
     },
     "Vendors/delos-data.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:8940862eda158903",
         "bodyHash": "sha256:af56edb56b53f2d0"
       },
@@ -593,8 +593,8 @@
     },
     "Vendors/minerva-innovation.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:dadf8952900bf8ad",
         "bodyHash": "sha256:97236bc18bf7844f"
       },
@@ -606,8 +606,8 @@
     },
     "Vendors/leadtek-research.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:a0dfe8438aebc846",
         "bodyHash": "sha256:5cf8a1911cc5d4a0"
       },
@@ -619,8 +619,8 @@
     },
     "Vendors/jentech-precision-industrial.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:a04a84c25d2cb411",
         "bodyHash": "sha256:73eb8d7868d05756"
       },
@@ -632,8 +632,8 @@
     },
     "Vendors/comino.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:0f9de3f02d6abe08",
         "bodyHash": "sha256:45e8fcd5b0021d16"
       },
@@ -645,8 +645,8 @@
     },
     "Vendors/accordance-systems.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:b92a51bb70254bf0",
         "bodyHash": "sha256:b1c5ce699ec8ef49"
       },
@@ -658,8 +658,8 @@
     },
     "Vendors/powerchip-semiconductor-manufacturing.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:994f941f3efbbdda",
         "bodyHash": "sha256:80353090222ced49"
       },
@@ -671,8 +671,8 @@
     },
     "Vendors/vaidio.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:7ed2aed0a3ffa7e3",
         "bodyHash": "sha256:e278874e535eda07"
       },
@@ -684,8 +684,8 @@
     },
     "Vendors/synology.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:3ea5082dcfbed0db",
         "bodyHash": "sha256:b8ba184ed23fb839"
       },
@@ -697,8 +697,8 @@
     },
     "Vendors/apaltek.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:d5493cbd1e21e093",
         "bodyHash": "sha256:adb1f8e85755fa22"
       },
@@ -710,8 +710,8 @@
     },
     "Vendors/rittal.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:fd3605acc467592d",
         "bodyHash": "sha256:6fee32af16ce6c32"
       },
@@ -723,8 +723,8 @@
     },
     "Vendors/vertiv-taiwan.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:03b05df505036d59",
         "bodyHash": "sha256:4b310791032a0745"
       },
@@ -736,8 +736,8 @@
     },
     "Vendors/hetone-enterprise.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:8e852bc07d0cccc4",
         "bodyHash": "sha256:2de601967aa00472"
       },
@@ -749,8 +749,8 @@
     },
     "Vendors/infortrend.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:ea802564d39e3d08",
         "bodyHash": "sha256:eadd5eeffc4d80d5"
       },
@@ -762,8 +762,8 @@
     },
     "Vendors/c-media-electronics.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:3d725c0968bcf1e7",
         "bodyHash": "sha256:36d0e1c4f6c2a4a2"
       },
@@ -775,8 +775,8 @@
     },
     "Vendors/anxpert-advanced.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:570d4b6d38ca4c89",
         "bodyHash": "sha256:eaa67d2e97f2868b"
       },
@@ -788,8 +788,8 @@
     },
     "Vendors/yonyou-taiwan.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:362eb167f1bf601e",
         "bodyHash": "sha256:384ae29bd6bd6597"
       },
@@ -801,8 +801,8 @@
     },
     "Vendors/axelera-ai.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:ccdf77f99beee6cd",
         "bodyHash": "sha256:52da31995a854c69"
       },
@@ -814,8 +814,8 @@
     },
     "Vendors/avermedia.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:feafde4dbcfe6692",
         "bodyHash": "sha256:6ae2f46c80521924"
       },
@@ -827,8 +827,8 @@
     },
     "Vendors/kaori-thermal.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:55eaf728f89054fd",
         "bodyHash": "sha256:ed02e11dc3ce4254"
       },
@@ -840,8 +840,8 @@
     },
     "Vendors/lengda-xiamen.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:760452354f1f935c",
         "bodyHash": "sha256:911438a018a30425"
       },
@@ -853,8 +853,8 @@
     },
     "Vendors/carl-zeiss.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:f921bd7c019c41f2",
         "bodyHash": "sha256:b7274735d9c8ed8c"
       },
@@ -866,8 +866,8 @@
     },
     "Vendors/amphenol.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:1e660d9673d06b50",
         "bodyHash": "sha256:e3de15c855e1f4ad"
       },
@@ -879,8 +879,8 @@
     },
     "Vendors/egis.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:ac54d7b5fc56de20",
         "bodyHash": "sha256:29eadf70af34f40c"
       },
@@ -892,8 +892,8 @@
     },
     "Vendors/jpc-connectivity.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:6ee8ec306d76ddb0",
         "bodyHash": "sha256:a40ea9d874909a7c"
       },
@@ -905,8 +905,8 @@
     },
     "Vendors/formosa-plastics.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:64ebc8beb9e55250",
         "bodyHash": "sha256:ff2aab967aab1ac0"
       },
@@ -918,8 +918,8 @@
     },
     "Vendors/hi-power-solution.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:928bd615d66be78b",
         "bodyHash": "sha256:82fafea3c7a4840a"
       },
@@ -931,8 +931,8 @@
     },
     "Vendors/neousys.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:243731b91ca55404",
         "bodyHash": "sha256:44e00098dc239ac6"
       },
@@ -944,8 +944,8 @@
     },
     "Vendors/kneron-taiwan.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:f5e3dcd892080c23",
         "bodyHash": "sha256:b0528533dc2b9a83"
       },
@@ -957,8 +957,8 @@
     },
     "Vendors/quadrep-electronics-taiwan.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:1ef63763b724b239",
         "bodyHash": "sha256:de455ab0f0d06e5f"
       },
@@ -970,8 +970,8 @@
     },
     "Vendors/ecolab.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:086b3e9515fb327a",
         "bodyHash": "sha256:4a07bb5e830dd134"
       },
@@ -983,8 +983,8 @@
     },
     "Vendors/voltronic-power.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:b0aeba012b316604",
         "bodyHash": "sha256:3f981bf32f7be928"
       },
@@ -996,8 +996,8 @@
     },
     "Vendors/danfoss-power-solutions.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:d28c0d0ada699b05",
         "bodyHash": "sha256:32f982e8ddb7f0f6"
       },
@@ -1009,8 +1009,8 @@
     },
     "Vendors/shuttle.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:64d282a10cd32bac",
         "bodyHash": "sha256:4f4126f57e18f645"
       },
@@ -1022,8 +1022,8 @@
     },
     "Vendors/skymizer-taiwan.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:807f688ab38b4c74",
         "bodyHash": "sha256:cf0a812869799632"
       },
@@ -1035,8 +1035,8 @@
     },
     "Vendors/ambedded.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:387f9324193c07ae",
         "bodyHash": "sha256:2e90820f3fdd51f7"
       },
@@ -1048,8 +1048,8 @@
     },
     "Vendors/flotrend.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:5c81c39c9cafaf0d",
         "bodyHash": "sha256:ce6c4f6a5b5f223c"
       },
@@ -1061,8 +1061,8 @@
     },
     "Vendors/brinno-incorporated.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:c376e6a2a355b20b",
         "bodyHash": "sha256:dda0df805c4b3225"
       },
@@ -1074,8 +1074,8 @@
     },
     "Vendors/jwipc.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:610c5b9a7c973e9a",
         "bodyHash": "sha256:07c5026e8c8f2fc8"
       },
@@ -1087,8 +1087,8 @@
     },
     "Vendors/legend-innovation.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:864837c0a03def52",
         "bodyHash": "sha256:78a4986ef67d61b2"
       },
@@ -1100,8 +1100,8 @@
     },
     "Vendors/cht-security.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:68d8511d6346df2a",
         "bodyHash": "sha256:6b385e08ac72abd9"
       },
@@ -1113,8 +1113,8 @@
     },
     "Vendors/aaeon.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:e5ff3cffbf1805dc",
         "bodyHash": "sha256:4d94b535ec132948"
       },
@@ -1126,8 +1126,8 @@
     },
     "Vendors/fs-tech.md": {
       "zh": {
-        "lastCommit": "23fa2125",
-        "lastModified": "2026-07-29T10:29:34+08:00",
+        "lastCommit": "2206fd1d",
+        "lastModified": "2026-07-29T10:35:20+08:00",
         "contentHash": "sha256:80f878d1e9f570ab",
         "bodyHash": "sha256:0758e5bd56f4d50c"
       },

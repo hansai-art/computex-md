@@ -45,8 +45,8 @@ const { lang = 'zh-TW' } = Astro.props;
 const {
   title,
   description = lang === 'zh-TW'
-    ? `開源、AI-friendly 的台灣完整知識庫。${_liveArticleCount}+ 頁深度內容涵蓋歷史、文化、美食、音樂、科技等 12 大主題，由社群共同編撰，讓全世界認識真正的台灣。`
-    : `The open-source, AI-friendly knowledge base about Taiwan. ${_liveArticleCount}+ pages covering history, culture, food, music, technology and more — written by the community, for the world.`,
+    ? `COMPUTEX 與台灣 AI 硬體產業的開放檔案庫，目前收錄 ${_liveArticleCount} 頁。每一項事實附出處連結與查證日期，官方沒公布的一律留白，不推測。`
+    : `An open archive of COMPUTEX and the Taiwan AI hardware industry, currently ${_liveArticleCount} pages. Every fact carries a source link and a checked date; what the organiser has not published is left blank, never inferred.`,
   image = '/images/taiwan-social.jpg',
   url = Astro.url.href,
   type = 'website',
@@ -229,12 +229,12 @@ const generateJSONLD = () => {
     '@type': 'WebSite',
     name:
       lang === 'zh-TW'
-        ? 'COMPUTEX.md - 台灣知識庫'
+        ? 'COMPUTEX.md：台灣 AI 硬體產業活體年鑑'
         : 'COMPUTEX.md — Knowledge Base',
     description:
       lang === 'zh-TW'
-        ? '讓全世界完整認識台灣 - 開源台灣知識庫，蒐集關於台灣的政治、經濟、文化、歷史、地理等各方面知識。'
-        : 'Open-source, AI-friendly knowledge base about Taiwan — politics, economy, culture, history, geography, and more.',
+        ? '參展廠商、產品、歷屆展會的結構化開放資料。事實層機械抽取自官方名錄，逐項附出處；策展層由中立編輯撰寫，廠商不能改。'
+        : 'Structured open data on COMPUTEX exhibitors, products and editions. The fact layer is extracted mechanically from the official directory with per-item sources; the curation layer is written by neutral editors.',
     url: siteUrl,
     inLanguage: lang,
     publisher: {
@@ -279,37 +279,29 @@ const organizationLD = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'COMPUTEX.md',
-  alternateName: ['台灣 .md', 'computex.md'],
+  alternateName: ['COMPUTEX.md', 'computex.md'],
   url: siteUrl,
-  logo: `${siteUrl}/images/taiwan-social.jpg`,
+  logo: `${siteUrl}/favicon.png`,
   description:
     lang === 'zh-TW'
-      ? '開源、AI-friendly 的台灣知識庫 — 一個會呼吸的數位生命體，87+ 篇深度策展文章、6 種語言、社群共編。'
-      : 'Open-source, AI-friendly knowledge base about Taiwan — a digital organism with 87+ curated articles in 6 languages, co-edited by the community.',
+      ? 'COMPUTEX 與台灣 AI 硬體產業的開放檔案庫。事實層可查證、策展層中立，非 COMPUTEX 或外貿協會官方網站。'
+      : 'An open archive of COMPUTEX and the Taiwan AI hardware industry. Verifiable fact layer, neutral curation layer. Not affiliated with COMPUTEX or TAITRA.',
   slogan:
     lang === 'zh-TW'
-      ? '策展島嶼的深度敘事'
-      : 'Curating the deep narratives of an island',
-  foundingDate: '2024-03-17',
+      ? '官方沒公布的，我們就留白'
+      : "What the organiser hasn't published stays blank",
+  foundingDate: '2026-07-28',
   inLanguage: ENABLED_LANGUAGE_CODES,
   knowsAbout: [
-    'Taiwan history',
-    'Taiwan culture',
-    'Taiwan geography',
-    'Taiwan politics',
-    'Taiwan economy',
-    'Taiwan society',
-    'Taiwanese food',
-    'Taiwan music',
-    'Taiwan art',
-    'Taiwanese people',
-    'Taiwan nature',
-    'Taiwan technology',
-    'Taiwan lifestyle',
+    'COMPUTEX',
+    'COMPUTEX Taipei',
+    'Taiwan AI hardware industry',
+    'AI server supply chain',
+    'Trade show exhibitor data',
+    'Taipei Nangang Exhibition Center',
+    'Data center cooling',
+    'Edge AI computing',
     'Semiconductor industry',
-    'Cross-strait relations',
-    'Taiwanese democracy',
-    'Indigenous Taiwanese peoples',
   ],
   sameAs: [
     'https://github.com/hansai-art/computex-md',
@@ -456,13 +448,13 @@ const collectionPageLD =
 // Dynamic keywords (zh-TW gets Chinese keywords; all other langs get English)
 const baseKeywords =
   lang === 'zh-TW'
-    ? '台灣, Taiwan, 台灣知識庫, 台灣歷史, 台灣文化, 台灣政治, 台灣經濟'
-    : 'Taiwan, knowledge base, Taiwan history, Taiwan culture, Taiwan politics, Taiwan economy';
+    ? 'COMPUTEX, 台北國際電腦展, 參展廠商, 攤位號, AI 硬體, 台灣供應鏈, 開放資料'
+    : 'COMPUTEX, COMPUTEX Taipei, exhibitor directory, booth number, AI hardware, Taiwan supply chain, open data';
 
 const categoryKeywords = category
   ? lang === 'zh-TW'
-    ? [`台灣${category}`, `${category}台灣`]
-    : [`Taiwan ${category}`, `${category} Taiwan`]
+    ? [`COMPUTEX ${category}`, `${category} COMPUTEX`]
+    : [`COMPUTEX ${category}`, `${category} COMPUTEX`]
   : [];
 
 const dynamicKeywords = [
@@ -640,15 +632,12 @@ const breadcrumbLD = generateBreadcrumbLD();
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:image:type" content="image/jpeg" />
-<meta
-  property="og:image:alt"
-  content={`${title} - ${lang === 'zh-TW' ? 'COMPUTEX.md 台灣知識庫' : 'COMPUTEX.md — Knowledge Base'}`}
-/>
+<meta property="og:image:alt" content={`${title}｜COMPUTEX.md`} />
 <meta
   property="og:site_name"
   content={lang === 'zh-TW'
-    ? 'COMPUTEX.md — 台灣知識庫'
-    : 'COMPUTEX.md — Knowledge Base'}
+    ? 'COMPUTEX.md：台灣 AI 硬體產業活體年鑑'
+    : 'COMPUTEX.md: a living archive of the Taiwan AI hardware industry'}
 />
 <meta
   property="og:locale"
@@ -689,10 +678,7 @@ const breadcrumbLD = generateBreadcrumbLD();
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={fullImageUrl} />
-<meta
-  name="twitter:image:alt"
-  content={`${title} - ${lang === 'zh-TW' ? 'COMPUTEX.md 台灣知識庫' : 'COMPUTEX.md — Knowledge Base'}`}
-/>
+<meta name="twitter:image:alt" content={`${title}｜COMPUTEX.md`} />
 
 <!-- Additional SEO -->
 <meta name="robots" content="index, follow" />

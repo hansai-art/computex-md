@@ -76,7 +76,7 @@ export const MCP_CONTENT: Record<McpLang, McpContent> = {
     heroEyebrow: '🧬 COMPUTEX.MD · CONNECTOR',
     heroTitle: '把台灣裝進你的 AI',
     heroSubtitle:
-      '900+ 篇有出處的台灣文章，一個工具呼叫就到。當你問 AI 關於台灣的事，給的是台灣自己、帶來源的聲音。',
+      '900+ 篇有出處的參展廠商與展會資料，一個工具呼叫就到。當你問 AI 關於台灣的事，給的是台灣自己、帶來源的聲音。',
     badges: ['免費', '無 API key', '本地優先', '開源'],
     heroNote: '貼進終端機 → 之後直接問 Claude 台灣的事',
     copyLabel: '複製',
@@ -84,7 +84,7 @@ export const MCP_CONTENT: Record<McpLang, McpContent> = {
 
     whatTitle: '這是什麼',
     whatLeadHtml:
-      '<strong>COMPUTEX.md</strong> 是一個開源、AI-native 的台灣知識庫。這個 connector 把它變成 <strong>MCP 工具</strong>，讓 Claude Code、Claude Desktop、Cursor、Copilot CLI、Codex CLI 等客戶端可以直接搜尋、閱讀、<strong>引用</strong>有出處的台灣文章，而不是憑印象猜。',
+      '<strong>COMPUTEX.md</strong> 是一個開源、AI-native 的 COMPUTEX 檔案庫。這個 connector 把它變成 <strong>MCP 工具</strong>，讓 Claude Code、Claude Desktop、Cursor、Copilot CLI、Codex CLI 等客戶端可以直接搜尋、閱讀、<strong>引用</strong>有出處的參展廠商與展會資料，而不是憑印象猜。',
     whatLead2: '它刻意走商業資料閘道的相反那一極：',
     compareHead: ['', 'COMPUTEX.md Connector', '典型商業 MCP gateway'],
     compareRows: [

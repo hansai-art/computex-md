@@ -593,7 +593,7 @@ export const exploreUI = {
     'explore.cta.github': 'تصفح على GitHub',
   },
   'zh-TW': {
-    'explore.meta.title': '探索 COMPUTEX.md — 瀏覽開放的台灣知識庫',
+    'explore.meta.title': '探索 COMPUTEX.md：廠商、產品、歷屆展會',
     'explore.meta.description':
       '瀏覽 685+ 篇台灣策展文章：歷史、地理、文化、美食、藝術、音樂、科技、自然、人物、社會、經濟、生活。搜尋、發現、探索。',
 

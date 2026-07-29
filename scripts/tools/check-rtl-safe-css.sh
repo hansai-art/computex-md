@@ -102,9 +102,13 @@ TW_PATTERNS=(
 # `left: 50%` + `transform: translateX(-50%)` 是置中慣用法。改成
 # inset-inline-start: 50% 在 RTL 會變成「從右邊算 50%」，配上固定方向的
 # translateX 反而偏移半個元素寬。置中沒有方向性，維持 physical 才對。
+# ⚠️ 這份清單用「檔案:行號」釘豁免，所以被守護的檔案只要在該行之前增刪任何一行，
+#    豁免就會失準：舊行號放行了不該放行的行，真正該豁免的行反而被擋下。
+#    2026-07-29 導覽列重寫刪了約 290 行，這兩筆就從 1045/1092 掉到 750/797。
+#    動到被守護的檔案時，記得回來對一次行號。
 ALLOWLIST=(
-  "src/components/Header.astro:1045|dropdown 置中：left:50% + translateX(-50%)"
-  "src/components/Header.astro:1092|dropdown 置中：left:50% + translateX(-50%)"
+  "src/components/Header.astro:750|nav-link 底線置中：left:50% + translateX(-50%)"
+  "src/components/Header.astro:797|dropdown 置中：left:50% + translateX(-50%)"
 )
 
 # ── 掛號中的債（受守護檔案裡「還沒還」的行）──────────────────────────────────
@@ -115,7 +119,7 @@ ALLOWLIST=(
 DEBT=(
   "src/styles/global.css:434|2026-07-26|.floating-md 屬浮動層，要跟 ReaderSettings / FeedbackWidget 同批鏡像，否則 RTL 下三者疊在一起"
   "src/styles/global.css:480|2026-07-26|同上（手機斷點）"
-  "src/styles/dark-polish.css:1433|2026-07-26|覆寫的 base 在 resources.template.astro，本輪未清該檔，成對改才有意義"
+  "src/styles/dark-polish.css:1433|2026-07-26|原因已變：resources.template.astro 在 2026-07-29 刪除（母體內容），這條 .resources-page 規則現在是沒有對應頁面的死 CSS。連同 .projects-page / .assets-page / .map-page / .taiwan-shape 等約 143 條一起清，不要單獨挑這一行改"
 )
 
 is_allowlisted() {

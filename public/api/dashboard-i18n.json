@@ -1,6 +1,6 @@
 {
-  "generated": "2026-07-29T02:33:36Z",
-  "max_total": 1544,
+  "generated": "2026-07-29T03:12:01Z",
+  "max_total": 823,
   "modules": [
     {
       "name": "home",
@@ -40,15 +40,15 @@
     {
       "name": "data",
       "langs": {
-        "zh-TW": 326,
-        "en": 326
+        "zh-TW": 0,
+        "en": 0
       }
     },
     {
       "name": "resources",
       "langs": {
-        "zh-TW": 361,
-        "en": 361
+        "zh-TW": 0,
+        "en": 0
       }
     },
     {
@@ -61,8 +61,8 @@
     {
       "name": "assets",
       "langs": {
-        "zh-TW": 34,
-        "en": 34
+        "zh-TW": 0,
+        "en": 0
       }
     },
     {
@@ -88,7 +88,7 @@
     }
   ],
   "lang_totals": {
-    "zh-TW": { "keys": 1544, "coverage_pct": 100.0 },
-    "en": { "keys": 1544, "coverage_pct": 100.0 }
+    "zh-TW": { "keys": 823, "coverage_pct": 100.0 },
+    "en": { "keys": 823, "coverage_pct": 100.0 }
   }
 }

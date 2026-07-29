@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-29T02:33:42.902Z",
+  "generated_at": "2026-07-29T03:12:06.730Z",
   "routines": null,
   "babel": null,
   "incidents": [
@@ -35,6 +35,11 @@
     }
   ],
   "deploys": [
+    {
+      "ts": "2026-07-29T02:35:50Z",
+      "conclusion": "success",
+      "title": "Quality Gene Tests: fix(vendors): 產生器輸出不等於 commit 後的樣子，重跑一次就是 86 檔格式雜訊"
+    },
     {
       "ts": "2026-07-29T01:31:06Z",
       "conclusion": "success",
