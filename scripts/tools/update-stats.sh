@@ -36,36 +36,58 @@ CONTRIBUTORS=$(python3 -c "import json;print(json.load(open('public/api/contribu
 # 舊版 ZH_PAGES 用 `! -path '*/en/*'` 把 ja/ko/es/fr 全算進 zh（3977 假數）— 修正。
 ZH_PAGES=$(find knowledge -maxdepth 2 -name '*.md' ! -name '_*' -regex 'knowledge/[A-Z][a-zA-Z]*/.*' | wc -l | tr -d ' ')
 EN_PAGES=$(find knowledge/en -name '*.md' ! -name '_*' 2>/dev/null | wc -l | tr -d ' ')
-JA_PAGES=$(find knowledge/ja -name '*.md' ! -name '_*' 2>/dev/null | wc -l | tr -d ' ')
-KO_PAGES=$(find knowledge/ko -name '*.md' ! -name '_*' 2>/dev/null | wc -l | tr -d ' ')
-ES_PAGES=$(find knowledge/es -name '*.md' ! -name '_*' 2>/dev/null | wc -l | tr -d ' ')
-FR_PAGES=$(find knowledge/fr -name '*.md' ! -name '_*' 2>/dev/null | wc -l | tr -d ' ')
 TOTAL_PAGES=$ZH_PAGES
+# 2026-07-29 COMPUTEX.md：語言列改成從 languages.mjs registry 動態長，不寫死
+# ja/ko/es/fr 五語（這個物種只有 zh-TW + en，母體版本會在 README 掛四行 0）。
+# 分類數同理：母體寫死 14，這裡從 knowledge/ 實際目錄算。
+# 這兩個數字是新讀者看到的第一批數字，掛別人的數字等於自我介紹就先失準。
+CATEGORIES=$(find knowledge -maxdepth 1 -type d -regex 'knowledge/[A-Z][a-zA-Z]*' | wc -l | tr -d ' ')
 # 近 7/30 天新文章：dashboard-vitals.json（routine 算好），fallback 0
 D7=$(python3 -c "import json;print(json.load(open('public/api/dashboard-vitals.json')).get('articlesLast7Days',0))" 2>/dev/null || echo 0)
 D30=$(python3 -c "import json;print(json.load(open('public/api/dashboard-vitals.json')).get('articlesLast30Days',0))" 2>/dev/null || echo 0)
 
 echo "Stars: $STARS | Forks: $FORKS | Contributors: $CONTRIBUTORS"
-echo "zh:$ZH_PAGES en:$EN_PAGES ja:$JA_PAGES ko:$KO_PAGES es:$ES_PAGES fr:$FR_PAGES | 7d:$D7 30d:$D30"
+echo "zh:$ZH_PAGES en:$EN_PAGES | categories:$CATEGORIES | 7d:$D7 30d:$D30"
 
 # 2. Regenerate README stats table between STATS:START/END markers.
 # 2026-06-13: full-block regen replaces the old per-row sed, which had drifted
 # off README's row names (only Contributors still matched → whole table sat
 # stale). Markers make it row-name-agnostic — robust against future renames.
-python3 - "$ZH_PAGES" "$EN_PAGES" "$JA_PAGES" "$KO_PAGES" "$ES_PAGES" "$FR_PAGES" "$CONTRIBUTORS" "$STARS" "$FORKS" "$D7" "$D30" <<'PYEOF'
-import sys, re
-zh, en, ja, ko, es, fr, contrib, stars, forks, d7, d30 = sys.argv[1:12]
+python3 - "$ZH_PAGES" "$CONTRIBUTORS" "$STARS" "$FORKS" "$D7" "$D30" "$CATEGORIES" <<'PYEOF'
+import sys, re, json
+from pathlib import Path
+
+zh, contrib, stars, forks, d7, d30, categories = sys.argv[1:8]
+
+# 語言列從 registry 長出來，不寫死。母體版本寫死 zh/en/ja/ko/es/fr 六列，
+# 這個物種只有 zh-TW + en，照抄會在 README 掛四行永遠是 0 的語言。
+REGISTRY = Path("src/config/languages.mjs")
+FLAGS = {
+    "zh-TW": "🇹🇼 Chinese (zh-TW)",
+    "en": "🇺🇸 English (en)",
+    "ja": "🇯🇵 日本語 (ja)",
+    "ko": "🇰🇷 한국어 (ko)",
+    "es": "🇪🇸 Español (es)",
+    "fr": "🇫🇷 Français (fr)",
+}
+codes = re.findall(r"code:\s*'([\w-]+)'", REGISTRY.read_text(encoding="utf-8"))
+if not codes:
+    print("⚠️  languages.mjs parse 不到語言 — 語言列略過（不靜默寫 0）")
+
+def count(code: str) -> str:
+    if code == "zh-TW":
+        return zh
+    d = Path("knowledge") / code
+    if not d.is_dir():
+        return "0"
+    return str(len([p for p in d.rglob("*.md") if not p.name.startswith("_")]))
+
+lang_rows = [(FLAGS.get(c, f"{c}"), count(c)) for c in codes]
+
 rows = [
     ("📄 Total articles (zh-TW SSOT)", zh),
-    ("🇹🇼 Chinese (zh-TW)", zh),
-    ("🇺🇸 English (en)", en),
-    ("🇯🇵 日本語 (ja)", ja),
-    ("🇰🇷 한국어 (ko)", ko),
-    ("🇪🇸 Español (es)", es),
-    ("🇫🇷 Français (fr)", fr),
-    ("📂 Categories", "14"),
-    ("🕸️ Knowledge graph nodes", "220+"),
-    ("🔗 Resource websites", "146+"),
+    *lang_rows,
+    ("📂 Categories", categories),
     ("👥 Contributors", contrib),
     ("⭐ GitHub Stars", stars),
     ("🍴 Forks", forks),

@@ -31,33 +31,22 @@
  *   which is conservative (a stale-but-true date, never a fake-fresh one).
  */
 import { execSync } from 'node:child_process';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import {
   ENABLED_LANGUAGE_CODES,
   DEFAULT_LANGUAGE,
 } from '../../src/config/languages.mjs';
+import { FOLDER_TO_SLUG } from '../../src/config/categories.mjs';
 
 const ROOT = process.cwd();
 const OUT = resolve(ROOT, 'src/data/content-dates.json');
 
 // knowledge/ category folder (capitalised) → URL slug (lowercase)
-const CAT_TO_SLUG = {
-  About: 'about',
-  History: 'history',
-  Geography: 'geography',
-  Culture: 'culture',
-  Food: 'food',
-  Art: 'art',
-  Music: 'music',
-  Technology: 'technology',
-  Nature: 'nature',
-  People: 'people',
-  Society: 'society',
-  Economy: 'economy',
-  Lifestyle: 'lifestyle',
-  Politics: 'politics',
-};
+// 2026-07-29：這裡原本是母體 14 分類的硬編副本。這個物種的分類不同，於是每個
+// 檔案路徑都比對不到分類，dates 產出 0 筆，`/latest` 與 sitemap lastmod 全空，
+// 而 build 只印一行 warning 就過去了。改吃 SSOT（src/config/categories.mjs）。
+const CAT_TO_SLUG = FOLDER_TO_SLUG;
 // Derive from the language registry (SSOT) — no hardcoded array (REFLEXES #20).
 const NON_DEFAULT_LANGS = new Set(
   ENABLED_LANGUAGE_CODES.filter((c) => c !== DEFAULT_LANGUAGE.code),
@@ -138,6 +127,25 @@ function knowledgePathToUrl(p) {
   const slug = file.replace(/\.md$/, '').normalize('NFC');
   const prefix = lang === 'zh-TW' ? '' : `/${lang}`;
   return `${prefix}/${catSlug}/${slug}/`;
+}
+
+/**
+ * 磁碟上實際有幾篇 zh-TW 文章（不含 hub 頁）。
+ * 用來把 anomaly 門檻從絕對值改成相對比例，見下方 MIN_EXPECTED。
+ */
+function countZhArticles() {
+  let n = 0;
+  for (const folder of Object.keys(CAT_TO_SLUG)) {
+    const dir = resolve(ROOT, 'knowledge', folder);
+    let entries;
+    try {
+      entries = readdirSync(dir);
+    } catch {
+      continue; // 分類資料夾還沒建，不算異常
+    }
+    n += entries.filter((f) => f.endsWith('.md') && !f.startsWith('_')).length;
+  }
+  return n;
 }
 
 function main() {
@@ -247,7 +255,12 @@ function main() {
   // collapse). Warn LOUDLY in the build log so the next pollution source or
   // regression announces itself, instead of waiting for a human to spot /latest.
   const FLOOD = 120;
-  const MIN_EXPECTED = 3000;
+  // 2026-07-29：母體的 3000 是它 3,977 篇語料的尺度。這個物種還在出生階段，
+  // 寫死絕對值會讓「永遠低於門檻」變成背景噪音，真的壞掉時反而沒人聽見
+  // （這次就是這樣：0 筆的 warning 混在一堆 warning 裡跟著 build 過去）。
+  // 改成相對比例：實際掃到幾個 zh-TW 檔，就該產出多少筆日期。
+  const zhFileCount = countZhArticles();
+  const MIN_EXPECTED = Math.max(1, Math.floor(zhFileCount * 0.9));
   const byDay = {};
   for (const v of Object.values(dates)) {
     const d = (v || '').slice(0, 10);

@@ -1,7 +1,7 @@
 {
   "_meta": {
-    "lastUpdated": "2026-07-29T01:33:45+08:00",
-    "zhCommitHead": "cd3fe19",
+    "lastUpdated": "2026-07-29T09:25:32+08:00",
+    "zhCommitHead": "f47b296",
     "totalZh": 1,
     "activeLanguages": ["en"],
     "summary": {
@@ -19,17 +19,17 @@
     }
   },
   "byArticle": {
-    "Editions/COMPUTEX 2027.md": {
+    "Editions/computex-2027.md": {
       "zh": {
-        "lastCommit": "cd3fe19a",
-        "lastModified": "2026-07-29T01:33:22+08:00",
+        "lastCommit": "",
+        "lastModified": "",
         "contentHash": "sha256:04d82d151edd06a7",
         "bodyHash": "sha256:cb76ed65842a839d"
       },
       "translations": {
         "en": {
           "path": "en/Editions/computex-2027.md",
-          "translatedFrom": "Editions/COMPUTEX 2027.md",
+          "translatedFrom": "Editions/computex-2027.md",
           "sourceCommitSha": "",
           "sourceContentHash": "",
           "sourceBodyHash": "",

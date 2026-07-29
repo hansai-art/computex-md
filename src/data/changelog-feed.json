@@ -1,7 +1,42 @@
 {
-  "generatedAt": "2026-07-28T17:33:47.796Z",
+  "generatedAt": "2026-07-29T01:25:33.845Z",
   "source": "git",
   "commits": [
+    {
+      "hash": "f47b2966ffa82a86c9f99d1cf512320210c36b3d",
+      "date": "2026-07-29T09:15:38+08:00",
+      "author": "Hans",
+      "message": "feat(quality): 品質基因在地化：新增 marketing-speak，並修好一直在空放的 terminology gate",
+      "articles": []
+    },
+    {
+      "hash": "e2877fe08b0b5b958c269b693e3ae3e7ea39a520",
+      "date": "2026-07-29T08:41:46+08:00",
+      "author": "Hans",
+      "message": "fix(hooks): pre-push 在新 repo 第一次 push 時靜默炸掉",
+      "articles": []
+    },
+    {
+      "hash": "57d008a942abfb42e164926786425f9813d60e15",
+      "date": "2026-07-29T01:36:30+08:00",
+      "author": "Hans",
+      "message": "feat: 授權定案 CC BY 4.0，llms.txt 重寫為 COMPUTEX.md 的正門",
+      "articles": []
+    },
+    {
+      "hash": "5637aa81ea805751a4ebf46f5caa0431106fd911",
+      "date": "2026-07-29T01:34:32+08:00",
+      "author": "Hans",
+      "message": "chore: prebuild 產生物同步（llms.txt / 翻譯狀態表）",
+      "articles": []
+    },
+    {
+      "hash": "597933e05c8682e03f92f191f8c06b56171ebd76",
+      "date": "2026-07-29T01:34:18+08:00",
+      "author": "Hans",
+      "message": "chore: 收尾剩餘 identity 置換與 build 產生物",
+      "articles": []
+    },
     {
       "hash": "cd3fe19a1568b2410ff60069de47c289eeccba85",
       "date": "2026-07-29T01:33:22+08:00",

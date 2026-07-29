@@ -16,7 +16,7 @@ status: 'draft'
 difficulty: 'beginner'
 readingTime: 3
 chineseTitle: 'COMPUTEX 2027：2027 年 6 月 1 日至 4 日，台北三館'
-translatedFrom: 'Editions/COMPUTEX 2027.md'
+translatedFrom: 'Editions/computex-2027.md'
 translationStatus: 'complete'
 lastUpdated: 2026-07-29
 sources:

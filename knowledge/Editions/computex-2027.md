@@ -3,7 +3,15 @@ title: 'COMPUTEX 2027：2027 年 6 月 1 日至 4 日，台北三館'
 description: 'COMPUTEX 2027 台北國際電腦展的會期是 2027 年 6 月 1 日至 4 日，地點在台北南港展覽館 1 館、2 館與世貿一館，由外貿協會與台北市電腦公會共同主辦。本頁只收錄官方網站已公布的事實，每一項附出處連結與查證日期；官方尚未公布的年度主題、參展家數、議程與票務時程一律留白，不從第三方彙整站或往年慣例推測。'
 date: 2026-07-29
 category: 'Editions'
-tags: ['COMPUTEX', 'COMPUTEX 2027', '台北國際電腦展', '南港展覽館', 'TAITRA', '展會資訊']
+tags:
+  [
+    'COMPUTEX',
+    'COMPUTEX 2027',
+    '台北國際電腦展',
+    '南港展覽館',
+    'TAITRA',
+    '展會資訊',
+  ]
 subcategory: '會期資訊'
 author: 'COMPUTEX.md Editors'
 featured: false
@@ -16,6 +24,7 @@ lastUpdated: 2026-07-29
 sources:
   - 'https://www.computextaipei.com.tw/'
 ---
+
 # COMPUTEX 2027：2027 年 6 月 1 日至 4 日，台北三館
 
 COMPUTEX 2027（台北國際電腦展）將於 **2027 年 6 月 1 日至 6 月 4 日**舉行，為期四天，地點在台北。這是目前官方網站首頁已經掛出的會期資訊。
