@@ -81,7 +81,10 @@ elif command -v gh >/dev/null 2>&1; then
   MAXWAIT="${TWMD_PREPUSH_MAXWAIT:-120}"  # 等待上限，避免無限卡 routine
   WAITED=0
   while :; do
-    started="$(gh run list --workflow=deploy.yml --status=in_progress --json startedAt -q '.[0].startedAt' 2>/dev/null)"
+    # || true 必要（同 2b 的理由）：repo 還沒有 deploy.yml run 時 gh 回非零，
+    # husky 的 sh -e 會讓賦值失敗直接炸掉整個 hook，而且一個字都不印。
+    # 母體在 2b 補過同一個坑，這裡漏了 —— 新 repo 第一次 push 必踩。
+    started="$(gh run list --workflow=deploy.yml --status=in_progress --json startedAt -q '.[0].startedAt' 2>/dev/null || true)"
     [ -z "$started" ] && break           # 無 in-flight deploy → 放行
     start_epoch="$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$started" +%s 2>/dev/null || echo 0)"
     elapsed=$(( $(date -u +%s) - start_epoch ))
