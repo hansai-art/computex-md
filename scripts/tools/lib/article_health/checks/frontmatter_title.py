@@ -45,6 +45,14 @@ TITLE_VAGUE_ADJECTIVES: list[str] = [
     "天后",
 ]
 
+#: title 長度門檻（effective length：CJK 算 1，其餘算 0.5）。
+#: 2026-05-23 放寬: 30→35 (recommend) / 35→45 (warn)。觸發：馬英九 EVOLVE
+#: 43 字 title 含 6 個 anchor 串成 narrative arc，原 35 字 cap 對這種太緊。
+#: 2026-07-29 抽成常數：原本 45 寫死在判斷式裡，測試另抄一份 35，門檻放寬後
+#: 測試沒跟著改而長期紅燈。門檻只准有一份。
+TITLE_LENGTH_RECOMMEND = 35
+TITLE_LENGTH_WARN = 45
+
 CJK_RE = re.compile(r"[一-鿿㐀-䶿]")
 
 # Half-width punctuation in CJK title context — HARD violations.
@@ -134,18 +142,16 @@ def check(target: FileTarget, config: dict[str, Any]) -> Iterator[Violation]:
                         editorial_ref="EDITORIAL.md §原則 4",
                     )
 
-    # 4. Length sanity (WARN) — recommend ≤ 35, hard cap at 45.
-    # 2026-05-23 放寬: 30→35 (recommend) / 35→45 (warn threshold)
-    # 觸發：馬英九 EVOLVE 43 字 title 包含 6 anchor 串成 narrative arc，
-    # 原 35 字 cap 對含多 anchor 的人物文太緊。
+    # 4. Length sanity (WARN) — recommend ≤ TITLE_LENGTH_RECOMMEND,
+    #    cap at TITLE_LENGTH_WARN（常數在檔頭，測試也讀同一個值）。
     length = _effective_length(title)
-    if length > 45:
+    if length > TITLE_LENGTH_WARN:
         yield Violation(
             check=CHECK_NAME,
             severity=Severity.WARN,
             message=(
-                f"title 過長 (effective length {length:.1f} > 45)"
-                " — EDITORIAL 建議 ≤ 35"
+                f"title 過長 (effective length {length:.1f} > {TITLE_LENGTH_WARN})"
+                f" — EDITORIAL 建議 ≤ {TITLE_LENGTH_RECOMMEND}"
             ),
             snippet=title,
             editorial_ref="EDITORIAL.md §Title 五原則",

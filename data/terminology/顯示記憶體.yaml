@@ -1,0 +1,22 @@
+id: 'xian-shi-ji-yi-ti'
+category: tech
+fork_type: B
+
+display:
+  taiwan: '顯示記憶體'
+  china: 顯存
+
+english: 'VRAM'
+
+detection:
+  severity: A
+
+notes: >
+  GPU 規格表常見。註記容量時台灣寫「顯示記憶體 24GB」。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'

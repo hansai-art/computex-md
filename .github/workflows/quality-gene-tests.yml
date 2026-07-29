@@ -1,0 +1,61 @@
+name: Quality Gene Tests
+
+# article-health 這套儀器自己的 pytest 套件（品質基因的自檢層）。
+#
+# 為什麼要有這支：母體 taiwan.md 的 CI **從來沒跑過 pytest**（8 支 workflow
+# 沒有一支跑），所以測試套件可以紅很久而沒有人知道。2026-07-29 接手時實測
+# 母體 6 個 failure，最老的可回溯到 2026-05-11：門檻放寬 35→45、vague 清單
+# 移除「國民」、fix() 從 bool 改成回傳計數 —— 每一次都是實作改了、測試沒跟著改。
+#
+# 這是 Rule 56 的形狀：儀器本身也需要儀器。守門的東西沒人守，就會慢慢變成
+# 裝飾品。裝飾品比沒有更糟，因為它讓人以為有在守。
+#
+# 額度（Rule 57）：
+#   單份大小 = 0（不產 artifact、不寫 cache、不上傳任何東西）
+#   同時存在量 = 0 MB → 對 Actions storage 512MB 額度零壓力
+#   單次執行 ≈ 25 秒（checkout 5s + setup-python 5s + pip install pytest 8s
+#              + pytest 本身 0.7s），GitHub 以分鐘為單位無條件進位 → 計 1 分鐘
+#   每日觸發次數 ≤ 10（只在動到 article_health / tests / config 時觸發）
+#   月上限 = 1 分 × 10 次 × 30 天 = 300 分，對 2,000 分/月 免費額度佔 15%
+#   沒有把壓力轉移到任何其他額度。
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/tools/lib/article_health/**'
+      - 'scripts/tools/article-health.py'
+      - 'scripts/tools/article-health.config.toml'
+      - 'tests/**'
+      - '.github/workflows/quality-gene-tests.yml'
+  pull_request:
+    paths:
+      - 'scripts/tools/lib/article_health/**'
+      - 'scripts/tools/article-health.py'
+      - 'scripts/tools/article-health.config.toml'
+      - 'tests/**'
+      - '.github/workflows/quality-gene-tests.yml'
+
+# 同一個 branch 連續推時只留最後一次。純省分鐘，不當任何儲存防線用
+# （Rule 57：cancel-in-progress 擋不住已經上傳的東西，這支本來就不上傳）。
+concurrency:
+  group: quality-gene-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # article-health 本體是純 stdlib（CI gate 不需要 pip），只有測試需要
+      # pytest；terminology-yaml-audit 需要 pyyaml。
+      - name: Install test deps
+        run: python3 -m pip install --quiet pytest pyyaml
+
+      - name: Run article-health test suite
+        run: python3 -m pytest tests/ -q

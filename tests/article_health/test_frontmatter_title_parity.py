@@ -44,8 +44,10 @@ FIXTURES = [
         "people-good-colon-sandwich",
     ),
     ("周杰倫：歌手", "People", 0, 1, "people-short-subtitle"),
+    # 長度從 plugin 常數反推，不寫死字串。母體這筆是 37 字，門檻 2026-05-23
+    # 從 35 放寬到 45 之後就不再觸發，這筆 fixture 從那天起一直紅。
     (
-        "黃魚鴞甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥東南西北春夏秋冬山水火木",
+        "黃" * (frontmatter_title.TITLE_LENGTH_WARN + 2),
         "Nature",
         0,
         1,

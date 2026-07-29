@@ -74,15 +74,23 @@ def test_external_url_ignored(tmp_path, fake_knowledge):
     assert violations == []
 
 
-def test_multiple_langs_caught(tmp_path, fake_knowledge):
-    body = (
-        "[A](/ja/People/x/)\n"
-        "[B](/ko/Music/y/)\n"
-        "[C](/fr/History/z/)\n"
-    )
+def test_every_translation_lang_is_caught(tmp_path, fake_knowledge):
+    """大小寫檢查對**每一個**已註冊翻譯語言都要生效。
+
+    2026-07-29 COMPUTEX.md 改：母體版本寫死 `/ja/ /ko/ /fr/`。這個物種只有
+    zh-TW + en，那三行全部落在「不是語言前綴」而靜默通過 —— 測試永遠綠，
+    但一個語言都沒驗到。改成從 langs registry 動態生成：以後加語言不必改
+    測試，也不會有新語言悄悄漏出檢查範圍。
+    """
+    from lib.article_health.langs import TRANSLATION_LANGS
+
+    codes = sorted(TRANSLATION_LANGS)
+    assert codes, "翻譯語言清單是空的，這個測試沒有意義"
+
+    body = "".join(f"[{c}](/{c}/History/x/)\n" for c in codes)
     violations, _ = _check(tmp_path, body)
     casing = [v for v in violations if "category" in v.message]
-    assert len(casing) == 3
+    assert len(casing) == len(codes)
 
 
 # ─── Phase 2: existence ─────────────────────────────────────────────────
@@ -170,7 +178,10 @@ def test_fix_lowercases_category(tmp_path, fake_knowledge):
     f = _write_tmp(tmp_path, body)
     target = load_target(f)
     changed = link_target.fix(target, {})
-    assert changed is True
+    # fix() 的契約是「回傳改寫了幾條連結」（int），不是 bool。
+    # 母體測試寫 `is True`，在 fix() 改成計數之後就一直紅，但 CI 從不跑
+    # pytest 所以沒人看到。2026-07-29 對齊實際契約。
+    assert changed == 2
     new_text = f.read_text(encoding="utf-8")
     assert "/en/history/qing-dynasty/" in new_text
     assert "/en/music/fire-ex/" in new_text
@@ -183,7 +194,7 @@ def test_fix_does_not_touch_existence(tmp_path, fake_knowledge):
     f = _write_tmp(tmp_path, body)
     target = load_target(f)
     changed = link_target.fix(target, {})
-    assert changed is False  # casing was already lowercase, nothing to fix
+    assert changed == 0  # casing was already lowercase, nothing to fix
 
 
 def test_frontmatter_preserved_after_fix(tmp_path, fake_knowledge):

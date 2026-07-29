@@ -7,6 +7,8 @@
 看起來會動。這份測試就是不讓「看起來會動」再度成立。
 """
 
+import contextlib
+import io
 import re
 from pathlib import Path
 
@@ -50,10 +52,27 @@ def test_translation_langs_matches_registry():
     assert ALL_LANGS == TRANSLATION_LANGS | {"zh-TW"}
 
 
-def test_the_four_newer_languages_are_visible():
-    """出生戰役那四個語言必須在清單裡 —— 寫死五語的年代看不到它們。"""
-    for lang in ("vi", "id", "pt", "hi"):
-        assert lang in TRANSLATION_LANGS
+def test_registry_is_actually_parsed_not_the_fallback(tmp_path, monkeypatch):
+    """保底清單只准在 registry 真的不見時登場，而且要出聲。
+
+    母體這支測的是「vi/id/pt/hi 四個語言看得到」—— 那是台灣物種的具體語言，
+    COMPUTEX.md 只有 zh-TW + en，照抄會永遠紅。但它守的神經迴路要留下：
+    「registry 沒讀到卻靜默沿用保底清單，看起來會動其實沒動」。
+
+    這個物種語言少，保底清單剛好等於 registry，等值比對抓不到病。所以改成直接
+    驗機制：registry 在 → 讀 registry；registry 不在 → 走保底**而且要叫**。
+    """
+    # 1. registry 在的時候，讀到的是 registry 的內容
+    assert langs_mod._REGISTRY.exists()
+    assert set(langs_mod._load()) == {c for c in _registry_codes() if c != "zh-TW"}
+
+    # 2. registry 不見的時候，走保底但 MUST 印警告到 stderr，不准靜默
+    monkeypatch.setattr(langs_mod, "_REGISTRY", tmp_path / "does-not-exist.mjs")
+    err = io.StringIO()
+    with contextlib.redirect_stderr(err):
+        fallback = langs_mod._load()
+    assert fallback == langs_mod._FALLBACK
+    assert "保底" in err.getvalue(), "走保底清單時必須出聲，靜默沿用正是這支在守的病"
 
 
 def test_no_check_hardcodes_the_five_language_world():

@@ -1,0 +1,22 @@
+id: 'ying-mu'
+category: tech
+fork_type: B
+
+display:
+  taiwan: '螢幕'
+  china: 屏幕
+
+english: 'screen / display'
+
+detection:
+  severity: A
+
+notes: >
+  面板產業題材。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'

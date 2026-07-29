@@ -1,0 +1,22 @@
+id: 'ji-yi-ti'
+category: tech
+fork_type: B
+
+display:
+  taiwan: '記憶體'
+  china: 內存
+
+english: 'RAM / memory'
+
+detection:
+  severity: A
+
+notes: >
+  伺服器規格表的必填欄位，抄規格時最容易整段照搬。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'

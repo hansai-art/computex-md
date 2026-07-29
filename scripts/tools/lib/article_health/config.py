@@ -55,6 +55,39 @@ class Config:
         return self.profiles.get(name)
 
 
+def option_for_category(
+    config: dict[str, Any] | None,
+    category: str,
+    key: str,
+    default: Any,
+) -> Any:
+    """讀一個 plugin option，但先讓 `per_category` 有機會覆蓋。
+
+    2026-07-29 COMPUTEX.md 新增。母體只有一種文體（敘事長文），所以字數／
+    媒體數這種門檻全站一個值就夠。這個物種同時養兩種東西：
+
+        Topics    產業觀察長文     —— 母體那套門檻適用
+        Vendors   廠商事實頁       —— 一張填滿來源的事實表 900 字就完整了
+
+    把 4500 字的深度門檻套到事實頁上，只會逼作者灌水 —— 而灌水正好摧毀
+    這個檔案庫唯一的價值（被 AI 引用）。門檻必須跟著文體走，不是跟著站走。
+
+    TOML 寫法：
+
+        [profiles.ci-deploy.options_overrides.word-count]
+        min_chars = 900
+        [profiles.ci-deploy.options_overrides.word-count.per_category]
+        Topics = 4500
+
+    找不到對應 category 就退回 `key` 的值，再退回 `default`。
+    """
+    opts = config or {}
+    per_category = opts.get("per_category") or {}
+    if category and category in per_category:
+        return per_category[category]
+    return opts.get(key, default)
+
+
 def _parse_severity(value: Any) -> Severity | None:
     if value is None:
         return None

@@ -1,0 +1,22 @@
+id: 'wang-lu'
+category: tech
+fork_type: B
+
+display:
+  taiwan: '網路'
+  china: 網絡
+
+english: 'network'
+
+detection:
+  severity: B
+
+notes: >
+  黃燈：專案管理的「網絡圖」等少數用法在台灣存在。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'

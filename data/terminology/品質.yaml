@@ -1,0 +1,22 @@
+id: 'pin-zhi'
+category: general
+fork_type: A
+
+display:
+  taiwan: '品質'
+  china: 質量
+
+english: 'quality'
+
+detection:
+  severity: B
+
+notes: >
+  黃燈：物理學的「質量」是正確用法，不能一律換。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'

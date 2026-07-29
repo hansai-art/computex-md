@@ -31,6 +31,7 @@ import os
 import re
 from typing import Any, Iterator
 
+from ..config import option_for_category
 from ..langs import TRANSLATION_LANGS
 from ..types import FileTarget, Severity, Violation
 
@@ -116,7 +117,11 @@ def check(target: FileTarget, config: dict[str, Any]) -> Iterator[Violation]:
     if _is_excluded_path(str(target.path)):
         return
 
-    min_chars = int((config or {}).get("min_chars", DEFAULT_MIN_CHARS))
+    # 門檻跟著文體走：Topics 產業觀察長文用深度門檻，Vendors / Products 事實頁
+    # 用低得多的門檻。理由見 config.option_for_category。
+    min_chars = int(
+        option_for_category(config, target.category, "min_chars", DEFAULT_MIN_CHARS)
+    )
 
     # Use FileTarget.body if loader split frontmatter; fallback to manual split
     body = target.body if target.body else target.text

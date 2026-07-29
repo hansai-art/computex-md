@@ -87,13 +87,31 @@ def test_prettier_wrapped_flow_tags_passes(tmp_path):
     assert _violations(tmp_path, fm) == []
 
 
-def test_hyphen_tags_warns_for_flow_array_style(tmp_path):
+def test_block_sequence_tags_passes(tmp_path):
+    """block sequence（`- item`）是合法 YAML 陣列，不該被擋。
+
+    2026-07-29 COMPUTEX.md 政策改動（母體是 WARN，要求一律 flow array）：
+    loader 那支 minimal parser 只認單行 flow array，block sequence 讀成空字串，
+    於是 frontmatter-format 判定「tags 不是 array」直接 hard fail；而 Prettier
+    會把長的 flow array 折成多行，同樣讀不到。兩種合法寫法都被擋，作者只好把
+    tags 縮短到一行塞得下 —— 變成工具在決定內容。正解是修 parser（已修），
+    並讓檢查接受兩種 YAML 陣列寫法。
+    """
     fm = GOOD_FRONTMATTER.replace(
         "tags: ['媒體', '科學傳播']\n",
         "tags:\n  - 媒體\n  - 科學傳播\n",
     )
+    assert _violations(tmp_path, fm) == []
+
+
+def test_scalar_tags_still_hard_fails(tmp_path):
+    """放寬只涵蓋「陣列的兩種寫法」。純字串 tags 依然要擋。"""
+    fm = GOOD_FRONTMATTER.replace(
+        "tags: ['媒體', '科學傳播']\n",
+        "tags: '媒體'\n",
+    )
     violations = _violations(tmp_path, fm)
-    assert any("flow array" in v.message for v in violations)
+    assert any("tags" in v.message and "陣列" in v.message for v in violations)
 
 
 def test_unquoted_string_scalar_warns(tmp_path):

@@ -197,7 +197,12 @@ def test_inline_image_existing_file_passes(tmp_path, monkeypatch):
     body = "![alt](/article-images/nature/owl.jpg) 段落"
     target = load_target(_write_article(tmp_path, body))
     violations = list(image_health.check(target, {}))
-    assert violations == []
+    # 這支測的是「圖檔存在就不該被抱怨」，不是「整篇零違規」。
+    # image-health 後來多了兩個跟這張圖無關的維度（INFO 圖片統計、WARN 媒體
+    # 數量下限），母體測試沒跟著改就一直紅。2026-07-29 收斂斷言範圍：
+    # 只要沒有任何一條在講這個圖片路徑有問題即可。
+    assert not [v for v in violations if "不存在" in v.message]
+    assert not [v for v in violations if v.severity is Severity.HARD]
 
 
 def test_external_hotlink_flagged(tmp_path, monkeypatch):

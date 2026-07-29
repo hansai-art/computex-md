@@ -1,0 +1,22 @@
+id: 'wang-ji-wang-lu'
+category: tech
+fork_type: C
+
+display:
+  taiwan: '網際網路'
+  china: 互聯網
+
+english: 'internet'
+
+detection:
+  severity: A
+
+notes: >
+  台灣用「網際網路」，中國用「互聯網」。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'

@@ -28,6 +28,7 @@ import re
 from pathlib import Path
 from typing import Any, Iterator
 
+from ..config import option_for_category
 from ..langs import TRANSLATION_LANGS
 from ..types import FileTarget, Severity, Violation
 
@@ -285,7 +286,13 @@ def check(target: FileTarget, config: dict[str, Any]) -> Iterator[Violation]:
     # Per REWRITE-PIPELINE Step 4.3.1 — depth article 理想 hero + 1-2 scene-mid
     # = 2-3 張。default min_images=3, soft-launch WARN, rewrite-stage-4 升 HARD.
     if not _is_excluded_from_count_gate(str(target.path)):
-        min_images = int(options.get("min_images", DEFAULT_MIN_IMAGES))
+        # 媒體下限也跟著文體走：Topics 產業觀察長文照母體節奏，Vendors / Products
+        # 事實頁一張 logo 或攤位照就夠。理由見 config.option_for_category。
+        min_images = int(
+            option_for_category(
+                options, target.category, "min_images", DEFAULT_MIN_IMAGES
+            )
+        )
         # length-scaled 媒體下限 (v6.8)：長文需要更多媒體立體呈現。effective_min =
         # max(base, round(CJK/cjk_per_media))。校準 cjk_per_media=1200 → 4500→4 / 7000→6 /
         # 9000→8。base min_images 是短 depth 的 floor，length-scale 把長文往上拉。

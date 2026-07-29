@@ -1,3 +1,15 @@
+# ⛔ 這支目前是 disabled（gh workflow disable deploy.yml，2026-07-29）。
+#
+# 原因：內容是母體的 GitHub Pages 部署流程，而 COMPUTEX.md 要部署到 Cloudflare Pages。
+# 留著會每次 push 都跑一次、燒 Actions 分鐘，而且會把站推到一個我們沒打算公開的地方。
+#
+# 停用不是刪除：Stage 9（部署）要把它改寫成 Cloudflare Pages 版本再重新啟用
+#   gh workflow enable deploy.yml
+#
+# 額度提醒（CLAUDE.md rule 57）：重新啟用前先算「單份大小 × 保留期 × 每日觸發次數」，
+# 特別是 dist artifact —— 母體的 dist 是 2.4GB 級距，上傳到 Actions storage 會很快爆掉
+# 帳號的免費額度。純 run 內流轉的 artifact 用完即刪，不要靠 retention-days 自然過期。
+
 name: Deploy to GitHub Pages
 
 on:

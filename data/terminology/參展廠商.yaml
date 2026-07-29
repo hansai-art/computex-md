@@ -1,0 +1,22 @@
+id: 'can-zhan-chang-shang'
+category: general
+fork_type: B
+
+display:
+  taiwan: '參展廠商'
+  china: 展商
+
+english: 'exhibitor'
+
+detection:
+  severity: A
+
+notes: >
+  同 攤位。台灣完整說參展廠商 / 參展商。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'

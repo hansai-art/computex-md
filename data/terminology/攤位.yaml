@@ -1,0 +1,22 @@
+id: 'tan-wei'
+category: general
+fork_type: B
+
+display:
+  taiwan: '攤位'
+  china: 展台
+
+english: 'booth'
+
+detection:
+  severity: A
+
+notes: >
+  展會用語。台灣說攤位 / 展位，「展台」是中國說法。本站每一頁都會用到。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'

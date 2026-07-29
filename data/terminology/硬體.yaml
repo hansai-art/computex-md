@@ -1,0 +1,22 @@
+id: 'ying-ti'
+category: tech
+fork_type: B
+
+display:
+  taiwan: '硬體'
+  china: 硬件
+
+english: 'hardware'
+
+detection:
+  severity: A
+
+notes: >
+  同 軟體。AI 硬體是本站主題，這個詞出現頻率最高。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'

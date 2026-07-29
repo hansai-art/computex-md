@@ -1,0 +1,22 @@
+id: 'mo-zu'
+category: tech
+fork_type: B
+
+display:
+  taiwan: '模組'
+  china: 模塊
+
+english: 'module'
+
+detection:
+  severity: A
+
+notes: >
+  光模組 / 電源模組 / 記憶體模組，展品描述高頻。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'

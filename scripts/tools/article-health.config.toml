@@ -31,6 +31,35 @@
 # every link target against `knowledge/{lang}/{Category}/*.md` filesystem.
 # Source-layer counterpart of post-build `verify-internal-links.sh`.
 
+# ════════════════════════════════════════════════════════════════════════════
+# COMPUTEX.md 在地化（2026-07-29，SPECIATION-PIPELINE Stage 3 品質基因在地化）
+# ════════════════════════════════════════════════════════════════════════════
+#
+# 上面整段是母體 taiwan.md 的病歷，逐條保留當方法參考。以下是這個物種改掉的地方。
+#
+# 1. 新增 marketing-speak（DEFAULT_SEVERITY = hard，APPLIES_TO = *）
+#    母體守「用台灣人的話」（terminology），這個物種要多守一條「用規格的話，
+#    不用行銷的話」。理由不是品味：參展廠商有商業動機，送來的文字天然帶行銷
+#    語氣；而 AI 引擎不引用行銷文案。頁面變廣告牆 = GEO 價值歸零 = 廠商不來 =
+#    飛輪反轉。所以這是存亡問題。
+#    不做 soft-launch：母體的 WARN 起手是為了 heal 幾百篇 legacy，這個物種出生
+#    時 corpus 是空的，沒有 legacy 要 grandfather，第一天就 HARD。
+#
+# 2. terminology（中國用語 → 台灣用語）保留，而且比母體更重要
+#    一度打算拿 marketing-speak 換掉它。讀完 TERMINOLOGY.md 後改判：AI 硬體的
+#    詞彙正是中國用語最容易滲進來的地方（軟件 / 硬件 / 內存 / 服務器 / 算法），
+#    來源是原廠 datasheet 與翻譯過的廠商文案。兩個都留，不是二選一。
+#
+# 3. 門檻改成 per_category（word-count / image-health）
+#    母體全站只有一種文體：敘事長文，所以 4500 字 + 3 媒體全站一個值就對。
+#    這個物種同時養兩種東西：
+#        Topics    產業觀察長文   → 沿用母體深度門檻
+#        Editions  年度展會敘事   → 中等
+#        Vendors   廠商事實頁     → 一張填滿來源的事實表 900 字就完整了
+#        Products  產品規格頁     → 同上
+#    把 4500 字套到事實頁只會逼作者灌水，而灌水正好摧毀這個檔案庫唯一的價值。
+#    機制見 lib/article_health/config.py:option_for_category。
+
 [meta]
 version = 1
 canonical_doc = "docs/editorial/EDITORIAL.md"
@@ -38,7 +67,37 @@ phase = "7-pre-commit-wired"
 
 # ── Per-check severity / options ─────────────────────────────────────────────
 # Plugin defaults are set in each module (DEFAULT_SEVERITY). Override here.
-# (No overrides currently — plugin defaults are appropriate.)
+
+[checks.marketing-speak]
+# 明確寫出來而不是靠 plugin default，讓「這個物種刻意選了 hard」留下紀錄。
+severity = "hard"
+
+# ── 全域門檻：以「事實頁」為基準，長文型別在 per_category 往上調 ────────────
+# 放在 [checks.*].options 而不是各 profile，才不會漏掉任何一個 profile
+# （母體有 8 個 profile，逐個複製 = 下次加 profile 就漏一個）。
+
+[checks.word-count.options]
+min_chars = 900
+
+[checks.word-count.options.per_category]
+Topics = 4500
+Editions = 1500
+
+[checks.image-health.options]
+min_images = 1
+# length_scaled 對事實頁沒有意義（事實表不是靠篇幅長出來的），只對長文開。
+length_scaled = false
+
+[checks.image-health.options.per_category]
+Topics = 3
+
+# media-richness 是另一支 plugin、另一份 min_images，兩邊要一起調 —— 只調
+# image-health 的話，事實頁會通過 image-health 卻被 media-richness 攔下。
+[checks.media-richness.options]
+min_images = 1
+
+[checks.media-richness.options.per_category]
+Topics = 3
 
 # ── Stage profiles ───────────────────────────────────────────────────────────
 
@@ -126,17 +185,14 @@ viz-health = "hard"
 # 既存 word-count min_chars=4500 跟 plugin DEFAULT_MIN_CHARS 一致所以 typo 沒
 # 顯性暴露，但 image-health 新加的 min_images_severity=hard 必須 reach
 # 才能 promote 預設 WARN → HARD，所以一併修正命名。
-[profiles."rewrite-stage-4".options_overrides.word-count]
-min_chars = 4500
-
+# 2026-07-29 COMPUTEX.md：這裡刻意**不再**覆蓋 min_chars / min_images。
+# profile 的 options_overrides 是淺層 update，一寫 `min_chars = 4500` 就會蓋掉
+# [checks.word-count.options] 的事實頁基準 900，而 per_category 只在有列到的
+# 分類生效 —— 結果 Vendors / Products 又被 4500 字綁架。門檻只留一份，在檔頭
+# [checks.*] 那組；profile 只負責調嚴重度與行為開關。
 [profiles."rewrite-stage-4".options_overrides.image-health]
-# 2026-06-07 哲宇 directive (REWRITE v6.8 媒體完整度低標提升)：length_scaled —
-# effective_min = max(3, round(prose-CJK / 1200)) → 4500→4 / 7000→6 / 9000→8；base 3 是
-# 短 depth floor (黃魚鴞 3635 字/3 媒體 全過)。named 富媒體範本 (設研院 5 / 天下 6 / 複雜 13)
-# 全過、text-only (雜學校 0) 失格。prose-CJK 排除 參考資料 footnote 段。深掃協議見 Step 1.9.0。
-min_images = 3
-length_scaled = true
-cjk_per_media = 1200
+# length_scaled 保持關閉（見檔頭）。這兩個 severity 開關才是 stage-4 要的：
+# 新文章必須達到該分類的媒體下限，legacy 走 default WARN。
 min_images_severity = "hard"
 zero_images_severity = "hard"
 
@@ -147,9 +203,7 @@ checks = ["image-health"]
 fail_on = "hard"
 
 [profiles."rewrite-stage-4-5".options_overrides.image-health]
-min_images = 3
-length_scaled = true
-cjk_per_media = 1200
+# 同 stage-4：門檻不在這裡複寫，只調嚴重度。
 min_images_severity = "hard"
 zero_images_severity = "hard"
 

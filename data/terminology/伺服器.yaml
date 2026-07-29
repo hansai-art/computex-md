@@ -1,0 +1,22 @@
+id: 'si-fu-qi'
+category: tech
+fork_type: B
+
+display:
+  taiwan: '伺服器'
+  china: 服務器
+
+english: 'server'
+
+detection:
+  severity: A
+
+notes: >
+  台灣 AI 伺服器供應鏈是本站核心題材，這個詞不能錯。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'

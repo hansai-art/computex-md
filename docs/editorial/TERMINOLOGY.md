@@ -1,11 +1,11 @@
 ---
 title: 'TERMINOLOGY'
-description: '用語規範 — 用台灣人說的話 / 中國用語 → 台灣用語對照表 / hard gate 違規清單'
+description: '用語規範 — Layer 1 用台灣人說的話（中國用語對照表）/ Layer 2 用規格的話不用行銷的話'
 type: 'editorial-canonical'
 status: 'canonical'
-current_version: 'v1.0'
-last_updated: 2026-03-30
-last_session: 'historical'
+current_version: 'v2.0'
+last_updated: 2026-07-29
+last_session: 'computex-md speciation stage 3'
 plugin_check: 'python3 scripts/tools/article-health.py {file} --check=terminology'
 sister_docs:
   - 'EDITORIAL.md'
@@ -16,14 +16,14 @@ upstream_canonical:
   - '../semiont/MANIFESTO.md'
 ---
 
-# 用語規範 — Taiwan.md 的文字應該像在台灣長大的人寫的
+# 用語規範 — COMPUTEX.md 的文字應該像在台灣長大的人寫的
 
 > 這不是政治立場，是生活經驗的真實性。
 > 我們保存的是這個時代、在這片土地上的語言習慣——它沒有對錯，但它是我們的。
 
 ## Layer 1：呈現規則
 
-Taiwan.md 文章一律使用台灣在地用語。以下是明確的替換規則（A 類 = 必換，不需判斷語境）：
+COMPUTEX.md 文章一律使用台灣在地用語。以下是明確的替換規則（A 類 = 必換，不需判斷語境）：
 
 ### A 類：一律替換
 
@@ -60,11 +60,104 @@ Taiwan.md 文章一律使用台灣在地用語。以下是明確的替換規則�
 | 領導 | 台灣較少用於日常，但描述中國制度時保留                                                                                                         |
 | 估計 | 中國口語常用（「估計他不會來」），台灣口語更常說「大概」「應該」「可能」；書面正式語境可用「預估」「推估」。描述統計數字時保留（「初步估計」） |
 
-完整詞庫見 `data/terminology/`（YAML 格式，持續擴充中）。
+完整詞庫見 `data/terminology/`（YAML 格式，持續擴充中）。YAML 是 SSOT，
+`npm run prebuild:terms` 會產生 plugin 讀的 `.china-terms.detection.tsv`。
+**加詞改 YAML，不要改 TSV。**
+
+### COMPUTEX.md 加碼的詞（2026-07-29）
+
+母體的詞庫是通用的，這個物種另外補了兩類，因為它們在這裡出現的頻率高得多：
+
+**AI 硬體規格用語** — 原廠 datasheet、翻譯過的廠商文案、跨海轉載的新聞稿，
+是中國用語滲進來的主要通道。規格表最容易整段照搬：
+
+| 中國用語   | 台灣用語   |
+| ---------- | ---------- |
+| 芯片       | 晶片       |
+| 集成電路   | 積體電路   |
+| 顯卡       | 顯示卡     |
+| 顯存       | 顯示記憶體 |
+| 主板       | 主機板     |
+| 存儲       | 儲存       |
+| 帶寬       | 頻寬       |
+| 激光       | 雷射       |
+| 光刻       | 微影       |
+| 模塊       | 模組       |
+| 接口       | 介面       |
+| 端口       | 連接埠     |
+| 網卡       | 網路卡     |
+| 交換機     | 交換器     |
+| 打印       | 列印       |
+| 筆記本電腦 | 筆記型電腦 |
+| 台式機     | 桌上型電腦 |
+| 標配       | 標準配備   |
+
+**展會用語** — 本站每一頁都會用到：
+
+| 中國用語 | 台灣用語             |
+| -------- | -------------------- |
+| 展台     | 攤位（或展位）       |
+| 展商     | 參展廠商（或參展商） |
 
 ---
 
-# Taiwan.md 用語校正基準
+## Layer 2：規格詞彙 vs 行銷詞彙
+
+> Layer 1 守的是「用台灣人的話」。Layer 2 守的是「用規格的話，不用行銷的話」。
+> 機器檢查：`marketing-speak` plugin（HARD）。
+
+### 為什麼這條規則存在
+
+這個檔案庫的核心矛盾在這裡：**參展廠商有商業動機**，他們送來的每一段文字天然
+帶著行銷語氣。而 AI 引擎不引用行銷文案。頁面一旦變成廣告牆，被引用的價值歸零；
+被引用的價值歸零，廠商就沒有理由來共編；飛輪反轉。
+
+所以「業界領先」「全球首創」「唯一」不是品味問題，是專案的存亡問題。
+
+### 規則
+
+**不禁止這些詞，禁止的是沒有出處的這些詞。**
+
+同一行只要有下列任一種佐證就放行：
+
+- Markdown 連結 `[來源](https://…)`
+- 裸 URL
+- 腳註標記 `[^1]`
+
+有第三方可查證的來源，正是我們希望廠商去做的事。這條規則的形狀是刻意的：
+它把「想吹捧」的動機，導向「去把出處找出來」。
+
+### 三種處理方式
+
+違規時三選一：
+
+1. **補來源**：同一行補上可查證的連結或腳註
+2. **改成可量化的中性表述**：「業界領先」→「2026 年該品類市佔 X%，來源 Y」
+3. **標明是誰說的**：如果是轉述廠商說法，用引號 ——
+   `該公司自稱「全球首創液冷機櫃」，但未提供第三方驗證。`
+   引號內的內容不受這條規則約束，因為那是轉述，不是我們的宣稱。
+
+### 詞表
+
+**絕對宣稱（HARD）**：業界領先／業界第一／全球首創／世界首創／全球第一／
+世界第一／全台第一／唯一一家／市場唯一／最強／最佳選擇／領導品牌／革命性／
+顛覆性／劃時代／無人能及／完美／無可取代／獨步全球／遙遙領先；
+英文 world-leading／world's first／industry-leading／industry first／
+first-ever／best-in-class／unrivaled／unmatched／revolutionary／
+game-changing／cutting-edge／state-of-the-art／the only／market leader。
+
+**緩和宣稱（WARN）**：業界少見／相對領先／數一數二／名列前茅／
+among the first／one of the leading。不擋，但讀者無法驗證的形容詞對 GEO
+沒有貢獻，能改成數字就改。
+
+英文譯本適用同一條規則：雙語都是我們的宣稱，不因為換了語言就不用附出處。
+
+詞表正本在 `scripts/tools/lib/article_health/checks/marketing_speak.py`，
+測試在 `tests/article_health/test_marketing_speak.py`。加詞兩邊一起改。
+
+---
+
+# COMPUTEX.md 用語校正基準
 
 > 台灣是一個國家。文章用語應自然、自信，不刻意迴避也不刻意強調。
 

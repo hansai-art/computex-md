@@ -82,7 +82,11 @@ def test_english_comma_not_flagged(tmp_path):
 # ════════════════════════════════════════════════════════════════════════
 
 
-@pytest.mark.parametrize("adj", ["傳奇", "偉大", "優秀", "最強", "國民", "天后"])
+# 清單以 plugin 的 TITLE_VAGUE_ADJECTIVES 為準，不在測試裡另抄一份。
+# 母體測試手抄的清單含「國民」，但 2026-05-11 已從 plugin 移除（「國民飲料」
+# 是 noun modifier 不是評價詞），測試沒跟著改，從那天起就一直紅 —— 而 CI
+# 不跑 pytest 所以沒人看到。2026-07-29 改成直接讀常數，以後增刪詞不會再漂移。
+@pytest.mark.parametrize("adj", frontmatter_title.TITLE_VAGUE_ADJECTIVES)
 def test_vague_adjective_is_warn(tmp_path, adj):
     violations = _check(tmp_path, f"{adj}的故事和台灣味道")
     warns = [v for v in violations if v.severity == Severity.WARN and adj in v.message]
@@ -138,11 +142,23 @@ def test_non_people_without_colon_no_colon_warn(tmp_path):
 
 
 def test_long_title_warns(tmp_path):
-    # > 35 effective chars: each CJK = 1, so 36 CJK chars triggers
-    long_title = "黃魚鴞甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥東南西北春夏秋冬山水火木"
+    """門檻取自 plugin 常數，不在測試裡另寫一個數字。
+
+    母體版本寫死 36 個字，但門檻 2026-05-23 已從 35 放寬到 45（含多 anchor
+    的人物文太緊），測試沒跟著改就一直紅。2026-07-29 改成從門檻反推長度。
+    """
+    threshold = frontmatter_title.TITLE_LENGTH_WARN
+    long_title = "黃" * (int(threshold) + 2)  # 每個 CJK 權重 1
     violations = _check(tmp_path, long_title)
     warns = [v for v in violations if "過長" in v.message]
-    assert len(warns) == 1, f"len={len(long_title)}, weight should be > 35, got {len(warns)} warns"
+    assert len(warns) == 1, f"weight={len(long_title)} > {threshold}, got {len(warns)} warns"
+
+
+def test_title_at_threshold_does_not_warn(tmp_path):
+    """剛好等於門檻不算過長 —— 界線要驗，否則放寬門檻時測試不會叫。"""
+    at_limit = "黃" * int(frontmatter_title.TITLE_LENGTH_WARN)
+    violations = _check(tmp_path, at_limit)
+    assert not [v for v in violations if "過長" in v.message]
 
 
 def test_normal_title_passes_length(tmp_path):

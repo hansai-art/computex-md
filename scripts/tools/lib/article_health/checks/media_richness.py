@@ -38,6 +38,7 @@ import os
 import re
 from typing import Any, Iterator
 
+from ..config import option_for_category
 from ..langs import TRANSLATION_LANGS
 from ..types import FileTarget, Severity, Violation
 
@@ -97,7 +98,11 @@ def check(target: FileTarget, config: dict[str, Any]) -> Iterator[Violation]:
 
     options = config or {}
     min_iframes = int(options.get("min_iframes", DEFAULT_MIN_IFRAMES))
-    min_images = int(options.get("min_images", DEFAULT_MIN_IMAGES))
+    # 跟 image-health 同一條規則：媒體下限跟著文體走，不是跟著站走。
+    # 理由見 config.option_for_category。
+    min_images = int(
+        option_for_category(options, target.category, "min_images", DEFAULT_MIN_IMAGES)
+    )
 
     body = target.body if target.body else target.text
     if not body:

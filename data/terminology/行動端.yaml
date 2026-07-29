@@ -1,0 +1,22 @@
+id: 'xing-dong-duan'
+category: tech
+fork_type: B
+
+display:
+  taiwan: '行動端'
+  china: 移動端
+
+english: 'mobile'
+
+detection:
+  severity: A
+
+notes: >
+  台灣用「行動端」，中國用「移動端」。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'

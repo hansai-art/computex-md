@@ -1,0 +1,22 @@
+id: 'zi-liao-ku'
+category: tech
+fork_type: B
+
+display:
+  taiwan: '資料庫'
+  china: 數據庫
+
+english: 'database'
+
+detection:
+  severity: A
+
+notes: >
+  台灣用「資料庫」，中國用「數據庫」。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'

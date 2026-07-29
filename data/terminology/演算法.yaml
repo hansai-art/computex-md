@@ -1,0 +1,22 @@
+id: 'yan-suan-fa'
+category: tech
+fork_type: B
+
+display:
+  taiwan: '演算法'
+  china: 算法
+
+english: 'algorithm'
+
+detection:
+  severity: B
+
+notes: >
+  黃燈：極少數數學語境可能出現，交作者判斷。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'

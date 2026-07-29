@@ -1,0 +1,22 @@
+id: 'ji-ti-dian-lu'
+category: tech
+fork_type: B
+
+display:
+  taiwan: '積體電路'
+  china: 集成電路
+
+english: 'integrated circuit'
+
+detection:
+  severity: A
+
+notes: >
+  IC 的正式中文。台灣產業文件一律用積體電路。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'

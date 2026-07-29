@@ -1,0 +1,22 @@
+id: 'jiao-huan-qi'
+category: tech
+fork_type: B
+
+display:
+  taiwan: '交換器'
+  china: 交換機
+
+english: 'switch'
+
+detection:
+  severity: A
+
+notes: >
+  資料中心網通設備，台灣一律用交換器。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'

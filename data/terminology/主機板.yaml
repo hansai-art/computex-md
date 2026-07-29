@@ -1,0 +1,22 @@
+id: 'zhu-ji-ban'
+category: tech
+fork_type: B
+
+display:
+  taiwan: '主機板'
+  china: 主板
+
+english: 'motherboard'
+
+detection:
+  severity: A
+
+notes: >
+  COMPUTEX 主場品類之一。
+
+sources:
+  - '教育部重編國語辭典修訂本 / 教育部資訊與通訊科技詞彙'
+  - 'COMPUTEX.md 編輯部（依台灣資通訊產業慣用語彙整理）'
+
+added: '2026-07-29'
+updated: '2026-07-29'
