@@ -11,10 +11,11 @@ const { enLink, hasEn } = await getLangSwitchPath(currentPath);
   ─────────────────────────────────────────
   - Converted to Tailwind atomic utilities in HTML
   - Removed scoped <style> block entirely
-  - Teal brand colors (#007864, #4fd1b0, #7ee8ca) are component-local
-    one-offs, kept as arbitrary values: bg-[#007864] / text-[#4fd1b0]
-  - Later phase may promote these to tokens if the color system picks
-    up a "lang-banner teal" brand identity
+  - 2026-07-29：原本是母體的薄荷綠 (#007864 底 / #4fd1b0 連結)。這條 bar 在每一頁
+    最頂端，是全站最顯眼的一塊母體顏色，所以先換：底色改品牌黑 #252126，連結改白字
+    洋紅底線（跟 /about、/contribute 的連結樣式一致）。
+    站上還有大量 #1a3c34 / #2d5016 母體綠散在 dark-polish.css 與各 template 裡，
+    那是整套配色遷移，要一起做，不在這個檔補丁。
 
   2026-07-06 empty-banner bug fix (design audit §2.9-2):
   - Pages with no English version (e.g. /semiont/anatomy/, 404) rendered
@@ -29,7 +30,7 @@ const { enLink, hasEn } = await getLangSwitchPath(currentPath);
   hasEn && (
     <div
       id="lang-banner"
-      class="relative z-50 hidden items-center justify-center gap-4 bg-[#007864] px-4 py-[0.6rem] text-center text-[0.85rem] leading-snug text-white [&_a]:font-semibold [&_a]:text-[#4fd1b0] [&_a]:underline [&_a:hover]:text-[#7ee8ca]"
+      class="relative z-50 hidden items-center justify-center gap-4 bg-[#252126] px-4 py-[0.6rem] text-center text-[0.85rem] leading-snug text-white [&_a]:font-semibold [&_a]:text-white [&_a]:underline [&_a]:decoration-[#E4007E] [&_a]:decoration-2 [&_a]:underline-offset-4 [&_a:hover]:text-[#E4007E]"
     >
       <span>
         🌐 English version available → <a href={enLink}>Switch to English</a>

@@ -173,10 +173,10 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
                           📖 {t('nav.about.story')}
                         </a>
                         <a
-                          href={`${navHref('/about')}#organism`}
+                          href={`${navHref('/about')}#charter`}
                           class="dropdown-item"
                         >
-                          🧬 {t('nav.about.organism')}
+                          🧬 {t('nav.about.charter')}
                         </a>
                         <a
                           href={`${navHref('/about')}#faq`}
@@ -212,24 +212,23 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
                         </a>
                         <div class="dropdown-divider" />
                         <a
-                          href={`${navHref('/contribute')}#form`}
+                          href={`${navHref('/contribute')}#how`}
                           class="dropdown-item"
                         >
-                          📝 {t('nav.contribute.submit')}
+                          📝 {t('nav.contribute.how')}
                         </a>
                         <a
-                          href={`${navHref('/contribute')}#cli`}
+                          href={`${navHref('/contribute')}#rules`}
                           class="dropdown-item"
                         >
-                          🖥️ {t('nav.contribute.cli')}
+                          ⛔ {t('nav.contribute.rules')}
                         </a>
-                        <a
-                          href="https://github.com/hansai-art/computex-md"
-                          target="_blank"
-                          class="dropdown-item"
-                        >
-                          🐙 GitHub
-                        </a>
+                        {/*
+                          2026-07-29 拿掉 🐙 GitHub 這一項。repo 目前是 private，
+                          點下去對所有訪客都是 404。等 repo 公開再加回來 ——
+                          全站還有 176 條同樣指向私有 repo 的連結，那是同一個
+                          決定，要一起處理，不是逐條拆。
+                        */}
                       </div>
                     </div>
                   </Fragment>

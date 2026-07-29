@@ -104,11 +104,14 @@ TW_PATTERNS=(
 # translateX 反而偏移半個元素寬。置中沒有方向性，維持 physical 才對。
 # ⚠️ 這份清單用「檔案:行號」釘豁免，所以被守護的檔案只要在該行之前增刪任何一行，
 #    豁免就會失準：舊行號放行了不該放行的行，真正該豁免的行反而被擋下。
-#    2026-07-29 導覽列重寫刪了約 290 行，這兩筆就從 1045/1092 掉到 750/797。
-#    動到被守護的檔案時，記得回來對一次行號。
+#    2026-07-29 導覽列重寫刪了約 290 行，這兩筆就從 1045/1092 掉到 750/797；
+#    同日下午 dropdown 拿掉一個項目再經 prettier 重排，變成 749/796。一天內失準
+#    三次，其中一次是 pre-commit 的 prettier 自己造成的 —— 所以對行號**要以
+#    prettier 跑完之後的檔案為準**：先 `npx prettier --write <file>` 再對行號，
+#    否則 commit 當下會被自己的 hook 擋下來。
 ALLOWLIST=(
-  "src/components/Header.astro:750|nav-link 底線置中：left:50% + translateX(-50%)"
-  "src/components/Header.astro:797|dropdown 置中：left:50% + translateX(-50%)"
+  "src/components/Header.astro:749|nav-link 底線置中：left:50% + translateX(-50%)"
+  "src/components/Header.astro:796|dropdown 置中：left:50% + translateX(-50%)"
 )
 
 # ── 掛號中的債（受守護檔案裡「還沒還」的行）──────────────────────────────────

@@ -1,7 +1,14 @@
 {
-  "generatedAt": "2026-07-29T04:14:00.005Z",
+  "generatedAt": "2026-07-29T04:29:41.337Z",
   "source": "git",
   "commits": [
+    {
+      "hash": "a96b97c12408af81a72448dcbbfe092aeaec29ef",
+      "date": "2026-07-29T12:16:25+08:00",
+      "author": "Hans",
+      "message": "feat(about,og): /about 重寫 + 修掉全站 101 頁的 404 社交圖",
+      "articles": []
+    },
     {
       "hash": "a1f49bfad1333c9be1fa8818104af6d7b2bfe1ed",
       "date": "2026-07-29T11:54:40+08:00",
