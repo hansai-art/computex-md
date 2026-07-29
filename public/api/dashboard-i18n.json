@@ -1,6 +1,6 @@
 {
-  "generated": "2026-07-29T04:29:41Z",
-  "max_total": 305,
+  "generated": "2026-07-29T04:53:44Z",
+  "max_total": 306,
   "modules": [
     {
       "name": "home",
@@ -19,8 +19,8 @@
     {
       "name": "contribute",
       "langs": {
-        "zh-TW": 51,
-        "en": 51
+        "zh-TW": 52,
+        "en": 52
       }
     },
     {
@@ -88,7 +88,7 @@
     }
   ],
   "lang_totals": {
-    "zh-TW": { "keys": 305, "coverage_pct": 100.0 },
-    "en": { "keys": 305, "coverage_pct": 100.0 }
+    "zh-TW": { "keys": 306, "coverage_pct": 100.0 },
+    "en": { "keys": 306, "coverage_pct": 100.0 }
   }
 }

@@ -1,7 +1,14 @@
 {
-  "generatedAt": "2026-07-29T04:29:41.337Z",
+  "generatedAt": "2026-07-29T04:53:44.100Z",
   "source": "git",
   "commits": [
+    {
+      "hash": "d0a1a541b2468d5a2d42a1302f88b15a9fabc356",
+      "date": "2026-07-29T12:33:05+08:00",
+      "author": "Hans",
+      "message": "fix(contribute): /contribute 的表單把訪客個資送到母體的試算表，整頁重寫",
+      "articles": []
+    },
     {
       "hash": "a96b97c12408af81a72448dcbbfe092aeaec29ef",
       "date": "2026-07-29T12:16:25+08:00",

@@ -1,15 +1,68 @@
 {
-  "lastUpdated": "2026-07-29T04:29:41.755Z",
+  "lastUpdated": "2026-07-29T04:53:44.437Z",
   "totals": {
-    "contributors": 0,
+    "contributors": 1,
     "activeWindow": "last 30d"
   },
-  "leaderboard": [],
+  "leaderboard": [
+    {
+      "login": "hansai-art",
+      "commits": 16,
+      "avatarUrl": "https://avatars.githubusercontent.com/u/132933660?v=4",
+      "profileUrl": "https://github.com/hansai-art",
+      "firstCommitAt": "2026-07-29 01:12:10 +0800",
+      "lastCommitAt": "2026-07-29 12:33:05 +0800",
+      "primaryArea": "system",
+      "breakdown": {
+        "content": 1,
+        "system": 14,
+        "translation": 9
+      }
+    }
+  ],
+  "allContributors": [
+    {
+      "login": "hansai-art",
+      "name": "hansai-art",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/132933660?v=4",
+      "profileUrl": "https://github.com/hansai-art",
+      "types": ["💻", "🖋️", "🌍"]
+    }
+  ],
   "topContent": [],
-  "topSystem": [],
+  "topSystem": [
+    {
+      "login": "hansai-art",
+      "commits": 16,
+      "avatarUrl": "https://avatars.githubusercontent.com/u/132933660?v=4",
+      "profileUrl": "https://github.com/hansai-art",
+      "firstCommitAt": "2026-07-29 01:12:10 +0800",
+      "lastCommitAt": "2026-07-29 12:33:05 +0800",
+      "primaryArea": "system",
+      "breakdown": {
+        "content": 1,
+        "system": 14,
+        "translation": 9
+      }
+    }
+  ],
   "topTranslation": [],
-  "weeklyActive": 0,
-  "monthlyActive": 0,
-  "recentlyJoined": [],
-  "error": "HTTP 404: {\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/repos/repos#list-repository-contributors\",\"stat"
+  "weeklyActive": 1,
+  "monthlyActive": 1,
+  "recentlyJoined": [
+    {
+      "login": "hansai-art",
+      "commits": 16,
+      "avatarUrl": "https://avatars.githubusercontent.com/u/132933660?v=4",
+      "profileUrl": "https://github.com/hansai-art",
+      "firstCommitAt": "2026-07-29 01:12:10 +0800",
+      "lastCommitAt": "2026-07-29 12:33:05 +0800",
+      "primaryArea": "system",
+      "breakdown": {
+        "content": 1,
+        "system": 14,
+        "translation": 9
+      }
+    }
+  ]
 }

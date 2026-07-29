@@ -85,12 +85,13 @@ const rules = [
 ];
 
 const soon = [
-  { title: t('contribute.soon.pr.title'), body: t('contribute.soon.pr.body') },
   {
     title: t('contribute.soon.score.title'),
     body: t('contribute.soon.score.body'),
   },
 ];
+
+const REPO = 'https://github.com/hansai-art/computex-md';
 ---
 
 <Layout
@@ -203,6 +204,27 @@ const soon = [
           >
           <p class="mt-3 text-[0.85rem] leading-[1.8] text-[#9ca3af]">
             {t('contribute.how.ctaNote')}
+          </p>
+        </div>
+
+        {/* repo 2026-07-29 轉公開，PR 從「還沒開放」升成真的送得出來的路。 */}
+        <div class="mt-12 border-t border-[#e5e7eb] pt-10">
+          <h3 class="m-0 text-[1.2rem] font-bold leading-snug text-[#252126]">
+            {t('contribute.pr.title')}
+          </h3>
+          <p class="mt-3 text-[1rem] leading-[1.9] text-[#4b5563]">
+            {t('contribute.pr.body')}
+          </p>
+          <p class="mt-5">
+            <a
+              href={REPO}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-ga-section="contribute_how"
+              data-ga-label="repo"
+              class="inline-block border-b-2 border-[#E4007E] pb-1 text-[0.95rem] font-semibold text-[#252126] no-underline transition-colors duration-200 hover:text-[#E4007E]"
+              >{t('contribute.pr.cta')}</a
+            >
           </p>
         </div>
       </div>

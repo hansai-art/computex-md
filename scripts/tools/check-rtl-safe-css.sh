@@ -110,8 +110,8 @@ TW_PATTERNS=(
 #    prettier 跑完之後的檔案為準**：先 `npx prettier --write <file>` 再對行號，
 #    否則 commit 當下會被自己的 hook 擋下來。
 ALLOWLIST=(
-  "src/components/Header.astro:749|nav-link 底線置中：left:50% + translateX(-50%)"
-  "src/components/Header.astro:796|dropdown 置中：left:50% + translateX(-50%)"
+  "src/components/Header.astro:754|nav-link 底線置中：left:50% + translateX(-50%)"
+  "src/components/Header.astro:801|dropdown 置中：left:50% + translateX(-50%)"
 )
 
 # ── 掛號中的債（受守護檔案裡「還沒還」的行）──────────────────────────────────

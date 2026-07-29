@@ -223,12 +223,14 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
                         >
                           ⛔ {t('nav.contribute.rules')}
                         </a>
-                        {/*
-                          2026-07-29 拿掉 🐙 GitHub 這一項。repo 目前是 private，
-                          點下去對所有訪客都是 404。等 repo 公開再加回來 ——
-                          全站還有 176 條同樣指向私有 repo 的連結，那是同一個
-                          決定，要一起處理，不是逐條拆。
-                        */}
+                        <a
+                          href="https://github.com/hansai-art/computex-md"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="dropdown-item"
+                        >
+                          🐙 GitHub
+                        </a>
                       </div>
                     </div>
                   </Fragment>
@@ -604,7 +606,10 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     --sep-color: #e2e8f0;
     --arrow-color: #94a3b8;
     --logo-color: #1a1a2e;
-    --dot-color: var(--green-mid);
+    /* 2026-07-29：字標那一點是母體的綠（--green-mid / --green-accent）。
+       它出現在每一頁的左上角，改成品牌洋紅 #E4007E，跟 favicon、OG 卡浮水印、
+       /about 的連結底線同一顆顏色。這是全站唯一該用洋紅的東西之一。 */
+    --dot-color: #e4007e;
     --search-border: rgba(0, 0, 0, 0.08);
     --search-bg: transparent;
     --search-color: #64748b;
@@ -633,7 +638,7 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     --sep-color: rgba(255, 255, 255, 0.25);
     --arrow-color: rgba(255, 255, 255, 0.6);
     --logo-color: #ffffff;
-    --dot-color: var(--green-accent);
+    --dot-color: #e4007e;
     --search-border: rgba(255, 255, 255, 0.2);
     --search-bg: rgba(255, 255, 255, 0.08);
     --search-color: rgba(255, 255, 255, 0.8);

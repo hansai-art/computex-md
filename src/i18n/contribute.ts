@@ -74,6 +74,11 @@ export const contributeUI = {
     'contribute.how.ctaNote':
       'Opens your mail client with the five fields pre-written. Type over them.',
 
+    'contribute.pr.title': 'Or send a pull request',
+    'contribute.pr.body':
+      'The source and the data are public. Every page is one Markdown file under knowledge/, so a correction is a one-line diff. A pull request is the only write path into the repository, and merging stays with a human: that boundary is the design, not a limitation.',
+    'contribute.pr.cta': 'Open the repository',
+
     'contribute.process.title': 'What happens after you send it',
     'contribute.process.step1':
       'The source you sent is checked against what the page currently says.',
@@ -98,10 +103,7 @@ export const contributeUI = {
 
     'contribute.soon.title': 'Not open yet',
     'contribute.soon.lead':
-      'Two things are designed but not available. They are listed here so this page does not imply more than exists.',
-    'contribute.soon.pr.title': 'Pull requests',
-    'contribute.soon.pr.body':
-      'The source and the data are not public yet, so a pull request cannot be sent. When they open, a pull request becomes the only write path and merging stays with a human. No date is promised.',
+      'One thing is designed but not available. It is listed here so this page does not imply more than exists.',
     'contribute.soon.score.title': 'Booth Score',
     'contribute.soon.score.body':
       'A completeness score computed mechanically from field coverage, source coverage and freshness, where marketing copy earns zero. The rule is settled; the implementation is not written. There is no ranking on the site today.',
@@ -166,6 +168,11 @@ export const contributeUI = {
     'contribute.how.ctaNote':
       '會開啟你的信箱程式，五個欄位已經先寫好，直接覆蓋填寫就可以。',
 
+    'contribute.pr.title': '或者直接送 PR',
+    'contribute.pr.body':
+      '原始碼與資料都是公開的。每一頁就是 knowledge/ 底下的一個 Markdown 檔，所以一筆更正往往只是一行 diff。PR 是進到這個資料庫的唯一寫入口，而合併由人決定：這條界線是設計，不是限制。',
+    'contribute.pr.cta': '打開資料庫',
+
     'contribute.process.title': '送出之後會發生什麼',
     'contribute.process.step1': '我們拿你附的出處，對照頁面上現在寫的內容。',
     'contribute.process.step2': '對得上就改，並把該欄位的查證日期更新成當天。',
@@ -187,10 +194,7 @@ export const contributeUI = {
 
     'contribute.soon.title': '還沒開放的',
     'contribute.soon.lead':
-      '有兩件事已經設計好但還不能用。列在這裡，是為了不讓這一頁講得比實際多。',
-    'contribute.soon.pr.title': '直接送 PR',
-    'contribute.soon.pr.body':
-      '原始碼與資料庫目前還沒公開，所以 PR 送不出來。開放之後，PR 會是唯一的寫入口，而合併由人決定。時間不承諾。',
+      '有一件事已經設計好但還不能用。列在這裡，是為了不讓這一頁講得比實際多。',
     'contribute.soon.score.title': 'Booth Score 完整度分數',
     'contribute.soon.score.body':
       '由欄位覆蓋率、出處覆蓋率與新鮮度機械計算的分數，行銷文案零加分。規則已經定了，實作還沒寫。站上目前沒有任何排名。',
