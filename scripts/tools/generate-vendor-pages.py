@@ -87,6 +87,42 @@ def zh_area(area: str) -> str:
     return f"{zh}（{area}）" if zh else area
 
 
+#: 全形標點。它們的字身本來就含左右留白，後面再補半形空格會看起來像斷開。
+_FULLWIDTH_TAIL = "）」』】》〉、，。：；？！"
+
+
+def cjk_join(prefix: str, value: str) -> str:
+    """中文前綴接一個可能以西文開頭的值，中間補一個空格。
+
+    「展區為AI 運算與技術」讀起來是黏的，86 頁的 description 與概覽段各出現一次。
+
+    兩個不補的情況：
+      - 值本身以中文開頭（「零組件與先進電源技術」）—— 補空格反而多一個洞
+      - 前綴結尾是全形標點（「⋯⋯（TaiNEX 1）」接攤位號）—— 全形字身自帶留白
+    """
+    head_is_latin = value[:1].isascii() and value[:1].isalnum()
+    tail_is_fullwidth = prefix[-1:] in _FULLWIDTH_TAIL
+    return (
+        f"{prefix} {value}" if head_is_latin and not tail_is_fullwidth else f"{prefix}{value}"
+    )
+
+
+def is_computex(show: str) -> bool:
+    """這一列是不是 COMPUTEX 本身。
+
+    官方的 `Exhibiting Record` 收的是這家公司參加過的**所有外貿協會展會**：
+    TAITRONICS、TAIPEI AMPA、TIMTOS、台灣形象展（馬來西亞 / 印尼 / 美國 / 印度
+    / 越南 / 菲律賓 / 歐洲 / 日本）、台北國際自行車展、醫療展、食品展⋯⋯
+    86 家共 634 列裡，467 列是 COMPUTEX，其餘 167 列不是。
+
+    2026-07-29 抓到：本檔原本把整包 record 當成 COMPUTEX 屆數在算，於是每一頁的
+    「官方名錄記載它參展過 N 屆」都可能多算，`/explore` 的「在 COMPUTEX 待最久的
+    廠商」榜也排錯人。表照列全部（那是官方名錄的原貌），但**凡是掛 COMPUTEX 名字
+    的計數，就只能數 COMPUTEX**。
+    """
+    return show.strip().upper().startswith("COMPUTEX")
+
+
 def _yaml_escape(s: str) -> str:
     return s.replace("'", "''")
 
@@ -104,22 +140,28 @@ def render(rec: dict[str, Any], siblings: list[tuple[str, str]]) -> str:
     booth = rec.get("booth") or ""
     url = rec.get("official_url") or ""
     record = rec.get("exhibiting_record") or []
+    cx_rows = [r for r in record if is_computex(r["show"])]
+    other_rows = [r for r in record if not is_computex(r["show"])]
 
-    years = [r["edition_year"] for r in record]
+    years = sorted({r["edition_year"] for r in cx_rows}, reverse=True)
     latest = years[0] if years else ""
-    span = f"{min(years)} 至 {max(years)}" if len(years) > 1 else (latest or "")
+    span = f"{years[-1]} 至 {years[0]}" if len(years) > 1 else (latest or "")
 
     title = f"{name}：COMPUTEX {latest} 參展資料" if latest else f"{name}：COMPUTEX 參展資料"
 
     desc_bits = [f"{name} 在 COMPUTEX {latest} 的官方參展資料"]
     if area:
-        desc_bits.append(f"展區為{zh_area(area)}")
+        desc_bits.append(cjk_join("展區為", zh_area(area)))
     if venue:
-        desc_bits.append(f"場館為{zh_venue(venue)}")
+        desc_bits.append(cjk_join("場館為", zh_venue(venue)))
     if booth:
         desc_bits.append(f"攤位號 {booth}")
     if len(years) > 1:
-        desc_bits.append(f"官方名錄記載的參展年份涵蓋 {span}，共 {len(years)} 屆")
+        desc_bits.append(f"官方名錄記載的 COMPUTEX 參展年份涵蓋 {span}，共 {len(years)} 屆")
+    if other_rows:
+        desc_bits.append(
+            f"官方名錄另記載 {len(other_rows)} 筆其他外貿協會展會紀錄，本頁一併列出但不計入 COMPUTEX 屆數"
+        )
     desc_bits.append(
         "本頁事實層每一項均附官方出處連結與查證日期，由程式從官方名錄機械抽取，"
         "不經語言模型改寫；官方名錄未提供的欄位一律留白，"
@@ -176,15 +218,31 @@ def render(rec: dict[str, Any], siblings: list[tuple[str, str]]) -> str:
         ]
         note = (
             "\n\n注意：其中 "
-            + "、".join(f"{r['edition_year']} 屆" for r in offset_rows)
-            + "的展期年份與屆別年份不一致，這是官方名錄原本就這樣記載，本頁照抄不修改。"
+            + "、".join(
+                cjk_join(f"{r['edition_year']} 年的", r["show"]) for r in offset_rows
+            )
+            + "，展期年份與屆別年份不一致，這是官方名錄原本就這樣記載，本頁照抄不修改。"
             if offset_rows
             else ""
         )
+        # 表列全部（官方名錄的原貌），但一句話先講清楚哪些是 COMPUTEX、哪些不是。
+        # 這一段以前只有一個「共 N 屆」，N 是整包紀錄的列數 —— 讀者會直接把它讀成
+        # 「來過 COMPUTEX N 次」，而那是錯的。
+        if other_rows:
+            lead = (
+                f"官方參展廠商頁列出 {len(record)} 筆參展紀錄，其中 {len(cx_rows)} 筆是 COMPUTEX"
+                + (f"（{len(years)} 屆，涵蓋 {span}）" if len(years) > 1 else "")
+                + f"，另外 {len(other_rows)} 筆是外貿協會主辦的其他展會。"
+                "下表照官方名錄原樣列出全部，展會名稱那一欄可以分辨。\n\n"
+            )
+        else:
+            lead = (
+                f"官方參展廠商頁列出的參展紀錄全部是 COMPUTEX，共 {len(years)} 屆"
+                + (f"，涵蓋 {span}。\n\n" if len(years) > 1 else "。\n\n")
+            )
         record_block = (
             "## 歷年參展紀錄\n\n"
-            f"官方參展廠商頁列出的參展年份如下，共 {len(years)} 屆"
-            + (f"，涵蓋 {span}。\n\n" if len(years) > 1 else "。\n\n")
+            + lead
             + "| 年份 | 展期 | 展會 |\n| --- | --- | --- |\n"
             + rec_rows
             + f"\n\n出處：[官方參展廠商頁]({src})，查證日期 {checked}。{note}\n"
@@ -199,12 +257,12 @@ def render(rec: dict[str, Any], siblings: list[tuple[str, str]]) -> str:
     # 這段是給 AI 引擎的答案單元：一句話回答「這家在哪、展什麼、來過幾次」。
     ov = [f"{name} 是 COMPUTEX {latest} 的參展廠商"]
     if booth:
-        ov.append(f"攤位在{zh_venue(venue) if venue else '會場'} {booth}")
+        ov.append(cjk_join(f"攤位在{zh_venue(venue) if venue else '會場'}", booth))
     if area:
-        ov.append(f"歸屬展區為{zh_area(area)}")
+        ov.append(cjk_join("歸屬展區為", zh_area(area)))
     ov.append(
-        f"官方名錄記載它參展過 {len(years)} 屆（{span}）" if len(years) > 1
-        else (f"官方名錄目前只記載 {latest} 這一屆" if latest else "官方名錄未列出歷年參展紀錄")
+        f"官方名錄記載它參展過 {len(years)} 屆 COMPUTEX（{span}）" if len(years) > 1
+        else (f"官方名錄目前只記載 {latest} 這一屆 COMPUTEX" if latest else "官方名錄未列出 COMPUTEX 參展紀錄")
     )
     overview = "，".join(ov) + "。"
 

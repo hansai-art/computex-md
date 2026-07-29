@@ -20,7 +20,7 @@
  */
 export const contributeUI = {
   en: {
-    'contribute.meta.title': 'Contribute — COMPUTEX.md',
+    'contribute.meta.title': 'Contribute to COMPUTEX.md',
     'contribute.meta.description':
       'Who may edit which layer, how to send a correction, how a company claims its own page, and the four things this site does not do.',
 
@@ -37,7 +37,7 @@ export const contributeUI = {
     'contribute.paths.whoLabel': 'Who:',
     'contribute.paths.noteLabel': 'Condition:',
 
-    'contribute.paths.fact.title': 'Fact layer — corrections',
+    'contribute.paths.fact.title': 'Fact layer: corrections',
     'contribute.paths.fact.who': 'Anyone.',
     'contribute.paths.fact.body':
       'Company name, exhibit zone, hall, booth number, years exhibited, official links. These are extracted mechanically from the public exhibitor directory, so they go wrong in exactly the ways a directory goes wrong: stale entries, renamed companies, moved booths.',
@@ -52,7 +52,7 @@ export const contributeUI = {
     'contribute.paths.claim.note':
       'Claiming costs nothing and changes nothing about how the page is ordered or displayed. There is no paid tier.',
 
-    'contribute.paths.curation.title': 'Curation layer — objections',
+    'contribute.paths.curation.title': 'Curation layer: objections',
     'contribute.paths.curation.who':
       'Anyone may object; only neutral editors may write.',
     'contribute.paths.curation.body':
@@ -118,7 +118,7 @@ export const contributeUI = {
   },
 
   'zh-TW': {
-    'contribute.meta.title': '參與編輯 — COMPUTEX.md',
+    'contribute.meta.title': '參與編輯 COMPUTEX.md',
     'contribute.meta.description':
       '誰可以改哪一層、怎麼送出勘誤、廠商怎麼認領自己的頁面，以及本站不做的四件事。',
 

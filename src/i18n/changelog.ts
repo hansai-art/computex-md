@@ -3,7 +3,7 @@ export const changelogUI = {
     // Meta
     'changelog.meta.title': 'Update History',
     'changelog.meta.description':
-      'Real-time update history of COMPUTEX.md — track every content addition and site improvement.',
+      'Real-time update history of COMPUTEX.md: track every content addition and site improvement.',
 
     // Header
     'changelog.header.title': 'Update History',
@@ -251,7 +251,7 @@ export const changelogUI = {
   es: {
     'changelog.meta.title': 'Historial de actualizaciones',
     'changelog.meta.description':
-      'Historial de actualizaciones en tiempo real de COMPUTEX.md — sigue cada adición de contenido y mejora del sitio.',
+      'Historial de actualizaciones en tiempo real de COMPUTEX.md: sigue cada adición de contenido y mejora del sitio.',
     'changelog.header.title': 'Historial de actualizaciones',
     'changelog.header.subtitle':
       'Sigue cada adición de contenido y mejora del sitio en COMPUTEX.md',
@@ -267,7 +267,7 @@ export const changelogUI = {
   fr: {
     'changelog.meta.title': 'Historique des mises à jour',
     'changelog.meta.description':
-      'Historique des mises à jour en temps réel de COMPUTEX.md — suivez chaque ajout de contenu et amélioration du site.',
+      'Historique des mises à jour en temps réel de COMPUTEX.md: suivez chaque ajout de contenu et amélioration du site.',
     'changelog.header.title': 'Historique des mises à jour',
     'changelog.header.subtitle':
       'Suivez chaque ajout de contenu et amélioration du site sur COMPUTEX.md',

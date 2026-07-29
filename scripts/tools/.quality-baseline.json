@@ -1,6 +1,6 @@
 {
   "version": "ssot-1.0",
-  "timestamp": "2026-07-29T04:53:44Z",
+  "timestamp": "2026-07-29T05:45:44Z",
   "total": 87,
   "flagged": 87,
   "files": [
@@ -32,7 +32,7 @@
     {
       "file": "vendors/inventec.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/southco-asia.md",
@@ -71,8 +71,8 @@
     },
     {
       "file": "vendors/ezbond-chemical.md",
-      "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×2; 無腳註"
+      "score": 7,
+      "reasons": "未人工審核; 後段清單堆砌31%; 稀薄段落×2; 引用荒漠(零腳註)"
     },
     {
       "file": "vendors/amazing-chip-semiconductor.md",
@@ -86,8 +86,8 @@
     },
     {
       "file": "vendors/siemens.md",
-      "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
+      "score": 6,
+      "reasons": "未人工審核; 後段清單堆砌31%; 稀薄段落×1; 引用荒漠(零腳註)"
     },
     {
       "file": "vendors/roboco.md",
@@ -112,7 +112,7 @@
     {
       "file": "vendors/liteon.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/vav-cooling.md",
@@ -167,7 +167,7 @@
     {
       "file": "vendors/rayvatek.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/amax-ky.md",
@@ -177,7 +177,7 @@
     {
       "file": "vendors/fsp.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/zoho.md",
@@ -212,7 +212,7 @@
     {
       "file": "vendors/elitegroup-computer-systems.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/continental.md",
@@ -231,8 +231,8 @@
     },
     {
       "file": "vendors/leadtek-research.md",
-      "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×1; 無腳註"
+      "score": 6,
+      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 引用荒漠(零腳註)"
     },
     {
       "file": "vendors/jentech-precision-industrial.md",
@@ -312,7 +312,7 @@
     {
       "file": "vendors/avermedia.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/kaori-thermal.md",
@@ -347,7 +347,7 @@
     {
       "file": "vendors/formosa-plastics.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/hi-power-solution.md",
@@ -376,8 +376,8 @@
     },
     {
       "file": "vendors/voltronic-power.md",
-      "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×1; 無腳註"
+      "score": 6,
+      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 引用荒漠(零腳註)"
     },
     {
       "file": "vendors/danfoss-power-solutions.md",
@@ -402,12 +402,12 @@
     {
       "file": "vendors/flotrend.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/brinno-incorporated.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/jwipc.md",
@@ -427,12 +427,12 @@
     {
       "file": "vendors/aaeon.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/fs-tech.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "editions/computex-2027.md",

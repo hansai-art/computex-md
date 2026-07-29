@@ -1,6 +1,6 @@
 ---
 title: 'FS-TECH COMPANY LTD.：COMPUTEX 2026 參展資料'
-description: 'FS-TECH COMPANY LTD. 在 COMPUTEX 2026 的官方參展資料，展區為AI 運算與系統整合方案（AI Computing & System Integration Solution），場館為台北南港展覽館 2 館（TaiNEX 2），攤位號 R0824，官方名錄記載的參展年份涵蓋 2011 至 2026，共 3 屆，本頁事實層每一項均附官方出處連結與查證日期，由程式從官方名錄機械抽取，不經語言模型改寫；官方名錄未提供的欄位一律留白，不從公司官網文案、新聞稿、往年慣例或第三方彙整站推測。'
+description: 'FS-TECH COMPANY LTD. 在 COMPUTEX 2026 的官方參展資料，展區為 AI 運算與系統整合方案（AI Computing & System Integration Solution），場館為台北南港展覽館 2 館（TaiNEX 2），攤位號 R0824，官方名錄另記載 5 筆其他外貿協會展會紀錄，本頁一併列出但不計入 COMPUTEX 屆數，本頁事實層每一項均附官方出處連結與查證日期，由程式從官方名錄機械抽取，不經語言模型改寫；官方名錄未提供的欄位一律留白，不從公司官網文案、新聞稿、往年慣例或第三方彙整站推測。'
 date: 2026-07-29
 category: 'Vendors'
 tags:
@@ -26,7 +26,7 @@ sources:
 
 # FS-TECH COMPANY LTD.：COMPUTEX 2026 參展資料
 
-> **30 秒概覽**：FS-TECH COMPANY LTD. 是 COMPUTEX 2026 的參展廠商，攤位在台北南港展覽館 2 館（TaiNEX 2） R0824，歸屬展區為AI 運算與系統整合方案（AI Computing & System Integration Solution），官方名錄記載它參展過 3 屆（2011 至 2026）。本頁只寫官方名錄查得到的事實，每一項附出處連結與查證日期；官方沒公布的欄位留白，不推測。
+> **30 秒概覽**：FS-TECH COMPANY LTD. 是 COMPUTEX 2026 的參展廠商，攤位在台北南港展覽館 2 館（TaiNEX 2）R0824，歸屬展區為 AI 運算與系統整合方案（AI Computing & System Integration Solution），官方名錄目前只記載 2026 這一屆 COMPUTEX。本頁只寫官方名錄查得到的事實，每一項附出處連結與查證日期；官方沒公布的欄位留白，不推測。
 
 這一頁分兩層：下面的事實層全部由程式從 COMPUTEX 官方名錄抽取，逐項可回查；
 策展層（產業位置、跨年度變化）目前留白，等有可查證的來源才寫。
@@ -44,13 +44,16 @@ sources:
 
 ## 歷年參展紀錄
 
-官方參展廠商頁列出的參展年份如下，共 3 屆，涵蓋 2011 至 2026。
+官方參展廠商頁列出 6 筆參展紀錄，其中 1 筆是 COMPUTEX，另外 5 筆是外貿協會主辦的其他展會。下表照官方名錄原樣列出全部，展會名稱那一欄可以分辨。
 
-| 年份 | 展期                     | 展會            |
-| ---- | ------------------------ | --------------- |
-| 2026 | 2026-09-24 至 2026-09-26 | Taiwan Expo USA |
-| 2025 | 2025-10-22 至 2025-10-24 | TAITRONICS      |
-| 2011 | 2011-10-05 至 2011-10-07 | Energy Taiwan   |
+| 年份 | 展期                     | 展會                            |
+| ---- | ------------------------ | ------------------------------- |
+| 2026 | 2026-09-24 至 2026-09-26 | Taiwan Expo USA                 |
+| 2026 | 2026-07-15 至 2026-07-17 | TAIWAN EXPO in Japan            |
+| 2026 | 2026-06-02 至 2026-06-05 | COMPUTEX TAIPEI                 |
+| 2026 | 2026-10-20 至 2026-10-22 | TAITRONICS & AIoT Taiwan        |
+| 2025 | 2025-10-22 至 2025-10-24 | TAITRONICS & AIoT Taiwan        |
+| 2011 | 2011-10-05 至 2011-10-07 | Energy Taiwan & Net-Zero Taiwan |
 
 出處：[官方參展廠商頁](https://www.computextaipei.com.tw/en/exhibitor/7A9EF59761602F5FD9292524493DC424/info.html)，查證日期 2026-07-29。
 

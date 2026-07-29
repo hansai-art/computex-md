@@ -112,31 +112,67 @@ def area_members(area: str, delay: float) -> list[dict[str, str]]:
     return list(out.values())
 
 
+_RE_TIMELINE = re.compile(r'<ul class="timeline">(.*?)</ul>\s*</section>', re.S)
+_RE_YEAR_BLOCK = re.compile(
+    r'<span class="year"[^>]*>\s*(\d{4})\s*</span>(.*?)(?=<span class="year"|\Z)',
+    re.S,
+)
+_RE_SHOW_ROW = re.compile(
+    r'<span class="date-range">\s*(\d{4}/\d{2}/\d{2})\s*-\s*(\d{4}/\d{2}/\d{2})\s*'
+    r"</span>\s*<p>(.*?)</p>",
+    re.S,
+)
+
+
 def _parse_exhibiting_record(html: str) -> list[dict[str, str]]:
-    """歷年參展紀錄。官方以 `年 / 起訖日 / 展名` 三欄列出。"""
-    m = re.search(r"Exhibiting Record(.*?)(?:Collapse|</section>)", html, re.S)
+    """歷年參展紀錄。
+
+    官方的結構是巢狀的：外層一個 `<li>` 是一個**年份**，內層 `<ul>` 才是那一年
+    參加過的**每一場展**。同一年可以有好幾場（外貿協會辦的展不只 COMPUTEX）。
+
+    2026-07-29 修掉的兩個抽取錯誤（都會讓事實層失真，而且不會有人發現）：
+
+    1. **一年只留一列**。舊版把整段壓平成純文字後逐列比對，遇到同一年第二列就
+       `continue`。AAEON 2022 那年參加了「TAIWAN EXPO in Malaysia」與
+       「Taiwan Expo in India」兩場，我們只留了馬來西亞那場，印度那場憑空消失。
+
+    2. **展名被截斷**。舊版展名用 `([A-Za-z ]+)` 抓，只吃得下英文字母與空格，
+       於是含 `'`、`&`、數字的展名全部在第一個非字母字元斷掉：
+       `Taiwan Int'l Fastener Show` → 「Taiwan Int」、
+       `Taipei Aerospace & Defense Technology Exhibition` → 「Taipei Aerospace」。
+       站上因此出現一批看起來像展名、其實是半截字串的資料。
+
+    改成照官方的 DOM 結構抽（年份 span + 該年的每一列 date-range/`<p>`），
+    展名整段照收不做字元過濾。
+
+    完全相同的重複列（年份、起訖日、展名四項全等）收成一列：官方頁面自己會重複
+    （AAEON 的 2026 COMPUTEX TAIPEI 就印了兩次），照抄過來只會讓我們的表格看起來
+    像抄錯。這是唯一做的正規化，其餘一律照抄 —— 包括屆別年份與展期年份對不上的
+    那些列（疫情延期留下的），那些在廠商頁會另外註明。
+    """
+    m = _RE_TIMELINE.search(html)
     if not m:
         return []
-    text = _clean(m.group(1))
-    # 「2026 2026/06/02 - 2026/06/05 COMPUTEX TAIPEI」
-    rows = re.findall(
-        r"(\d{4})\s+(\d{4}/\d{2}/\d{2})\s*-\s*(\d{4}/\d{2}/\d{2})\s+([A-Za-z ]+)",
-        text,
-    )
-    seen: set[str] = set()
-    out = []
-    for year, start, end, show in rows:
-        if year in seen:
-            continue
-        seen.add(year)
-        out.append(
-            {
-                "edition_year": year,
-                "start_date": start.replace("/", "-"),
-                "end_date": end.replace("/", "-"),
-                "show": show.strip(),
-            }
-        )
+
+    out: list[dict[str, str]] = []
+    seen: set[tuple[str, str, str, str]] = set()
+    for year, block in _RE_YEAR_BLOCK.findall(m.group(1)):
+        for start, end, show_raw in _RE_SHOW_ROW.findall(block):
+            show = _clean(show_raw)
+            if not show:
+                continue
+            key = (year, start, end, show)
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append(
+                {
+                    "edition_year": year,
+                    "start_date": start.replace("/", "-"),
+                    "end_date": end.replace("/", "-"),
+                    "show": show,
+                }
+            )
     return out
 
 

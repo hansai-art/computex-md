@@ -187,6 +187,16 @@ if ! bash scripts/tools/check-rtl-safe-css.sh --staged; then
   exit 1
 fi
 
+# ═══ Em dash detector（2026-07-29）═══
+# 讀者看得到的字串一律用冒號，不用全形破折號。這條規則不會壞任何東西，
+# 所以只會被慢慢滲回來 —— 尤其英文標題的 `Title — subtitle` 是預設反射。
+# 一次盤點在 i18n 找到 78 行，其中 5 行是同一天新寫的。註解不算。
+if ! node scripts/tools/check-em-dash.mjs; then
+  echo ""
+  echo "  跳過此檢查（緊急修復）：git commit --no-verify"
+  exit 1
+fi
+
 # ═══ Narrative scope pollution detector（2026-04-11 session α）═══
 # 同一個 commit 理論上只該動一個 narrative domain。多 domain 通常表示
 # 並行 agent 互相污染。警告模式（不擋），要求 commit message 聲明。

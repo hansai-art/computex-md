@@ -1,6 +1,6 @@
 ---
 title: 'Neousys Technology Inc.：COMPUTEX 2026 參展資料'
-description: 'Neousys Technology Inc. 在 COMPUTEX 2026 的官方參展資料，展區為AI 運算與系統整合方案（AI Computing & System Integration Solution），場館為台北南港展覽館 2 館（TaiNEX 2），攤位號 R0129，官方名錄記載的參展年份涵蓋 2011 至 2026，共 14 屆，本頁事實層每一項均附官方出處連結與查證日期，由程式從官方名錄機械抽取，不經語言模型改寫；官方名錄未提供的欄位一律留白，不從公司官網文案、新聞稿、往年慣例或第三方彙整站推測。'
+description: 'Neousys Technology Inc. 在 COMPUTEX 2026 的官方參展資料，展區為 AI 運算與系統整合方案（AI Computing & System Integration Solution），場館為台北南港展覽館 2 館（TaiNEX 2），攤位號 R0129，官方名錄記載的 COMPUTEX 參展年份涵蓋 2011 至 2026，共 14 屆，本頁事實層每一項均附官方出處連結與查證日期，由程式從官方名錄機械抽取，不經語言模型改寫；官方名錄未提供的欄位一律留白，不從公司官網文案、新聞稿、往年慣例或第三方彙整站推測。'
 date: 2026-07-29
 category: 'Vendors'
 tags:
@@ -26,7 +26,7 @@ sources:
 
 # Neousys Technology Inc.：COMPUTEX 2026 參展資料
 
-> **30 秒概覽**：Neousys Technology Inc. 是 COMPUTEX 2026 的參展廠商，攤位在台北南港展覽館 2 館（TaiNEX 2） R0129，歸屬展區為AI 運算與系統整合方案（AI Computing & System Integration Solution），官方名錄記載它參展過 14 屆（2011 至 2026）。本頁只寫官方名錄查得到的事實，每一項附出處連結與查證日期；官方沒公布的欄位留白，不推測。
+> **30 秒概覽**：Neousys Technology Inc. 是 COMPUTEX 2026 的參展廠商，攤位在台北南港展覽館 2 館（TaiNEX 2）R0129，歸屬展區為 AI 運算與系統整合方案（AI Computing & System Integration Solution），官方名錄記載它參展過 14 屆 COMPUTEX（2011 至 2026）。本頁只寫官方名錄查得到的事實，每一項附出處連結與查證日期；官方沒公布的欄位留白，不推測。
 
 這一頁分兩層：下面的事實層全部由程式從 COMPUTEX 官方名錄抽取，逐項可回查；
 策展層（產業位置、跨年度變化）目前留白，等有可查證的來源才寫。
@@ -45,7 +45,7 @@ sources:
 
 ## 歷年參展紀錄
 
-官方參展廠商頁列出的參展年份如下，共 14 屆，涵蓋 2011 至 2026。
+官方參展廠商頁列出的參展紀錄全部是 COMPUTEX，共 14 屆，涵蓋 2011 至 2026。
 
 | 年份 | 展期                     | 展會            |
 | ---- | ------------------------ | --------------- |
@@ -66,7 +66,7 @@ sources:
 
 出處：[官方參展廠商頁](https://www.computextaipei.com.tw/en/exhibitor/FF6AAA6D014B247BD9292524493DC424/info.html)，查證日期 2026-07-29。
 
-注意：其中 2020 屆的展期年份與屆別年份不一致，這是官方名錄原本就這樣記載，本頁照抄不修改。
+注意：其中 2020 年的 COMPUTEX TAIPEI，展期年份與屆別年份不一致，這是官方名錄原本就這樣記載，本頁照抄不修改。
 
 ## 官方名錄未提供的
 

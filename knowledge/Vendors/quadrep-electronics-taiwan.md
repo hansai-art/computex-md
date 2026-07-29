@@ -1,6 +1,6 @@
 ---
 title: 'Quadrep Electronics (Taiwan ) Ltd.：COMPUTEX 2026 參展資料'
-description: 'Quadrep Electronics (Taiwan ) Ltd. 在 COMPUTEX 2026 的官方參展資料，展區為AI 運算與技術（AI Computing & Tech），場館為台北南港展覽館 1 館（TaiNEX 1），攤位號 J0310，官方名錄記載的參展年份涵蓋 2019 至 2026，共 3 屆，本頁事實層每一項均附官方出處連結與查證日期，由程式從官方名錄機械抽取，不經語言模型改寫；官方名錄未提供的欄位一律留白，不從公司官網文案、新聞稿、往年慣例或第三方彙整站推測。'
+description: 'Quadrep Electronics (Taiwan ) Ltd. 在 COMPUTEX 2026 的官方參展資料，展區為 AI 運算與技術（AI Computing & Tech），場館為台北南港展覽館 1 館（TaiNEX 1），攤位號 J0310，官方名錄記載的 COMPUTEX 參展年份涵蓋 2025 至 2026，共 2 屆，官方名錄另記載 1 筆其他外貿協會展會紀錄，本頁一併列出但不計入 COMPUTEX 屆數，本頁事實層每一項均附官方出處連結與查證日期，由程式從官方名錄機械抽取，不經語言模型改寫；官方名錄未提供的欄位一律留白，不從公司官網文案、新聞稿、往年慣例或第三方彙整站推測。'
 date: 2026-07-29
 category: 'Vendors'
 tags: ['COMPUTEX', 'COMPUTEX 2026', '參展廠商', 'AI 運算與技術', 'AI 硬體']
@@ -25,7 +25,7 @@ sources:
 
 # Quadrep Electronics (Taiwan ) Ltd.：COMPUTEX 2026 參展資料
 
-> **30 秒概覽**：Quadrep Electronics (Taiwan ) Ltd. 是 COMPUTEX 2026 的參展廠商，攤位在台北南港展覽館 1 館（TaiNEX 1） J0310，歸屬展區為AI 運算與技術（AI Computing & Tech），官方名錄記載它參展過 3 屆（2019 至 2026）。本頁只寫官方名錄查得到的事實，每一項附出處連結與查證日期；官方沒公布的欄位留白，不推測。
+> **30 秒概覽**：Quadrep Electronics (Taiwan ) Ltd. 是 COMPUTEX 2026 的參展廠商，攤位在台北南港展覽館 1 館（TaiNEX 1）J0310，歸屬展區為 AI 運算與技術（AI Computing & Tech），官方名錄記載它參展過 2 屆 COMPUTEX（2025 至 2026）。本頁只寫官方名錄查得到的事實，每一項附出處連結與查證日期；官方沒公布的欄位留白，不推測。
 
 這一頁分兩層：下面的事實層全部由程式從 COMPUTEX 官方名錄抽取，逐項可回查；
 策展層（產業位置、跨年度變化）目前留白，等有可查證的來源才寫。
@@ -42,7 +42,7 @@ sources:
 
 ## 歷年參展紀錄
 
-官方參展廠商頁列出的參展年份如下，共 3 屆，涵蓋 2019 至 2026。
+官方參展廠商頁列出 3 筆參展紀錄，其中 2 筆是 COMPUTEX（2 屆，涵蓋 2025 至 2026），另外 1 筆是外貿協會主辦的其他展會。下表照官方名錄原樣列出全部，展會名稱那一欄可以分辨。
 
 | 年份 | 展期                     | 展會            |
 | ---- | ------------------------ | --------------- |

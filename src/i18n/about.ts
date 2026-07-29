@@ -75,7 +75,7 @@ export const aboutUI = {
       'Open an issue or send a pull request. Corrections to the fact layer need a source; that is the only requirement, and it applies equally to us and to you.',
 
     'about.figures.vendors': 'exhibitors on file',
-    'about.figures.returning': 'with 2+ editions',
+    'about.figures.returning': 'with 2+ COMPUTEX editions',
     'about.figures.span': 'years covered',
     'about.figures.pages': 'pages published',
 
@@ -179,7 +179,7 @@ export const aboutUI = {
       '開 issue 或直接送 pull request。修正事實層需要附出處，就這一個條件，而且這條件對我們跟對你一樣適用。',
 
     'about.figures.vendors': '家參展廠商在檔',
-    'about.figures.returning': '家有 2 屆以上',
+    'about.figures.returning': '家來過 2 屆以上 COMPUTEX',
     'about.figures.span': '涵蓋年份',
     'about.figures.pages': '頁已發布',
 

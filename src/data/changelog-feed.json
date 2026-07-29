@@ -1,7 +1,14 @@
 {
-  "generatedAt": "2026-07-29T04:53:44.100Z",
+  "generatedAt": "2026-07-29T05:45:42.865Z",
   "source": "git",
   "commits": [
+    {
+      "hash": "0243444111c6068f01cac64a712d3e458409fabb",
+      "date": "2026-07-29T12:57:46+08:00",
+      "author": "Hans",
+      "message": "feat(brand): cross-domain: 站台標記換掉母體的台灣島與國旗，repo 轉公開",
+      "articles": []
+    },
     {
       "hash": "d0a1a541b2468d5a2d42a1302f88b15a9fabc356",
       "date": "2026-07-29T12:33:05+08:00",

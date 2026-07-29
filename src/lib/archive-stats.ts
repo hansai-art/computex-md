@@ -43,13 +43,13 @@ export interface ExhibitorRecord {
 export interface ArchiveStats {
   /** 官方名錄抓到的參展廠商數 */
   vendors: number;
-  /** 其中有 2 屆以上參展紀錄的家數 */
+  /** 其中有 2 屆以上 **COMPUTEX** 參展紀錄的家數 */
   returning: number;
-  /** 參展紀錄涵蓋的最早年份 */
+  /** COMPUTEX 參展紀錄涵蓋的最早年份 */
   earliestYear: number;
-  /** 參展紀錄涵蓋的最晚年份 */
+  /** COMPUTEX 參展紀錄涵蓋的最晚年份 */
   latestYear: number;
-  /** 參展紀錄涵蓋的不同屆數 */
+  /** COMPUTEX 參展紀錄涵蓋的不同屆數 */
   editionsCovered: number;
   /** 有攤位號的家數 */
   withBooth: number;
@@ -97,6 +97,42 @@ function readExhibitors(): ExhibitorRecord[] {
   return out;
 }
 
+/**
+ * 官方名錄的 `exhibiting_record` 收的是**這家公司參加過的所有外貿協會展會**，
+ * 不是只有 COMPUTEX：86 家共 542 列紀錄裡，442 列是 COMPUTEX TAIPEI，其餘 100
+ * 列是 TAITRONICS、TAIPEI AMPA、TIMTOS、台灣形象展（馬來西亞 / 印尼 / 美國 /
+ * 越南 / 菲律賓 / 歐洲）、台北國際自行車展、醫療展、食品展⋯⋯
+ *
+ * 2026-07-29 抓到：本檔原本把整包 record 當成 COMPUTEX 屆數在算，於是
+ *   - 首頁 / 探索頁的「N 家跨屆參展」多算了 6 家
+ *   - 「在 COMPUTEX 待最久的廠商」榜前三名（Leadtek / Siemens / Voltronic）
+ *     其實不是 COMPUTEX 的前三名（真正的是 Dynatron / Innodisk / Chenbro），
+ *     其中 Siemens 的名次有一部分來自它參加過的其他展
+ *
+ * 這正是本站宣稱不會犯的那一類錯：一個掛著「純機械、買不到」的排行榜，算錯了
+ * 對象。榜單標題寫 COMPUTEX，計數就只能數 COMPUTEX。
+ *
+ * 原始的 record 不刪也不藏 —— 廠商頁的「歷年參展紀錄」表照列全部，只是把
+ * 「幾屆 COMPUTEX」跟「其他展會」分開講。
+ */
+function isComputex(show: unknown): boolean {
+  return String(show ?? '')
+    .trim()
+    .toUpperCase()
+    .startsWith('COMPUTEX');
+}
+
+/** 這家廠商的 COMPUTEX 屆別年份集合（不含其他外貿協會展會）。 */
+function computexYears(r: ExhibitorRecord): Set<number> {
+  const ys = new Set<number>();
+  for (const e of r.exhibiting_record ?? []) {
+    if (!isComputex(e.show)) continue;
+    const y = Number.parseInt(String(e.edition_year ?? ''), 10);
+    if (Number.isFinite(y)) ys.add(y);
+  }
+  return ys;
+}
+
 function countPages(lang: string, folder: string): number {
   try {
     return readdirSync(
@@ -120,11 +156,7 @@ export function getArchiveStats(lang = 'zh-TW'): ArchiveStats {
   let returning = 0;
 
   for (const r of exhibitors) {
-    const ys = new Set<number>();
-    for (const e of r.exhibiting_record ?? []) {
-      const y = Number.parseInt(String(e.edition_year ?? ''), 10);
-      if (Number.isFinite(y)) ys.add(y);
-    }
+    const ys = computexYears(r);
     years.push(...ys);
     if (ys.size >= 2) returning += 1;
   }
@@ -190,6 +222,10 @@ function slugByExhibitorId(lang: string): Map<string, string> {
  * 排序純機械：屆數多的在前，同屆數比誰更早開始。這條排序刻意跟未來的
  * Booth Score 同一個性質 — 文案吹捧不加分，只有可查證的紀錄算數。
  *
+ * 只數 COMPUTEX（見 `isComputex` 的說明）。名錄裡有 2 家的歷年紀錄完全不含
+ * COMPUTEX（只參加過其他外貿協會展會，2027 是第一次來），它們屆數為 0，
+ * 自然排在最後 — 這是對的，不是要修掉的邊界。
+ *
  * 沒有對應頁面的廠商直接不列入：首頁只放點得到的東西。
  */
 export function longestExhibitors(
@@ -206,11 +242,7 @@ export function longestExhibitors(
   for (const r of readExhibitors()) {
     const slug = slugs.get(r.exhibitor_id);
     if (!slug) continue;
-    const ys = new Set<number>();
-    for (const e of r.exhibiting_record ?? []) {
-      const y = Number.parseInt(String(e.edition_year ?? ''), 10);
-      if (Number.isFinite(y)) ys.add(y);
-    }
+    const ys = computexYears(r);
     out.push({
       name: r.name,
       editions: ys.size,
@@ -218,6 +250,13 @@ export function longestExhibitors(
       slug,
     });
   }
-  out.sort((a, b) => b.editions - a.editions || a.since - b.since);
+  // 第三順位用名稱：目前有 4 家同為 16 屆、同為 2010 年起，前兩個鍵分不出來。
+  // 沒有第三個鍵的話，誰上榜取決於檔案讀取順序 —— 那是排行榜最不該有的東西。
+  out.sort(
+    (a, b) =>
+      b.editions - a.editions ||
+      a.since - b.since ||
+      a.name.localeCompare(b.name, 'en'),
+  );
   return out.slice(0, limit);
 }

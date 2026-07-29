@@ -61,7 +61,7 @@
 | 🇹🇼 Chinese (zh-TW)             | 87    |
 | 🇺🇸 English (en)                | 1     |
 | 📂 Categories                  | 4     |
-| 👥 Contributors                | 0     |
+| 👥 Contributors                | 1     |
 | ⭐ GitHub Stars                | 0     |
 | 🍴 Forks                       | 0     |
 | 📅 Articles last 7 days        | 1     |
@@ -175,10 +175,11 @@ ShareAlike 會對商業轉載加上條件，勸退的正好是我們想要的那
 ## 👥 貢獻者
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-
-還沒有外部貢獻者。這一區由 `public/api/contributors.json` 自動產生，資料來源是本 repo
-的 commit 紀錄。
-
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/hansai-art"><img src="https://avatars.githubusercontent.com/u/132933660?v=4" width="100px;" alt=""/><br /><sub><b>hansai-art</b></sub></a><br />💻 🖋️ 🌍</td>
+  </tr>
+</table>
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ---

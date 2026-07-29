@@ -142,7 +142,7 @@ export const ui = {
     'article.signature.contribute': 'Edit or contribute',
     'article.signature.support': 'Sponsor upkeep',
     'article.signature.note':
-      'COMPUTEX.md is open-source, free, and ad-free, and upkeep has some costs. All three are welcome — pick just one.',
+      'COMPUTEX.md is open-source, free, and ad-free, and upkeep has some costs. All three are welcome: pick just one.',
     'article.signature.copied': 'Link copied',
     // category-hub UI
     'category.articleCount': '{n} articles',

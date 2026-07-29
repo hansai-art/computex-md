@@ -331,7 +331,13 @@
           "edition_year": "2022",
           "start_date": "2022-09-29",
           "end_date": "2022-10-01",
-          "show": "Taiwan Int"
+          "show": "Taiwan Int'l Ocean and Fisheries Industry Show"
+        },
+        {
+          "edition_year": "2022",
+          "start_date": "2022-09-29",
+          "end_date": "2022-10-01",
+          "show": "Taiwan Smart Agriweek"
         },
         {
           "edition_year": "2021",
@@ -367,13 +373,13 @@
           "edition_year": "2012",
           "start_date": "2012-10-09",
           "end_date": "2012-10-12",
-          "show": "TAITRONICS"
+          "show": "TAITRONICS & AIoT Taiwan"
         },
         {
           "edition_year": "2011",
           "start_date": "2011-10-10",
           "end_date": "2011-10-13",
-          "show": "TAITRONICS"
+          "show": "TAITRONICS & AIoT Taiwan"
         }
       ],
       "source_url": "https://www.computextaipei.com.tw/en/exhibitor/863BF807EF326F91D9292524493DC424/info.html",
@@ -418,13 +424,25 @@
           "edition_year": "2025",
           "start_date": "2025-09-18",
           "end_date": "2025-09-20",
-          "show": "Taipei Aerospace"
+          "show": "Taipei Aerospace & Defense Technology Exhibition"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
         },
         {
           "edition_year": "2024",
           "start_date": "2024-05-16",
           "end_date": "2024-05-18",
           "show": "TAIWAN EXPO IN INDONESIA"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-12-29",
+          "end_date": "2024-12-31",
+          "show": "Taiwan XR Pavilion at AWE"
         },
         {
           "edition_year": "2023",
@@ -454,7 +472,13 @@
           "edition_year": "2016",
           "start_date": "2016-11-09",
           "end_date": "2016-11-11",
-          "show": "Taiwan International Fisheries"
+          "show": "Taiwan International Fisheries & Seafood Show"
+        },
+        {
+          "edition_year": "2016",
+          "start_date": "2016-05-31",
+          "end_date": "2016-06-04",
+          "show": "COMPUTEX TAIPEI"
         },
         {
           "edition_year": "2015",
@@ -670,6 +694,12 @@
           "show": "Taiwan Pavilion Cybersec Asia"
         },
         {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
           "edition_year": "2024",
           "start_date": "2024-06-04",
           "end_date": "2024-06-07",
@@ -750,49 +780,67 @@
           "edition_year": "2024",
           "start_date": "2024-04-17",
           "end_date": "2024-04-20",
-          "show": "TAIPEI AMPA"
+          "show": "TAIPEI AMPA/E-Mobility Taiwan & AUTOTRONICS TAIPEI"
         },
         {
           "edition_year": "2023",
           "start_date": "2023-04-12",
           "end_date": "2023-04-15",
-          "show": "TAIPEI AMPA"
+          "show": "TAIPEI AMPA/E-Mobility Taiwan & AUTOTRONICS TAIPEI"
         },
         {
           "edition_year": "2022",
           "start_date": "2022-04-20",
           "end_date": "2022-04-23",
-          "show": "TAIPEI AMPA"
+          "show": "TAIPEI AMPA/E-Mobility Taiwan & AUTOTRONICS TAIPEI"
         },
         {
           "edition_year": "2021",
           "start_date": "2021-04-14",
           "end_date": "2021-04-17",
-          "show": "TAIPEI AMPA"
+          "show": "TAIPEI AMPA/E-Mobility Taiwan & AUTOTRONICS TAIPEI"
         },
         {
           "edition_year": "2019",
           "start_date": "2019-04-24",
           "end_date": "2019-04-27",
-          "show": "TAIPEI AMPA"
+          "show": "TAIPEI AMPA/E-Mobility Taiwan & AUTOTRONICS TAIPEI"
         },
         {
           "edition_year": "2018",
           "start_date": "2018-04-25",
           "end_date": "2018-04-28",
-          "show": "Taiwan Int"
+          "show": "Taiwan Int'l Lighting Show"
+        },
+        {
+          "edition_year": "2018",
+          "start_date": "2018-04-11",
+          "end_date": "2018-04-14",
+          "show": "TAIPEI AMPA/E-Mobility Taiwan & AUTOTRONICS TAIPEI"
         },
         {
           "edition_year": "2017",
           "start_date": "2017-04-19",
           "end_date": "2017-04-22",
-          "show": "TAIPEI AMPA"
+          "show": "TAIPEI AMPA/E-Mobility Taiwan & AUTOTRONICS TAIPEI"
+        },
+        {
+          "edition_year": "2017",
+          "start_date": "2017-04-12",
+          "end_date": "2017-04-15",
+          "show": "Taiwan Int'l Lighting Show"
         },
         {
           "edition_year": "2016",
           "start_date": "2016-04-06",
           "end_date": "2016-04-09",
-          "show": "TAIPEI AMPA"
+          "show": "TAIPEI AMPA/E-Mobility Taiwan & AUTOTRONICS TAIPEI"
+        },
+        {
+          "edition_year": "2016",
+          "start_date": "2016-04-13",
+          "end_date": "2016-04-16",
+          "show": "Taiwan Int'l Lighting Show"
         },
         {
           "edition_year": "2015",
@@ -801,34 +849,82 @@
           "show": "COMPUTEX TAIPEI"
         },
         {
+          "edition_year": "2015",
+          "start_date": "2015-03-25",
+          "end_date": "2015-03-28",
+          "show": "Taiwan Int'l Lighting Show"
+        },
+        {
+          "edition_year": "2015",
+          "start_date": "2015-10-06",
+          "end_date": "2015-10-09",
+          "show": "TAITRONICS & AIoT Taiwan"
+        },
+        {
           "edition_year": "2014",
           "start_date": "2014-03-20",
           "end_date": "2014-03-23",
-          "show": "Taiwan Int"
+          "show": "Taiwan Int'l Lighting Show"
+        },
+        {
+          "edition_year": "2014",
+          "start_date": "2014-10-06",
+          "end_date": "2014-10-09",
+          "show": "TAITRONICS & AIoT Taiwan"
         },
         {
           "edition_year": "2013",
           "start_date": "2013-03-26",
           "end_date": "2013-03-29",
-          "show": "Taiwan Int"
+          "show": "Taiwan Int'l Lighting Show"
+        },
+        {
+          "edition_year": "2013",
+          "start_date": "2013-10-08",
+          "end_date": "2013-10-11",
+          "show": "TAITRONICS & AIoT Taiwan"
         },
         {
           "edition_year": "2012",
           "start_date": "2012-10-09",
           "end_date": "2012-10-12",
-          "show": "TAITRONICS"
+          "show": "TAITRONICS & AIoT Taiwan"
+        },
+        {
+          "edition_year": "2012",
+          "start_date": "2012-04-11",
+          "end_date": "2012-04-14",
+          "show": "TAIPEI AMPA/E-Mobility Taiwan & AUTOTRONICS TAIPEI"
+        },
+        {
+          "edition_year": "2012",
+          "start_date": "2012-03-13",
+          "end_date": "2012-03-16",
+          "show": "Taiwan Int'l Lighting Show"
         },
         {
           "edition_year": "2011",
           "start_date": "2011-10-10",
           "end_date": "2011-10-13",
-          "show": "TAITRONICS"
+          "show": "TAITRONICS & AIoT Taiwan"
+        },
+        {
+          "edition_year": "2011",
+          "start_date": "2011-04-12",
+          "end_date": "2011-04-15",
+          "show": "TAIPEI AMPA/E-Mobility Taiwan & AUTOTRONICS TAIPEI"
+        },
+        {
+          "edition_year": "2011",
+          "start_date": "2011-03-18",
+          "end_date": "2011-03-21",
+          "show": "Taiwan Int'l Lighting Show"
         },
         {
           "edition_year": "2010",
           "start_date": "2010-10-11",
           "end_date": "2010-10-14",
-          "show": "TAITRONICS"
+          "show": "TAITRONICS & AIoT Taiwan"
         }
       ],
       "source_url": "https://www.computextaipei.com.tw/en/exhibitor/F7AB586454C95B1BD9292524493DC424/info.html",
@@ -877,25 +973,25 @@
           "edition_year": "2019",
           "start_date": "2019-10-24",
           "end_date": "2019-10-27",
-          "show": "Kaohsiung Int"
+          "show": "Kaohsiung Int’l Hotel, Restaurant, Baking and Catering Show"
         },
         {
           "edition_year": "2018",
           "start_date": "2018-10-25",
           "end_date": "2018-10-28",
-          "show": "Kaohsiung Int"
+          "show": "Kaohsiung Int’l Hotel, Restaurant, Baking and Catering Show"
         },
         {
           "edition_year": "2017",
           "start_date": "2017-06-21",
           "end_date": "2017-06-24",
-          "show": "Taiwan Int"
+          "show": "Taiwan Int'l Hotel, Restaurant & Catering Show (Taiwan HORECA)"
         },
         {
           "edition_year": "2015",
           "start_date": "2015-06-24",
           "end_date": "2015-06-27",
-          "show": "Taiwan Int"
+          "show": "Taiwan Int'l Hotel, Restaurant & Catering Show (Taiwan HORECA)"
         }
       ],
       "source_url": "https://www.computextaipei.com.tw/en/exhibitor/F0B56788D85BCB82D9292524493DC424/info.html",
@@ -985,16 +1081,34 @@
           "show": "Taiwan Expo USA"
         },
         {
+          "edition_year": "2026",
+          "start_date": "2026-07-15",
+          "end_date": "2026-07-17",
+          "show": "TAIWAN EXPO in Japan"
+        },
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2026",
+          "start_date": "2026-10-20",
+          "end_date": "2026-10-22",
+          "show": "TAITRONICS & AIoT Taiwan"
+        },
+        {
           "edition_year": "2025",
           "start_date": "2025-10-22",
           "end_date": "2025-10-24",
-          "show": "TAITRONICS"
+          "show": "TAITRONICS & AIoT Taiwan"
         },
         {
           "edition_year": "2011",
           "start_date": "2011-10-05",
           "end_date": "2011-10-07",
-          "show": "Energy Taiwan"
+          "show": "Energy Taiwan & Net-Zero Taiwan"
         }
       ],
       "source_url": "https://www.computextaipei.com.tw/en/exhibitor/7A9EF59761602F5FD9292524493DC424/info.html",
@@ -1047,6 +1161,12 @@
           "show": "Taiwan Expo USA"
         },
         {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
           "edition_year": "2024",
           "start_date": "2024-06-04",
           "end_date": "2024-06-07",
@@ -1068,37 +1188,43 @@
           "edition_year": "2017",
           "start_date": "2017-10-11",
           "end_date": "2017-10-14",
-          "show": "TAITRONICS"
+          "show": "TAITRONICS & AIoT Taiwan"
         },
         {
           "edition_year": "2016",
           "start_date": "2016-10-06",
           "end_date": "2016-10-09",
-          "show": "TAITRONICS"
+          "show": "TAITRONICS & AIoT Taiwan"
         },
         {
           "edition_year": "2015",
           "start_date": "2015-10-06",
           "end_date": "2015-10-09",
-          "show": "TAITRONICS"
+          "show": "TAITRONICS & AIoT Taiwan"
         },
         {
           "edition_year": "2014",
           "start_date": "2014-10-06",
           "end_date": "2014-10-09",
-          "show": "TAITRONICS"
+          "show": "TAITRONICS & AIoT Taiwan"
         },
         {
           "edition_year": "2011",
           "start_date": "2011-10-10",
           "end_date": "2011-10-13",
-          "show": "TAITRONICS"
+          "show": "TAITRONICS & AIoT Taiwan"
         },
         {
           "edition_year": "2010",
           "start_date": "2010-10-11",
           "end_date": "2010-10-14",
-          "show": "TAITRONICS"
+          "show": "TAITRONICS & AIoT Taiwan"
+        },
+        {
+          "edition_year": "2010",
+          "start_date": "2010-06-01",
+          "end_date": "2010-06-05",
+          "show": "COMPUTEX TAIPEI"
         }
       ],
       "source_url": "https://www.computextaipei.com.tw/en/exhibitor/FF57410B3C81B6BED9292524493DC424/info.html",
@@ -1164,6 +1290,12 @@
           "start_date": "2026-09-24",
           "end_date": "2026-09-26",
           "show": "Taiwan Expo USA"
+        },
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
         },
         {
           "edition_year": "2025",
@@ -1565,6 +1697,12 @@
           "show": "Taiwan Expo USA"
         },
         {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
           "edition_year": "2024",
           "start_date": "2024-06-04",
           "end_date": "2024-06-07",
@@ -1574,7 +1712,25 @@
           "edition_year": "2023",
           "start_date": "2023-09-14",
           "end_date": "2023-09-16",
-          "show": "Taipei Aerospace"
+          "show": "Taipei Aerospace & Defense Technology Exhibition"
+        },
+        {
+          "edition_year": "2023",
+          "start_date": "2023-10-05",
+          "end_date": "2023-10-07",
+          "show": "Taiwan Expo in India"
+        },
+        {
+          "edition_year": "2023",
+          "start_date": "2023-07-20",
+          "end_date": "2023-07-22",
+          "show": "Taiwan Expo in Thailand"
+        },
+        {
+          "edition_year": "2023",
+          "start_date": "2023-10-18",
+          "end_date": "2023-10-20",
+          "show": "Energy Taiwan & Net-Zero Taiwan"
         }
       ],
       "source_url": "https://www.computextaipei.com.tw/en/exhibitor/814777545F28B5A3D9292524493DC424/info.html",
@@ -1683,6 +1839,12 @@
           "start_date": "2026-06-02",
           "end_date": "2026-06-05",
           "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2026",
+          "start_date": "2026-09-17",
+          "end_date": "2026-09-19",
+          "show": "TAIWAN EXPO in Philippines"
         },
         {
           "edition_year": "2025",

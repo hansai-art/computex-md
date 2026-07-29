@@ -1,6 +1,6 @@
 ---
 title: 'JPC connectivity：COMPUTEX 2026 參展資料'
-description: 'JPC connectivity 在 COMPUTEX 2026 的官方參展資料，展區為AI 運算與技術（AI Computing & Tech），場館為台北南港展覽館 1 館（TaiNEX 1），攤位號 J0410，官方名錄記載的參展年份涵蓋 2010 至 2026，共 10 屆，本頁事實層每一項均附官方出處連結與查證日期，由程式從官方名錄機械抽取，不經語言模型改寫；官方名錄未提供的欄位一律留白，不從公司官網文案、新聞稿、往年慣例或第三方彙整站推測。'
+description: 'JPC connectivity 在 COMPUTEX 2026 的官方參展資料，展區為 AI 運算與技術（AI Computing & Tech），場館為台北南港展覽館 1 館（TaiNEX 1），攤位號 J0410，官方名錄記載的 COMPUTEX 參展年份涵蓋 2010 至 2026，共 8 屆，官方名錄另記載 4 筆其他外貿協會展會紀錄，本頁一併列出但不計入 COMPUTEX 屆數，本頁事實層每一項均附官方出處連結與查證日期，由程式從官方名錄機械抽取，不經語言模型改寫；官方名錄未提供的欄位一律留白，不從公司官網文案、新聞稿、往年慣例或第三方彙整站推測。'
 date: 2026-07-29
 category: 'Vendors'
 tags: ['COMPUTEX', 'COMPUTEX 2026', '參展廠商', 'AI 運算與技術', 'AI 硬體']
@@ -25,7 +25,7 @@ sources:
 
 # JPC connectivity：COMPUTEX 2026 參展資料
 
-> **30 秒概覽**：JPC connectivity 是 COMPUTEX 2026 的參展廠商，攤位在台北南港展覽館 1 館（TaiNEX 1） J0410，歸屬展區為AI 運算與技術（AI Computing & Tech），官方名錄記載它參展過 10 屆（2010 至 2026）。本頁只寫官方名錄查得到的事實，每一項附出處連結與查證日期；官方沒公布的欄位留白，不推測。
+> **30 秒概覽**：JPC connectivity 是 COMPUTEX 2026 的參展廠商，攤位在台北南港展覽館 1 館（TaiNEX 1）J0410，歸屬展區為 AI 運算與技術（AI Computing & Tech），官方名錄記載它參展過 8 屆 COMPUTEX（2010 至 2026）。本頁只寫官方名錄查得到的事實，每一項附出處連結與查證日期；官方沒公布的欄位留白，不推測。
 
 這一頁分兩層：下面的事實層全部由程式從 COMPUTEX 官方名錄抽取，逐項可回查；
 策展層（產業位置、跨年度變化）目前留白，等有可查證的來源才寫。
@@ -42,24 +42,26 @@ sources:
 
 ## 歷年參展紀錄
 
-官方參展廠商頁列出的參展年份如下，共 10 屆，涵蓋 2010 至 2026。
+官方參展廠商頁列出 12 筆參展紀錄，其中 8 筆是 COMPUTEX（8 屆，涵蓋 2010 至 2026），另外 4 筆是外貿協會主辦的其他展會。下表照官方名錄原樣列出全部，展會名稱那一欄可以分辨。
 
-| 年份 | 展期                     | 展會                         |
-| ---- | ------------------------ | ---------------------------- |
-| 2026 | 2026-06-02 至 2026-06-05 | COMPUTEX TAIPEI              |
-| 2025 | 2025-04-23 至 2025-04-26 | TAIPEI AMPA                  |
-| 2024 | 2024-06-04 至 2024-06-07 | COMPUTEX TAIPEI              |
-| 2023 | 2023-05-30 至 2023-06-02 | COMPUTEX TAIPEI              |
-| 2022 | 2022-04-20 至 2022-04-23 | TAIPEI AMPA                  |
-| 2021 | 2021-12-21 至 2021-12-23 | Photonics Festival in TAIWAN |
-| 2020 | 2021-05-31 至 2021-06-30 | COMPUTEX TAIPEI              |
-| 2019 | 2019-05-28 至 2019-06-01 | COMPUTEX TAIPEI              |
-| 2011 | 2011-05-31 至 2011-06-04 | COMPUTEX TAIPEI              |
-| 2010 | 2010-06-01 至 2010-06-05 | COMPUTEX TAIPEI              |
+| 年份 | 展期                     | 展會                                               |
+| ---- | ------------------------ | -------------------------------------------------- |
+| 2026 | 2026-06-02 至 2026-06-05 | COMPUTEX TAIPEI                                    |
+| 2026 | 2026-04-14 至 2026-04-17 | TAIPEI AMPA/E-Mobility Taiwan & AUTOTRONICS TAIPEI |
+| 2025 | 2025-04-23 至 2025-04-26 | TAIPEI AMPA/E-Mobility Taiwan & AUTOTRONICS TAIPEI |
+| 2025 | 2025-05-20 至 2025-05-23 | COMPUTEX TAIPEI                                    |
+| 2024 | 2024-06-04 至 2024-06-07 | COMPUTEX TAIPEI                                    |
+| 2023 | 2023-05-30 至 2023-06-02 | COMPUTEX TAIPEI                                    |
+| 2022 | 2022-04-20 至 2022-04-23 | TAIPEI AMPA/E-Mobility Taiwan & AUTOTRONICS TAIPEI |
+| 2021 | 2021-12-21 至 2021-12-23 | Photonics Festival in TAIWAN                       |
+| 2020 | 2021-05-31 至 2021-06-30 | COMPUTEX TAIPEI                                    |
+| 2019 | 2019-05-28 至 2019-06-01 | COMPUTEX TAIPEI                                    |
+| 2011 | 2011-05-31 至 2011-06-04 | COMPUTEX TAIPEI                                    |
+| 2010 | 2010-06-01 至 2010-06-05 | COMPUTEX TAIPEI                                    |
 
 出處：[官方參展廠商頁](https://www.computextaipei.com.tw/en/exhibitor/E96B5C9DB467586FD9292524493DC424/info.html)，查證日期 2026-07-29。
 
-注意：其中 2020 屆的展期年份與屆別年份不一致，這是官方名錄原本就這樣記載，本頁照抄不修改。
+注意：其中 2020 年的 COMPUTEX TAIPEI，展期年份與屆別年份不一致，這是官方名錄原本就這樣記載，本頁照抄不修改。
 
 ## 官方名錄未提供的
 

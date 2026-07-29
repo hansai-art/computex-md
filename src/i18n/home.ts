@@ -19,7 +19,7 @@ export const homeUI = {
     // ── Hero stats（數字由 archive-stats 現算，這裡只有標籤）──
     'hero.stat.vendors.label': 'exhibitors',
     'hero.stat.returning.label': 'returning',
-    'hero.stat.editions.label': 'editions covered',
+    'hero.stat.editions.label': 'COMPUTEX editions covered',
     'hero.stat.earliest.label': 'earliest on record',
 
     'home.hero.subtitle': 'A living archive of Taiwan AI hardware',
@@ -88,7 +88,7 @@ export const homeUI = {
     'home.shelf.unit': 'pages',
     'home.shelf.empty':
       'Nothing here yet. This section stays empty until there are facts to put in it.',
-    'home.shelf.vendors.longestLabel': 'Longest exhibiting records on file',
+    'home.shelf.vendors.longestLabel': 'Longest COMPUTEX records on file',
     'home.shelf.vendors.blurb':
       'One page per exhibiting company, extracted from the official directory: venue, booth number, official site, product tags, and the full year-by-year exhibiting record.',
     'home.shelf.products.blurb':
@@ -137,7 +137,7 @@ export const homeUI = {
     // ── Hero stats（數字由 archive-stats 現算，這裡只有標籤）──
     'hero.stat.vendors.label': '家參展廠商',
     'hero.stat.returning.label': '家跨屆參展',
-    'hero.stat.editions.label': '屆參展紀錄',
+    'hero.stat.editions.label': '屆 COMPUTEX 有紀錄',
     'hero.stat.earliest.label': '最早紀錄年份',
 
     'home.hero.subtitle': '台灣 AI 硬體產業活體年鑑',
@@ -200,7 +200,7 @@ export const homeUI = {
     'home.shelf.lead': '數字從檔案數出來，不是估的。空的就是空的。',
     'home.shelf.unit': '頁',
     'home.shelf.empty': '還沒有內容。要有可查證的事實才會生出頁面。',
-    'home.shelf.vendors.longestLabel': '官方名錄上參展紀錄最長的幾家',
+    'home.shelf.vendors.longestLabel': '官方名錄上 COMPUTEX 紀錄最長的幾家',
     'home.shelf.vendors.blurb':
       '一家參展廠商一頁，從官方名錄機械抽取：場館、攤位號、官方網站、產品標籤，以及逐年的完整參展紀錄。',
     'home.shelf.products.blurb': '展出的產品與技術，跟做它的公司分開放。',
