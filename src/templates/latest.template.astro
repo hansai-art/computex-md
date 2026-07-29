@@ -25,6 +25,7 @@
  * stays inline (locale logic, same pattern as changelog.template).
  * Design: reports/latest-articles-discoverability-design-2026-06-09.md §WS2.
  */
+import { withTrailingSlash } from '../utils/href';
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
 import ArticleCard from '../components/ArticleCard.astro';
@@ -96,7 +97,9 @@ const localeFor = (l: string) =>
   l === 'en' ? 'en-US' : l === 'zh-TW' ? 'zh-TW' : l;
 
 function hrefFor(a: { category: string; slug: string }) {
-  return `${langPrefix}/${a.category}/${encodeURIComponent(a.slug)}`;
+  return withTrailingSlash(
+    `${langPrefix}/${a.category}/${encodeURIComponent(a.slug)}`,
+  );
 }
 // Compact MM/DD for the left date-nav rail.
 function fmtDayShort(d: string) {
@@ -292,7 +295,7 @@ const navMonthsData = navMonths.map((m) => ({
 
       <div class="mt-10 border-t border-[#f1f5f9] pt-6 text-center">
         <a
-          href={`${langPrefix}/changelog`}
+          href={withTrailingSlash(`${langPrefix}/changelog`)}
           data-ga-section="latest_page"
           data-ga-label="to_changelog"
           class="text-[0.9rem] font-semibold text-[#10b981] no-underline hover:underline"

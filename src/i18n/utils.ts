@@ -1,6 +1,7 @@
 import { ui, defaultLang, showDefaultLang } from './ui';
 import type { Lang } from '../types';
 import { ALL_LANGUAGE_CODES } from '../config/languages';
+import { withTrailingSlash } from '../utils/href';
 
 // 2026-04-25 β7 Phase 1：fix B5（i18n-evolution-roadmap audit）
 // 之前用 `lang in ui` 檢查，ui object 只 import 4 個 i18n module（en/ja/ko/zh-TW）
@@ -52,8 +53,16 @@ export function useTranslations(lang: Lang) {
   };
 }
 
+/**
+ * 2026-07-30：輸出一律過 withTrailingSlash。本站 canonical 與 sitemap 用的是
+ * 帶斜線的形式（Astro build.format 預設 'directory'），不帶斜線的內鏈在
+ * Cloudflare Pages 會先吃一個 308。當天掃 dist：不帶斜線 11,346 條、
+ * 帶斜線只有 1,129 條，等於九成內鏈每一次點擊都白丟一次權重。
+ */
 export function useTranslatedPath(lang: Lang) {
   return function translatePath(path: string, l: string = lang) {
-    return !showDefaultLang && l === defaultLang ? path : `/${l}${path}`;
+    return withTrailingSlash(
+      !showDefaultLang && l === defaultLang ? path : `/${l}${path}`,
+    );
   };
 }

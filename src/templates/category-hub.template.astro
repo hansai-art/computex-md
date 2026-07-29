@@ -16,6 +16,7 @@
  *
  * 2026-05-03 sleepy-colden P1 follow-up unification（在 article.template.astro 之後）。
  */
+import { withTrailingSlash } from '../utils/href';
 import { marked } from 'marked';
 import Layout from '../layouts/Layout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
@@ -382,7 +383,9 @@ const otherCategories = categories
           <ol class="crumb-list m-0 flex list-none items-center gap-2 p-0">
             <li>
               <a
-                href={langUrlPrefix === '' ? '/' : langUrlPrefix}
+                href={langUrlPrefix === ''
+                  ? '/'
+                  : withTrailingSlash(langUrlPrefix)}
                 style={`color: ${categoryInfo.color};`}>{t('article.home')}</a
               >
             </li>
@@ -516,7 +519,7 @@ const otherCategories = categories
                 </span>
                 {otherCategories.map((cat) => (
                   <a
-                    href={`${langUrlPrefix}/${cat.key}`}
+                    href={withTrailingSlash(`${langUrlPrefix}/${cat.key}`)}
                     class="othercat-link flex items-center justify-between rounded px-2 py-[0.35rem] text-[0.78rem] text-[var(--color-ink-soft)] no-underline opacity-75 transition-all duration-150 hover:bg-[rgba(45,80,22,0.06)] hover:text-[var(--categoryColor,#2d5016)] hover:opacity-100"
                   >
                     <span>
@@ -542,7 +545,9 @@ const otherCategories = categories
                         <ArticleCard
                           density="detailed"
                           titleTag="h3"
-                          href={`${langUrlPrefix}/${category}/${encodeURIComponent(article.slug)}`}
+                          href={withTrailingSlash(
+                            `${langUrlPrefix}/${category}/${encodeURIComponent(article.slug)}`,
+                          )}
                           title={article.title}
                           description={article.description}
                           categoryColor={categoryInfo.color}
@@ -651,7 +656,9 @@ const otherCategories = categories
                           <ArticleCard
                             density="row"
                             titleTag="h3"
-                            href={`${langUrlPrefix}/${category}/${encodeURIComponent(article.slug)}`}
+                            href={withTrailingSlash(
+                              `${langUrlPrefix}/${category}/${encodeURIComponent(article.slug)}`,
+                            )}
                             title={article.title}
                             description={article.description}
                             categoryColor={categoryInfo.color}
@@ -787,7 +794,7 @@ const otherCategories = categories
                 <div class="othercats-chips">
                   {otherCategories.map((cat) => (
                     <a
-                      href={`${langUrlPrefix}/${cat.key}`}
+                      href={withTrailingSlash(`${langUrlPrefix}/${cat.key}`)}
                       class="othercat-chip"
                     >
                       <span>{cat.icon}</span> {cat.name}
@@ -813,7 +820,11 @@ const otherCategories = categories
               </p>
               <div class="flex flex-wrap justify-center gap-4 max-[768px]:flex-col max-[768px]:items-center">
                 <a
-                  href={langUrlPrefix === '' ? '/' : langUrlPrefix}
+                  href={
+                    langUrlPrefix === ''
+                      ? '/'
+                      : withTrailingSlash(langUrlPrefix)
+                  }
                   class="inline-flex items-center gap-2 rounded-xl bg-[var(--categoryColor)] px-8 py-4 font-semibold text-white no-underline transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_16px_rgba(0,0,0,0.2)]"
                 >
                   {t('article.backToHome')}

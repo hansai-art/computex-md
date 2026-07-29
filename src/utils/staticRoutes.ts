@@ -15,6 +15,7 @@ import { readdirSync } from 'fs';
 import { resolve, join } from 'path';
 import type { Lang } from '../config/languages';
 import { LANGUAGES } from '../config/languages';
+import { withTrailingSlash } from './href';
 
 const NON_DEFAULT_LANGS = LANGUAGES.filter(
   (l) => l.enabled && !l.isDefault,
@@ -142,16 +143,21 @@ export function staticPageExists(
 /**
  * Nav / dropdown 用的 lang-aware href：該語言版本存在 → 帶語言前綴；
  * 不存在 → 退回 zh 路徑（讀者至少到得了內容，不是 404）。
+ *
+ * 2026-07-30：輸出一律過 withTrailingSlash。本站 canonical 與 sitemap 都是
+ * 帶斜線的形式，不帶斜線的內鏈會先吃一個 308（當天 dist 掃到 11,346 條）。
  */
 export function resolveStaticHref(
   lang: Lang | 'zh-TW',
   basePath: string,
 ): string {
-  if (lang === 'zh-TW') return basePath;
+  if (lang === 'zh-TW') return withTrailingSlash(basePath);
   if (staticPageExists(lang, basePath)) {
-    return basePath === '/' ? `/${lang}` : `/${lang}${basePath}`;
+    return withTrailingSlash(
+      basePath === '/' ? `/${lang}` : `/${lang}${basePath}`,
+    );
   }
-  return basePath;
+  return withTrailingSlash(basePath);
 }
 
 export { NON_DEFAULT_LANGS };

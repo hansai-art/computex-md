@@ -22,6 +22,7 @@
  * 版面刻意跟 about.template.astro 對齊（同一組 prose 寬度、分隔線、編號欄），
  * 兩頁會被同一個人連著讀。
  */
+import { withTrailingSlash } from '../utils/href';
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
 import { getLangFromUrl, useTranslations } from '../i18n/utils';
@@ -329,7 +330,7 @@ const REPO = 'https://github.com/hansai-art/computex-md';
             >{CONTACT}</a
           >
           <a
-            href={`${langPrefix}/about`}
+            href={withTrailingSlash(`${langPrefix}/about`)}
             data-ga-section="contribute_contact"
             data-ga-label="about"
             class="rounded-lg border-2 border-[#252126] bg-white px-8 py-3 text-[0.95rem] font-semibold text-[#252126] no-underline transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#252126] hover:text-white"

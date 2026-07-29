@@ -1,3 +1,4 @@
+import { withTrailingSlash } from './href';
 import { readFile, readdir } from 'fs/promises';
 import { resolve } from 'path';
 import type { Lang } from '../config/languages';
@@ -342,12 +343,17 @@ export async function getLangSwitchPath(currentPath: string) {
   // below were hardcoded to 6 languages, so vi/id/pt/hi silently never
   // appeared in hreflang tags or the language switcher despite having real
   // translated content — callers should read `langs` going forward.
+  // 2026-07-30：link 一律過 withTrailingSlash。語言切換器每頁 3 條，200 頁
+  // 就是 600 條 308；hreflang 也讀同一份資料，宣告會轉址的網址等於自廢武功。
   const langsOut: Partial<Record<Lang, { link: string; has: boolean }>> = {
-    'zh-TW': { link: links.zh ?? '/', has: has.zh ?? true },
+    'zh-TW': {
+      link: withTrailingSlash(links.zh ?? '/'),
+      has: has.zh ?? true,
+    },
   };
   for (const lang of NON_DEFAULT_ENABLED_LANGS) {
     langsOut[lang] = {
-      link: links[lang] ?? `/${lang}`,
+      link: withTrailingSlash(links[lang] ?? `/${lang}`),
       has: has[lang] ?? false,
     };
   }
@@ -355,12 +361,12 @@ export async function getLangSwitchPath(currentPath: string) {
   // Map abstract result back to legacy named exports for backwards compat with
   // existing callers. Future: callers should iterate `langs` directly.
   return {
-    zhLink: links.zh ?? '/',
-    enLink: links.en ?? '/en',
-    jaLink: links.ja ?? '/ja',
-    koLink: links.ko ?? '/ko',
-    frLink: links.fr ?? '/fr',
-    esLink: links.es ?? '/es',
+    zhLink: withTrailingSlash(links.zh ?? '/'),
+    enLink: withTrailingSlash(links.en ?? '/en'),
+    jaLink: withTrailingSlash(links.ja ?? '/ja'),
+    koLink: withTrailingSlash(links.ko ?? '/ko'),
+    frLink: withTrailingSlash(links.fr ?? '/fr'),
+    esLink: withTrailingSlash(links.es ?? '/es'),
     hasZh: has.zh ?? true,
     hasEn: has.en ?? true,
     hasJa: has.ja ?? true,

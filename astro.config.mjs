@@ -149,11 +149,17 @@ export default defineConfig({
       // claim "modified today" on every build, the exact anti-pattern Google
       // names (→ distrusts our lastmod site-wide). lastmod is now set per-URL in
       // serialize() from content-dates.json. See SEO plan report §1.1.
-      // Customize priority and changefreq for different pages
-      customPages: [
-        'https://computex.taiwanai.ngo/?changefreq=daily&priority=1.0',
-        'https://computex.taiwanai.ngo/en?changefreq=daily&priority=1.0',
-      ],
+      // 2026-07-30: customPages REMOVED. It held two entries that tried to set
+      // per-page priority by appending a query string:
+      //   https://computex.taiwanai.ngo/?changefreq=daily&priority=1.0
+      //   https://computex.taiwanai.ngo/en?changefreq=daily&priority=1.0
+      // customPages does not parse query strings — it just adds the literal
+      // string as a <loc>. So the live sitemap announced two junk URLs, and the
+      // homepage appeared TWICE (once real, once with the query). The /en one
+      // also 308s (missing trailing slash). Announcing URLs we don't stand
+      // behind is the same disease as the 2026-07-17 alias episode.
+      // Per-page priority now lives in serialize() below, which is the only
+      // place @astrojs/sitemap actually honours it.
       i18n: {
         defaultLocale: DEFAULT_LANGUAGE.code,
         locales: sitemapLocales,
@@ -193,6 +199,18 @@ export default defineConfig({
           else delete item.lastmod;
         } catch {
           delete item.lastmod;
+        }
+        // 2026-07-30: homepage priority, moved here from the old customPages
+        // hack. serialize() is the only hook @astrojs/sitemap actually reads
+        // per-URL priority from; a query string on customPages never worked.
+        try {
+          const p = new URL(item.url).pathname;
+          if (p === '/' || /^\/[a-z]{2}(-[A-Z]{2})?\/$/.test(p)) {
+            item.priority = 1.0;
+            item.changefreq = 'daily';
+          }
+        } catch {
+          /* malformed URL：維持整站預設 */
         }
         if (!item.links || item.links.length === 0) return item;
         const filteredLinks = item.links.filter((link) => {

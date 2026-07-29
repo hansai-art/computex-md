@@ -91,26 +91,78 @@ if (pages.length === 0) {
 const dead = new Map(); // href → 引用它的頁面清單
 let checked = 0;
 
+/**
+ * 2026-07-30：第二道檢查 —— 站內連結的「形式」，不只是「存不存在」。
+ *
+ * 死連結會 404，很痛所以看得見。這一種不會 404，所以躲了很久：本站
+ * build.format 是 'directory'（產出 about/index.html），Cloudflare Pages 對
+ * 這種產物會把 /about 用 308 轉到 /about/。canonical、sitemap、hreflang 用的
+ * 全都是帶斜線的形式，可是站內連結不是 —— 當天掃出 11,346 條不帶斜線、
+ * 帶斜線只有 1,129 條，等於九成內鏈每一次點擊都先吃一個 308。
+ * 爬蟲預算雙倍消耗，連 301/308 等於白丟一次權重。
+ *
+ * 所以「點得到」不等於「對」。這一支同時驗兩件事。
+ * 檔案型路由（/llms.txt、/rss.xml、/foo.md）不在此限，它們本來就沒有斜線。
+ */
+const noSlash = new Map(); // href → 引用它的頁面清單
+
+function needsSlash(href) {
+  const pathname = href.split(/[?#]/)[0];
+  if (pathname === '' || pathname === '/' || pathname.endsWith('/'))
+    return false;
+  const lastSeg = pathname.slice(pathname.lastIndexOf('/') + 1);
+  if (/\.[a-zA-Z0-9]{2,5}$/.test(lastSeg)) return false; // 檔案不是目錄
+  return true;
+}
+
 for (const file of pages) {
   const html = readFileSync(file, 'utf-8');
+  const page = relative(distDir, file).split(sep).join('/');
   for (const m of html.matchAll(/<a\b[^>]*?\bhref="([^"]+)"/g)) {
     const href = m[1];
     if (!href.startsWith('/') || href.startsWith('//')) continue;
     checked += 1;
+    if (needsSlash(href)) {
+      if (!noSlash.has(href)) noSlash.set(href, []);
+      noSlash.get(href).push(page);
+    }
     if (resolves(href)) continue;
     if (!dead.has(href)) dead.set(href, []);
-    dead.get(href).push(relative(distDir, file).split(sep).join('/'));
+    dead.get(href).push(page);
   }
 }
 
 const fresh = [...dead];
+const slashless = [...noSlash];
 
-if (fresh.length === 0) {
+if (fresh.length === 0 && slashless.length === 0) {
   console.log(
-    `✅ [internal-links] ${pages.length} 頁共 ${checked} 條站內連結沒有死連結`,
+    `✅ [internal-links] ${pages.length} 頁共 ${checked} 條站內連結沒有死連結，形式也一致（全部帶結尾斜線）`,
   );
   process.exit(0);
 }
+
+if (slashless.length > 0) {
+  const refs = slashless.reduce((a, [, r]) => a + r.length, 0);
+  console.error(
+    `❌ [internal-links] ${slashless.length} 個路徑、共 ${refs} 條站內連結沒有結尾斜線（會吃 308）：`,
+  );
+  for (const [href, r] of slashless
+    .sort((a, b) => b[1].length - a[1].length)
+    .slice(0, 15)) {
+    const sample = r.slice(0, 2).join(', ');
+    const more = r.length > 2 ? ` …+${r.length - 2}` : '';
+    console.error(`   ${href}   ← ${r.length} 頁：${sample}${more}`);
+  }
+  if (slashless.length > 15)
+    console.error(`   …另外 ${slashless.length - 15} 個路徑`);
+  console.error(
+    '\n   修法：站內連結一律過 src/utils/href.ts 的 withTrailingSlash()。\n' +
+      '   NEVER 改 canonical / sitemap 去遷就連結 —— 那些網址已經被索引了。',
+  );
+}
+
+if (fresh.length === 0) process.exit(1);
 
 const totalRefs = fresh.reduce((a, [, refs]) => a + refs.length, 0);
 console.error(

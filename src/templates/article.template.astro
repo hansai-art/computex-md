@@ -1,4 +1,5 @@
 ---
+import { withTrailingSlash } from '../utils/href';
 import { CATEGORY_MAPPING } from '../config/categories';
 /**
  * article.template.astro — 統一 article page template (6 langs 共用)
@@ -531,7 +532,9 @@ const encodedTitle = encodeURIComponent(title);
               </span>
             </button>
             <a
-              href={lang === 'zh-TW' ? '/contribute' : `/${lang}/contribute`}
+              href={withTrailingSlash(
+                lang === 'zh-TW' ? '/contribute' : `/${lang}/contribute`,
+              )}
               data-ga-section="article_signature"
               data-ga-label="contribute"
               class="inline-flex items-center gap-[0.4rem] rounded-full border border-[rgba(26,60,52,0.2)] bg-transparent px-[0.9rem] py-[0.45rem] font-[family-name:var(--font-mono)] text-[0.8rem] font-medium text-[#1a3c34] no-underline transition-all duration-200 hover:bg-[rgba(26,60,52,0.06)]"
@@ -689,7 +692,7 @@ const encodedTitle = encodeURIComponent(title);
         <!-- Return navigation -->
         <div class="my-10 mb-4 flex flex-wrap gap-3 max-[640px]:flex-col">
           <a
-            href={`/${category}`}
+            href={withTrailingSlash(`/${category}`)}
             class="inline-flex items-center justify-center gap-[0.45rem] rounded-full px-5 py-[0.55rem] font-[family-name:var(--font-mono)] text-[0.82rem] font-medium text-[#f8f1e9] no-underline transition-all duration-200 hover:opacity-[0.88]"
             style={`background:${categoryInfo.color};`}
           >
@@ -779,7 +782,9 @@ const encodedTitle = encodeURIComponent(title);
                 return (
                   <ArticleCard
                     density="premium"
-                    href={`${langUrlPrefix}/${article.category}/${encodeURIComponent(article.slug)}`}
+                    href={withTrailingSlash(
+                      `${langUrlPrefix}/${article.category}/${encodeURIComponent(article.slug)}`,
+                    )}
                     title={article.title}
                     description={article.description}
                     categoryLabel={relCat.name}
@@ -794,7 +799,7 @@ const encodedTitle = encodeURIComponent(title);
             </div>
             <div class="mt-10 text-center">
               <a
-                href={`${langUrlPrefix}/${category}`}
+                href={withTrailingSlash(`${langUrlPrefix}/${category}`)}
                 data-ga-section="article_related"
                 data-ga-label="view_all_category"
                 class="inline-flex items-center gap-2 rounded-full border-[1.5px] px-6 py-[0.65rem] font-[family-name:var(--font-mono)] text-[0.88rem] font-medium no-underline transition-all duration-200 hover:bg-black/[0.04]"
@@ -876,7 +881,9 @@ const encodedTitle = encodeURIComponent(title);
         </div>
         <div class="mt-8 text-center">
           <a
-            href={lang === 'zh-TW' ? '/latest' : `/${lang}/latest`}
+            href={withTrailingSlash(
+              lang === 'zh-TW' ? '/latest' : `/${lang}/latest`,
+            )}
             data-ga-section="article_latest_rail"
             data-ga-label="view_all"
             class="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#10b981]/40 px-6 py-[0.6rem] font-[family-name:var(--font-mono)] text-[0.88rem] font-semibold text-[#065f46] no-underline transition-all hover:bg-[#ecfdf5]"
@@ -1036,7 +1043,7 @@ const encodedTitle = encodeURIComponent(title);
           {
             otherCategories.map((cat) => (
               <a
-                href={`/${cat.key}`}
+                href={withTrailingSlash(`/${cat.key}`)}
                 class="flex overflow-hidden rounded-2xl border border-[rgba(26,60,52,0.06)] bg-white no-underline shadow-[0_2px_8px_rgba(26,60,52,0.05)] transition-[transform,box-shadow] duration-[250ms] hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(26,60,52,0.12)]"
               >
                 <div

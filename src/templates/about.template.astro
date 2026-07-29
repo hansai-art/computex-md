@@ -15,6 +15,7 @@
  * 所以「非官方」的聲明放在最前面而不是頁尾，資料來源與更新方式寫成可查證的
  * 句子而不是形容詞，數字一律現算。
  */
+import { withTrailingSlash } from '../utils/href';
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
 import { getLangFromUrl, useTranslations } from '../i18n/utils';
@@ -140,7 +141,7 @@ const REPO = 'https://github.com/hansai-art/computex-md';
         </p>
         <p class="mt-6">
           <a
-            href={`${langPrefix}/vendors`}
+            href={withTrailingSlash(`${langPrefix}/vendors`)}
             class="inline-block border-b-2 border-[#E4007E] pb-1 text-[0.95rem] font-semibold text-[#252126] no-underline transition-colors duration-200 hover:text-[#E4007E]"
             >{t('about.md.cta')}</a
           >
@@ -338,7 +339,7 @@ const REPO = 'https://github.com/hansai-art/computex-md';
             >{t('about.contact.issue')}</a
           >
           <a
-            href={`${langPrefix}/contribute`}
+            href={withTrailingSlash(`${langPrefix}/contribute`)}
             data-ga-section="about_contact"
             data-ga-label="contribute"
             class="rounded-lg border-2 border-[#252126] bg-white px-8 py-3 text-[0.95rem] font-semibold text-[#252126] no-underline transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#252126] hover:text-white"

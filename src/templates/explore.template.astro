@@ -25,6 +25,7 @@
  * 熱門搜尋詞不手寫，從實際資料現算（展區 + 館別）。手寫的熱門詞很容易變成
  * 「點了搜出 0 筆」，那比沒有還糟。
  */
+import { withTrailingSlash } from '../utils/href';
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
 import CategoryGrid from '../components/CategoryGrid.astro';
@@ -273,7 +274,7 @@ const rawSample = longest[0]
               </p>
             </div>
             <a
-              href={`${langUrlPrefix}/latest`}
+              href={withTrailingSlash(`${langUrlPrefix}/latest`)}
               class="flex-shrink-0 whitespace-nowrap text-[0.88rem] font-semibold text-[#252126] no-underline underline-offset-4 hover:underline hover:decoration-[#E4007E]"
               data-ga-section="explore_latest"
               data-ga-label="view_all"
@@ -286,7 +287,9 @@ const rawSample = longest[0]
               const cfg = exploreCats[a.category] || {};
               return (
                 <a
-                  href={`${langUrlPrefix}/${a.category}/${encodeURIComponent(a.slug)}`}
+                  href={withTrailingSlash(
+                    `${langUrlPrefix}/${a.category}/${encodeURIComponent(a.slug)}`,
+                  )}
                   class="group flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 no-underline transition-all hover:border-[#e2e8f0] hover:bg-[#f8fafc]"
                   data-ga-section="explore_latest"
                 >
@@ -327,7 +330,9 @@ const rawSample = longest[0]
             {longest.map((v, i) => (
               <li class="border-t border-[#e5e7eb] first:border-t-0">
                 <a
-                  href={`${langUrlPrefix}/vendors/${encodeURIComponent(v.slug)}`}
+                  href={withTrailingSlash(
+                    `${langUrlPrefix}/vendors/${encodeURIComponent(v.slug)}`,
+                  )}
                   class="group grid grid-cols-[auto_1fr_auto] items-baseline gap-x-5 py-5 no-underline max-[480px]:gap-x-3"
                   data-ga-section="explore_longest"
                 >
@@ -355,7 +360,7 @@ const rawSample = longest[0]
 
           <p class="mt-6">
             <a
-              href={`${langUrlPrefix}/vendors`}
+              href={withTrailingSlash(`${langUrlPrefix}/vendors`)}
               class="inline-block border-b-2 border-[#E4007E] pb-1 text-[0.95rem] font-semibold text-[#252126] no-underline transition-colors duration-200 hover:text-[#E4007E]"
             >
               {t('explore.longest.viewAll')}
@@ -385,7 +390,7 @@ const rawSample = longest[0]
         {
           [
             {
-              href: `${langUrlPrefix}/organism`,
+              href: withTrailingSlash(`${langUrlPrefix}/organism`),
               title: t('explore.machine.organism.title'),
               desc: t('explore.machine.organism.desc'),
               cta: t('explore.machine.organism.cta'),
@@ -446,7 +451,7 @@ const rawSample = longest[0]
         class="flex flex-wrap justify-center gap-3 max-[480px]:flex-col max-[480px]:items-stretch"
       >
         <a
-          href={`${langUrlPrefix}/contribute`}
+          href={withTrailingSlash(`${langUrlPrefix}/contribute`)}
           class="rounded-lg bg-[#252126] px-6 py-3 text-[0.95rem] font-semibold text-white no-underline transition-all hover:-translate-y-px hover:bg-[#E4007E]"
         >
           {t('explore.cta.contribute')}

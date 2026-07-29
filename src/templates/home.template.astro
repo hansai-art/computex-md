@@ -18,6 +18,7 @@
  *                     搬過來就是把真實個人的話錯置到另一個專案上（跟 README
  *                     貢獻者名單同一類問題）
  */
+import { withTrailingSlash } from '../utils/href';
 import Layout from '../layouts/Layout.astro';
 import HeroSection from '../components/home/HeroSection.astro';
 import ReaderDoors from '../components/home/ReaderDoors.astro';
@@ -91,7 +92,7 @@ const langUrlPrefix = isZh ? '' : `/${lang}`;
           class="mt-8 flex flex-wrap justify-center gap-4 px-4 max-[480px]:flex-col max-[480px]:items-center"
         >
           <a
-            href={`${langUrlPrefix}/organism`}
+            href={withTrailingSlash(`${langUrlPrefix}/organism`)}
             data-ga-section="feature_cta"
             data-ga-label="organism"
             class="inline-flex items-center gap-2 rounded-lg border-[1.5px] border-[#e5e7eb] bg-white px-6 py-[0.7rem] text-[0.9rem] font-semibold text-[#252126] no-underline transition-all duration-[250ms] hover:-translate-y-px hover:border-[#E4007E]/40 hover:text-[#E4007E] hover:shadow-[0_2px_8px_rgba(37,33,38,0.08)]"

@@ -4,7 +4,7 @@
  * Keywords live only at article footer (avoid duplicate chrome).
  * Meta strings and dates follow `lang` via ui.ts + Intl.
  */
-import { useTranslatedPath, useTranslations } from '../i18n/utils';
+import { useTranslations } from '../i18n/utils';
 import { languages, type Locale } from '../i18n/ui';
 
 type Contributor = string | { name: string; login: string };
@@ -41,9 +41,13 @@ const {
 } = Astro.props;
 
 const t = useTranslations(lang);
-const translatePath = useTranslatedPath(lang);
-const langPrefix = translatePath(lang);
-const articleUrl = `https://computex.taiwanai.ngo${langPrefix}/${category}/${slug}`;
+// 2026-07-30：原本寫 translatePath(lang)，那是把語言代碼當成路徑丟進去。
+// translatePath 對預設語言直接回傳原字串，結果拼出
+// `https://computex.taiwanai.ngozh-TW/vendors/x` —— 網域後面直接黏 zh-TW，
+// dist 掃到 261 處，全站文章的 Facebook / Twitter / LINE 分享連結都指向
+// 一個不存在的網域。正確寫法跟 FeedbackWidget.astro 一致：預設語言沒有前綴。
+const langPrefix = lang === 'zh-TW' ? '' : `/${lang}`;
+const articleUrl = `https://computex.taiwanai.ngo${langPrefix}/${category}/${slug}/`;
 const encodedUrl = encodeURIComponent(articleUrl);
 const encodedTitle = encodeURIComponent(title);
 

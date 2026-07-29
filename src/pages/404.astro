@@ -1,4 +1,5 @@
 ---
+import { withTrailingSlash } from '../utils/href';
 import { CATEGORY_LIST } from '../config/categories';
 import Layout from '../layouts/Layout.astro';
 import fs from 'fs';
@@ -185,7 +186,7 @@ const categories = [...CATEGORY_LIST];
           data-i18n-text="back">← 回首頁</a
         >
         <a
-          href="/organism"
+          href="/organism/"
           class="inline-flex items-center rounded-lg bg-[#f0f0f0] px-5 py-[0.6rem] text-[0.95rem] font-semibold text-[#333] no-underline transition-all duration-200 hover:bg-[#e0e0e0]"
           >🧬 生命體</a
         >
@@ -252,7 +253,7 @@ const categories = [...CATEGORY_LIST];
           {
             categories.map((cat) => (
               <a
-                href={`/${cat}`}
+                href={withTrailingSlash(`/${cat}`)}
                 data-category={cat}
                 data-i18n-text={`cat.${cat}`}
               >
@@ -328,7 +329,7 @@ const categories = [...CATEGORY_LIST];
           {
             categories.map((cat) => (
               <a
-                href={`/${cat}`}
+                href={withTrailingSlash(`/${cat}`)}
                 data-category={cat}
                 data-i18n-text={`cat.${cat}`}
               >

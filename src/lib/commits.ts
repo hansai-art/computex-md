@@ -59,7 +59,9 @@ function filesToArticles(files: string[]): ChangelogArticle[] {
     // `computex-2027.md`（slug-format gate 要求），舊 commit 的連結仍指向
     // `/editions/COMPUTEX 2027`。
     if (!existsSync(resolve(process.cwd(), file))) continue;
-    const url = `/${m[1].toLowerCase()}/${m[2]}`;
+    // 2026-07-30：帶結尾斜線。本站 canonical / sitemap 都是帶斜線的形式，
+    // 不帶斜線在 Cloudflare Pages 會先吃一個 308。
+    const url = `/${m[1].toLowerCase()}/${m[2]}/`;
     if (seen.has(url)) continue;
     seen.add(url);
     out.push({ url, name: m[2] });
