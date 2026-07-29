@@ -1,5 +1,5 @@
 /**
- * tokens.css — Taiwan.md Design System (Single Source of Truth)
+ * tokens.css — COMPUTEX.md Design System (Single Source of Truth)
  *
  * All design tokens live here. Everything else (global.css @layer base,
  * component scoped styles, template scoped styles) reads from these
@@ -46,15 +46,47 @@
   --shadow-soft: 0 8px 30px rgba(15, 23, 42, 0.06);
   --shadow-card: 0 16px 40px rgba(15, 23, 42, 0.08);
 
-  /* === Taiwan Typography System === */
-  --font-title: 'Noto Serif TC', 'Source Han Serif TC', 'PMingLiU', serif;
-  --font-reading:
-    'jf-jinxuanlatte', 'Noto Sans TC', 'Source Han Sans TC', sans-serif;
-  --font-interface:
-    'Noto Sans TC', 'Source Han Sans TC', 'PingFang TC', sans-serif;
-  --font-quote: 'jf-lanyangming', 'Noto Serif TC', serif;
-  /* Legacy compatibility alias — still used in 4 files */
-  --font-editorial: var(--font-title);
+  /* === Typography ===
+   * 2026-07-29 全站改黑體（Hans 指定），同時把繼承來的字體鏈修乾淨。
+   *
+   * 改之前的狀況：這份鏈裡有五個 justfont 字名（jf-jinxuanlatte / jf-lanyangming
+   * / jf-lanyanghei / jf-kamabit / rixingsong-semibold），justfont SDK 已於同日
+   * 整段移除（那是母體的專案 65854），所以那五個名字**全部解析不到**，實際渲染
+   * 一直是靜默 fallback 到 Noto Sans/Serif TC。也就是說「現在看到的排版」不是
+   * 任何人設計的結果，是一連串失敗的 fallback，這正是它看起來制式的原因。
+   *
+   * 現在的配對（拉丁 + CJK 兩層，不是一套字硬撐兩種文字）：
+   *   拉丁 = IBM Plex Sans / IBM Plex Mono —— IBM 為技術產品與技術文件做的字體，
+   *          出身就是硬體公司的工程文件，跟本站的主題同一個世界；而且它不是
+   *          Inter / Space Grotesk 那種到處都是的預設臉。
+   *   CJK  = Noto Sans TC（黑體）—— Plex 沒有繁中，CJK 字符由 fallback 鏈接手。
+   *
+   * mono 不是裝飾：本站的事實層全部是機器從官方名錄抽出來的（攤位號、
+   * exhibitor_id、屆數、查證日期），這些一律走 --font-mono，人寫的散文走
+   * --font-body。字體本身就在標示「這一行是機器抽的還是人寫的」。
+   */
+  --font-display:
+    'IBM Plex Sans', 'Noto Sans TC', 'PingFang TC', 'Source Han Sans TC',
+    sans-serif;
+  --font-body: var(--font-display);
+  --font-mono:
+    'IBM Plex Mono', 'SF Mono', 'Roboto Mono', ui-monospace, monospace;
+
+  /* --font-sans / --font-mono 同時是 Tailwind 自己的 theme token 名。
+   * tokens.css 是 unlayered，Tailwind theme 在 @layer theme，unlayered 一律
+   * 贏過 layered，所以這兩行同時做兩件事：餵我們自己的 var()，也讓
+   * Tailwind 的 `font-sans` / `font-mono` utility 解析到同一套字。
+   * 這是刻意的 —— 兩條路只有一個真相。 */
+  --font-sans: var(--font-display);
+
+  /* 舊名保留為別名：37 處 var(--font-title|reading|interface|quote|editorial)
+   * 散在 8 個檔，一次全改容易漏；別名讓它們自動指到新的黑體系統。
+   * 新程式碼一律用 --font-display / --font-body / --font-mono。 */
+  --font-title: var(--font-display);
+  --font-reading: var(--font-body);
+  --font-interface: var(--font-display);
+  --font-quote: var(--font-body);
+  --font-editorial: var(--font-display);
 
   /* === Title sizes === */
   --title-subsection-size: clamp(1.3rem, 2.4vw, 1.7rem);

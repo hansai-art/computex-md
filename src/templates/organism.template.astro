@@ -1,0 +1,777 @@
+---
+/**
+ * organism.template.astro：/organism 生命體
+ *
+ * 本站的核心概念不是「一個資料收集網站」，是一個會長大的數位生命體：
+ * 有人補進一項可查證的事實，它就長大一點。這一頁是它此刻的體檢表。
+ *
+ * ## 這一頁取代了什麼
+ *
+ * 取種時這個位置放的是母體的 /graph：12 個台灣主題分類（歷史 / 地理 /
+ * 文化 / 美食 …）的力導向圖。那張圖跟本站沒有任何關係，而且母體作者自己
+ * 就否定過它（`OrganismPreview.astro` 註解原文：「12-category force-directed
+ * graph is a database visualization」）。所以這裡不是換皮，是換掉。
+ *
+ * ## 唯一的硬規則
+ *
+ * **這一頁上任何會動、會亮、會排位置的東西，都必須追得回語料裡的一個欄位。**
+ *
+ *   位置 = 真實攤位座標（館別 → 走道字母 → 攤位號）
+ *   大小 = COMPUTEX 屆數
+ *   亮度 = 生命力分數（十項機械計分，演算法公開）
+ *   顏色 = 館別
+ *   心跳 = 真實 commit 節奏
+ *
+ * 沒有一顆細胞的位置是隨機的，沒有一個數字是湊的。做不到就不放，因為
+ * 一頁「看起來很有科技感但數字是假的」視覺，會把整個專案的可信度一起賠掉，
+ * 而可信度是本站唯一的資產。
+ *
+ * ## 為什麼整片看起來是半亮的
+ *
+ * 因為它就是半亮的：事實層幾乎滿分，策展層全站 0。這不是要修的 bug，
+ * 這正是這一頁要講的話：它被餵了事實，還沒有人替它想過。
+ * 任何讓分數好看一點的加權都是對讀者說謊。
+ */
+import Layout from '../layouts/Layout.astro';
+import OrganismCanvas from '../components/OrganismCanvas.astro';
+import organism from '../data/organism.json';
+import { getLangFromUrl, useTranslatedPath } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const zh = lang === 'zh-TW';
+const translatePath = useTranslatedPath(lang);
+
+const { summary, criteria, cells, heartbeat, shape } = organism;
+
+// 六條「指標 → 形狀」。live=false 的那幾條還沒有資料源，頁面照實標「未接」。
+const signals = Object.values(shape);
+const liveSignals = signals.filter((s) => s.live).length;
+
+const factCriteria = criteria.filter((c) => c.layer === 'fact');
+const curationCriteria = criteria.filter((c) => c.layer === 'curation');
+
+// 逐項達成數，給下面的計分表用。這是「這個生命體哪一段長得好、哪一段沒長」
+// 的實際分佈，不是示意。
+const perCriterion = criteria.map((c) => ({
+  ...c,
+  count: cells.filter((cell) => cell.have.includes(c.key)).length,
+}));
+
+// 最需要餵養的細胞：缺得最多的排前面，同分的用屆數多的優先
+//（在展會活越久、資料卻越少，落差越刺眼）。
+const hungriest = [...cells]
+  .sort(
+    (a, b) => b.missing.length - a.missing.length || b.editions - a.editions,
+  )
+  .slice(0, 12);
+
+const totalCommits = heartbeat.reduce((n, d) => n + d.commits, 0);
+const activeDays = heartbeat.length;
+// 這個檔案庫多大了：第一次 commit 到今天。
+const ageDays =
+  activeDays > 0
+    ? Math.max(
+        1,
+        Math.round(
+          (Date.parse(heartbeat[activeDays - 1].date) -
+            Date.parse(heartbeat[0].date)) /
+            86400000,
+        ) + 1,
+      )
+    : 0;
+// 一根長條的長條圖不是圖表，是一根長條。歷史還太短的時候改用一句話講實話，
+// 不要為了「看起來像有在跳」而畫一條假的曲線。
+const HEARTBEAT_CHART_MIN_DAYS = 5;
+const showBeatChart = activeDays >= HEARTBEAT_CHART_MIN_DAYS;
+
+const title = zh ? '生命體' : 'The Organism';
+const description = zh
+  ? `COMPUTEX.md 此刻的體檢表：${summary.cells} 個條目，整體生命力 ${summary.vitality}%。頁面上的生命體由六項站台指標驅動，體積、瓣數、心跳、線亮度、變形速度與殘影層數各對應一項，全部追得回語料裡的欄位。`
+  : `A live readout of COMPUTEX.md: ${summary.cells} entries at ${summary.vitality}% overall vitality. The organism on this page is driven by six site metrics: volume, lobe count, pulse, wire brightness, morph speed and afterimage layers. Every one traces back to a field in the corpus.`;
+---
+
+<Layout
+  title={title}
+  description={description}
+  lang={lang}
+  readerSettings={true}
+>
+  <main class="organism-page">
+    {
+      /* 生命體獨佔上方。坑 4：中文標題 NEVER 疊在網格正中央（參考圖的英文
+        能疊是因為拉丁字母筆畫少、字距寬；中文方塊字疊上去兩個主角互相打架）。
+        正解是生命體在上、文字沉到底部、中間用漸層遮罩隔開。 */
+    }
+    <section class="hero" aria-label={zh ? '生命體' : 'The organism'}>
+      <div class="hero-body">
+        <OrganismCanvas
+          shape={shape}
+          label={zh
+            ? `以 WebGL 繪製的生命體線框。它的體積、瓣數、心跳、線亮度、變形速度與殘影層數各自對應一項站台指標，完整數值列在下方「形狀是怎麼算出來的」表格，也可從 /api/organism.json 取得。`
+            : `A WebGL wireframe of the organism. Its volume, lobe count, pulse, wire brightness, morph speed and afterimage layers each map to one site metric. The full numbers are in the table below and in /api/organism.json.`}
+        />
+      </div>
+      <div class="hero-veil" aria-hidden="true"></div>
+      <div class="hero-text">
+        <p class="eyebrow">{zh ? '此刻的狀態' : 'Live readout'}</p>
+        <h1>{zh ? '這個檔案庫是活的' : 'This archive is alive'}</h1>
+        <p class="standfirst">
+          {
+            zh
+              ? '上面那個東西不是插圖。它的形狀由六項站台指標決定：條目數撐開體積、Booth Score 決定線有多亮、七日編輯數決定它變形得多快。有人補進一項可查證的事實，它就長大一點。'
+              : 'The shape above is not an illustration. Six site metrics drive it: entry count sets its volume, Booth Score sets how bright the wires burn, edits over the last seven days set how fast it morphs. Every verifiable fact someone adds makes it grow.'
+          }
+        </p>
+      </div>
+    </section>
+
+    <div class="shell">
+      {/* 生命徵象：全部是 build 時從語料算出來的 */}
+      <section class="vitals" aria-label={zh ? '生命徵象' : 'Vital signs'}>
+        <div class="vital">
+          <span class="v-num">{summary.cells}</span>
+          <span class="v-label">{zh ? '細胞' : 'cells'}</span>
+        </div>
+        <div class="vital">
+          <span class="v-num">{summary.vitality}<i>%</i></span>
+          <span class="v-label">{zh ? '整體生命力' : 'vitality'}</span>
+        </div>
+        <div class="vital">
+          <span class="v-num"
+            >{summary.facts_filled}<i>/{summary.facts_possible}</i></span
+          >
+          <span class="v-label">{zh ? '已填事實' : 'facts filled'}</span>
+        </div>
+        <div class="vital">
+          <span class="v-num">{summary.curated}<i>/{summary.cells}</i></span>
+          <span class="v-label">{zh ? '有策展層' : 'with curation'}</span>
+        </div>
+        <div class="vital">
+          <span class="v-num">{summary.editions_max}</span>
+          <span class="v-label">{zh ? '最長屆數' : 'longest run'}</span>
+        </div>
+      </section>
+
+      {/* 六條指標 → 形狀。哪幾條是真的、哪幾條還沒接，全部攤開。 */}
+      <section class="signals">
+        <h2>{zh ? '形狀是怎麼算出來的' : 'How the shape is computed'}</h2>
+        <p class="section-note">
+          {
+            zh
+              ? `六項指標各驅動一個形狀變數。其中 ${liveSignals} 條已經接上真實資料源，其餘標「未接」的用一個寫在 scripts/tools/generate-organism.py 裡的預設值撐著，不會補一個看起來合理的假數字：這一頁的整個論點就是每個視覺變數都追得回一個真實欄位。`
+              : `Six metrics each drive one shape variable. ${liveSignals} of them are wired to a real source; the rest are marked "not wired" and fall back to a constant written in scripts/tools/generate-organism.py. None are filled with plausible-looking fake numbers, because this page's entire claim is that every visual variable traces back to a real field.`
+          }
+        </p>
+        <ul class="signal-list">
+          {
+            signals.map((s) => (
+              <li class={s.live ? 'is-live' : 'is-dark'}>
+                <span class="s-dot" aria-hidden="true" />
+                <span class="s-metric">{zh ? s.zh : s.en}</span>
+                <span class="s-arrow" aria-hidden="true">
+                  →
+                </span>
+                <span class="s-drives">{zh ? s.drives_zh : s.drives_en}</span>
+                <span class="s-value mono">
+                  {s.value === null ? (zh ? '未接' : 'not wired') : s.value}
+                </span>
+                <span class="s-source">{zh ? s.source_zh : s.source_en}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      {/* 心跳 */}
+      {
+        activeDays > 0 && (
+          <section class="heart">
+            <h2>{zh ? '心跳' : 'Heartbeat'}</h2>
+            <p class="section-note">
+              {zh
+                ? '近 90 天的 commit 節奏，直接讀 git，不經任何中間快取。'
+                : 'Commit rhythm over the last 90 days, read straight from git.'}
+            </p>
+
+            {showBeatChart ? (
+              <ol class="beats">
+                {heartbeat.map((d) => (
+                  <li>
+                    <span
+                      class="beat"
+                      style={`--h:${Math.min(100, d.commits * 4)}%`}
+                    />
+                    <span class="beat-label">
+                      {d.date.slice(5)} · {d.commits}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p class="beat-young">
+                {zh
+                  ? `這個檔案庫現在 ${ageDays} 天大，${totalCommits} 次 commit，${activeDays} 天有動作。歷史累積到 ${HEARTBEAT_CHART_MIN_DAYS} 天以上，這裡才會換成節奏圖：一根長條的長條圖不是圖表。`
+                  : `This archive is ${ageDays} ${ageDays === 1 ? 'day' : 'days'} old: ${totalCommits} commits across ${activeDays} active ${activeDays === 1 ? 'day' : 'days'}. The rhythm chart appears once there are at least ${HEARTBEAT_CHART_MIN_DAYS} days of history, because a bar chart with one bar is just a bar.`}
+              </p>
+            )}
+          </section>
+        )
+      }
+
+      {/* 計分表 */}
+      <section class="scoring">
+        <h2>{zh ? '它靠什麼長大' : 'What makes it grow'}</h2>
+        <p class="section-note">
+          {
+            zh
+              ? '生命力是十項機械檢查，各 10 分，演算法公開（scripts/tools/generate-organism.py），任何人可以自己重算。行銷文案一個字都不加分。'
+              : 'Vitality is ten mechanical checks worth 10 points each. The algorithm is public (scripts/tools/generate-organism.py) and anyone can recompute it. Marketing copy earns exactly zero.'
+          }
+        </p>
+
+        <div class="layers">
+          <div class="layer">
+            <h3>
+              {zh ? '事實層' : 'Fact layer'}
+              <span class="layer-note"
+                >{
+                  zh
+                    ? '官方名錄查得到的，廠商可直接送 PR 修改'
+                    : 'from the official listing; exhibitors may edit these directly'
+                }</span
+              >
+            </h3>
+            <ul class="criteria">
+              {
+                perCriterion
+                  .filter((c) => c.layer === 'fact')
+                  .map((c) => (
+                    <li>
+                      <span class="c-name">{zh ? c.zh : c.en}</span>
+                      <span class="c-bar" aria-hidden="true">
+                        <i style={`--w:${(c.count / summary.cells) * 100}%`} />
+                      </span>
+                      <span class="c-count">
+                        {c.count}/{summary.cells}
+                      </span>
+                    </li>
+                  ))
+              }
+            </ul>
+          </div>
+
+          <div class="layer">
+            <h3>
+              {zh ? '策展層' : 'Curation layer'}
+              <span class="layer-note"
+                >{
+                  zh
+                    ? '要人寫、要查證的；廠商可在 PR 提異議，不能直接改'
+                    : 'written and verified by editors; exhibitors may object in a PR but not edit directly'
+                }</span
+              >
+            </h3>
+            <ul class="criteria">
+              {
+                perCriterion
+                  .filter((c) => c.layer === 'curation')
+                  .map((c) => (
+                    <li>
+                      <span class="c-name">{zh ? c.zh : c.en}</span>
+                      <span class="c-bar" aria-hidden="true">
+                        <i style={`--w:${(c.count / summary.cells) * 100}%`} />
+                      </span>
+                      <span class="c-count">
+                        {c.count}/{summary.cells}
+                      </span>
+                    </li>
+                  ))
+              }
+            </ul>
+          </div>
+        </div>
+
+        <p class="honest">
+          {
+            zh
+              ? `所以它現在是半亮的：${factCriteria.length} 項事實層幾乎滿分，${curationCriteria.length} 項策展層全站 ${summary.curated} 家。這不是還沒修好的 bug，這是實況：它被餵了事實，還沒有人替它想過。`
+              : `That is why the organism burns half-lit: the ${factCriteria.length} fact-layer checks are nearly full, while the ${curationCriteria.length} curation-layer checks stand at ${summary.curated} of ${summary.cells}. This is not an unfinished bug. It is the honest state: the organism has been fed facts, but nobody has interpreted them yet.`
+          }
+        </p>
+      </section>
+
+      {/* 餵養入口 */}
+      <section class="feed">
+        <h2>{zh ? '最需要餵養的細胞' : 'Hungriest cells'}</h2>
+        <p class="section-note">
+          {
+            zh
+              ? '缺得最多的排前面；同樣缺的，在 COMPUTEX 活越久的排前面：待越久資料卻越少，落差越大。'
+              : 'Most incomplete first; among equals, the ones with the longest COMPUTEX history come first, because a long run with a thin page is the widest gap.'
+          }
+        </p>
+        <ul class="hungry">
+          {
+            hungriest.map((c) => (
+              <li>
+                <a href={translatePath(`/vendors/${c.slug}`)}>
+                  <span class="h-name">{c.name}</span>
+                  <span class="h-meta">
+                    <span class="mono">{c.booth}</span>
+                    <span class="mono">TaiNEX {c.hall}</span>
+                    <span class="mono">
+                      {c.editions}{' '}
+                      {zh ? '屆' : c.editions === 1 ? 'edition' : 'editions'}
+                    </span>
+                  </span>
+                  <span class="h-gap">
+                    {zh ? '缺' : 'missing'} <b>{c.missing.length}</b>
+                    {zh ? ' 項' : ''}
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="feed-cta">
+          {
+            zh
+              ? '要餵它：改對應的 knowledge/Vendors/*.md，送一個 PR。事實層要附出處連結與查證日期，策展層要能被第三方驗證。'
+              : 'To feed it: edit the matching knowledge/Vendors/*.md and open a pull request. Fact-layer claims need a source URL and a checked-on date; curation-layer claims must be independently verifiable.'
+          }
+          <a
+            class="feed-link"
+            href="https://github.com/hansai-art/computex-md/tree/main/knowledge/Vendors"
+            rel="noopener">knowledge/Vendors →</a
+          >
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <style>
+    .organism-page {
+      /* 生命體是純黑底白線框（Hans 選定），所以這一頁的底整片壓到純黑，
+       * 不用 --color-bg 的 #050505：白線框在 #050505 上會浮出一圈灰邊。 */
+      background: #000;
+      color: var(--color-ink);
+      padding: 0 0 6rem;
+    }
+    .shell {
+      max-width: var(--container-wide);
+      margin: 0 auto;
+      padding-inline: var(--space-page-x);
+    }
+    .mono,
+    .organism-page :is(.v-num, .c-count, .beat-label, .s-value) {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── hero ─────────────────────────────────────────────────
+     * 坑 4：中文標題 NEVER 疊在網格正中央。生命體獨佔上方，文字沉到底部，
+     * 中間 .hero-veil 是透明到純黑的漸層把兩個主角隔開。參考圖
+     *（21st.dev AnomalousMatterHero）敢把英文疊在網格上，是因為拉丁字母
+     * 筆畫少、字距寬；中文方塊字疊上去就是兩團東西互相打架。 */
+    .hero {
+      position: relative;
+      block-size: clamp(560px, 92vh, 940px);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      isolation: isolate;
+    }
+    .hero-body {
+      position: absolute;
+      inset: 0;
+      inset-block-end: 20%;
+      z-index: 0;
+    }
+    .hero-veil {
+      position: absolute;
+      inset-inline: 0;
+      inset-block-end: 0;
+      block-size: 58%;
+      z-index: 1;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0, 0, 0, 0.55) 34%,
+        #000 74%
+      );
+      pointer-events: none;
+    }
+    .hero-text {
+      position: relative;
+      z-index: 2;
+      grid-row: 2;
+      inline-size: 100%;
+      max-width: var(--container-wide);
+      margin: 0 auto;
+      padding: 0 var(--space-page-x) clamp(2.5rem, 6vh, 4.5rem);
+    }
+
+    /* ── lede ─────────────────────────────────────────────── */
+    /* 字距只給拉丁字母。中文方塊字本來就有字身框的間距，再加 0.2em 會把
+     * 「此刻的狀態」拉成一排散開的字，看起來像沒排版而不是像有設計。 */
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-ink-soft);
+      margin: 0 0 0.9rem;
+    }
+    :root:lang(en) .eyebrow,
+    [lang='en'] .eyebrow {
+      letter-spacing: 0.22em;
+    }
+    .lede h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5.2vw, 3.4rem);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      line-height: 1.12;
+      text-wrap: balance;
+      margin: 0 0 1rem;
+    }
+    .standfirst {
+      max-width: 62ch;
+      font-size: clamp(0.98rem, 1.6vw, 1.1rem);
+      line-height: 1.75;
+      color: var(--color-ink-soft);
+      margin: 0;
+    }
+
+    /* ── 六條指標 → 形狀 ──────────────────────────────────────
+     * 在線 / 未接的差別用點的填色表示，不是只靠顏色：未接那幾列整列調暗，
+     * 數值欄直接寫「未接」。看得到的誠實比好看的假數字重要。 */
+    .signal-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border-block-start: 1px solid var(--color-border);
+    }
+    .signal-list li {
+      display: grid;
+      grid-template-columns:
+        10px minmax(6rem, 0.9fr) 1rem minmax(5rem, 0.7fr)
+        auto minmax(0, 1.4fr);
+      align-items: center;
+      gap: 0.9rem;
+      padding: 0.7rem 0.2rem;
+      border-block-end: 1px solid var(--color-border);
+      font-size: 0.85rem;
+    }
+    .s-dot {
+      inline-size: 8px;
+      block-size: 8px;
+      border-radius: 50%;
+      border: 1px solid var(--color-ink-soft);
+    }
+    .is-live .s-dot {
+      background: var(--color-ink);
+      border-color: var(--color-ink);
+    }
+    .is-dark {
+      color: var(--color-ink-soft);
+    }
+    .s-arrow,
+    .s-source {
+      color: var(--color-ink-soft);
+    }
+    .s-source {
+      font-size: 0.76rem;
+      line-height: 1.5;
+    }
+    .s-value {
+      font-size: 0.85rem;
+      text-align: end;
+      min-inline-size: 4.5rem;
+    }
+    .is-dark .s-value {
+      font-size: 0.74rem;
+      letter-spacing: 0.06em;
+    }
+    @media (max-width: 760px) {
+      .signal-list li {
+        grid-template-columns: 10px 1fr auto;
+        row-gap: 0.35rem;
+      }
+      .s-arrow {
+        display: none;
+      }
+      .s-drives {
+        grid-column: 2;
+        font-size: 0.78rem;
+        color: var(--color-ink-soft);
+      }
+      .s-source {
+        grid-column: 2 / -1;
+      }
+    }
+
+    /* ── 生命徵象 ─────────────────────────────────────────── */
+    .vitals {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1px;
+      background: var(--color-border);
+      border: 1px solid var(--color-border);
+      margin: 2.75rem 0 2.25rem;
+    }
+    .vital {
+      background: var(--color-bg);
+      padding: 1.15rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .v-num {
+      font-size: clamp(1.5rem, 3vw, 2.05rem);
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .v-num i {
+      font-style: normal;
+      font-size: 0.5em;
+      color: var(--color-ink-soft);
+      margin-left: 0.1em;
+    }
+    .v-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-ink-soft);
+    }
+
+    /* ── 區塊共用 ─────────────────────────────────────────── */
+    .organism-page .shell > section:not(.vitals) {
+      margin-top: 4rem;
+    }
+    .organism-page h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.35rem, 2.6vw, 1.8rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 0 0 0.6rem;
+    }
+    .section-note {
+      max-width: 68ch;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--color-ink-soft);
+      margin: 0 0 1.6rem;
+    }
+
+    /* ── 心跳 ─────────────────────────────────────────────── */
+    .beats {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 96px;
+      border-block-end: 1px solid var(--color-border);
+    }
+    .beats li {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 0.4rem;
+      min-width: 34px;
+      height: 100%;
+    }
+    .beat {
+      display: block;
+      width: 100%;
+      max-width: 26px;
+      height: var(--h);
+      min-height: 3px;
+      background: linear-gradient(to top, hsl(168 68% 44%), hsl(168 68% 58%));
+    }
+    .beat-label {
+      font-size: 0.62rem;
+      color: var(--color-ink-soft);
+      white-space: nowrap;
+    }
+    .beat-young {
+      max-width: 66ch;
+      margin: 0;
+      padding-inline-start: 1.1rem;
+      border-inline-start: 2px solid var(--color-border);
+      font-size: 0.9rem;
+      line-height: 1.8;
+      color: var(--color-ink-soft);
+    }
+
+    /* ── 計分表 ───────────────────────────────────────────── */
+    .layers {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2.4rem;
+    }
+    .layer h3 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0 0 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .layer-note {
+      font-weight: 400;
+      font-size: 0.78rem;
+      line-height: 1.55;
+      color: var(--color-ink-soft);
+    }
+    .criteria {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+    .criteria li {
+      display: grid;
+      grid-template-columns: minmax(7rem, 1fr) 2.2fr auto;
+      align-items: center;
+      gap: 0.85rem;
+      font-size: 0.85rem;
+    }
+    .c-bar {
+      height: 6px;
+      background: var(--color-border);
+      display: block;
+    }
+    .c-bar i {
+      display: block;
+      height: 100%;
+      width: var(--w);
+      background: hsl(168 68% 50%);
+    }
+    .c-count {
+      font-size: 0.75rem;
+      color: var(--color-ink-soft);
+    }
+    .honest {
+      max-width: 70ch;
+      margin: 2.2rem 0 0;
+      padding-inline-start: 1.1rem;
+      border-inline-start: 2px solid var(--color-border);
+      font-size: 0.92rem;
+      line-height: 1.8;
+      color: var(--color-ink-soft);
+    }
+
+    /* ── 餵養 ─────────────────────────────────────────────── */
+    .hungry {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border-block-start: 1px solid var(--color-border);
+    }
+    .hungry a {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.85rem 0.4rem;
+      border-block-end: 1px solid var(--color-border);
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.15s ease;
+    }
+    .hungry a:hover,
+    .hungry a:focus-visible {
+      background: var(--color-bg-soft);
+    }
+    .h-name {
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .h-meta {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .h-meta span {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      font-size: 0.7rem;
+      color: var(--color-ink-soft);
+      border: 1px solid var(--color-border);
+      padding: 0.15rem 0.45rem;
+    }
+    .h-gap {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-ink-soft);
+      white-space: nowrap;
+    }
+    /* 右下角有一組固定定位的浮動元件（回頂端 / Aa / .md）。清單的右欄會被它
+     * 蓋住，所以最後幾列要讓出寬度。--floating-cluster-reserve 是 tokens.css
+     * 定義的那一組的寬度，跟 ArticleSidebar 用的是同一個值。 */
+    .feed {
+      padding-inline-end: 0;
+    }
+    @media (min-width: 900px) {
+      .hungry li:nth-last-child(-n + 3) a {
+        padding-inline-end: var(--floating-cluster-reserve);
+      }
+      .feed-cta {
+        padding-inline-end: var(--floating-cluster-reserve);
+      }
+    }
+    .h-gap b {
+      color: var(--color-ink);
+      font-size: 0.95rem;
+    }
+    .feed-cta {
+      max-width: 70ch;
+      margin: 1.6rem 0 0;
+      font-size: 0.88rem;
+      line-height: 1.8;
+      color: var(--color-ink-soft);
+    }
+    .feed-link {
+      display: inline-block;
+      margin-inline-start: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--color-ink);
+      text-decoration: none;
+      border-block-end: 1px solid currentColor;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 640px) {
+      .criteria li {
+        grid-template-columns: minmax(6rem, 1fr) 1.4fr auto;
+        gap: 0.6rem;
+      }
+      .hungry a {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+    }
+  </style>
+</Layout>

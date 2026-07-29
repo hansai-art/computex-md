@@ -129,7 +129,7 @@ html[data-shot='1'][data-og='1'] main.article-page > section:first-of-type {
 }
 
 html[data-shot='1'][data-og='1'] main.article-page .hero-title {
-  font-family: 'Noto Serif TC', 'Source Han Serif TC', serif !important;
+  font-family: var(--font-display) !important;
   font-weight: 900 !important;
   font-size: 3.75rem !important; /* 60px */
   line-height: 1.2 !important;
@@ -145,7 +145,7 @@ html[data-shot='1'][data-og='1']
   > section
   > div:nth-child(2)
   > p {
-  font-family: 'Noto Serif TC', serif !important;
+  font-family: var(--font-display) !important;
   font-size: 1.2rem !important; /* 19.2px */
   max-width: min(860px, 75%) !important;
   line-height: 1.65 !important;
@@ -222,7 +222,7 @@ html[data-shot='1'][data-diary='1'] .diary-entry-hero {
 }
 
 html[data-shot='1'][data-diary='1'] .diary-entry-hero h1 {
-  font-family: 'rixingsong-semibold', 'Noto Serif TC', serif !important;
+  font-family: var(--font-display) !important;
   font-size: 4rem !important; /* 64px — 比 article OG 的 3.75rem 略大，
                                   日記文字密度通常較低 */
   font-weight: 600 !important;
@@ -237,7 +237,7 @@ html[data-shot='1'][data-diary='1'] .diary-entry-hero h1 {
 
 /* OG 模式（批次產圖）強制走 Noto Serif TC 避 justfont rate limit */
 html[data-shot='1'][data-diary='1'][data-og='1'] .diary-entry-hero h1 {
-  font-family: 'Noto Serif TC', 'Source Han Serif TC', serif !important;
+  font-family: var(--font-display) !important;
   font-weight: 900 !important;
   font-size: 3.5rem !important; /* 56px — 略縮容納 line-clamp 3 */
 }

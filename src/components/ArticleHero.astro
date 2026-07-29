@@ -78,7 +78,7 @@ const categoryUrl = translatePath(`/${category}`);
     >
       <a
         href={homeUrl}
-        class="whitespace-nowrap font-['Inter','Satoshi',system-ui,sans-serif] text-[0.78rem] text-[rgba(248,241,233,0.65)] no-underline transition-colors duration-200 hover:text-[#f8f1e9]"
+        class="whitespace-nowrap font-[family-name:var(--font-mono)] text-[0.78rem] text-[rgba(248,241,233,0.65)] no-underline transition-colors duration-200 hover:text-[#f8f1e9]"
         >{homeLabel}</a
       >
       <svg
@@ -95,7 +95,7 @@ const categoryUrl = translatePath(`/${category}`);
       </svg>
       <a
         href={categoryUrl}
-        class="whitespace-nowrap font-['Inter','Satoshi',system-ui,sans-serif] text-[0.78rem] font-semibold no-underline transition-colors duration-200 hover:opacity-70"
+        class="whitespace-nowrap font-[family-name:var(--font-mono)] text-[0.78rem] font-semibold no-underline transition-colors duration-200 hover:opacity-70"
         style={`color:${categoryColor};`}>{categoryName}</a
       >
       {
@@ -113,7 +113,7 @@ const categoryUrl = translatePath(`/${category}`);
             >
               <polyline points="9 18 15 12 9 6" />
             </svg>
-            <span class="whitespace-nowrap font-['Inter','Satoshi',system-ui,sans-serif] text-[0.78rem] text-[rgba(248,241,233,0.75)]">
+            <span class="whitespace-nowrap font-[family-name:var(--font-mono)] text-[0.78rem] text-[rgba(248,241,233,0.75)]">
               {subcategory}
             </span>
           </>
@@ -132,7 +132,7 @@ const categoryUrl = translatePath(`/${category}`);
         <polyline points="9 18 15 12 9 6"></polyline>
       </svg>
       <span
-        class="max-w-[24ch] overflow-hidden text-ellipsis whitespace-nowrap font-['Inter','Satoshi',system-ui,sans-serif] text-[0.78rem] text-[rgba(248,241,233,0.85)]"
+        class="max-w-[24ch] overflow-hidden text-ellipsis whitespace-nowrap font-[family-name:var(--font-mono)] text-[0.78rem] text-[rgba(248,241,233,0.85)]"
         aria-current="page">{title}</span
       >
     </nav>
@@ -140,7 +140,7 @@ const categoryUrl = translatePath(`/${category}`);
     {
       status && (
         <div
-          class="mb-4 inline-block rounded-full px-[0.85rem] py-[0.3rem] font-['Inter',system-ui,sans-serif] text-[0.7rem] font-semibold uppercase tracking-[0.18em] backdrop-blur-md"
+          class="mb-4 inline-block rounded-full px-[0.85rem] py-[0.3rem] font-[family-name:var(--font-mono)] text-[0.7rem] font-semibold uppercase tracking-[0.18em] backdrop-blur-md"
           style={`background:${categoryColor}25; color:${categoryColor};`}
         >
           {status}
@@ -148,12 +148,10 @@ const categoryUrl = translatePath(`/${category}`);
       )
     }
 
-    <!-- Title — `.hero-title` class kept as hook: justfont's `h1` rule
-         in Layout.astro injects `font-family: jf-lanyanghei` (extraheavy)
-         site-wide. (Was rixingsong-semibold until 2026-05-04, when
-         justfont's CDN started serving a malformed woff for that face;
-         see Layout.astro for full context.) No inline font-family here
-         so the injection wins. -->
+    <!-- Title — `.hero-title` 這個 class 是樣式鉤子，繼承自母體時它的用途是
+         讓 justfont 的 h1 規則注進 `jf-lanyanghei`。justfont 已於 2026-07-29
+         整段移除（母體的專案），現在 `.hero-title` 由 global.css 接手，走
+         --font-display（黑體）。這裡照舊不寫 inline font-family。 -->
     <h1
       class="hero-title mb-4 max-w-[820px] text-[clamp(2rem,5vw,3.4rem)] font-bold leading-[1.2] tracking-[0.01em] text-[#f8f1e9] max-[640px]:text-[1.85rem]"
     >
@@ -162,7 +160,7 @@ const categoryUrl = translatePath(`/${category}`);
 
     {
       description && (
-        <p class="mb-7 max-w-[680px] font-['Noto_Serif_TC',serif] text-[clamp(0.95rem,2.2vw,1.1rem)] leading-[1.75] text-[rgba(248,241,233,0.75)]">
+        <p class="mb-7 max-w-[680px] font-[family-name:var(--font-body)] text-[clamp(0.95rem,2.2vw,1.1rem)] leading-[1.75] text-[rgba(248,241,233,0.75)]">
           {description}
         </p>
       )
@@ -174,7 +172,7 @@ const categoryUrl = translatePath(`/${category}`);
       This replaces the old `:global(.btn-ghost)` scoped style.
     -->
     <div
-      class="[&_#tts-play]:rounded-full [&_#tts-play]:border [&_#tts-play]:border-white/20 [&_#tts-play]:bg-white/10 [&_#tts-play]:px-[1.1rem] [&_#tts-play]:py-[0.45rem] [&_#tts-play]:font-['Inter',system-ui,sans-serif] [&_#tts-play]:text-[0.82rem] [&_#tts-play]:text-[rgba(248,241,233,0.8)] [&_#tts-play]:backdrop-blur-[4px] [&_#tts-play:hover]:bg-white/20 [&_#tts-play:hover]:text-[#f8f1e9] [&_#tts-stop]:rounded-full [&_#tts-stop]:border [&_#tts-stop]:border-white/20 [&_#tts-stop]:bg-white/10 [&_#tts-stop]:px-[1.1rem] [&_#tts-stop]:py-[0.45rem] [&_#tts-stop]:font-['Inter',system-ui,sans-serif] [&_#tts-stop]:text-[0.82rem] [&_#tts-stop]:text-[rgba(248,241,233,0.8)] [&_#tts-stop]:backdrop-blur-[4px] [&_#tts-stop:hover]:bg-white/20 [&_#tts-stop:hover]:text-[#f8f1e9]"
+      class="[&_#tts-play]:rounded-full [&_#tts-play]:border [&_#tts-play]:border-white/20 [&_#tts-play]:bg-white/10 [&_#tts-play]:px-[1.1rem] [&_#tts-play]:py-[0.45rem] [&_#tts-play]:font-[family-name:var(--font-mono)] [&_#tts-play]:text-[0.82rem] [&_#tts-play]:text-[rgba(248,241,233,0.8)] [&_#tts-play]:backdrop-blur-[4px] [&_#tts-play:hover]:bg-white/20 [&_#tts-play:hover]:text-[#f8f1e9] [&_#tts-stop]:rounded-full [&_#tts-stop]:border [&_#tts-stop]:border-white/20 [&_#tts-stop]:bg-white/10 [&_#tts-stop]:px-[1.1rem] [&_#tts-stop]:py-[0.45rem] [&_#tts-stop]:font-[family-name:var(--font-mono)] [&_#tts-stop]:text-[0.82rem] [&_#tts-stop]:text-[rgba(248,241,233,0.8)] [&_#tts-stop]:backdrop-blur-[4px] [&_#tts-stop:hover]:bg-white/20 [&_#tts-stop:hover]:text-[#f8f1e9]"
     >
       <TextToSpeech lang={lang as any} />
     </div>

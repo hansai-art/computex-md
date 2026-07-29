@@ -114,9 +114,11 @@ TW_PATTERNS=(
 #    三次，其中一次是 pre-commit 的 prettier 自己造成的 —— 所以對行號**要以
 #    prettier 跑完之後的檔案為準**：先 `npx prettier --write <file>` 再對行號，
 #    否則 commit 當下會被自己的 hook 擋下來。
+#    2026-07-29 第四次失準：/graph → /organism 改名讓 Header.astro 上方多兩行，
+#    754/801 變成 756/803。
 ALLOWLIST=(
-  "src/components/Header.astro:754|nav-link 底線置中：left:50% + translateX(-50%)"
-  "src/components/Header.astro:801|dropdown 置中：left:50% + translateX(-50%)"
+  "src/components/Header.astro:756|nav-link 底線置中：left:50% + translateX(-50%)"
+  "src/components/Header.astro:803|dropdown 置中：left:50% + translateX(-50%)"
 )
 
 # ── 掛號中的債（受守護檔案裡「還沒還」的行）──────────────────────────────────

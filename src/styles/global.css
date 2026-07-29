@@ -475,31 +475,28 @@
  * 所以拿掉那個前綴，讓字族鏈無條件生效。仍然留在 layer 之外：unlayered 一律
  * 贏過 layered，跟原本的意圖一致。
  *
- * rixingsong 現在解析不到（沒有 webfont 供應了），瀏覽器直接往後掉到
- * Noto Serif TC。鏈本來就是為了這件事寫的。
+ * 2026-07-29 全站改黑體：這條原本指名的 rixingsong-semibold 是 justfont 的
+ * 日星初號楷，供應端已隨 SDK 一起移除，寫在這裡只會靜默 fallback 到明體。
+ * 現在直接指向 --font-display，字族由 tokens.css 單點決定。
  * ========================================================================== */
 .hero-title {
-  font-family:
-    'rixingsong-semibold', 'Noto Serif TC', 'Source Han Serif TC', serif;
+  font-family: var(--font-display);
 }
 
 /* ==========================================================================
- * .prose body 字體統一 — 內文 + 內文標題都用 jf-jinxuanlatte 2.0（四分糖）
+ * .prose 標題字族 — 內文標題跟內文同一字族
  *
  * 範圍：article + hub 的 markdown 渲染區（`<div class="prose">`）。
  * 目的：article 內文標題（h2/h3/h4 from markdown）跟內文同一字族，避免兩
- * 種視覺族（lanyanghei 標題 + jinxuanlatte 內文）撕裂閱讀節奏。
+ * 種視覺族撕裂閱讀節奏。
  *
  * 原本的選擇器是 `html.jf-active .prose :is(h1,…,h6)`，`html.jf-active` 前綴是
  * 用來在 specificity 上贏過 justfont SDK 注入的 `.jf-active h2`。SDK 已於
  * 2026-07-29 移除（見 Layout.astro），`jf-active` 不會再出現，前綴一起拿掉。
  * 仍然留在 @layer base 之外：unlayered 一律贏過 layered，跟原本的意圖一致。
- *
- * jf-jinxuanlatte 現在解析不到，瀏覽器往後掉到 Noto Sans TC。
  * ========================================================================== */
 .prose :is(h1, h2, h3, h4, h5, h6) {
-  font-family:
-    'jf-jinxuanlatte', 'Noto Sans TC', 'Source Han Sans TC', sans-serif;
+  font-family: var(--font-display);
   font-weight: 600;
 }
 

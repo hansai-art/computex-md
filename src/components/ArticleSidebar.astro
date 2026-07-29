@@ -152,7 +152,7 @@ const normalizedContributors = contributors.map((contributor) => {
 >
   <!-- Reading meta -->
   <div
-    class="border-b border-[rgba(26,60,52,0.08)] pb-5 [&_.meta-row]:mb-2 [&_.meta-row]:flex [&_.meta-row]:items-center [&_.meta-row]:gap-[0.55rem] [&_.meta-row]:font-['Inter',system-ui,sans-serif] [&_.meta-row]:text-[0.82rem] [&_.meta-row]:text-[#4a5e52] [&_.meta-row_svg]:flex-shrink-0 [&_.meta-row_svg]:text-[#7a8b7e] [&_.meta-row--subtle]:text-[#7a8b7e]"
+    class="border-b border-[rgba(26,60,52,0.08)] pb-5 [&_.meta-row]:mb-2 [&_.meta-row]:flex [&_.meta-row]:items-center [&_.meta-row]:gap-[0.55rem] [&_.meta-row]:font-[family-name:var(--font-mono)] [&_.meta-row]:text-[0.82rem] [&_.meta-row]:text-[#4a5e52] [&_.meta-row_svg]:flex-shrink-0 [&_.meta-row_svg]:text-[#7a8b7e] [&_.meta-row--subtle]:text-[#7a8b7e]"
   >
     {
       readingTime && (
@@ -299,7 +299,7 @@ const normalizedContributors = contributors.map((contributor) => {
   {
     normalizedContributors.length > 0 && (
       <div class="border-b border-[rgba(26,60,52,0.08)] py-5">
-        <p class="mb-[0.85rem] font-['Inter',system-ui,sans-serif] text-[0.67rem] font-bold uppercase tracking-[0.2em] text-[#9aa89e]">
+        <p class="mb-[0.85rem] font-[family-name:var(--font-mono)] text-[0.67rem] font-bold uppercase tracking-[0.2em] text-[#9aa89e]">
           {contributorsHeading}
         </p>
         <div class="flex flex-wrap gap-[0.4rem]">
@@ -309,12 +309,12 @@ const normalizedContributors = contributors.map((contributor) => {
                 href={contributor.profileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="rounded-full border border-[rgba(0,109,119,0.15)] bg-[rgba(0,109,119,0.07)] px-[0.6rem] py-[0.22rem] font-['Inter',system-ui,sans-serif] text-[0.75rem] text-[#006d77] no-underline transition-colors duration-150 hover:bg-[rgba(0,109,119,0.14)]"
+                class="rounded-full border border-[rgba(0,109,119,0.15)] bg-[rgba(0,109,119,0.07)] px-[0.6rem] py-[0.22rem] font-[family-name:var(--font-mono)] text-[0.75rem] text-[#006d77] no-underline transition-colors duration-150 hover:bg-[rgba(0,109,119,0.14)]"
               >
                 {contributor.name}
               </a>
             ) : (
-              <span class="rounded-full border border-[rgba(0,109,119,0.15)] bg-[rgba(0,109,119,0.07)] px-[0.6rem] py-[0.22rem] font-['Inter',system-ui,sans-serif] text-[0.75rem] text-[#006d77]">
+              <span class="rounded-full border border-[rgba(0,109,119,0.15)] bg-[rgba(0,109,119,0.07)] px-[0.6rem] py-[0.22rem] font-[family-name:var(--font-mono)] text-[0.75rem] text-[#006d77]">
                 {contributor.name}
               </span>
             ),
@@ -327,12 +327,12 @@ const normalizedContributors = contributors.map((contributor) => {
   <!-- Share (after contributors; nowrap labels avoid Facebook mid-word wrap) -->
   <div class="border-b border-[rgba(26,60,52,0.08)] py-5 last:border-b-0">
     <p
-      class="mb-[0.85rem] font-['Inter',system-ui,sans-serif] text-[0.67rem] font-bold uppercase tracking-[0.2em] text-[#9aa89e]"
+      class="mb-[0.85rem] font-[family-name:var(--font-mono)] text-[0.67rem] font-bold uppercase tracking-[0.2em] text-[#9aa89e]"
     >
       {shareLabel}
     </p>
     <div
-      class="flex flex-col gap-[0.1rem] [&_.share-row]:flex [&_.share-row]:w-full [&_.share-row]:cursor-pointer [&_.share-row]:items-center [&_.share-row]:gap-[0.65rem] [&_.share-row]:rounded-md [&_.share-row]:border-none [&_.share-row]:bg-transparent [&_.share-row]:px-2 [&_.share-row]:py-[0.45rem] [&_.share-row]:text-start [&_.share-row]:font-['Inter',system-ui,sans-serif] [&_.share-row]:text-[0.82rem] [&_.share-row]:leading-snug [&_.share-row]:text-[#4a5e52] [&_.share-row]:no-underline [&_.share-row]:transition-colors [&_.share-row]:duration-150 [&_.share-row_span]:min-w-0 [&_.share-row_span]:whitespace-nowrap [&_.share-row_svg]:flex-shrink-0 [&_.share-row_svg]:text-[#7a8b7e] [&_.share-row:hover]:bg-[rgba(26,60,52,0.05)] [&_.share-row:hover]:text-[#1a3c34] [&_.share-row:hover_svg]:text-[#1a3c34]"
+      class="flex flex-col gap-[0.1rem] [&_.share-row]:flex [&_.share-row]:w-full [&_.share-row]:cursor-pointer [&_.share-row]:items-center [&_.share-row]:gap-[0.65rem] [&_.share-row]:rounded-md [&_.share-row]:border-none [&_.share-row]:bg-transparent [&_.share-row]:px-2 [&_.share-row]:py-[0.45rem] [&_.share-row]:text-start [&_.share-row]:font-[family-name:var(--font-mono)] [&_.share-row]:text-[0.82rem] [&_.share-row]:leading-snug [&_.share-row]:text-[#4a5e52] [&_.share-row]:no-underline [&_.share-row]:transition-colors [&_.share-row]:duration-150 [&_.share-row_span]:min-w-0 [&_.share-row_span]:whitespace-nowrap [&_.share-row_svg]:flex-shrink-0 [&_.share-row_svg]:text-[#7a8b7e] [&_.share-row:hover]:bg-[rgba(26,60,52,0.05)] [&_.share-row:hover]:text-[#1a3c34] [&_.share-row:hover_svg]:text-[#1a3c34]"
     >
       <a
         href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}

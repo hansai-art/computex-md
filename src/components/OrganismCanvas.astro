@@ -1,0 +1,387 @@
+---
+/**
+ * OrganismCanvas.astro：生命體本體（Three.js 線框）
+ *
+ * 視覺參照 = 21st.dev 的 AnomalousMatterHero（Perlin 位移幾何）。
+ * Hans 選定的樣子是**純黑底 + 白色線框網格**，不是實心著色球體。
+ * 洋紅 #E4007E 是「現在式」專用色，全站只准出現在 logo、sparkline 當前點、
+ * 時間軸把手三處，生命體本體一點都不准沾。
+ *
+ * ## 六條「指標 → 形狀」對應（2026-07-28 定案）
+ *
+ *   條目數      → 體積（半徑）
+ *   反向連結數  → 瓣數
+ *   AI 抓取次數 → 心跳（脈動頻率）
+ *   Booth Score → 線亮度
+ *   七日編輯數  → 變形速度
+ *   語言數      → 殘影層數
+ *
+ * 其中反向連結與 AI 抓取兩條**還沒有資料源**。generate-organism.py 給的是
+ * `value: null` + 一個寫在那邊的 fallback，頁面同時把「未接」標出來。
+ * NEVER 用一個看起來合理的假數字補上：這一頁的整個論點就是「每個視覺變數
+ * 都追得回一個真實欄位」，補假數字等於當場推翻它自己。
+ *
+ * ## 視覺四要件（Hans 三次退件才對齊，動這支之前先讀完）
+ *
+ * 參照樣本的三行關鍵碼，照抄不要自己發明：
+ *
+ *     new THREE.IcosahedronGeometry(1.2, 64)
+ *     float displacement = snoise(position * 2.0 + time * 0.5) * 0.2;
+ *     float fresnel = pow(1.0 - dot(normal, vec3(0.0, 0.0, 1.0)), 2.0);
+ *
+ * 1. **網目要細**。detail = 64（約 84,500 個三角形），線框才會是一片薄紗。
+ *    detail 24 畫出來是一顆看得見格子的球，不是那個東西。
+ * 2. **噪聲頻率要高、幅度要小**。取樣座標長度約 2.4（= 半徑 1.2 × 2.0），
+ *    幅度只有半徑的 1/6。這組數字產生的是**一圈細密皺褶的裙邊**。
+ *    ⚠️ 我曾把頻率壓到 0.82 想做「大而平滑的瓣」，結果是一顆光滑馬鈴薯：
+ *    低頻 = 沒有皺褶 = 沒有那個生物感。要的是高頻小幅，不是低頻大幅。
+ * 3. **著色是 fresnel 邊緣光，不是位移灰階**。正對鏡頭的地方暗，側面掠過的
+ *    地方亮，所以中心是一團暗的密網、輪廓是一圈亮的皺邊。這是整個畫面的
+ *    層次來源。用位移值當灰階會得到一坨均勻的灰，完全沒有那個深度。
+ * 4. **持續緩慢變形**：噪聲場自己會漂移（uTime 進到噪聲座標），不是只有物體
+ *    在轉。只有轉動的話看起來是「在轉」，不是「在活」。
+ *
+ * 殘影層（語言數那一條）疊在上面：每一層是「0.62 秒前的自己」，做法是把同一個
+ * shader 的 time uniform 往回推 k × 0.62 秒，NEVER 用不同半徑畫同心殼
+ * （同心殼是靜態的洋蔥，不是殘影）。層數上限壓在 3，detail 64 很貴。
+ *
+ * ## 五條實作坑（每一條都真的踩過）
+ *
+ * 1. 位移幅度 MUST 是**相對半徑的比例**。寫成絕對值時，體積長大會讓尖刺穿過
+ *    鏡頭炸成星芒。鏡頭距離也要跟著 (半徑 + 位移) 走。
+ * 2. NEVER 自己加 `document.hidden` 暫停 rAF：那會讓畫面在非前景分頁完全凍住，
+ *    切回來是一張死圖。瀏覽器本來就會節流 rAF，這裡只用 IntersectionObserver
+ *    判斷「有沒有在畫面裡」。
+ * 3. 轉動速度要**慢於**變形速度，否則使用者只看到「在轉」。
+ * 4. 中文標題 NEVER 疊在網格正中央（參考圖的英文能疊是因為拉丁字母筆畫少、
+ *    字距寬）。版面在 organism.template.astro：生命體獨佔上方、文字沉到底部、
+ *    中間用漸層遮罩隔開。
+ * 5. 進場動畫的進度 MUST 用**實際經過時間**算，NEVER 用累加 dt：掉幀或分頁
+ *    節流時 dt 累加會停住，生命體永遠長不大。
+ */
+interface Props {
+  /** generate-organism.py 的 shape 區塊 */
+  shape: Record<string, { value: number | null; fallback?: number }>;
+  /** 無障礙描述；視覺內容在頁面別處有純文字對應 */
+  label: string;
+}
+
+const { shape, label } = Astro.props;
+
+// null（未接）就用 fallback。fallback 寫在 generate-organism.py 裡，
+// 頁面上也會標出哪幾條是未接的。
+const v = (k: string) => shape[k]?.value ?? shape[k]?.fallback ?? 0;
+
+const params = {
+  entries: v('entries'),
+  lobes: v('backlinks'),
+  pulse: v('ai_fetches'),
+  brightness: v('booth_score'),
+  morph: v('edits_7d'),
+  layers: v('languages'),
+};
+---
+
+<div class="organism-stage" data-organism>
+  <canvas data-organism-canvas aria-hidden="true"></canvas>
+  <p class="sr-only">{label}</p>
+  <script
+    type="application/json"
+    data-organism-params
+    set:html={JSON.stringify(params)}
+  />
+</div>
+
+<script>
+  import * as THREE from 'three';
+
+  const stage = document.querySelector<HTMLElement>('[data-organism]');
+  const canvas = stage?.querySelector<HTMLCanvasElement>(
+    '[data-organism-canvas]',
+  );
+  const paramsEl = stage?.querySelector<HTMLScriptElement>(
+    '[data-organism-params]',
+  );
+  if (stage && canvas && paramsEl) {
+    const P = JSON.parse(paramsEl.textContent || '{}') as {
+      entries: number;
+      lobes: number;
+      pulse: number;
+      brightness: number;
+      morph: number;
+      layers: number;
+    };
+
+    const reduce = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+
+    // ── 指標 → 形狀 ─────────────────────────────────────────────────────
+    // 每一條都夾在一個範圍裡：資料再大再小，形狀都還是一個生命體，不會變成
+    // 一個點或一團爆炸。夾的上下界寫在這裡，看得到、改得動。
+    const clamp = (x: number, lo: number, hi: number) =>
+      Math.min(hi, Math.max(lo, x));
+
+    // 條目數 → 體積。用 log 而不是線性：86 → 8600 條的時候，線性會讓它
+    // 撐爆畫面，log 讓「長大」這件事一直看得出來但不會失控。
+    const RADIUS = clamp(0.72 + Math.log10(P.entries + 1) * 0.38, 0.8, 1.9);
+    // 反向連結 → 瓣數
+    const LOBES = clamp(Math.round(P.lobes), 3, 11);
+    // AI 抓取 → 心跳（每秒次數）。0 次抓取 = 只有一個基礎心跳，不是不跳。
+    const PULSE_HZ = clamp(0.18 + P.pulse / 4000, 0.18, 1.2);
+    // Booth Score → 線亮度
+    const WIRE = clamp(0.24 + (P.brightness / 100) * 0.62, 0.24, 0.92);
+    // 七日編輯 → 變形速度
+    const MORPH = clamp(0.05 + P.morph * 0.012, 0.05, 0.5);
+    // 語言數 → 殘影層數。detail 64 每層 8.45 萬個三角形，上限壓 3。
+    const LAYERS = clamp(Math.round(P.layers), 1, 3);
+
+    // 坑 3：轉動要慢於變形，否則看起來只是「在轉」。
+    const SPIN = MORPH * 0.22;
+    // 要件 2：位移幅度 = 半徑的 1/6（參照樣本是 0.2 / 1.2）。
+    // 坑 1：寫成比例而不是絕對值，體積長大時皺褶跟著等比例長，不會刺穿鏡頭。
+    const DISPLACE_RATIO = 0.2 / 1.2;
+    // 要件 2：噪聲取樣座標的長度。參照樣本 = 半徑 1.2 × 頻率 2.0 = 2.4。
+    // 這裡除以半徑，體積長大時皺褶密度才不會被拉開變稀。
+    // 瓣數（反向連結）在這條線上加減：連結越多，裙邊皺褶越密。
+    // 3 → 2.10、11 → 3.06，都還在「一圈細密皺褶」的範圍。
+    const NOISE_SPAN = 1.74 + LOBES * 0.12;
+    const NOISE_FREQ = NOISE_SPAN / RADIUS;
+    // 殘影的時間延遲：每一層是 0.62 秒前的自己（視覺要件 2）。
+    const TRAIL_DELAY = 0.62;
+
+    const scene = new THREE.Scene();
+    // FOV 照抄參照樣本的 75：廣角讓皺邊有透視張力，換成 38 會變成一張平的貼圖。
+    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 100);
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true,
+    });
+    renderer.setClearColor(0x000000, 0);
+
+    // 要件 1：detail 64 = 20 × 65² = 84,500 個三角形。線框才會是一片薄紗。
+    const geometry = new THREE.IcosahedronGeometry(RADIUS, 64);
+
+    const vertexShader = /* glsl */ `
+      uniform float uTime;
+      uniform float uRadius;
+      uniform float uDisplace;
+      uniform float uNoiseFreq;
+      uniform float uGrow;
+      varying vec3 vNormal;
+
+      // Ashima simplex noise（公有領域）
+      vec3 mod289(vec3 x){ return x - floor(x * (1.0/289.0)) * 289.0; }
+      vec4 mod289(vec4 x){ return x - floor(x * (1.0/289.0)) * 289.0; }
+      vec4 permute(vec4 x){ return mod289(((x*34.0)+1.0)*x); }
+      vec4 taylorInvSqrt(vec4 r){ return 1.79284291400159 - 0.85373472095314 * r; }
+      float snoise(vec3 v){
+        const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+        const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+        vec3 i  = floor(v + dot(v, C.yyy));
+        vec3 x0 = v - i + dot(i, C.xxx);
+        vec3 g = step(x0.yzx, x0.xyz);
+        vec3 l = 1.0 - g;
+        vec3 i1 = min(g.xyz, l.zxy);
+        vec3 i2 = max(g.xyz, l.zxy);
+        vec3 x1 = x0 - i1 + C.xxx;
+        vec3 x2 = x0 - i2 + C.yyy;
+        vec3 x3 = x0 - D.yyy;
+        i = mod289(i);
+        vec4 p = permute(permute(permute(
+                   i.z + vec4(0.0, i1.z, i2.z, 1.0))
+                 + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+                 + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+        float n_ = 0.142857142857;
+        vec3 ns = n_ * D.wyz - D.xzx;
+        vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+        vec4 x_ = floor(j * ns.z);
+        vec4 y_ = floor(j - 7.0 * x_);
+        vec4 x = x_ * ns.x + ns.yyyy;
+        vec4 y = y_ * ns.x + ns.yyyy;
+        vec4 h = 1.0 - abs(x) - abs(y);
+        vec4 b0 = vec4(x.xy, y.xy);
+        vec4 b1 = vec4(x.zw, y.zw);
+        vec4 s0 = floor(b0) * 2.0 + 1.0;
+        vec4 s1 = floor(b1) * 2.0 + 1.0;
+        vec4 sh = -step(h, vec4(0.0));
+        vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+        vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
+        vec3 p0 = vec3(a0.xy, h.x);
+        vec3 p1 = vec3(a0.zw, h.y);
+        vec3 p2 = vec3(a1.xy, h.z);
+        vec3 p3 = vec3(a1.zw, h.w);
+        vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+        p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+        vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+        m = m * m;
+        return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+      }
+
+      void main() {
+        // 照抄參照樣本：位移沿法線、取樣座標 = position × 頻率、時間整體位移。
+        // 要件 4：uTime 加在取樣座標上，所以就算物體不轉，表面也一直在皺動。
+        // 這是「活著」跟「在轉」的差別。
+        float displacement =
+          snoise(position * uNoiseFreq + uTime) * uDisplace * uRadius;
+
+        // fresnel 用未變形的法線算（參照樣本也是）。這條法線在物件座標系，
+        // 會跟著 mesh 一起轉，所以亮帶會在表面上緩慢掃過去。
+        vNormal = normal;
+
+        vec3 newPos = (position + normal * displacement) * uGrow;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);
+      }
+    `;
+
+    const fragmentShader = /* glsl */ `
+      uniform float uOpacity;
+      uniform float uBrightness;
+      varying vec3 vNormal;
+      void main() {
+        // 要件 3：fresnel 邊緣光。正對鏡頭 → dot 接近 1 → fresnel 接近 0 → 暗；
+        // 側面掠過 → dot 接近 0 → fresnel 接近 1 → 亮。所以中心是一團暗的密網、
+        // 輪廓是一圈亮的皺邊，整張圖的層次全部來自這一行。
+        //
+        // 參照樣本裡還有一個 diffuse 項，但它的 uniform 名字打錯（宣告
+        // pointLightPosition、傳進來的是 pointLightPos），實際恆等於 0。
+        // 那張大家看到的圖就是純 fresnel，所以這裡不抄那段死碼。
+        float fresnel = 1.0 - dot(normalize(vNormal), vec3(0.0, 0.0, 1.0));
+        fresnel = pow(fresnel, 2.0);
+        // Booth Score → 線亮度。純黑白，洋紅一點都不准沾。
+        gl_FragColor = vec4(vec3(fresnel * uBrightness), uOpacity);
+      }
+    `;
+
+    // 視覺要件 2：每一層是「0.62 秒前的自己」。做法是同一個 shader、
+    // 同一個幾何，只把 uTime 往回推；不是不同半徑的同心殼。
+    const layers = Array.from({ length: LAYERS }, (_, k) => {
+      const mat = new THREE.ShaderMaterial({
+        uniforms: {
+          uTime: { value: 0 },
+          uRadius: { value: RADIUS },
+          uDisplace: { value: DISPLACE_RATIO },
+          uNoiseFreq: { value: NOISE_FREQ },
+          uGrow: { value: 0 },
+          uOpacity: { value: k === 0 ? 1 : 0.26 / k },
+          uBrightness: { value: WIRE },
+        },
+        vertexShader,
+        fragmentShader,
+        wireframe: true,
+        transparent: true,
+        depthWrite: k === 0,
+      });
+      const mesh = new THREE.Mesh(geometry, mat);
+      scene.add(mesh);
+      return { mesh, mat, delay: k * TRAIL_DELAY };
+    });
+
+    function resize() {
+      const w = stage.clientWidth;
+      const h = stage.clientHeight;
+      if (!w || !h) return;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      // 坑 1 的後半：鏡頭距離跟著 (半徑 + 位移) 走，而且窄畫面要再退遠一點，
+      // 否則手機上生命體會被切掉兩側。
+      //
+      // FILL = 生命體要佔畫面半高的幾成。參照樣本是 fov 75 / z 3 / 半徑 1.2 +
+      // 位移 0.2，算出來剛好 0.61，照抄這個數字，畫面比例才跟參考圖一樣飽滿。
+      const FILL = 0.61;
+      const extent = RADIUS * (1 + DISPLACE_RATIO);
+      const fovRad = (camera.fov * Math.PI) / 180;
+      const distV = extent / (Math.tan(fovRad / 2) * FILL);
+      const distH = extent / (Math.tan(fovRad / 2) * camera.aspect * FILL);
+      camera.position.z = Math.max(distV, distH);
+      camera.updateProjectionMatrix();
+    }
+
+    // 坑 2：只用 IntersectionObserver 判斷「有沒有在畫面裡」。
+    // NEVER 加 document.hidden 的暫停：那會讓非前景分頁的畫面完全凍住，
+    // 切回來看到一張死圖。rAF 在背景分頁本來就會被瀏覽器節流。
+    let visible = true;
+    new IntersectionObserver(
+      (entries) => {
+        visible = entries[0].isIntersecting;
+        if (visible && !reduce) requestAnimationFrame(frame);
+      },
+      { rootMargin: '120px' },
+    ).observe(stage);
+
+    // 坑 5：進場用**實際經過時間**，不是累加 dt。掉幀或分頁節流時 dt 會停住，
+    // 生命體就永遠長不大。
+    const t0 = performance.now();
+    const GROW_MS = 2200;
+    let running = false;
+
+    function frame() {
+      if (running && !visible) {
+        running = false;
+        return;
+      }
+      running = true;
+      const elapsed = (performance.now() - t0) / 1000;
+      const grow = Math.min(1, (elapsed * 1000) / GROW_MS);
+      // easeOutCubic，讓它是「長出來」不是「彈出來」
+      const eased = 1 - Math.pow(1 - grow, 3);
+
+      // AI 抓取 → 心跳：整體尺度上的一個緩慢脈動。
+      const beat = 1 + Math.sin(elapsed * Math.PI * 2 * PULSE_HZ) * 0.022;
+
+      for (const { mesh, mat, delay } of layers) {
+        // 殘影 = 同一個東西的過去。時間往回推，其他參數完全一樣。
+        // 參照樣本的變形速度換算成「每秒噪聲座標位移」= 0.15。MORPH 的中段
+        // （七日 16 筆編輯 → 0.24）乘 0.62 剛好落在那裡，冷站慢、熱站快。
+        mat.uniforms.uTime.value = Math.max(0, elapsed - delay) * MORPH * 0.62;
+        mat.uniforms.uGrow.value = eased * beat;
+        mesh.rotation.y = (elapsed - delay) * SPIN;
+        mesh.rotation.x = (elapsed - delay) * SPIN * 0.42;
+      }
+
+      renderer.render(scene, camera);
+      if (!reduce) requestAnimationFrame(frame);
+    }
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(stage);
+    resize();
+
+    if (reduce) {
+      // 尊重系統設定：畫一張靜止的，不進 rAF 迴圈。
+      for (const { mat } of layers) {
+        mat.uniforms.uGrow.value = 1;
+        mat.uniforms.uTime.value = 1.4;
+      }
+      renderer.render(scene, camera);
+    } else {
+      requestAnimationFrame(frame);
+    }
+  }
+</script>
+
+<style>
+  .organism-stage {
+    position: relative;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+  .organism-stage canvas {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

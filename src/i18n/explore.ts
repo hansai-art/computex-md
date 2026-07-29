@@ -52,10 +52,10 @@ export const exploreUI = {
     'explore.machine.heading': 'The machine-readable route',
     'explore.machine.subtitle':
       'This archive is built to be quoted by language models as much as read by people. These are the doors built for them.',
-    'explore.machine.graph.title': 'Relationship graph',
-    'explore.machine.graph.desc':
-      'How the pages connect: exhibitors, editions, and the zones they sit in.',
-    'explore.machine.graph.cta': 'Open the graph',
+    'explore.machine.organism.title': 'The Organism',
+    'explore.machine.organism.desc':
+      'The archive as a living colony: one cell per exhibitor, sitting at its real booth coordinate, lit by how complete its page is.',
+    'explore.machine.organism.cta': 'Open the organism',
     'explore.machine.llms.title': 'llms.txt',
     'explore.machine.llms.desc':
       'One plain-text file describing what this archive is, what it does not claim, and how to cite it.',
@@ -107,9 +107,10 @@ export const exploreUI = {
     'explore.machine.heading': '機器可讀的那條路',
     'explore.machine.subtitle':
       '這個檔案庫是為了「被語言模型引用」跟「被人讀」同時設計的。下面這幾道門是給前者開的。',
-    'explore.machine.graph.title': '關聯圖',
-    'explore.machine.graph.desc': '看這些頁彼此怎麼連：廠商、屆數、所屬展區。',
-    'explore.machine.graph.cta': '打開關聯圖',
+    'explore.machine.organism.title': '生命體',
+    'explore.machine.organism.desc':
+      '把整個檔案庫看成一個群落：一顆細胞是一家廠商，待在自己真實的攤位座標上，亮度是這一頁被補到什麼程度。',
+    'explore.machine.organism.cta': '打開生命體',
     'explore.machine.llms.title': 'llms.txt',
     'explore.machine.llms.desc':
       '一個純文字檔，說明這個檔案庫是什麼、不主張什麼、該怎麼引用。',

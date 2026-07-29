@@ -67,7 +67,7 @@ export const homeUI = {
     'home.features.complete.title': 'Open to correction',
     'home.features.complete.desc':
       'Every page can be claimed and corrected through a pull request',
-    'home.features.cta.graph': '🔗 Knowledge graph',
+    'home.features.cta.organism': '🧬 The organism',
     'home.features.cta.ssot': '📂 Browse the raw Markdown ↗',
 
     // ── VitalsStrip ──
@@ -181,7 +181,7 @@ export const homeUI = {
       '一家公司一份檔案跨年度累積，不是每屆重開一個新檔',
     'home.features.complete.title': '開放被糾正',
     'home.features.complete.desc': '每一頁都可以認領，用 pull request 修正',
-    'home.features.cta.graph': '🔗 知識圖譜',
+    'home.features.cta.organism': '🧬 生命體',
     'home.features.cta.ssot': '📂 瀏覽原始 Markdown ↗',
 
     // ── VitalsStrip ──

@@ -9,7 +9,7 @@
     "postinstall": "bash scripts/core/sync.sh",
     "twmd": "node scripts/twmd.mjs",
     "dev": "npm run prebuild:sync && npm run prebuild:gitinfo && (python3 scripts/core/generate-newsroom-data.py --quiet || true) && astro dev",
-    "prebuild": "npm run prebuild:sync && npm run prebuild:terms && npm run prebuild:status && npm run prebuild:aliases && run-p prebuild:api prebuild:search prebuild:dashboard prebuild:changelog prebuild:contributors prebuild:buildperf prebuild:langswitch prebuild:og prebuild:i18n prebuild:content-dates prebuild:gitinfo prebuild:content-stats prebuild:i18n-progress prebuild:llms prebuild:stats && npm run prebuild:latest && npm run prebuild:redirects && npm run verify:data",
+    "prebuild": "npm run prebuild:sync && npm run prebuild:terms && npm run prebuild:status && npm run prebuild:aliases && run-p prebuild:api prebuild:search prebuild:dashboard prebuild:changelog prebuild:contributors prebuild:buildperf prebuild:langswitch prebuild:og prebuild:i18n prebuild:content-dates prebuild:gitinfo prebuild:content-stats prebuild:i18n-progress prebuild:llms prebuild:stats prebuild:organism && npm run prebuild:latest && npm run prebuild:redirects && npm run verify:data",
     "prebuild:sync": "bash scripts/core/sync.sh",
     "prebuild:terms": "python3 scripts/core/extract-china-terms.py --quiet",
     "prebuild:status": "python3 scripts/tools/lang-sync/status.py && python3 scripts/tools/sync-translations-json.py",
@@ -67,7 +67,8 @@
     "verify:data": "node scripts/tools/verify-generated-data.mjs",
     "verify:doors": "node scripts/tools/verify-machine-doors.mjs",
     "verify:size": "node scripts/tools/verify-build-size.mjs",
-    "verify:accounts": "node scripts/tools/verify-no-inherited-accounts.mjs"
+    "verify:accounts": "node scripts/tools/verify-no-inherited-accounts.mjs",
+    "prebuild:organism": "python3 scripts/tools/generate-organism.py"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.17",
@@ -80,7 +81,8 @@
     "minisearch": "^7.2.0",
     "rehype-external-links": "^3.0.0",
     "remark-wiki-link": "^2.0.1",
-    "tailwindcss": "^4.2.2"
+    "tailwindcss": "^4.2.2",
+    "three": "^0.185.1"
   },
   "devDependencies": {
     "husky": "^9.1.7",

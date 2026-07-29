@@ -94,27 +94,31 @@ const { readerSettings } = Astro.props;
 <script is:inline>
   (function () {
     try {
-      if (!window.__TW_MD_READER_SETTINGS) return;
-      var qs = new URLSearchParams(location.search);
-      if (qs.get('shot') === '1') return;
       var html = document.documentElement;
+      // ?shot=1（OG 圖產生器）一律亮色：社群卡片縮圖在各家 app 的白底 feed 裡
+      // 用深色會糊成一塊。這條要在 readerSettings gate 之前，因為 OG 圖也可能
+      // 打在沒開 reader settings 的頁面上。
+      var qs = new URLSearchParams(location.search);
+      if (qs.get('shot') === '1') {
+        html.removeAttribute('data-theme');
+        return;
+      }
+      if (!window.__TW_MD_READER_SETTINGS) return;
       var saved = null;
       try {
         saved = localStorage.getItem('tw-md-theme');
       } catch (_) {}
-      // Default = light（哲宇明確要求：「全部網站都預設用亮色模式 除非特別切換暗色模式」）
+      // 2026-07-29 起預設 = 深色，而且深色是由 Layout.astro 直接寫在 <html> 上的，
+      // 這段 script 的工作只剩「使用者明確要亮色時，把它拿掉」。
+      //
+      // 之前是相反的：預設亮色、script 負責加上深色。那個預設不是本站的決定，
+      // 是母體作者的（原註解：「哲宇明確要求：全部網站都預設用亮色模式」），
+      // 跟著取種一起被繼承下來。
       var prefersDark =
-        window.matchMedia &&
+        !window.matchMedia ||
         window.matchMedia('(prefers-color-scheme: dark)').matches;
-      var effective =
-        saved === 'dark'
-          ? 'dark'
-          : saved === 'auto'
-            ? prefersDark
-              ? 'dark'
-              : 'light'
-            : 'light';
-      if (effective === 'dark') html.setAttribute('data-theme', 'dark');
+      var wantsLight = saved === 'light' || (saved === 'auto' && !prefersDark);
+      if (wantsLight) html.removeAttribute('data-theme');
       var size = null;
       try {
         size = localStorage.getItem('tw-md-text-size');

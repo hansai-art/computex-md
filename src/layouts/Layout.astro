@@ -181,7 +181,25 @@ const skipLinkLabel = skipLinkLabels[lang] ?? skipLinkLabels['zh-TW'];
 ---
 
 <!doctype html>
-<html lang={lang} dir={dir}>
+{
+  /*
+  data-theme="dark" 直接寫死在伺服器產出的 HTML 上（2026-07-29，Hans 指定
+  「以深色為主」）。
+
+  為什麼寫在這裡而不是靠 JS 設：
+  1. 沒有 FOUC —— first paint 就已經是深色，不會先閃一下白底。
+  2. JS 關掉也是深色。原本的作法是 inline script 讀 localStorage 再 setAttribute，
+     JS 一關就退回亮色。
+  3. `?shot=1`（OG 圖）與使用者明確選亮色，由 HeadInlineScripts 的 script 負責
+     **移除**這個屬性 —— 也就是深色是預設值，亮色是一個要主動做的動作。
+     方向跟 2026-07-29 之前相反：那時的預設亮色是母體作者的產品決定
+     （原註解寫「哲宇明確要求：全部網站都預設用亮色模式」），不是本站的。
+
+  這裡用 Astro 的 JSX 註解而不是 HTML 註解：JSX 註解不會進產出，HTML 註解會，
+  而這一段會出現在每一頁。
+*/
+}
+<html lang={lang} dir={dir} data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -198,14 +216,22 @@ const skipLinkLabel = skipLinkLabels[lang] ?? skipLinkLabels['zh-TW'];
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- 中文字體：Noto Sans TC / Noto Serif TC。
-         2026-07-29 起這是**唯一**的中文 webfont 來源，不再是 fallback：
-         原本排在它前面的 justfont（金萱、蘭陽黑、蘭陽明體、鶴體、日星初號楷）
-         用的是母體的 justfont 專案 65854，已整段移除（理由見本檔 frontmatter
-         的第三方帳號說明）。各處 font-family 鏈裡的 `jf-*` 字名現在解析不到，
-         瀏覽器直接掉到這裡載入的 Noto，鏈本來就是為了這件事寫的。 -->
+    {
+      /* 字體：IBM Plex Sans（拉丁）+ IBM Plex Mono（數據）+ Noto Sans TC（繁中黑體）。
+        2026-07-29 全站改黑體並重寫字體鏈，理由與配對邏輯見 src/styles/tokens.css
+        的 Typography 段。這裡只講「載了什麼、為什麼不載別的」：
+
+        - Noto Serif TC 整組拿掉。全站已無明體，載了也沒人用，等於白付一次
+          字體下載。拿掉的重量正好抵掉新加的兩支 Plex。
+        - 沒有 justfont。原本的五支（金萱、蘭陽黑、蘭陽明體、鶴體、日星初號楷）
+          用的是母體的專案 65854，已整段移除（理由見本檔 frontmatter）。
+        - Noto Sans TC 保留 300-900 全段：中文標題要壓到 900，內文要 300/400，
+          中間的 500/600/700 UI 在用，沒有哪一段是備而不用的。
+        - Plex 只取實際用得到的字重（Sans 400/500/600/700、Mono 400/500），
+          不整組拉。 */
+    }
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;800;900&family=Noto+Serif+TC:wght@400;600;700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;600;700;800;900&display=swap"
       rel="preload"
       as="style"
       onload="this.onload=null;this.rel='stylesheet'"
@@ -213,7 +239,7 @@ const skipLinkLabel = skipLinkLabels[lang] ?? skipLinkLabels['zh-TW'];
     <!-- JS 關閉時的退路 -->
     <noscript>
       <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;800;900&family=Noto+Serif+TC:wght@400;600;700;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet"
       />
     </noscript>
@@ -942,6 +968,9 @@ gtag('config', ${JSON.stringify(GA_MEASUREMENT_ID)});`}
       const ghBase = 'https://github.com/hansai-art/computex-md/blob/main';
 
       let target = '/README.md'; // Default fallback
+      // 少數頁面的 .md 版本在本站上、不在 GitHub 上（例如 /organism 的純文字
+      // 雙胞胎）。那種情況要送到站內網址，不要套 ghBase。
+      let sameSite = null;
 
       // Handle special pages
       if (
@@ -955,8 +984,12 @@ gtag('config', ${JSON.stringify(GA_MEASUREMENT_ID)});`}
         target = '/CONTRIBUTING.md';
       } else if (pathname.includes('/resources')) {
         target = '/knowledge/About/台灣官方網站資源.md';
-      } else if (pathname.includes('/graph')) {
-        target = '/src/pages/graph.astro';
+      } else if (pathname.includes('/organism')) {
+        // /organism 的主角是 WebGL，爬蟲看到的是一片黑。純文字雙胞胎才是這一頁
+        // 真正可被引用的版本，所以 .md 鈕直接送到它，不送 GitHub 原始碼。
+        sameSite = pathname.startsWith('/en')
+          ? '/en/organism.md'
+          : '/organism.md';
       } else if (pathname.includes('/map')) {
         target = pathname.startsWith('/en')
           ? '/src/pages/en/map.astro'
@@ -993,7 +1026,7 @@ gtag('config', ${JSON.stringify(GA_MEASUREMENT_ID)});`}
         }
       }
 
-      btn.href = ghBase + target;
+      btn.href = sameSite ? sameSite : ghBase + target;
 
       // Hash-based active state can only be detected client-side
       if (window.location.hash === '#categories') {

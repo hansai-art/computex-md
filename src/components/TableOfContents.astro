@@ -74,7 +74,7 @@ const headings = extractHeadings(content);
       aria-label={t('article.toc')}
       id="toc"
     >
-      <p class="mb-5 px-1 font-['Inter',system-ui,sans-serif] text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[#9aa89e]">
+      <p class="mb-5 px-1 font-[family-name:var(--font-mono)] text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[#9aa89e]">
         {t('article.toc')}
       </p>
       <ol class="m-0 flex list-none flex-col gap-[0.1rem] p-0">
@@ -92,7 +92,7 @@ const headings = extractHeadings(content);
               class="toc-link flex items-baseline gap-[0.6rem] rounded-md border-s-2 border-transparent px-[0.6rem] py-[0.42rem] no-underline transition-[background-color,color] duration-150 hover:bg-[rgba(26,60,52,0.05)] hover:text-[#1a3c34] [&.active]:border-s-[#006d77] [&.active]:bg-[rgba(0,109,119,0.06)] [&.active]:text-[#006d77]"
               data-toc-id={h.id}
             >
-              <span class="w-[1.6rem] flex-shrink-0 font-['Inter',system-ui,sans-serif] text-[0.65rem] [font-variant-numeric:tabular-nums] text-[#b8c4be]">
+              <span class="w-[1.6rem] flex-shrink-0 font-[family-name:var(--font-mono)] text-[0.65rem] [font-variant-numeric:tabular-nums] text-[#b8c4be]">
                 {h.level === 2
                   ? String(
                       headings.filter((x, j) => x.level === 2 && j <= i).length,
@@ -100,7 +100,7 @@ const headings = extractHeadings(content);
                   : ''}
               </span>
               <span
-                class={`font-['Noto_Serif_TC',serif] leading-[1.45] [.toc-link:hover_&]:text-inherit [.toc-link.active_&]:text-inherit ${
+                class={`font-[family-name:var(--font-body)] leading-[1.45] [.toc-link:hover_&]:text-inherit [.toc-link.active_&]:text-inherit ${
                   h.level === 2
                     ? 'text-[0.82rem] font-medium text-[#3a4f44]'
                     : 'text-[0.78rem] text-[#7a8b7e]'

@@ -377,11 +377,10 @@ const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
       try {
         saved = localStorage.getItem('tw-md-theme');
       } catch (_) {}
-      // Default = 'light' when LS is empty. 'auto' is now an explicit
-      // opt-in (no longer the default state, post 2026-05-02 γ-late
-      // observer feedback to default-light everywhere).
-      if (saved === 'dark' || saved === 'auto') return saved;
-      return 'light';
+      // 2026-07-29 起 LS 空 = 'dark'（Hans 指定深色為主）。'light' 與 'auto'
+      // 都要明確寫進 LS，因為它們現在都是「偏離預設」的選擇。
+      if (saved === 'light' || saved === 'auto') return saved;
+      return 'dark';
     }
     function readSize() {
       var saved = null;
@@ -393,10 +392,10 @@ const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
 
     function applyTheme(value) {
       // value: 'light' | 'auto' | 'dark'.
-      // 'light' clears LS (it's the default). 'auto' and 'dark' write
-      // explicit values so the FOUC init script knows the user opted in.
+      // 'dark' 是預設，清掉 LS 即可；'light' 與 'auto' 要寫進 LS，
+      // 這樣 HeadInlineScripts 的 FOUC init 才知道使用者主動選過。
       try {
-        if (value === 'light') localStorage.removeItem('tw-md-theme');
+        if (value === 'dark') localStorage.removeItem('tw-md-theme');
         else localStorage.setItem('tw-md-theme', value);
       } catch (_) {}
       var effective =

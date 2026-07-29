@@ -92,13 +92,15 @@ const navConfig = [
     pathWithoutHash !== fullPath
       ? false
       : currentPath.startsWith(pathWithoutHash);
-  // /latest 與 /graph 掛在「探索」底下，/mcp 掛在「監測」底下：
+  // /latest 與 /organism 掛在「探索」底下，/mcp 掛在「監測」底下：
   // 人在那些頁面時，父項要跟著亮。
   if (item.path === '/explore') {
     const latest = navHref('/latest');
-    const graph = navHref('/graph');
+    const organism = navHref('/organism');
     active =
-      active || currentPath.startsWith(latest) || currentPath.startsWith(graph);
+      active ||
+      currentPath.startsWith(latest) ||
+      currentPath.startsWith(organism);
   }
   if (item.path === '/dashboard') {
     active = active || currentPath.startsWith(navHref('/mcp'));
@@ -115,7 +117,7 @@ const navConfig = [
 const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
   '/explore': [
     { href: navHref('/latest'), label: `🆕 ${t('nav.latest')}` },
-    { href: navHref('/graph'), label: `🕸️ ${t('nav.graph-view')}` },
+    { href: navHref('/organism'), label: `🧬 ${t('nav.organism-view')}` },
   ],
   '/dashboard': [{ href: navHref('/mcp'), label: `🔌 ${t('nav.mcp')}` }],
   '/about': [
@@ -689,7 +691,7 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     text-decoration: none;
     font-size: 1.3rem;
     font-weight: 700;
-    font-family: 'Noto Serif TC', serif;
+    font-family: var(--font-body);
     flex-shrink: 0;
     display: flex;
     align-items: center;

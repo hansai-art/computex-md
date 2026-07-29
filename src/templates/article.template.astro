@@ -90,19 +90,17 @@ const seoDateModified =
 const langPath = lang === 'zh-TW' ? '' : `${lang}/`;
 const langUrlPrefix = lang === 'zh-TW' ? '' : `/${lang}`;
 
-// Per-lang prose font (wired into <style define:vars> below as --prose-font).
-// zh-TW uses jf-jinxuanlatte (justfont 金萱拿鐵) to match site body cascade
-// — restored 2026-05-04 after Tailwind migration silently flipped it to
-// Noto Serif TC. en/es/fr use Inter; ja/ko use Noto Serif JP/KR.
-const proseFontMap: Record<string, string> = {
-  'zh-TW': "'jf-jinxuanlatte','Noto Sans TC','Source Han Sans TC',sans-serif",
-  en: "'Inter',system-ui,sans-serif",
-  ja: "'Noto Serif JP',serif",
-  ko: "'Noto Serif KR',serif",
-  es: "'Inter',system-ui,sans-serif",
-  fr: "'Inter',system-ui,sans-serif",
-};
-const proseFont = proseFontMap[lang] ?? proseFontMap['zh-TW'];
+// 內文字族（下面的 <style define:vars> 會接成 --prose-font）。
+//
+// 2026-07-29 之前這裡是一張逐語言的字體對照表，六列沒有一列真的生效過：
+//   zh-TW → justfont 金萱拿鐵，供應端已隨 SDK 移除，靜默 fallback
+//   en/es/fr → 'Inter'，從來沒載入過（而且 Inter 正是那個到處都是的預設臉）
+//   ja/ko → Noto Serif JP/KR，那兩個語言在本站根本沒開（config/languages.mjs）
+// 而它被寫進每一頁的 inline style，光 `jf-jinxuanlatte` 這個字串在 dist 就
+// 出現一萬多次 —— 一張全部失效的表，被複製了兩百遍。
+//
+// 現在全語言統一走 --font-body（黑體），字族由 tokens.css 單點決定。
+const proseFont = 'var(--font-body)';
 
 // ── Category → folder mapping ─────────────────────────────────────────────────
 const categoryMapping = CATEGORY_MAPPING;
@@ -340,7 +338,7 @@ const encodedTitle = encodeURIComponent(title);
               {(frontmatter.imageCredit ||
                 frontmatter.imageLicense ||
                 frontmatter.imageSource) && (
-                <figcaption class="mt-3 px-1 font-['Inter',system-ui,sans-serif] text-[0.78rem] leading-relaxed text-[rgba(26,60,52,0.6)]">
+                <figcaption class="mt-3 px-1 font-[family-name:var(--font-mono)] text-[0.78rem] leading-relaxed text-[rgba(26,60,52,0.6)]">
                   {frontmatter.imageCredit && (
                     <span>
                       {t('article.imageCredit') || '圖片'}：
@@ -430,7 +428,7 @@ const encodedTitle = encodeURIComponent(title);
         {
           frontmatter.source && frontmatter.source.length > 0 && (
             <div class="my-12 rounded-2xl border border-[rgba(26,60,52,0.08)] bg-[rgba(26,60,52,0.03)] p-8">
-              <h3 class="mb-4 font-['Inter',system-ui,sans-serif] text-[0.85rem] font-semibold uppercase tracking-[0.1em] text-[#1a3c34]">
+              <h3 class="mb-4 font-[family-name:var(--font-mono)] text-[0.85rem] font-semibold uppercase tracking-[0.1em] text-[#1a3c34]">
                 {t('article.sources')}
               </h3>
               <ul class="m-0 flex list-none flex-col gap-2 p-0">
@@ -475,7 +473,7 @@ const encodedTitle = encodeURIComponent(title);
             >
           </div>
           <div
-            class="font-['Inter',system-ui,sans-serif] text-[0.83rem] leading-[1.6] text-[#5a4a42] [&>strong]:mb-[0.3rem] [&>strong]:block [&>strong]:text-[0.8rem] [&>strong]:font-semibold [&>strong]:uppercase [&>strong]:tracking-[0.08em] [&>strong]:text-[#c17d5e]"
+            class="font-[family-name:var(--font-mono)] text-[0.83rem] leading-[1.6] text-[#5a4a42] [&>strong]:mb-[0.3rem] [&>strong]:block [&>strong]:text-[0.8rem] [&>strong]:font-semibold [&>strong]:uppercase [&>strong]:tracking-[0.08em] [&>strong]:text-[#c17d5e]"
           >
             <strong>{t('article.disclaimer.title')}</strong>
             {t('article.disclaimer.body')}
@@ -494,14 +492,14 @@ const encodedTitle = encodeURIComponent(title);
           aria-label={t('article.signature.intro')}
         >
           <p
-            class="m-0 font-['Inter',system-ui,sans-serif] text-[0.82rem] leading-[1.6] text-[#5a6b60]"
+            class="m-0 font-[family-name:var(--font-mono)] text-[0.82rem] leading-[1.6] text-[#5a6b60]"
           >
             {t('article.signature.intro')}
           </p>
           <div class="mt-3 flex flex-wrap items-center gap-2.5">
             <button
               type="button"
-              class="signature-share-btn inline-flex cursor-pointer items-center gap-[0.4rem] rounded-full border border-[rgba(26,60,52,0.2)] bg-transparent px-[0.9rem] py-[0.45rem] font-['Inter',system-ui,sans-serif] text-[0.8rem] font-medium text-[#1a3c34] no-underline transition-all duration-200 hover:bg-[rgba(26,60,52,0.06)]"
+              class="signature-share-btn inline-flex cursor-pointer items-center gap-[0.4rem] rounded-full border border-[rgba(26,60,52,0.2)] bg-transparent px-[0.9rem] py-[0.45rem] font-[family-name:var(--font-mono)] text-[0.8rem] font-medium text-[#1a3c34] no-underline transition-all duration-200 hover:bg-[rgba(26,60,52,0.06)]"
               data-share-label={t('article.signature.share')}
               data-copied-label={t('article.signature.copied')}
               data-ga-section="article_signature"
@@ -536,7 +534,7 @@ const encodedTitle = encodeURIComponent(title);
               href={lang === 'zh-TW' ? '/contribute' : `/${lang}/contribute`}
               data-ga-section="article_signature"
               data-ga-label="contribute"
-              class="inline-flex items-center gap-[0.4rem] rounded-full border border-[rgba(26,60,52,0.2)] bg-transparent px-[0.9rem] py-[0.45rem] font-['Inter',system-ui,sans-serif] text-[0.8rem] font-medium text-[#1a3c34] no-underline transition-all duration-200 hover:bg-[rgba(26,60,52,0.06)]"
+              class="inline-flex items-center gap-[0.4rem] rounded-full border border-[rgba(26,60,52,0.2)] bg-transparent px-[0.9rem] py-[0.45rem] font-[family-name:var(--font-mono)] text-[0.8rem] font-medium text-[#1a3c34] no-underline transition-all duration-200 hover:bg-[rgba(26,60,52,0.06)]"
             >
               <svg
                 width="14"
@@ -561,12 +559,12 @@ const encodedTitle = encodeURIComponent(title);
             }
           </div>
           <p
-            class="m-0 mt-[0.9rem] font-['Inter',system-ui,sans-serif] text-[0.75rem] leading-[1.6] text-[#9aa89e]"
+            class="m-0 mt-[0.9rem] font-[family-name:var(--font-mono)] text-[0.75rem] leading-[1.6] text-[#9aa89e]"
           >
             {t('article.signature.note')}
           </p>
           <p
-            class="m-0 mt-[0.35rem] font-['Inter',system-ui,sans-serif] text-[0.72rem] leading-[1.5] text-[#9aa89e]"
+            class="m-0 mt-[0.35rem] font-[family-name:var(--font-mono)] text-[0.72rem] leading-[1.5] text-[#9aa89e]"
           >
             <a
               href={`https://github.com/hansai-art/computex-md/edit/main/knowledge/${langPath}${categoryMapping[category as string]}/${slug}.md`}
@@ -593,13 +591,13 @@ const encodedTitle = encodeURIComponent(title);
           {
             frontmatter.tags && frontmatter.tags.length > 0 && (
               <div class="flex min-w-0 flex-1 flex-col gap-2">
-                <span class="font-['Inter',system-ui,sans-serif] text-[0.67rem] font-bold uppercase tracking-[0.2em] text-[#9aa89e]">
+                <span class="font-[family-name:var(--font-mono)] text-[0.67rem] font-bold uppercase tracking-[0.2em] text-[#9aa89e]">
                   {t('article.sidebar.keywordsLabel')}
                 </span>
                 <div class="flex flex-wrap gap-[0.4rem]">
                   {frontmatter.tags.map((tag: string) => (
                     <span
-                      class="rounded-full border px-[0.7rem] py-1 font-['Inter',system-ui,sans-serif] text-[0.75rem] font-medium"
+                      class="rounded-full border px-[0.7rem] py-1 font-[family-name:var(--font-mono)] text-[0.75rem] font-medium"
                       style={`color:${categoryInfo.color}; background:${categoryInfo.colorLight}; border-color:${categoryInfo.color}28;`}
                     >
                       {tag}
@@ -612,7 +610,7 @@ const encodedTitle = encodeURIComponent(title);
 
           <div class="flex items-center gap-[0.4rem]">
             <span
-              class="me-1 font-['Inter',system-ui,sans-serif] text-[0.78rem] text-[#7a8b7e]"
+              class="me-1 font-[family-name:var(--font-mono)] text-[0.78rem] text-[#7a8b7e]"
               >{t('article.share')}</span
             >
             <a
@@ -692,7 +690,7 @@ const encodedTitle = encodeURIComponent(title);
         <div class="my-10 mb-4 flex flex-wrap gap-3 max-[640px]:flex-col">
           <a
             href={`/${category}`}
-            class="inline-flex items-center justify-center gap-[0.45rem] rounded-full px-5 py-[0.55rem] font-['Inter',system-ui,sans-serif] text-[0.82rem] font-medium text-[#f8f1e9] no-underline transition-all duration-200 hover:opacity-[0.88]"
+            class="inline-flex items-center justify-center gap-[0.45rem] rounded-full px-5 py-[0.55rem] font-[family-name:var(--font-mono)] text-[0.82rem] font-medium text-[#f8f1e9] no-underline transition-all duration-200 hover:opacity-[0.88]"
             style={`background:${categoryInfo.color};`}
           >
             <svg
@@ -709,7 +707,7 @@ const encodedTitle = encodeURIComponent(title);
           </a>
           <a
             href="/"
-            class="inline-flex items-center justify-center gap-[0.45rem] rounded-full border border-[rgba(26,60,52,0.2)] bg-transparent px-5 py-[0.55rem] font-['Inter',system-ui,sans-serif] text-[0.82rem] font-medium text-[#1a3c34] no-underline transition-all duration-200 hover:bg-[rgba(26,60,52,0.06)]"
+            class="inline-flex items-center justify-center gap-[0.45rem] rounded-full border border-[rgba(26,60,52,0.2)] bg-transparent px-5 py-[0.55rem] font-[family-name:var(--font-mono)] text-[0.82rem] font-medium text-[#1a3c34] no-underline transition-all duration-200 hover:bg-[rgba(26,60,52,0.06)]"
           >
             <svg
               width="14"
@@ -762,10 +760,10 @@ const encodedTitle = encodeURIComponent(title);
         >
           <div class="mx-auto max-w-[var(--container-article)]">
             <div class="mb-12 text-center">
-              <p class="mb-[0.6rem] font-['Inter',system-ui,sans-serif] text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-[#9aa89e]">
+              <p class="mb-[0.6rem] font-[family-name:var(--font-mono)] text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-[#9aa89e]">
                 {t('article.furtherReading')}
               </p>
-              <h2 class="font-['Inter',serif] text-[clamp(1.5rem,3vw,2rem)] font-bold leading-[1.25] text-[#1a3c34]">
+              <h2 class="font-[family-name:var(--font-display)] text-[clamp(1.5rem,3vw,2rem)] font-bold leading-[1.25] text-[#1a3c34]">
                 {t('article.relatedReads')}
               </h2>
             </div>
@@ -799,7 +797,7 @@ const encodedTitle = encodeURIComponent(title);
                 href={`${langUrlPrefix}/${category}`}
                 data-ga-section="article_related"
                 data-ga-label="view_all_category"
-                class="inline-flex items-center gap-2 rounded-full border-[1.5px] px-6 py-[0.65rem] font-['Inter',system-ui,sans-serif] text-[0.88rem] font-medium no-underline transition-all duration-200 hover:bg-black/[0.04]"
+                class="inline-flex items-center gap-2 rounded-full border-[1.5px] px-6 py-[0.65rem] font-[family-name:var(--font-mono)] text-[0.88rem] font-medium no-underline transition-all duration-200 hover:bg-black/[0.04]"
                 style={`color:${categoryInfo.color}; border-color:${categoryInfo.color}30;`}
               >
                 {t('article.viewAll')} {categoryInfo.name}
@@ -841,12 +839,12 @@ const encodedTitle = encodeURIComponent(title);
       <div class="mx-auto max-w-[var(--container-article)]">
         <div class="mb-8 text-center">
           <p
-            class="mb-[0.6rem] font-['Inter',system-ui,sans-serif] text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-[#9aa89e]"
+            class="mb-[0.6rem] font-[family-name:var(--font-mono)] text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-[#9aa89e]"
           >
             {t('latest.eyebrow')}
           </p>
           <h2
-            class="font-['Inter',serif] text-[clamp(1.4rem,3vw,1.9rem)] font-bold leading-[1.25] text-[#1a3c34]"
+            class="font-[family-name:var(--font-display)] text-[clamp(1.4rem,3vw,1.9rem)] font-bold leading-[1.25] text-[#1a3c34]"
           >
             {t('latest.railHeading')}
           </h2>
@@ -881,7 +879,7 @@ const encodedTitle = encodeURIComponent(title);
             href={lang === 'zh-TW' ? '/latest' : `/${lang}/latest`}
             data-ga-section="article_latest_rail"
             data-ga-label="view_all"
-            class="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#10b981]/40 px-6 py-[0.6rem] font-['Inter',system-ui,sans-serif] text-[0.88rem] font-semibold text-[#065f46] no-underline transition-all hover:bg-[#ecfdf5]"
+            class="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#10b981]/40 px-6 py-[0.6rem] font-[family-name:var(--font-mono)] text-[0.88rem] font-semibold text-[#065f46] no-underline transition-all hover:bg-[#ecfdf5]"
           >
             {t('latest.railViewAll')}{' '}
             →
@@ -988,7 +986,7 @@ const encodedTitle = encodeURIComponent(title);
       hasRandomPool && (
         <div class="flex justify-center bg-[#f8f1e9] px-8 py-10">
           <button
-            class="inline-flex cursor-pointer items-center gap-[0.6rem] rounded-full border-[1.5px] border-[rgba(26,60,52,0.2)] bg-white px-7 py-3 font-['Inter',system-ui,sans-serif] text-[0.88rem] font-medium text-[#1a3c34] transition-all duration-200 hover:border-[#1a3c34] hover:bg-[#1a3c34] hover:text-[#f8f1e9]"
+            class="inline-flex cursor-pointer items-center gap-[0.6rem] rounded-full border-[1.5px] border-[rgba(26,60,52,0.2)] bg-white px-7 py-3 font-[family-name:var(--font-mono)] text-[0.88rem] font-medium text-[#1a3c34] transition-all duration-200 hover:border-[#1a3c34] hover:bg-[#1a3c34] hover:text-[#f8f1e9]"
             id="randomBtn"
             type="button"
             data-ga-section="article_random"
@@ -1024,12 +1022,12 @@ const encodedTitle = encodeURIComponent(title);
       <div class="mx-auto max-w-[var(--container-article)]">
         <div class="mb-12 text-center">
           <p
-            class="mb-[0.6rem] font-['Inter',system-ui,sans-serif] text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-[#9aa89e]"
+            class="mb-[0.6rem] font-[family-name:var(--font-mono)] text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-[#9aa89e]"
           >
             {t('article.exploreTaiwan')}
           </p>
           <h2
-            class="font-['Inter',serif] text-[clamp(1.5rem,3vw,2rem)] font-bold leading-[1.25] text-[#1a3c34]"
+            class="font-[family-name:var(--font-display)] text-[clamp(1.5rem,3vw,2rem)] font-bold leading-[1.25] text-[#1a3c34]"
           >
             {t('article.moreAspects')}
           </h2>
@@ -1048,16 +1046,16 @@ const encodedTitle = encodeURIComponent(title);
                 />
                 <div class="flex flex-col gap-[0.4rem] px-6 py-[1.4rem]">
                   <span
-                    class="font-['Inter',system-ui,sans-serif] text-[0.92rem] font-bold -tracking-[0.01em]"
+                    class="font-[family-name:var(--font-mono)] text-[0.92rem] font-bold -tracking-[0.01em]"
                     style={`color:${cat.color};`}
                   >
                     {cat.name}
                   </span>
-                  <p class="m-0 font-['Inter',system-ui,sans-serif] text-[0.82rem] leading-[1.55] text-[#6a7d72]">
+                  <p class="m-0 font-[family-name:var(--font-mono)] text-[0.82rem] leading-[1.55] text-[#6a7d72]">
                     {cat.description}
                   </p>
                   <span
-                    class="mt-[0.35rem] inline-flex items-center gap-[0.3rem] font-['Inter',system-ui,sans-serif] text-[0.78rem] font-semibold"
+                    class="mt-[0.35rem] inline-flex items-center gap-[0.3rem] font-[family-name:var(--font-mono)] text-[0.78rem] font-semibold"
                     style={`color:${cat.color};`}
                   >
                     {t('article.startExplore')}
