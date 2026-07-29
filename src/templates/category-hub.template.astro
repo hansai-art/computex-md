@@ -993,7 +993,9 @@ const otherCategories = categories
     font-weight: 600;
     color: var(--color-ink-soft);
     text-decoration: none;
-    transition: all 0.15s ease;
+    transition:
+      all var(--dur-1) var(--ease-out-expo),
+      transform var(--dur-2) var(--ease-out-expo);
   }
   .sidebar-essay-link:hover {
     background: color-mix(
@@ -1234,7 +1236,9 @@ const otherCategories = categories
     text-decoration: none;
     border-bottom: 1.5px solid var(--color-ink-soft);
     padding-bottom: 1px;
-    transition: all 0.2s;
+    transition:
+      all var(--dur-1) var(--ease-out-expo),
+      transform var(--dur-2) var(--ease-out-expo);
   }
   .hub-prose :global(a:hover) {
     color: var(--color-ink);
@@ -1252,7 +1256,9 @@ const otherCategories = categories
     color: #2d5016;
     white-space: nowrap;
     text-decoration: none;
-    transition: all 0.25s ease;
+    transition:
+      all var(--dur-2) var(--ease-out-expo),
+      transform var(--dur-2) var(--ease-out-expo);
     border-bottom: none;
   }
   .hub-prose :global(a.topic-pill:hover) {
@@ -1451,7 +1457,7 @@ const otherCategories = categories
     color: var(--color-ink);
     font-size: 0.85rem;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color var(--dur-1) var(--ease-out-expo);
   }
   .hub-search input:focus-visible {
     border-color: var(--categoryColor, #2d5016);
@@ -1502,7 +1508,9 @@ const otherCategories = categories
     font-weight: 600;
     white-space: nowrap;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition:
+      all var(--dur-1) var(--ease-out-expo),
+      transform var(--dur-2) var(--ease-out-expo);
   }
   .sort-btn:hover {
     border-color: var(--categoryColor, #2d5016);
@@ -1591,7 +1599,9 @@ const otherCategories = categories
     color: var(--color-ink-soft);
     font-size: 0.78rem;
     text-decoration: none;
-    transition: all 0.15s ease;
+    transition:
+      all var(--dur-1) var(--ease-out-expo),
+      transform var(--dur-2) var(--ease-out-expo);
   }
   .othercat-chip:hover {
     border-color: var(--categoryColor, #2d5016);

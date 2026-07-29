@@ -12,8 +12,8 @@
   padding: 1rem 1.2rem;
   text-align: center;
   transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+    transform var(--dur-2) var(--ease-out-expo),
+    box-shadow var(--dur-2) var(--ease-out-expo);
   border-left: 4px solid transparent;
 }
 .vital-card[data-vital='heartbeat'] {

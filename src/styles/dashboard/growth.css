@@ -14,7 +14,7 @@
   font-family: inherit;
 }
 .growth-dot {
-  transition: r 0.15s;
+  transition: r var(--dur-1) var(--ease-out-expo);
 }
 .growth-dot-hover:hover + .growth-dot,
 .growth-dot-hover:hover ~ .growth-dot {

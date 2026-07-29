@@ -77,15 +77,15 @@ const iconSize = `${size * 1.08}rem`; // icon roughly matches x-height
   .brand-dot {
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 600;
-    transition: color 0.45s;
+    transition: color var(--dur-2) var(--ease-out-expo);
   }
 
   /* auto: colours come from parent via CSS vars (Header.astro pattern) */
   .brand-mark--auto {
     color: var(--logo-color, #1a1a2e);
     transition:
-      color 0.45s,
-      transform 0.3s;
+      color var(--dur-2) var(--ease-out-expo),
+      transform var(--dur-2) var(--ease-out-expo);
   }
   .brand-mark--auto .brand-dot {
     color: var(--dot-color, #00d4aa);

@@ -118,7 +118,9 @@ const show = lang === 'zh-TW' && (links.length > 0 || !!makingOf);
     );
     text-decoration: none;
     color: inherit;
-    transition: all 0.2s ease;
+    transition:
+      all var(--dur-1) var(--ease-out-expo),
+      transform var(--dur-2) var(--ease-out-expo);
   }
   .nt-cta:hover {
     border-style: solid;
@@ -157,7 +159,7 @@ const show = lang === 'zh-TW' && (links.length > 0 || !!makingOf);
   .nt-cta-arrow {
     font-size: 1.3rem;
     color: #4fd1b0;
-    transition: transform 0.2s ease;
+    transition: transform var(--dur-2) var(--ease-out-expo);
   }
   .nt-cta:hover .nt-cta-arrow {
     transform: translateX(4px);

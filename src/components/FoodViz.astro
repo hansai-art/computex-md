@@ -716,7 +716,9 @@
     cursor: pointer;
     font-size: 15px;
     font-weight: 500;
-    transition: all 0.2s;
+    transition:
+      all var(--dur-1) var(--ease-out-expo),
+      transform var(--dur-2) var(--ease-out-expo);
   }
   .viz-tab:hover {
     background: #f8f9fa;

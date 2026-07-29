@@ -74,8 +74,8 @@ const url =
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
     text-decoration: none;
     transition:
-      transform 0.15s ease,
-      box-shadow 0.15s ease;
+      transform var(--dur-2) var(--ease-out-expo),
+      box-shadow var(--dur-2) var(--ease-out-expo);
   }
   .twmd-fb-fab:hover {
     transform: translateY(-1px);
@@ -164,8 +164,8 @@ const url =
     font-size: 0.8rem;
     cursor: pointer;
     transition:
-      border-color 0.12s,
-      background 0.12s;
+      border-color var(--dur-1) var(--ease-out-expo),
+      background var(--dur-1) var(--ease-out-expo);
   }
   .twmd-fb-chip.is-on {
     border-color: var(--twmd-fb-accent);

@@ -1301,7 +1301,7 @@ const encodedTitle = encodeURIComponent(title);
        double underline (reported 2026-05-04). */
     border-bottom: none;
     padding-bottom: 0;
-    transition: text-decoration-color 0.2s;
+    transition: text-decoration-color var(--dur-1) var(--ease-out-expo);
   }
   .prose :global(a:hover) {
     text-decoration-color: #006d77;
@@ -1499,8 +1499,8 @@ const encodedTitle = encodeURIComponent(title);
     border-bottom: none;
     padding: 0 0.05em;
     transition:
-      color 0.15s,
-      text-decoration-color 0.15s;
+      color var(--dur-1) var(--ease-out-expo),
+      text-decoration-color var(--dur-1) var(--ease-out-expo);
   }
   .prose :global(.footnote-ref:hover) {
     color: #1d4ed8;
@@ -1515,7 +1515,7 @@ const encodedTitle = encodeURIComponent(title);
     font-size: 0.9em;
     text-decoration: none;
     border-bottom: none;
-    transition: color 0.15s;
+    transition: color var(--dur-1) var(--ease-out-expo);
   }
   .prose :global(.footnote-backref:hover) {
     color: #6b7280;

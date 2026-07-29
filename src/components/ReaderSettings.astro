@@ -561,7 +561,9 @@ const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
     justify-content: center;
     cursor: pointer;
     box-shadow: var(--shadow-card);
-    transition: all 0.2s;
+    transition:
+      all var(--dur-1) var(--ease-out-expo),
+      transform var(--dur-2) var(--ease-out-expo);
     z-index: 40;
   }
   .reader-settings-toggle:hover {
@@ -591,10 +593,10 @@ const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
     opacity: 0;
     transform: translateY(6px);
     transition:
-      opacity 0.2s,
-      transform 0.2s,
-      background 0.2s,
-      color 0.2s;
+      opacity var(--dur-2) var(--ease-out-expo),
+      transform var(--dur-2) var(--ease-out-expo),
+      background var(--dur-1) var(--ease-out-expo),
+      color var(--dur-1) var(--ease-out-expo);
     z-index: 40;
   }
   .back-to-top.is-visible {
@@ -608,7 +610,7 @@ const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
   }
   @media (prefers-reduced-motion: reduce) {
     .back-to-top {
-      transition: opacity 0.2s;
+      transition: opacity var(--dur-1) var(--ease-out-expo);
       transform: none;
     }
     .back-to-top.is-visible {
@@ -689,8 +691,8 @@ const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
     color: var(--color-ink-soft);
     cursor: pointer;
     transition:
-      background 0.15s,
-      color 0.15s;
+      background var(--dur-1) var(--ease-out-expo),
+      color var(--dur-1) var(--ease-out-expo);
   }
   .rs-seg:hover {
     color: var(--color-ink);
@@ -713,7 +715,7 @@ const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
     border-radius: 9px;
     background: color-mix(in srgb, var(--color-accent) 8%, transparent);
     border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);
-    transition: background 0.15s;
+    transition: background var(--dur-1) var(--ease-out-expo);
   }
   .rs-raw-link:hover {
     background: color-mix(in srgb, var(--color-accent) 14%, transparent);

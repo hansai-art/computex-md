@@ -60,9 +60,9 @@
   white-space: nowrap;
   opacity: 0.65;
   transition:
-    background-color 0.15s,
-    opacity 0.15s,
-    border-color 0.15s;
+    background-color var(--dur-1) var(--ease-out-expo),
+    opacity var(--dur-1) var(--ease-out-expo),
+    border-color var(--dur-1) var(--ease-out-expo);
 }
 .dashboard-toc-link:hover {
   background: rgba(0, 0, 0, 0.04);

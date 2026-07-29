@@ -98,13 +98,13 @@
   height: 100%;
   background: linear-gradient(90deg, #8b5cf6, #6366f1);
   border-radius: 4px;
-  transition: width 0.8s ease;
+  transition: width var(--dur-3) var(--ease-in-out-quart);
 }
 .ga-country-bar-fill {
   height: 100%;
   background: linear-gradient(90deg, #06b6d4, #3b82f6);
   border-radius: 4px;
-  transition: width 0.8s ease;
+  transition: width var(--dur-3) var(--ease-in-out-quart);
 }
 .ga-source-count,
 .ga-country-count {
@@ -129,7 +129,7 @@
 a.ga-page-row-link {
   text-decoration: none;
   color: inherit;
-  transition: background-color 0.15s ease;
+  transition: background-color var(--dur-1) var(--ease-out-expo);
   padding-left: 0.4rem;
   padding-right: 0.4rem;
   border-radius: 6px;
@@ -278,8 +278,8 @@ a.ga-page-row-link:hover .ga-page-name {
 .sc-word {
   cursor: default;
   transition:
-    fill 0.15s ease,
-    opacity 0.15s ease;
+    fill var(--dur-1) var(--ease-out-expo),
+    opacity var(--dur-1) var(--ease-out-expo);
 }
 .sc-word:hover {
   fill: #4338ca !important;

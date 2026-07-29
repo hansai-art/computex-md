@@ -116,9 +116,15 @@ TW_PATTERNS=(
 #    否則 commit 當下會被自己的 hook 擋下來。
 #    2026-07-29 第四次失準：/graph → /organism 改名讓 Header.astro 上方多兩行，
 #    754/801 變成 756/803。
+#    2026-07-29 第五次失準：動態 token 化把單行 transition 展成多行，prettier 跑完
+#    再多四行，756/803 變成 760/807。五次裡有兩次是 prettier 自己造成的。
+#    ⚠️ 根因未解：只要用行號釘豁免，任何在上方增刪行的改動都會讓它失準，而且失準
+#    的方向是「靜默放行不該放行的行」。建議改成用內容指紋（例如同一條規則裡必須
+#    同時出現 translateX(-50%)）釘豁免，行號只當提示。這需要動 gate 本身的邏輯，
+#    留給獨立一次修改，不要夾在其他工作裡順手改。
 ALLOWLIST=(
-  "src/components/Header.astro:756|nav-link 底線置中：left:50% + translateX(-50%)"
-  "src/components/Header.astro:803|dropdown 置中：left:50% + translateX(-50%)"
+  "src/components/Header.astro:760|nav-link 底線置中：left:50% + translateX(-50%)"
+  "src/components/Header.astro:807|dropdown 置中：left:50% + translateX(-50%)"
 )
 
 # ── 掛號中的債（受守護檔案裡「還沒還」的行）──────────────────────────────────

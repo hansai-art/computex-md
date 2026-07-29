@@ -11,8 +11,8 @@
   padding: 1.5rem;
   text-align: center;
   transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+    transform var(--dur-2) var(--ease-out-expo),
+    box-shadow var(--dur-2) var(--ease-out-expo);
 }
 .nextstep-card:hover {
   transform: translateY(-2px);
@@ -53,7 +53,9 @@
   text-decoration: none;
   font-size: 0.82rem;
   font-weight: 500;
-  transition: all 0.2s;
+  transition:
+    all var(--dur-1) var(--ease-out-expo),
+    transform var(--dur-2) var(--ease-out-expo);
 }
 .nextstep-link:hover {
   background: rgba(139, 92, 246, 0.06);

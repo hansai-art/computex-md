@@ -139,7 +139,7 @@
        follows the skip link to the other side when dir=rtl (ar). */
     border-end-end-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    transition: transform 0.18s ease;
+    transition: transform var(--dur-2) var(--ease-out-expo);
   }
   .skip-link:focus,
   .skip-link:focus-visible {
@@ -325,10 +325,38 @@
     scroll-behavior: smooth;
   }
 
-  /* respect 系統「減少動畫」偏好 */
+  /* respect 系統「減少動畫」偏好
+   *
+   * 2026-07-29 從「只關 smooth scroll」擴成全站總開關。動態 token 化之後
+   * （tokens.css 的 --dur-* / --ease-*），這裡改四個變數就能收掉所有走
+   * token 的動畫，不必去 80 幾個地方各加一次 media query。
+   *
+   * 但是光改變數不夠：站上還有寫死秒數的宣告與 @keyframes（float* 裝飾動畫、
+   * marquee、ekgDraw），它們讀不到 token。所以下面補一條 * 規則把
+   * transition / animation 一起壓掉。用 0.01ms 而不是 none，是因為 none 會
+   * 讓 transitionend / animationend 事件不觸發，依賴這些事件收尾的 JS 會卡住。
+   *
+   * scroll-behavior 仍要單獨寫：它不是 transition 也不是 animation，* 規則
+   * 蓋不到。 */
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
+    }
+
+    :root {
+      --dur-1: 0.01ms;
+      --dur-2: 0.01ms;
+      --dur-3: 0.01ms;
+      --dur-4: 0.01ms;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      transition-delay: 0ms !important;
     }
   }
 
@@ -373,7 +401,9 @@
     border-bottom: 1px solid
       color-mix(in srgb, var(--color-ink-soft) 35%, transparent);
     padding-bottom: 1px;
-    transition: all 0.2s ease;
+    transition:
+      all var(--dur-1) var(--ease-out-expo),
+      transform var(--dur-2) var(--ease-out-expo);
   }
   main
     a:not(.nav-link):not([class*='btn']):not(.card-link):not(.logo):not(
@@ -423,7 +453,9 @@
     font-weight: 700;
     text-decoration: none;
     box-shadow: var(--shadow-card);
-    transition: all 0.2s;
+    transition:
+      all var(--dur-1) var(--ease-out-expo),
+      transform var(--dur-2) var(--ease-out-expo);
     z-index: 40;
   }
   .floating-md:hover {

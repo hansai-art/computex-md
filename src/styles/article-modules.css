@@ -1430,7 +1430,12 @@
       .tw-arc,
       .tw-multiples
     ) {
-      animation: tw-mod-rise 0.55s ease-out both;
+      /* 這是站上唯一的進場動畫，走 --dur-3（大件）+ expo（出現＝進場曲線）。
+         注意：有 animation-timeline 時 duration 會被捲動範圍取代，這裡的
+         --dur-3 只在不支援 scroll-timeline 的瀏覽器（走時間軸 fallback）
+         生效；easing 兩種情況都會套用，所以曲線才是這行真正的重點。
+         也不需要另外做錯開：每個模組各自捲進視窗才動，捲動本身就是錯開。 */
+      animation: tw-mod-rise var(--dur-3) var(--ease-out-expo) both;
       animation-timeline: view();
       animation-range: entry 0% entry 40%;
     }

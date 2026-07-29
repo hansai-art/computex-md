@@ -670,11 +670,15 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     backdrop-filter: blur(var(--header-blur));
     -webkit-backdrop-filter: blur(var(--header-blur));
     border-bottom: 1px solid var(--header-border);
+    /* 唯一一個真的「A 移到 B」的站台級狀態：捲下去變實心、捲上來變透明，
+       兩個方向對稱，所以用對稱曲線 in-out-quart，而不是給進場用的 expo。
+       時長取 --dur-3：這是整片 header 的底色與模糊一起變，面積最大，
+       快了會像閃一下。 */
     transition:
-      background 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-      backdrop-filter 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-      border-color 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-      box-shadow 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+      background var(--dur-3) var(--ease-in-out-quart),
+      backdrop-filter var(--dur-3) var(--ease-in-out-quart),
+      border-color var(--dur-3) var(--ease-in-out-quart),
+      box-shadow var(--dur-3) var(--ease-in-out-quart);
   }
   .header-inner {
     max-width: var(--container-wide);
@@ -697,8 +701,8 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     align-items: center;
     gap: 0.4rem;
     transition:
-      color 0.45s,
-      transform 0.3s;
+      color var(--dur-2) var(--ease-out-expo),
+      transform var(--dur-2) var(--ease-out-expo);
     color: var(--logo-color);
   }
   .logo:hover {
@@ -713,7 +717,7 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     color: var(--dot-color);
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 600;
-    transition: color 0.45s;
+    transition: color var(--dur-2) var(--ease-out-expo);
   }
 
   /* Nav Desktop */
@@ -733,8 +737,8 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     font-weight: 500;
     color: var(--nav-color);
     transition:
-      color 0.25s,
-      background-color 0.25s;
+      color var(--dur-2) var(--ease-out-expo),
+      background-color var(--dur-2) var(--ease-out-expo);
     display: flex;
     align-items: center;
     gap: 0.25rem;
@@ -758,7 +762,7 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     height: 2px;
     background: var(--green-accent);
     border-radius: 1px;
-    transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: width var(--dur-2) var(--ease-out-expo);
     transform: translateX(-50%);
   }
   .nav-link:hover::after {
@@ -781,7 +785,7 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     background: var(--sep-color);
     margin: 0 0.2rem;
     flex-shrink: 0;
-    transition: background 0.45s;
+    transition: background var(--dur-2) var(--ease-out-expo);
   }
 
   /* Dropdown */
@@ -792,8 +796,8 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     font-size: 0.55em;
     color: var(--arrow-color);
     transition:
-      color 0.25s,
-      transform 0.25s;
+      color var(--dur-2) var(--ease-out-expo),
+      transform var(--dur-2) var(--ease-out-expo);
     margin-inline-start: 1px;
   }
   /* Dropdown — transparent state: dark glass */
@@ -821,9 +825,9 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     overflow-y: auto;
     overscroll-behavior: contain;
     transition:
-      opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-      visibility 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity var(--dur-2) var(--ease-out-expo),
+      visibility var(--dur-2) var(--ease-out-expo),
+      transform var(--dur-2) var(--ease-out-expo);
   }
   /* Dropdown — scrolled state: white glass */
   .scrolled .dropdown-menu {
@@ -853,8 +857,8 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     font-weight: 500;
     white-space: nowrap;
     transition:
-      background-color 0.15s,
-      color 0.15s;
+      background-color var(--dur-1) var(--ease-out-expo),
+      color var(--dur-1) var(--ease-out-expo);
   }
   .dropdown-item:hover {
     background: rgba(79, 209, 176, 0.18);
@@ -895,9 +899,9 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     background: var(--search-bg);
     cursor: pointer;
     transition:
-      color 0.35s,
-      border-color 0.35s,
-      background-color 0.35s;
+      color var(--dur-2) var(--ease-out-expo),
+      border-color var(--dur-2) var(--ease-out-expo),
+      background-color var(--dur-2) var(--ease-out-expo);
     flex-shrink: 0;
     color: var(--search-color);
     font-family: inherit;
@@ -917,9 +921,9 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     border: 1px solid var(--kbd-border);
     line-height: 1.3;
     transition:
-      background-color 0.35s,
-      color 0.35s,
-      border-color 0.35s;
+      background-color var(--dur-2) var(--ease-out-expo),
+      color var(--dur-2) var(--ease-out-expo),
+      border-color var(--dur-2) var(--ease-out-expo);
   }
 
   /* GitHub icon link */
@@ -929,7 +933,7 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     justify-content: center;
     padding: 0.4rem;
     border-radius: 8px;
-    transition: transform 0.2s;
+    transition: transform var(--dur-2) var(--ease-out-expo);
     text-decoration: none;
     flex-shrink: 0;
   }
@@ -937,7 +941,7 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     width: 20px;
     height: 20px;
     color: var(--gh-color);
-    transition: color 0.35s;
+    transition: color var(--dur-2) var(--ease-out-expo);
   }
   .gh-link:hover svg {
     color: var(--nav-hover-color);
@@ -954,8 +958,8 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     padding: 3px;
     flex-shrink: 0;
     transition:
-      background-color 0.35s,
-      border-color 0.35s;
+      background-color var(--dur-2) var(--ease-out-expo),
+      border-color var(--dur-2) var(--ease-out-expo);
     background: var(--lang-bg);
     border: 1px solid var(--lang-border);
   }
@@ -967,9 +971,9 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     color: var(--lang-color);
     border-radius: 7px;
     transition:
-      background-color 0.25s,
-      color 0.25s,
-      box-shadow 0.25s;
+      background-color var(--dur-2) var(--ease-out-expo),
+      color var(--dur-2) var(--ease-out-expo),
+      box-shadow var(--dur-2) var(--ease-out-expo);
     min-width: 36px;
     text-align: center;
   }
@@ -1002,9 +1006,9 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     font-weight: 600;
     cursor: pointer;
     transition:
-      background-color 0.25s,
-      border-color 0.25s,
-      color 0.25s;
+      background-color var(--dur-2) var(--ease-out-expo),
+      border-color var(--dur-2) var(--ease-out-expo),
+      color var(--dur-2) var(--ease-out-expo);
   }
   .lang-dropdown-toggle:hover,
   .lang-dropdown-toggle[aria-expanded='true'] {
@@ -1022,7 +1026,10 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
   .lang-caret {
     font-size: 0.7rem;
     opacity: 0.7;
-    transition: transform 0.2s;
+    /* 全站唯一放 overshoot 的地方：這個箭頭只有在使用者「點下去」時才翻，
+       不會因為滑鼠經過而動，也不會在載入時自己彈一下。回彈代表「這東西有
+       質量、我剛剛推了它」，只有使用者真的施力的動作配得上。 */
+    transition: transform var(--dur-2) var(--ease-overshoot);
   }
   .lang-dropdown-toggle[aria-expanded='true'] .lang-caret {
     transform: rotate(180deg);
@@ -1062,8 +1069,8 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     color: #334155;
     font-size: 0.9rem;
     transition:
-      background-color 0.15s,
-      color 0.15s;
+      background-color var(--dur-1) var(--ease-out-expo),
+      color var(--dur-1) var(--ease-out-expo);
   }
   .lang-dropdown-item:hover {
     background: rgba(0, 120, 100, 0.06);
@@ -1094,9 +1101,9 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     font-size: 1.2rem;
     flex-shrink: 0;
     transition:
-      color 0.35s,
-      background-color 0.35s,
-      border-color 0.35s;
+      color var(--dur-2) var(--ease-out-expo),
+      background-color var(--dur-2) var(--ease-out-expo),
+      border-color var(--dur-2) var(--ease-out-expo);
     color: var(--burger-color);
     background: var(--burger-bg);
     border: 1px solid var(--burger-border);
@@ -1135,8 +1142,8 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     justify-content: center;
     cursor: pointer;
     transition:
-      transform 0.25s ease,
-      color 0.15s ease;
+      transform var(--dur-2) var(--ease-out-expo),
+      color var(--dur-1) var(--ease-out-expo);
     line-height: 1;
     flex-shrink: 0;
   }
@@ -1159,7 +1166,7 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
   .mobile-sub-links {
     display: grid;
     grid-template-rows: 0fr;
-    transition: grid-template-rows 0.28s ease;
+    transition: grid-template-rows var(--dur-2) var(--ease-out-expo);
   }
   .mobile-sub-links.open {
     grid-template-rows: 1fr;
@@ -1217,7 +1224,7 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     border-radius: 8px;
     text-decoration: none;
     color: inherit;
-    transition: background 0.15s;
+    transition: background var(--dur-1) var(--ease-out-expo);
     border-bottom: none;
   }
   :global(.search-item:hover) {
@@ -1277,9 +1284,9 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
     font-weight: 500;
     color: #475569;
     transition:
-      background 0.15s,
-      border-color 0.15s,
-      color 0.15s;
+      background var(--dur-1) var(--ease-out-expo),
+      border-color var(--dur-1) var(--ease-out-expo),
+      color var(--dur-1) var(--ease-out-expo);
   }
   :global(.search-hot-chip:hover) {
     border-color: #10b981;
@@ -1504,9 +1511,9 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
         0 8px 20px var(--glass-shadow),
         inset 0 1px 0 var(--glass-inset);
       transition:
-        background-color 0.35s,
-        border-color 0.35s,
-        box-shadow 0.35s;
+        background-color var(--dur-2) var(--ease-out-expo),
+        border-color var(--dur-2) var(--ease-out-expo),
+        box-shadow var(--dur-2) var(--ease-out-expo);
       /* #1142: cap drawer height + scroll internally (see ≤1024 block) */
       max-height: calc(100vh - 4.5rem);
       max-height: calc(100dvh - 4.5rem);

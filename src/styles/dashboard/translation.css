@@ -27,7 +27,10 @@
   flex-shrink: 0;
 }
 .donut-fill {
-  transition: stroke-dasharray 1s ease;
+  /* 甜甜圈自己畫出來，是整個 dashboard 唯一的敘事型動畫，所以吃 --dur-4
+     這一階（原本就寫 1s，比其他量表都慢，那個意圖要保留）。曲線用
+     in-out-quart：畫弧是從 A 到 B 的移動，不是出現或消失。 */
+  transition: stroke-dasharray var(--dur-4) var(--ease-in-out-quart);
 }
 .donut-label {
   font-size: 0.85rem;

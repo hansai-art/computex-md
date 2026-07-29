@@ -94,7 +94,7 @@
 }
 /* Clickable performer rows → open the spore post in a new tab */
 .spore-table tr.spore-row-link {
-  transition: background 0.14s;
+  transition: background var(--dur-1) var(--ease-out-expo);
 }
 .spore-table tr.spore-row-link:hover {
   background: var(--bg-elevated, #f6faf7);
@@ -160,7 +160,7 @@
 .spore-amp-fill {
   height: 100%;
   background: linear-gradient(90deg, #10b981, #059669);
-  transition: width 400ms ease-out;
+  transition: width var(--dur-3) var(--ease-in-out-quart);
 }
 .spore-amp-value {
   color: var(--text-muted, #666);

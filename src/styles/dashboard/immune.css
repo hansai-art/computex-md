@@ -73,7 +73,7 @@
   color: inherit;
   font-size: 0.85rem;
   border: 1px solid rgba(0, 0, 0, 0.04);
-  transition: background 0.15s;
+  transition: background var(--dur-1) var(--ease-out-expo);
 }
 .queue-item:hover {
   background: rgba(59, 130, 246, 0.05);
@@ -107,7 +107,9 @@
   font-size: 0.82rem;
   color: #64748b;
   cursor: pointer;
-  transition: all 0.2s;
+  transition:
+    all var(--dur-1) var(--ease-out-expo),
+    transform var(--dur-2) var(--ease-out-expo);
 }
 .queue-toggle-btn:hover {
   border-color: #8b5cf6;
