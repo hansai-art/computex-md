@@ -57,8 +57,8 @@
 
 | Metric                         | Count |
 | ------------------------------ | ----- |
-| 📄 Total articles (zh-TW SSOT) | 1     |
-| 🇹🇼 Chinese (zh-TW)             | 1     |
+| 📄 Total articles (zh-TW SSOT) | 87    |
+| 🇹🇼 Chinese (zh-TW)             | 87    |
 | 🇺🇸 English (en)                | 1     |
 | 📂 Categories                  | 4     |
 | 👥 Contributors                | 0     |

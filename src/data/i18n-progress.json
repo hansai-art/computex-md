@@ -1,8 +1,12 @@
 {
-  "total_zh": 1,
+  "total_zh": 87,
   "total_en": 1,
-  "coverage_en": 100.0,
+  "coverage_en": 1.1,
   "categories": {
+    "Vendors": {
+      "zh": 86,
+      "en": 0
+    },
     "Editions": {
       "zh": 1,
       "en": 1

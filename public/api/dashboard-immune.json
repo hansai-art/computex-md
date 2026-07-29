@@ -1,14 +1,14 @@
 {
-  "lastUpdated": "2026-07-29T01:33:49.666435",
+  "lastUpdated": "2026-07-29T10:28:05.191160",
   "schemaVersion": "v2-2026-05-16",
   "featureFlag": "IMMUNE_V2",
-  "immuneScore": 44,
+  "immuneScore": 46,
   "status": "漂移 — 多維度退化中",
   "components": {
     "review_coverage": 0.0,
     "plugin_pass_rate": 70.0,
     "plugin_health": 100.0,
-    "citation_density": 40.0,
+    "citation_density": 59.8,
     "tool_freshness": 40,
     "drift_velocity": 90.0,
     "external_rulers": 0.0
@@ -30,7 +30,7 @@
       "weight": 3.0
     },
     "T2": {
-      "total": 1,
+      "total": 87,
       "reviewed": 0,
       "pct": 0.0,
       "weight": 1.5
@@ -43,8 +43,8 @@
     }
   },
   "pluginPassDetail": {
-    "total_files": 1,
-    "hard_pass_files": 1,
+    "total_files": 87,
+    "hard_pass_files": 87,
     "hard_pass_pct": 100.0,
     "warn_pass_files": 0,
     "warn_pass_pct": 0.0,
@@ -54,16 +54,16 @@
     "grades": {
       "A": 0,
       "B": 0,
-      "C": 0,
+      "C": 86,
       "D": 1,
       "F": 0
     },
-    "files_with_grade": 1
+    "files_with_grade": 87
   },
   "freshnessDetail": {
     "editorial_days_old": 999,
     "avg_plugin_days_old": 0.0,
-    "plugin_count": 27,
+    "plugin_count": 29,
     "source": "git log %ai (not fs mtime — worktree-safe)"
   },
   "driftDetail": {
@@ -73,8 +73,8 @@
   },
   "pluginHealthDetail": {
     "schema": "v2-loadable-2026-07-10",
-    "plugin_count": 27,
-    "healthy_count": 27,
+    "plugin_count": 29,
+    "healthy_count": 29,
     "unhealthy_count": 0,
     "editorial_age_days": 0,
     "age_watch_days": 30,
@@ -176,6 +176,12 @@
         "age_watch": false
       },
       {
+        "plugin": "marketing_speak",
+        "plugin_age_days": 0,
+        "healthy": true,
+        "age_watch": false
+      },
+      {
         "plugin": "media_richness",
         "plugin_age_days": 0,
         "healthy": true,
@@ -207,6 +213,12 @@
       },
       {
         "plugin": "seo_meta",
+        "plugin_age_days": 0,
+        "healthy": true,
+        "age_watch": false
+      },
+      {
+        "plugin": "slug_format",
         "plugin_age_days": 0,
         "healthy": true,
         "age_watch": false
@@ -246,7 +258,7 @@
   },
   "externalRulersDetail": {
     "ruledArticles": 0,
-    "totalArticles": 1,
+    "totalArticles": 87,
     "rulerSources": {
       "factcheckReports": true,
       "readerErrataCommits90d": true,

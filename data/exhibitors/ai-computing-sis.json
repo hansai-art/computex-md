@@ -1,0 +1,1901 @@
+{
+  "_generated": "2026-07-29",
+  "_source": "COMPUTEX official exhibitor directory",
+  "_area": "AI Computing & System Integration Solution",
+  "count": 29,
+  "exhibitors": [
+    {
+      "exhibitor_id": "74FD19904D2EC6E1D9292524493DC424",
+      "name": "AMAX-KY",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0233a",
+      "official_url": "http://www.amax.tw",
+      "brands": [],
+      "official_tags": [
+        {
+          "code": "OPT00347",
+          "label": "AI"
+        },
+        {
+          "code": "OPT00701",
+          "label": "AI Platform"
+        },
+        {
+          "code": "OPT00446",
+          "label": "AI Service"
+        },
+        {
+          "code": "OPT00348",
+          "label": "ESG"
+        },
+        {
+          "code": "OPT00444",
+          "label": "HPC"
+        },
+        {
+          "code": "OPT00705",
+          "label": "SmartManufacturing"
+        }
+      ],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/74FD19904D2EC6E1D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "B5B08A9389C5B5ABD9292524493DC424",
+      "name": "AMAZING CHIP SEMICONDUCTOR CORPORATION",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0931",
+      "official_url": "http://www.acschip.com/",
+      "brands": [],
+      "official_tags": [],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/B5B08A9389C5B5ABD9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "E4AD4B054C89BBC9D9292524493DC424",
+      "name": "Accordance Systems Inc.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0134",
+      "official_url": "http://www.accordance.com.tw/",
+      "brands": ["AiRPA", "ARAID", "PLC PLUS"],
+      "official_tags": [
+        {
+          "code": "OPT00419",
+          "label": "DataCenter"
+        },
+        {
+          "code": "OPT00709",
+          "label": "EdgeAI"
+        },
+        {
+          "code": "OPT00425",
+          "label": "Embedded"
+        },
+        {
+          "code": "OPT00702",
+          "label": "Robotics"
+        },
+        {
+          "code": "OPT00422",
+          "label": "Semiconductor"
+        },
+        {
+          "code": "OPT00705",
+          "label": "SmartManufacturing"
+        }
+      ],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-06-04",
+          "end_date": "2024-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2023",
+          "start_date": "2023-05-30",
+          "end_date": "2023-06-02",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2022",
+          "start_date": "2022-05-24",
+          "end_date": "2022-05-27",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2020",
+          "start_date": "2021-05-31",
+          "end_date": "2021-06-30",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2019",
+          "start_date": "2019-05-28",
+          "end_date": "2019-06-01",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2018",
+          "start_date": "2018-06-05",
+          "end_date": "2018-06-09",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2017",
+          "start_date": "2017-05-30",
+          "end_date": "2017-06-03",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2016",
+          "start_date": "2016-05-31",
+          "end_date": "2016-06-04",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2015",
+          "start_date": "2015-06-02",
+          "end_date": "2015-06-06",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2014",
+          "start_date": "2014-06-03",
+          "end_date": "2014-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2013",
+          "start_date": "2013-06-04",
+          "end_date": "2013-06-08",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2012",
+          "start_date": "2012-06-05",
+          "end_date": "2012-06-09",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2011",
+          "start_date": "2011-05-31",
+          "end_date": "2011-06-04",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/E4AD4B054C89BBC9D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "869FC6443B62302DD9292524493DC424",
+      "name": "Ambedded Technology Co., Ltd",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0834",
+      "official_url": "http://www.ambedded.com.tw",
+      "brands": ["Ambedded Technology"],
+      "official_tags": [],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-06-04",
+          "end_date": "2024-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2023",
+          "start_date": "2023-05-30",
+          "end_date": "2023-06-02",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2022",
+          "start_date": "2022-08-03",
+          "end_date": "2022-08-05",
+          "show": "TAIWAN EXPO in Malaysia"
+        },
+        {
+          "edition_year": "2020",
+          "start_date": "2021-05-31",
+          "end_date": "2021-06-30",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2019",
+          "start_date": "2019-05-28",
+          "end_date": "2019-06-01",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2018",
+          "start_date": "2018-06-05",
+          "end_date": "2018-06-09",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/869FC6443B62302DD9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "863BF807EF326F91D9292524493DC424",
+      "name": "AptObject Corporation",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0731",
+      "official_url": "http://www.aptobject.com",
+      "brands": ["AptBee"],
+      "official_tags": [
+        {
+          "code": "OPT00701",
+          "label": "AI Platform"
+        },
+        {
+          "code": "OPT00446",
+          "label": "AI Service"
+        },
+        {
+          "code": "OPT00424",
+          "label": "Cloud"
+        },
+        {
+          "code": "OPT00348",
+          "label": "ESG"
+        },
+        {
+          "code": "OPT00452",
+          "label": "SI"
+        },
+        {
+          "code": "OPT00705",
+          "label": "SmartManufacturing"
+        }
+      ],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-06-04",
+          "end_date": "2024-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2023",
+          "start_date": "2023-05-30",
+          "end_date": "2023-06-02",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2022",
+          "start_date": "2022-09-29",
+          "end_date": "2022-10-01",
+          "show": "Taiwan Int"
+        },
+        {
+          "edition_year": "2021",
+          "start_date": "2022-09-01",
+          "end_date": "2022-09-03",
+          "show": "Taiwan Smart Agriweek"
+        },
+        {
+          "edition_year": "2020",
+          "start_date": "2021-05-31",
+          "end_date": "2021-06-30",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2015",
+          "start_date": "2015-06-02",
+          "end_date": "2015-06-06",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2014",
+          "start_date": "2014-06-03",
+          "end_date": "2014-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2013",
+          "start_date": "2013-06-04",
+          "end_date": "2013-06-08",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2012",
+          "start_date": "2012-10-09",
+          "end_date": "2012-10-12",
+          "show": "TAITRONICS"
+        },
+        {
+          "edition_year": "2011",
+          "start_date": "2011-10-10",
+          "end_date": "2011-10-13",
+          "show": "TAITRONICS"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/863BF807EF326F91D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "5296819F11254CCED9292524493DC424",
+      "name": "Brinno Incorporated",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0732",
+      "official_url": "http://www.brinno.com",
+      "brands": ["Brinno"],
+      "official_tags": [
+        {
+          "code": "OPT00347",
+          "label": "AI"
+        },
+        {
+          "code": "OPT00709",
+          "label": "EdgeAI"
+        },
+        {
+          "code": "OPT00425",
+          "label": "Embedded"
+        },
+        {
+          "code": "OPT00710",
+          "label": "FPGA"
+        }
+      ],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-09-18",
+          "end_date": "2025-09-20",
+          "show": "Taipei Aerospace"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-05-16",
+          "end_date": "2024-05-18",
+          "show": "TAIWAN EXPO IN INDONESIA"
+        },
+        {
+          "edition_year": "2023",
+          "start_date": "2023-05-30",
+          "end_date": "2023-06-02",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2020",
+          "start_date": "2021-05-31",
+          "end_date": "2021-06-30",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2018",
+          "start_date": "2018-06-05",
+          "end_date": "2018-06-09",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2017",
+          "start_date": "2017-05-30",
+          "end_date": "2017-06-03",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2016",
+          "start_date": "2016-11-09",
+          "end_date": "2016-11-11",
+          "show": "Taiwan International Fisheries"
+        },
+        {
+          "edition_year": "2015",
+          "start_date": "2015-06-02",
+          "end_date": "2015-06-06",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2014",
+          "start_date": "2014-06-03",
+          "end_date": "2014-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2013",
+          "start_date": "2013-06-04",
+          "end_date": "2013-06-08",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2012",
+          "start_date": "2012-06-05",
+          "end_date": "2012-06-09",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2011",
+          "start_date": "2011-05-31",
+          "end_date": "2011-06-04",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2010",
+          "start_date": "2010-06-01",
+          "end_date": "2010-06-05",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/5296819F11254CCED9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "3C6C923033D10AB8D9292524493DC424",
+      "name": "C-Media Electronics Inc.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0120",
+      "official_url": "http://www.cmedia.com.tw",
+      "brands": ["C-Media"],
+      "official_tags": [],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2020",
+          "start_date": "2021-05-31",
+          "end_date": "2021-06-30",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2019",
+          "start_date": "2019-05-28",
+          "end_date": "2019-06-01",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2018",
+          "start_date": "2018-06-05",
+          "end_date": "2018-06-09",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2017",
+          "start_date": "2017-05-30",
+          "end_date": "2017-06-03",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2016",
+          "start_date": "2016-05-31",
+          "end_date": "2016-06-04",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2015",
+          "start_date": "2015-06-02",
+          "end_date": "2015-06-06",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2014",
+          "start_date": "2014-06-03",
+          "end_date": "2014-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2013",
+          "start_date": "2013-06-04",
+          "end_date": "2013-06-08",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2012",
+          "start_date": "2012-06-05",
+          "end_date": "2012-06-09",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2011",
+          "start_date": "2011-05-31",
+          "end_date": "2011-06-04",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2010",
+          "start_date": "2010-06-01",
+          "end_date": "2010-06-05",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/3C6C923033D10AB8D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "61D79B554ACF90D4D9292524493DC424",
+      "name": "C.Y. Intelligence Co., Ltd.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0832",
+      "official_url": "https://www.cyintell.com/",
+      "brands": [],
+      "official_tags": [],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-06-04",
+          "end_date": "2024-06-07",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/61D79B554ACF90D4D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "31860FE29381D915D9292524493DC424",
+      "name": "CHT Security Co., Ltd.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0632",
+      "official_url": "http://www.chtsecurity.com",
+      "brands": ["SecuTex", "CypherCom", "HorusEyes"],
+      "official_tags": [
+        {
+          "code": "OPT00446",
+          "label": "AI Service"
+        },
+        {
+          "code": "OPT00429",
+          "label": "CyberSecurity"
+        },
+        {
+          "code": "OPT00703",
+          "label": "Quantum"
+        },
+        {
+          "code": "OPT00450",
+          "label": "Security"
+        },
+        {
+          "code": "OPT00459",
+          "label": "ZeroTrust"
+        }
+      ],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-01-22",
+          "end_date": "2025-01-23",
+          "show": "Taiwan Pavilion Cybersec Asia"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-06-04",
+          "end_date": "2024-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2023",
+          "start_date": "2023-05-30",
+          "end_date": "2023-06-02",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2022",
+          "start_date": "2022-08-03",
+          "end_date": "2022-08-05",
+          "show": "TAIWAN EXPO in Malaysia"
+        },
+        {
+          "edition_year": "2020",
+          "start_date": "2021-05-31",
+          "end_date": "2021-06-30",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/31860FE29381D915D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "F7AB586454C95B1BD9292524493DC424",
+      "name": "EZBOND CHEMICAL CO., LTD.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0331a",
+      "official_url": "http://www.ezbond.com.tw",
+      "brands": ["DOWSIL", "ZYMET"],
+      "official_tags": [
+        {
+          "code": "OPT00347",
+          "label": "AI"
+        },
+        {
+          "code": "OPT00419",
+          "label": "DataCenter"
+        },
+        {
+          "code": "OPT00423",
+          "label": "Edge"
+        },
+        {
+          "code": "OPT00422",
+          "label": "Semiconductor"
+        },
+        {
+          "code": "OPT00432",
+          "label": "VR"
+        },
+        {
+          "code": "OPT00722",
+          "label": "Wearables"
+        }
+      ],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-04-17",
+          "end_date": "2024-04-20",
+          "show": "TAIPEI AMPA"
+        },
+        {
+          "edition_year": "2023",
+          "start_date": "2023-04-12",
+          "end_date": "2023-04-15",
+          "show": "TAIPEI AMPA"
+        },
+        {
+          "edition_year": "2022",
+          "start_date": "2022-04-20",
+          "end_date": "2022-04-23",
+          "show": "TAIPEI AMPA"
+        },
+        {
+          "edition_year": "2021",
+          "start_date": "2021-04-14",
+          "end_date": "2021-04-17",
+          "show": "TAIPEI AMPA"
+        },
+        {
+          "edition_year": "2019",
+          "start_date": "2019-04-24",
+          "end_date": "2019-04-27",
+          "show": "TAIPEI AMPA"
+        },
+        {
+          "edition_year": "2018",
+          "start_date": "2018-04-25",
+          "end_date": "2018-04-28",
+          "show": "Taiwan Int"
+        },
+        {
+          "edition_year": "2017",
+          "start_date": "2017-04-19",
+          "end_date": "2017-04-22",
+          "show": "TAIPEI AMPA"
+        },
+        {
+          "edition_year": "2016",
+          "start_date": "2016-04-06",
+          "end_date": "2016-04-09",
+          "show": "TAIPEI AMPA"
+        },
+        {
+          "edition_year": "2015",
+          "start_date": "2015-06-02",
+          "end_date": "2015-06-06",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2014",
+          "start_date": "2014-03-20",
+          "end_date": "2014-03-23",
+          "show": "Taiwan Int"
+        },
+        {
+          "edition_year": "2013",
+          "start_date": "2013-03-26",
+          "end_date": "2013-03-29",
+          "show": "Taiwan Int"
+        },
+        {
+          "edition_year": "2012",
+          "start_date": "2012-10-09",
+          "end_date": "2012-10-12",
+          "show": "TAITRONICS"
+        },
+        {
+          "edition_year": "2011",
+          "start_date": "2011-10-10",
+          "end_date": "2011-10-13",
+          "show": "TAITRONICS"
+        },
+        {
+          "edition_year": "2010",
+          "start_date": "2010-10-11",
+          "end_date": "2010-10-14",
+          "show": "TAITRONICS"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/F7AB586454C95B1BD9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "F0B56788D85BCB82D9292524493DC424",
+      "name": "Ecolab Limited",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0125",
+      "official_url": "https://www.ecolab.com/",
+      "brands": ["Ecolab", "Nalco Water"],
+      "official_tags": [
+        {
+          "code": "OPT00347",
+          "label": "AI"
+        },
+        {
+          "code": "OPT00716",
+          "label": "CircularEconomy"
+        },
+        {
+          "code": "OPT00419",
+          "label": "DataCenter"
+        },
+        {
+          "code": "OPT00717",
+          "label": "GreenTech"
+        },
+        {
+          "code": "OPT00447",
+          "label": "Liquidcooling"
+        }
+      ],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2019",
+          "start_date": "2019-10-24",
+          "end_date": "2019-10-27",
+          "show": "Kaohsiung Int"
+        },
+        {
+          "edition_year": "2018",
+          "start_date": "2018-10-25",
+          "end_date": "2018-10-28",
+          "show": "Kaohsiung Int"
+        },
+        {
+          "edition_year": "2017",
+          "start_date": "2017-06-21",
+          "end_date": "2017-06-24",
+          "show": "Taiwan Int"
+        },
+        {
+          "edition_year": "2015",
+          "start_date": "2015-06-24",
+          "end_date": "2015-06-27",
+          "show": "Taiwan Int"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/F0B56788D85BCB82D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "A2A82F03BF7F0C0BD9292524493DC424",
+      "name": "Egis Technology Inc.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0826",
+      "official_url": "http://www.egistec.com",
+      "brands": ["Egis"],
+      "official_tags": [],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2015",
+          "start_date": "2015-06-02",
+          "end_date": "2015-06-06",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2010",
+          "start_date": "2010-06-01",
+          "end_date": "2010-06-05",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/A2A82F03BF7F0C0BD9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "7A9EF59761602F5FD9292524493DC424",
+      "name": "FS-TECH COMPANY LTD.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0824",
+      "official_url": "http://fs-technology.com",
+      "brands": [],
+      "official_tags": [
+        {
+          "code": "OPT00347",
+          "label": "AI"
+        },
+        {
+          "code": "OPT00701",
+          "label": "AI Platform"
+        },
+        {
+          "code": "OPT00446",
+          "label": "AI Service"
+        },
+        {
+          "code": "OPT00711",
+          "label": "AIPlatform"
+        },
+        {
+          "code": "OPT00704",
+          "label": "AIService"
+        },
+        {
+          "code": "OPT00549",
+          "label": "DigitalTwin"
+        }
+      ],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-09-24",
+          "end_date": "2026-09-26",
+          "show": "Taiwan Expo USA"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-10-22",
+          "end_date": "2025-10-24",
+          "show": "TAITRONICS"
+        },
+        {
+          "edition_year": "2011",
+          "start_date": "2011-10-05",
+          "end_date": "2011-10-07",
+          "show": "Energy Taiwan"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/7A9EF59761602F5FD9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "264C165ABB199FA8D9292524493DC424",
+      "name": "Guchii Technology Co, Ltd.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0431a",
+      "official_url": "http://www.guchii.com",
+      "brands": [],
+      "official_tags": [],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/264C165ABB199FA8D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "FF57410B3C81B6BED9292524493DC424",
+      "name": "Inventec Corporation",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0313a",
+      "official_url": "http://www.inventec.com/",
+      "brands": [],
+      "official_tags": [],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-08-14",
+          "end_date": "2025-08-16",
+          "show": "Taiwan Expo USA"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-06-04",
+          "end_date": "2024-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2023",
+          "start_date": "2023-05-30",
+          "end_date": "2023-06-02",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2020",
+          "start_date": "2021-05-31",
+          "end_date": "2021-06-30",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2017",
+          "start_date": "2017-10-11",
+          "end_date": "2017-10-14",
+          "show": "TAITRONICS"
+        },
+        {
+          "edition_year": "2016",
+          "start_date": "2016-10-06",
+          "end_date": "2016-10-09",
+          "show": "TAITRONICS"
+        },
+        {
+          "edition_year": "2015",
+          "start_date": "2015-10-06",
+          "end_date": "2015-10-09",
+          "show": "TAITRONICS"
+        },
+        {
+          "edition_year": "2014",
+          "start_date": "2014-10-06",
+          "end_date": "2014-10-09",
+          "show": "TAITRONICS"
+        },
+        {
+          "edition_year": "2011",
+          "start_date": "2011-10-10",
+          "end_date": "2011-10-13",
+          "show": "TAITRONICS"
+        },
+        {
+          "edition_year": "2010",
+          "start_date": "2010-10-11",
+          "end_date": "2010-10-14",
+          "show": "TAITRONICS"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/FF57410B3C81B6BED9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "70780D020CA44624D9292524493DC424",
+      "name": "Kaori Thermal Technology Co., Ltd.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0227a",
+      "official_url": "https://www.kaorithermal.com/",
+      "brands": [],
+      "official_tags": [],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/70780D020CA44624D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "5683C201C8836251D9292524493DC424",
+      "name": "Kneron (Taiwan) Co., Ltd.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0532",
+      "official_url": "https://www.kneron.com/",
+      "brands": [],
+      "official_tags": [
+        {
+          "code": "OPT00347",
+          "label": "AI"
+        },
+        {
+          "code": "OPT00701",
+          "label": "AI Platform"
+        },
+        {
+          "code": "OPT00704",
+          "label": "AIService"
+        },
+        {
+          "code": "OPT00551",
+          "label": "AMR"
+        },
+        {
+          "code": "OPT00436",
+          "label": "AutonomousVehicles"
+        }
+      ],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-09-24",
+          "end_date": "2026-09-26",
+          "show": "Taiwan Expo USA"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-06-04",
+          "end_date": "2024-06-07",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/5683C201C8836251D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "BA8F7B621FB8DF57D9292524493DC424",
+      "name": "LEGEND INNOVATION INC.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0128",
+      "official_url": "http://www.legendinno.com.tw",
+      "brands": [],
+      "official_tags": [],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/BA8F7B621FB8DF57D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "3FB6A6B25FFAA888D9292524493DC424",
+      "name": "Latticework Taiwan LTD",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0932a",
+      "official_url": "http://www.latticeworkinc.com/",
+      "brands": ["VAISense"],
+      "official_tags": [
+        {
+          "code": "OPT00347",
+          "label": "AI"
+        },
+        {
+          "code": "OPT00701",
+          "label": "AI Platform"
+        },
+        {
+          "code": "OPT00709",
+          "label": "EdgeAI"
+        },
+        {
+          "code": "OPT00450",
+          "label": "Security"
+        },
+        {
+          "code": "OPT00705",
+          "label": "SmartManufacturing"
+        }
+      ],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-06-04",
+          "end_date": "2024-06-07",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/3FB6A6B25FFAA888D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "E302B7F280DAAC73D9292524493DC424",
+      "name": "MiTAC Computing Technology Corp.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0504",
+      "official_url": "https://www.mitaccomputing.com/",
+      "brands": ["MiTAC Computing"],
+      "official_tags": [],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-06-04",
+          "end_date": "2024-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2023",
+          "start_date": "2023-05-30",
+          "end_date": "2023-06-02",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2020",
+          "start_date": "2021-05-31",
+          "end_date": "2021-06-30",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2019",
+          "start_date": "2019-10-16",
+          "end_date": "2019-10-18",
+          "show": "Taiwan International AIoT Show"
+        },
+        {
+          "edition_year": "2017",
+          "start_date": "2017-05-30",
+          "end_date": "2017-06-03",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/E302B7F280DAAC73D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "B7FC4782DA4CE008D9292524493DC424",
+      "name": "Minerva Innovation Company",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0933",
+      "official_url": "http://www.minerva.com.tw",
+      "brands": [],
+      "official_tags": [],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-06-04",
+          "end_date": "2024-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2023",
+          "start_date": "2023-05-30",
+          "end_date": "2023-06-02",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2020",
+          "start_date": "2021-05-31",
+          "end_date": "2021-06-30",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2019",
+          "start_date": "2019-05-28",
+          "end_date": "2019-06-01",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2018",
+          "start_date": "2018-06-05",
+          "end_date": "2018-06-09",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2017",
+          "start_date": "2017-05-30",
+          "end_date": "2017-06-03",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2016",
+          "start_date": "2016-05-31",
+          "end_date": "2016-06-04",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2015",
+          "start_date": "2015-06-02",
+          "end_date": "2015-06-06",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2014",
+          "start_date": "2014-06-03",
+          "end_date": "2014-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2013",
+          "start_date": "2013-06-04",
+          "end_date": "2013-06-08",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2012",
+          "start_date": "2012-06-05",
+          "end_date": "2012-06-09",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/B7FC4782DA4CE008D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "FF6AAA6D014B247BD9292524493DC424",
+      "name": "Neousys Technology Inc.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0129",
+      "official_url": "http://www.neousys-tech.com",
+      "brands": ["Neousys"],
+      "official_tags": [
+        {
+          "code": "OPT00701",
+          "label": "AI Platform"
+        }
+      ],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-06-04",
+          "end_date": "2024-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2023",
+          "start_date": "2023-05-30",
+          "end_date": "2023-06-02",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2020",
+          "start_date": "2021-05-31",
+          "end_date": "2021-06-30",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2019",
+          "start_date": "2019-05-28",
+          "end_date": "2019-06-01",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2018",
+          "start_date": "2018-06-05",
+          "end_date": "2018-06-09",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2017",
+          "start_date": "2017-05-30",
+          "end_date": "2017-06-03",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2016",
+          "start_date": "2016-05-31",
+          "end_date": "2016-06-04",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2015",
+          "start_date": "2015-06-02",
+          "end_date": "2015-06-06",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2014",
+          "start_date": "2014-06-03",
+          "end_date": "2014-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2013",
+          "start_date": "2013-06-04",
+          "end_date": "2013-06-08",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2012",
+          "start_date": "2012-06-05",
+          "end_date": "2012-06-09",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2011",
+          "start_date": "2011-05-31",
+          "end_date": "2011-06-04",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/FF6AAA6D014B247BD9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "814777545F28B5A3D9292524493DC424",
+      "name": "Rayvatek INC.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0425",
+      "official_url": "http://www.rayvatek.com",
+      "brands": ["Rayvatek"],
+      "official_tags": [
+        {
+          "code": "OPT00347",
+          "label": "AI"
+        },
+        {
+          "code": "OPT00454",
+          "label": "Drone"
+        },
+        {
+          "code": "OPT00441",
+          "label": "EnergyStorage"
+        },
+        {
+          "code": "OPT00456",
+          "label": "LEO"
+        },
+        {
+          "code": "OPT00536",
+          "label": "ManufacturingTech"
+        },
+        {
+          "code": "OPT00453",
+          "label": "UAV"
+        }
+      ],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-08-14",
+          "end_date": "2025-08-16",
+          "show": "Taiwan Expo USA"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-06-04",
+          "end_date": "2024-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2023",
+          "start_date": "2023-09-14",
+          "end_date": "2023-09-16",
+          "show": "Taipei Aerospace"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/814777545F28B5A3D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "62534B35573DCAAFD9292524493DC424",
+      "name": "Rittal Ltd.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0123",
+      "official_url": "http://www.rittal.com.tw",
+      "brands": [],
+      "official_tags": [],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/62534B35573DCAAFD9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "A4046018FFFD7397D9292524493DC424",
+      "name": "Senao Networks Inc.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0219",
+      "official_url": "http://www.senaonetworks.com",
+      "brands": ["Senao"],
+      "official_tags": [],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2015",
+          "start_date": "2015-06-02",
+          "end_date": "2015-06-06",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2014",
+          "start_date": "2014-06-03",
+          "end_date": "2014-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2013",
+          "start_date": "2013-06-04",
+          "end_date": "2013-06-08",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2012",
+          "start_date": "2012-06-05",
+          "end_date": "2012-06-09",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2011",
+          "start_date": "2011-05-31",
+          "end_date": "2011-06-04",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2010",
+          "start_date": "2010-06-01",
+          "end_date": "2010-06-05",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/A4046018FFFD7397D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "04213C24001A0946D9292524493DC424",
+      "name": "Shuttle Inc.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0114",
+      "official_url": "http://www.shuttle.com",
+      "brands": ["Shuttle", "XPC"],
+      "official_tags": [],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-06-04",
+          "end_date": "2024-06-07",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2021",
+          "start_date": "2021-05-31",
+          "end_date": "2021-06-30",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2018",
+          "start_date": "2018-06-05",
+          "end_date": "2018-06-09",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2017",
+          "start_date": "2017-05-30",
+          "end_date": "2017-06-03",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2016",
+          "start_date": "2016-05-31",
+          "end_date": "2016-06-04",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2015",
+          "start_date": "2015-06-02",
+          "end_date": "2015-06-06",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2012",
+          "start_date": "2012-06-05",
+          "end_date": "2012-06-09",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2011",
+          "start_date": "2011-05-31",
+          "end_date": "2011-06-04",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2010",
+          "start_date": "2010-06-01",
+          "end_date": "2010-06-05",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/04213C24001A0946D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "43CFA0F6FAAA501CD9292524493DC424",
+      "name": "Skymizer Taiwan Inc.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0923",
+      "official_url": "http://skymizer.ai/",
+      "brands": ["Skymizer"],
+      "official_tags": [
+        {
+          "code": "OPT00347",
+          "label": "AI"
+        },
+        {
+          "code": "OPT00701",
+          "label": "AI Platform"
+        },
+        {
+          "code": "OPT00711",
+          "label": "AIPlatform"
+        },
+        {
+          "code": "OPT00709",
+          "label": "EdgeAI"
+        },
+        {
+          "code": "OPT00708",
+          "label": "LLM"
+        }
+      ],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2024",
+          "start_date": "2024-06-04",
+          "end_date": "2024-06-07",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/43CFA0F6FAAA501CD9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "3F740588901676E1D9292524493DC424",
+      "name": "Vaidio",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0634",
+      "official_url": "https://www.vaidio.ai/",
+      "brands": ["IRONYUN", "VAIDIO"],
+      "official_tags": [
+        {
+          "code": "OPT00347",
+          "label": "AI"
+        },
+        {
+          "code": "OPT00701",
+          "label": "AI Platform"
+        },
+        {
+          "code": "OPT00711",
+          "label": "AIPlatform"
+        },
+        {
+          "code": "OPT00712",
+          "label": "ComputerVision"
+        },
+        {
+          "code": "OPT00708",
+          "label": "LLM"
+        },
+        {
+          "code": "OPT00450",
+          "label": "Security"
+        }
+      ],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/3F740588901676E1D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    },
+    {
+      "exhibitor_id": "BB183F720B1E6C73D9292524493DC424",
+      "name": "YONYOU TAIWAN CO., LTD.",
+      "venue": "Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2)",
+      "show_area": "AI Computing & System Integration Solution",
+      "booth": "R0325a",
+      "official_url": "https://www.yonyou.com.tw/",
+      "brands": [],
+      "official_tags": [
+        {
+          "code": "OPT00701",
+          "label": "AI Platform"
+        },
+        {
+          "code": "OPT00424",
+          "label": "Cloud"
+        },
+        {
+          "code": "OPT00443",
+          "label": "MaaS"
+        },
+        {
+          "code": "OPT00452",
+          "label": "SI"
+        }
+      ],
+      "exhibiting_record": [
+        {
+          "edition_year": "2026",
+          "start_date": "2026-06-02",
+          "end_date": "2026-06-05",
+          "show": "COMPUTEX TAIPEI"
+        },
+        {
+          "edition_year": "2025",
+          "start_date": "2025-05-20",
+          "end_date": "2025-05-23",
+          "show": "COMPUTEX TAIPEI"
+        }
+      ],
+      "source_url": "https://www.computextaipei.com.tw/en/exhibitor/BB183F720B1E6C73D9292524493DC424/info.html",
+      "source_type": "official",
+      "last_checked_at": "2026-07-29",
+      "harvested_from_area": "AI Computing & System Integration Solution"
+    }
+  ]
+}

@@ -310,7 +310,12 @@ def check(target: FileTarget, config: dict[str, Any]) -> Iterator[Violation]:
         # 與 paragraph_rhythm density 同一把尺）。靜態圖 ≥1 floor 不變。
         viz_count = len(_RE_VIZ_MODULE.findall(body))
         media_total = total_images + iframe_count + viz_count
-        if media_total >= min_images and total_images == 0:
+        # `media_total > 0` 是 2026-07-29 COMPUTEX.md 補的。這條守的是「媒體夠但
+        # 全是影片 → OG card 沒有靜態圖可用」。min_images 被 per_category 設成 0
+        # 的文體（Vendors / Products 事實頁，刻意不放圖）會讓 `0 >= 0` 成立而觸發，
+        # 訊息印出來是「0 影片但 0 圖」，本身就自相矛盾。零媒體屬於下面 elif 的
+        # 管轄範圍，不歸這條。
+        if media_total > 0 and media_total >= min_images and total_images == 0:
             # 媒體夠但 0 靜態圖 — OG card / poster 缺素材 (影片 thumbnail 不可靠)
             yield Violation(
                 check=CHECK_NAME,

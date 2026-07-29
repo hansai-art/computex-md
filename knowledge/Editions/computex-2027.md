@@ -27,6 +27,8 @@ sources:
 
 # COMPUTEX 2027：2027 年 6 月 1 日至 4 日，台北三館
 
+> **30 秒概覽**：COMPUTEX 2027 的會期是 2027 年 6 月 1 日至 4 日共四天，場地是台北南港展覽館 1 館、2 館與世貿一館，由中華民國對外貿易發展協會（TAITRA）與台北市電腦商業同業公會（TCA）共同主辦。這四項是官方網站已經掛出來的。年度主題、參展家數、議程與票務時程官方都還沒公布，本頁一律留白，不推測。
+
 COMPUTEX 2027（台北國際電腦展）將於 **2027 年 6 月 1 日至 6 月 4 日**舉行，為期四天，地點在台北。這是目前官方網站首頁已經掛出的會期資訊。
 
 ## 已公布的事實
@@ -57,10 +59,16 @@ COMPUTEX.md 的每一頁都分成兩層：**事實層**（可查證、附出處�
 
 這樣切的原因很實際。展會資訊每年都會被大量轉載，轉載過程中「往年是這樣所以今年應該也是」的推測會被寫成肯定句，然後被搜尋引擎與 AI 一起吃進去。等到官方公布真正的數字，網路上已經流傳了一份錯的。我們寧可留白，也不補那個空格。
 
-## 相關
+## 延伸閱讀
 
-- COMPUTEX 歷屆展會：見「歷屆展會」分類
-- 參展廠商資料：見「廠商」分類
+本站已經整理了 COMPUTEX 2026 兩個 AI 展區共 86 家參展廠商的官方事實層，
+每一家都附攤位號、官方網站與歷年參展紀錄。2027 年的名錄公布後會用同一套流程更新：
+
+- [Wiwynn Corporation：COMPUTEX 2026 參展資料](/vendors/wiwynn/)
+- [Inventec Corporation：COMPUTEX 2026 參展資料](/vendors/inventec/)
+- [MiTAC Computing Technology Corp.：COMPUTEX 2026 參展資料](/vendors/mitac-computing/)
+- [Micro-Star International Co., Ltd.：COMPUTEX 2026 參展資料](/vendors/micro-star-international/)
+- [Synology Inc.：COMPUTEX 2026 參展資料](/vendors/synology/)
 
 ---
 

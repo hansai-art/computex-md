@@ -59,6 +59,15 @@ import { join, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
 
+import {
+  CATEGORY_LABELS,
+  FOLDER_TO_SLUG,
+} from '../../src/config/categories.mjs';
+import {
+  DEFAULT_LANGUAGE,
+  ENABLED_LANGUAGE_CODES,
+} from '../../src/config/languages.mjs';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const repoRoot = join(__dirname, '..', '..');
@@ -68,102 +77,43 @@ const outDir = join(repoRoot, 'public', 'og-images');
 const translationsPath = join(knowledgeDir, '_translations.json');
 const faviconPath = join(repoRoot, 'public', 'favicon.png');
 
-// 13 categories — keys match URL slug, folder names mapped from frontmatter category
-const CATEGORY_MAP = {
-  About: 'about',
-  History: 'history',
-  Geography: 'geography',
-  Culture: 'culture',
-  Food: 'food',
-  Art: 'art',
-  Music: 'music',
-  Technology: 'technology',
-  Nature: 'nature',
-  People: 'people',
-  Society: 'society',
-  Economy: 'economy',
-  Lifestyle: 'lifestyle',
-};
+// 資料夾名 → URL slug。吃 src/config/categories.mjs 正本。
+//
+// 2026-07-29：這裡原本是母體 13 分類的第八份寫死副本。這個物種的資料夾叫
+// Vendors / Products / Editions / Topics，一個都對不上，所以掃描結果永遠是
+// 「0 routable items」，然後印「✅ No images need (re)generation」就結束 ——
+// 全站 87 頁一張 OG 圖都沒有，而且看起來像成功。同一個形狀的坑在
+// build-content-dates.mjs 已經踩過一次（第七份副本，產出 0 筆日期）。
+// 分類表只准有一份，任何新的 build script 都 import 這支。
+const CATEGORY_MAP = { ...FOLDER_TO_SLUG };
 
-const LANGUAGES = ['zh-TW', 'en', 'ja', 'ko'];
-const DEFAULT_LANG = 'zh-TW';
+// 語言清單同樣吃正本，不寫死。母體是 4 語，這個物種目前 zh-TW + en。
+// 寫死的後果比分類表更隱蔽：多寫一個沒開的語言只是白跑，少寫一個開了的語言
+// 是那語言的 OG 圖整批不存在，而且不會有任何錯誤訊息。
+const LANGUAGES = [...ENABLED_LANGUAGE_CODES];
+const DEFAULT_LANG = DEFAULT_LANGUAGE.code;
 
-// i18n labels embedded inline (extracted from src/i18n/ui.ts)。Source-of-truth
-// 在 ui.ts；此 mirror 維護成本低（13 cats × 4 langs，半年改一次）。
-// 若 ui.ts 加新分類或語言，記得同步本表（REFLEXES #43 的同型 SSOT 風險）。
+// i18n labels。分類標籤吃 categories.mjs 正本（CATEGORY_LABELS），
+// 這裡只轉成本檔要的 `{ lang: { slug: label } }` 形狀。
+// 母體原本在這裡放一份 13 分類 × 4 語的手抄鏡像，附註「半年改一次、維護成本低」。
+// 對這個物種不成立：分類名就是產品定位（廠商 / 產品 / 歷屆展會 / 產業觀察），
+// 會跟著談授權的進度動，抄一份就是排定一次漂移。
 const HOME_LABEL = {
   'zh-TW': '首頁',
   en: 'Home',
-  ja: 'ホーム',
-  ko: '홈',
 };
 
-const CATEGORY_LABEL = {
-  'zh-TW': {
-    about: '關於',
-    history: '歷史',
-    geography: '地理',
-    culture: '文化',
-    food: '美食',
-    art: '藝術',
-    music: '音樂',
-    technology: '科技',
-    nature: '自然',
-    people: '人物',
-    politics: '政治',
-    society: '社會',
-    economy: '經濟',
-    lifestyle: '生活',
-  },
-  en: {
-    about: 'About',
-    history: 'History',
-    geography: 'Geography',
-    culture: 'Culture',
-    food: 'Food',
-    art: 'Art',
-    music: 'Music',
-    technology: 'Technology',
-    nature: 'Nature',
-    people: 'People',
-    politics: 'Politics',
-    society: 'Society',
-    economy: 'Economy',
-    lifestyle: 'Lifestyle',
-  },
-  ja: {
-    about: '概要',
-    history: '歴史',
-    geography: '地理',
-    culture: '文化',
-    food: 'グルメ',
-    art: '芸術',
-    music: '音楽',
-    technology: 'テクノロジー',
-    nature: '自然',
-    people: '人物',
-    politics: '政治',
-    society: '社会',
-    economy: '経済',
-    lifestyle: 'ライフスタイル',
-  },
-  ko: {
-    about: '소개',
-    history: '역사',
-    geography: '지리',
-    culture: '문화',
-    food: '음식',
-    art: '예술',
-    music: '음악',
-    technology: '기술',
-    nature: '자연',
-    people: '인물',
-    politics: '정치',
-    society: '사회',
-    economy: '경제',
-    lifestyle: '라이프스타일',
-  },
-};
+const CATEGORY_LABEL = Object.fromEntries(
+  LANGUAGES.map((lang) => [
+    lang,
+    Object.fromEntries(
+      Object.entries(CATEGORY_LABELS).map(([slug, labels]) => [
+        slug,
+        labels[lang] ?? labels[DEFAULT_LANG] ?? slug,
+      ]),
+    ),
+  ]),
+);
 
 // 影響 OG 視覺輸出的檔案 — 任一 mtime 比 JPG 新 → 全量重產。
 // v4：本檔自身（template inline）+ favicon。若本檔修 visual rendering 邏輯

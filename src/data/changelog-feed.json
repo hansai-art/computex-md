@@ -1,7 +1,26 @@
 {
-  "generatedAt": "2026-07-29T01:25:33.845Z",
+  "generatedAt": "2026-07-29T02:27:59.586Z",
   "source": "git",
   "commits": [
+    {
+      "hash": "03eb6a7bc2aaeae1b00202e5ff31d81f547b6415",
+      "date": "2026-07-29T09:30:52+08:00",
+      "author": "Hans",
+      "message": "fix(loader): minimal parser 讀不懂 Prettier 折行的 tags，而測試環境剛好看不到",
+      "articles": []
+    },
+    {
+      "hash": "48234f5f6f448d38d89c9936c3eba1009e53f9f6",
+      "date": "2026-07-29T09:27:32+08:00",
+      "author": "Hans",
+      "message": "feat(identity): README 換成自己的門面，並修好三處還停在母體尺度的衍生資料",
+      "articles": [
+        {
+          "url": "/editions/computex-2027",
+          "name": "computex-2027"
+        }
+      ]
+    },
     {
       "hash": "f47b2966ffa82a86c9f99d1cf512320210c36b3d",
       "date": "2026-07-29T09:15:38+08:00",

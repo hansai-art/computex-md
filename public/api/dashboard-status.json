@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-28T17:33:50.724Z",
+  "generated_at": "2026-07-29T02:28:07.573Z",
   "routines": null,
   "babel": null,
   "incidents": [
@@ -12,7 +12,7 @@
     {
       "ts": "2026-07-28",
       "level": "red",
-      "text": "🛡️ 免疫系統 器官分數 44 < 50，需要干預",
+      "text": "🛡️ 免疫系統 器官分數 46 < 50，需要干預",
       "source": "dashboard-organism.json"
     },
     {
@@ -30,9 +30,30 @@
     {
       "ts": "2026-07-28",
       "level": "yellow",
-      "text": "免疫 v3=44：漂移 — 多維度退化中",
+      "text": "免疫 v3=46：漂移 — 多維度退化中",
       "source": "dashboard-immune.json"
     }
   ],
-  "deploys": null
+  "deploys": [
+    {
+      "ts": "2026-07-29T01:31:06Z",
+      "conclusion": "success",
+      "title": "Quality Gene Tests: fix(loader): minimal parser 讀不懂 Prettier 折行的 tags，而測試環境剛好看不到"
+    },
+    {
+      "ts": "2026-07-29T01:17:12Z",
+      "conclusion": "success",
+      "title": "Quality Gene Tests: feat(quality): 品質基因在地化：新增 marketing-speak，並修好一直在空放的 terminology gate"
+    },
+    {
+      "ts": "2026-07-29T00:41:53Z",
+      "conclusion": "failure",
+      "title": "Deploy to GitHub Pages: fix(hooks): pre-push 在新 repo 第一次 push 時靜默炸掉"
+    },
+    {
+      "ts": "2026-07-29T00:41:26Z",
+      "conclusion": "failure",
+      "title": "Deploy to GitHub Pages: feat: 授權定案 CC BY 4.0，llms.txt 重寫為 COMPUTEX.md 的正門"
+    }
+  ]
 }

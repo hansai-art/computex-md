@@ -23,7 +23,7 @@ export const aboutUI = {
       'Surprisingly, no one had claimed the computex.md domain yet. Perhaps the universe was telling us it was time to make this happen.',
 
     // Stats
-    'about.stats.pages.number': '1+',
+    'about.stats.pages.number': '87+',
     'about.stats.pages.label': 'Pages',
     'about.stats.countries.number': '106',
     'about.stats.countries.label': 'Countries',
@@ -502,7 +502,7 @@ export const aboutUI = {
       '驚くことに、computex.md というドメインはまだ誰にも取られていませんでした。きっと宇宙が「今こそやるべき時だ」と教えてくれたのでしょう。',
 
     // Stats
-    'about.stats.pages.number': '1+',
+    'about.stats.pages.number': '87+',
     'about.stats.pages.label': 'ページ',
     'about.stats.countries.number': '106',
     'about.stats.countries.label': 'か国',
@@ -973,7 +973,7 @@ export const aboutUI = {
       '놀랍게도 computex.md 도메인을 아무도 선점하지 않았습니다. 어쩌면 우주가 이 일을 해야 할 때라고 알려주고 있었던 것일지도 모릅니다.',
 
     // Stats
-    'about.stats.pages.number': '1+',
+    'about.stats.pages.number': '87+',
     'about.stats.pages.label': '페이지',
     'about.stats.countries.number': '106',
     'about.stats.countries.label': '국가',
@@ -1441,7 +1441,7 @@ export const aboutUI = {
       'Điều đáng kinh ngạc là tên miền computex.md vẫn chưa bị ai mua trước. Có lẽ vũ trụ đang nói với chúng tôi rằng đã đến lúc thực hiện điều này.',
 
     // Stats
-    'about.stats.pages.number': '1+',
+    'about.stats.pages.number': '87+',
     'about.stats.pages.label': 'Trang',
     'about.stats.countries.number': '106',
     'about.stats.countries.label': 'Quốc gia',
@@ -1922,7 +1922,7 @@ export const aboutUI = {
       'Yang mengejutkan, domain computex.md ternyata belum dibeli siapa pun. Mungkin semesta sedang memberi tahu kami bahwa sudah waktunya mewujudkan ini.',
 
     // Stats
-    'about.stats.pages.number': '1+',
+    'about.stats.pages.number': '87+',
     'about.stats.pages.label': 'Halaman',
     'about.stats.countries.number': '106',
     'about.stats.countries.label': 'Negara',
@@ -2405,7 +2405,7 @@ export const aboutUI = {
       'Surpreendentemente, ninguém havia comprado o domínio computex.md antes. Talvez fosse o universo nos dizendo que era hora de fazer isso.',
 
     // Stats
-    'about.stats.pages.number': '1+',
+    'about.stats.pages.number': '87+',
     'about.stats.pages.label': 'páginas',
     'about.stats.countries.number': '106',
     'about.stats.countries.label': 'países',
@@ -2886,7 +2886,7 @@ export const aboutUI = {
       'हैरानी की बात है कि computex.md डोमेन पहले किसी ने नहीं खरीदा था। शायद ब्रह्मांड हमें बता रहा था कि अब यह काम करने का समय आ गया है।',
 
     // Stats
-    'about.stats.pages.number': '1+',
+    'about.stats.pages.number': '87+',
     'about.stats.pages.label': 'पृष्ठ',
     'about.stats.countries.number': '106',
     'about.stats.countries.label': 'देश',
@@ -3367,7 +3367,7 @@ export const aboutUI = {
       'من المثير للدهشة أن اسم النطاق computex.md لم يسبقه أحد إلى شرائه. ربما يكون الكون يخبرنا أن هذا الأمر كان يجب أن يُنفَّذ.',
 
     // Stats
-    'about.stats.pages.number': '1+',
+    'about.stats.pages.number': '87+',
     'about.stats.pages.label': 'الصفحات',
     'about.stats.countries.number': '106',
     'about.stats.countries.label': 'الدول',
@@ -3832,7 +3832,7 @@ export const aboutUI = {
       'Удивительно, но домен computex.md никто не успел купить раньше. Возможно, Вселенная говорит нам, что это должно было произойти.',
 
     // Stats
-    'about.stats.pages.number': '1+',
+    'about.stats.pages.number': '87+',
     'about.stats.pages.label': 'Страницы',
     'about.stats.countries.number': '106',
     'about.stats.countries.label': 'Страны',
@@ -4311,7 +4311,7 @@ export const aboutUI = {
       '令人驚訝的是，computex.md 這個域名居然沒有人搶先買下。或許是宇宙在告訴我們，這件事該做了。',
 
     // Stats
-    'about.stats.pages.number': '1+',
+    'about.stats.pages.number': '87+',
     'about.stats.pages.label': '頁面',
     'about.stats.countries.number': '106',
     'about.stats.countries.label': '國家',
@@ -4759,7 +4759,7 @@ export const aboutUI = {
     'about.naming.lucky.title': 'Une heureuse coïncidence',
     'about.naming.lucky.desc':
       "Étonnamment, personne n'avait encore revendiqué le domaine computex.md. Peut-être que l'univers nous disait qu'il était temps de le réaliser.",
-    'about.stats.pages.number': '1+',
+    'about.stats.pages.number': '87+',
     'about.stats.pages.label': 'Pages',
     'about.stats.countries.number': '106',
     'about.stats.countries.label': 'Pays',
@@ -5173,7 +5173,7 @@ export const aboutUI = {
     'about.naming.lucky.title': 'Una Coincidencia Afortunada',
     'about.naming.lucky.desc':
       'Sorprendentemente, nadie había reclamado aún el dominio computex.md. Quizás el universo nos decía que era el momento de hacer esto realidad.',
-    'about.stats.pages.number': '1+',
+    'about.stats.pages.number': '87+',
     'about.stats.pages.label': 'Páginas',
     'about.stats.countries.number': '106',
     'about.stats.countries.label': 'Países',

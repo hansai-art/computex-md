@@ -82,6 +82,12 @@ min_chars = 900
 [checks.word-count.options.per_category]
 Topics = 4500
 Editions = 1500
+# Vendors / Products = 事實頁。完整度由 Booth Score（欄位覆蓋率 + 每項有無
+# source URL）量，不由字數量。把長文門檻套上來只會逼人灌水，而灌水正是這個
+# 檔案庫存在要消滅的東西。400 字是「一張填滿的事實表 + 留白清單」的實際下限，
+# 低於它代表官方欄位沒抓齊，那才是真正該修的東西。
+Vendors = 400
+Products = 400
 
 [checks.image-health.options]
 min_images = 1
@@ -90,14 +96,31 @@ length_scaled = false
 
 [checks.image-health.options.per_category]
 Topics = 3
+# 廠商頁 0 張是刻意的，不是待補：廠商 logo 是註冊商標，我們沒有授權；擺一張
+# 無關的 stock photo 就是這個專案定義的灌水。等 TAITRA 授權或廠商自己附圖 PR
+# 進來再往上調，NEVER 為了讓門檻變綠去塞圖。
+Vendors = 0
+Products = 0
 
-# media-richness 是另一支 plugin、另一份 min_images，兩邊要一起調 —— 只調
+# media-richness 是另一支 plugin、另一份 min_images，兩邊要一起調：只調
 # image-health 的話，事實頁會通過 image-health 卻被 media-richness 攔下。
 [checks.media-richness.options]
 min_images = 1
 
 [checks.media-richness.options.per_category]
 Topics = 3
+Vendors = 0
+Products = 0
+
+# footnote-density 只調嚴重度，等級照算照報（dashboard 仍拿得到 A-F）。
+# 事實頁的引用長在表格「出處」欄，每列自帶連結 + 查證日期，比腳註好稽核：
+# 欄位缺了產生器會擋，腳註漏了不會。長文型別維持 WARN 不動。
+[checks.footnote-density.options]
+severity = "warn"
+
+[checks.footnote-density.options.per_category]
+Vendors = "info"
+Products = "info"
 
 # ── Stage profiles ───────────────────────────────────────────────────────────
 

@@ -1,9 +1,13 @@
 {
-  "totalArticles": 2,
-  "totalCategories": 2,
+  "totalArticles": 88,
+  "totalCategories": 3,
   "estimatedContributors": 0,
-  "totalTags": 6,
+  "totalTags": 0,
   "categories": [
+    {
+      "name": "Vendors",
+      "count": 86
+    },
     {
       "name": "en",
       "count": 1
@@ -13,40 +17,15 @@
       "count": 1
     }
   ],
-  "topTags": [
-    {
-      "name": "COMPUTEX",
-      "count": 1
-    },
-    {
-      "name": "COMPUTEX 2027",
-      "count": 1
-    },
-    {
-      "name": "台北國際電腦展",
-      "count": 1
-    },
-    {
-      "name": "南港展覽館",
-      "count": 1
-    },
-    {
-      "name": "TAITRA",
-      "count": 1
-    },
-    {
-      "name": "展會資訊",
-      "count": 1
-    }
-  ],
+  "topTags": [],
   "languageDistribution": {
-    "zh-TW": 2,
+    "zh-TW": 88,
     "en": 0
   },
-  "lastUpdated": "2026-07-29T01:25:33.634Z",
+  "lastUpdated": "2026-07-29T02:27:59.649Z",
   "stars": 0,
   "forks": 0,
-  "zhPages": 1,
+  "zhPages": 87,
   "enPages": 1,
-  "totalPages": 1
+  "totalPages": 87
 }

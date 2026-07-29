@@ -211,3 +211,7 @@ public/api/dashboard-newsroom.json
 # 干擾 rescue-orphans 的孤兒盤點與 verify-commit-scope 的檔數比對。
 knowledge/**/*.metrics.json
 knowledge/**/*.patch-metrics.json
+
+# harvest-exhibitors.py 的原始 HTML 快取。解析規則改版時重跑不必再打官方站，
+# 但這是別人網站的內容，不進版控（授權未談定，且 86 份 HTML 沒有保存價值）。
+.cache/

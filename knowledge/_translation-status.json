@@ -1,16 +1,16 @@
 {
   "_meta": {
-    "lastUpdated": "2026-07-29T09:25:32+08:00",
-    "zhCommitHead": "f47b296",
-    "totalZh": 1,
+    "lastUpdated": "2026-07-29T10:27:56+08:00",
+    "zhCommitHead": "03eb6a7",
+    "totalZh": 87,
     "activeLanguages": ["en"],
     "summary": {
       "en": {
-        "total_zh": 1,
+        "total_zh": 87,
         "fresh": 0,
         "stale": 1,
         "metadata_stale": 0,
-        "missing": 0,
+        "missing": 86,
         "orphan": 0
       }
     },
@@ -19,12 +19,1130 @@
     }
   },
   "byArticle": {
-    "Editions/computex-2027.md": {
+    "Vendors/mouser-electronics.md": {
       "zh": {
         "lastCommit": "",
         "lastModified": "",
-        "contentHash": "sha256:04d82d151edd06a7",
-        "bodyHash": "sha256:cb76ed65842a839d"
+        "contentHash": "sha256:834ae7e7d7b790c6",
+        "bodyHash": "sha256:1b184d89402c8a97"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/quettaflow.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:c57f592a41030063",
+        "bodyHash": "sha256:0fb672077c5d9b35"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/aptobject.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:0477c4a260073da6",
+        "bodyHash": "sha256:dac756b65251a1cb"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/qnap-systems.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:ca11c388289afba7",
+        "bodyHash": "sha256:fb31a3d1b5de1929"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/taiwan-intelligence-research-and-development.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:23cd8740d55caa41",
+        "bodyHash": "sha256:86e7775f5c48d247"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/inventec.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:47f2a215f60857f5",
+        "bodyHash": "sha256:953eef4eeb37ada3"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/southco-asia.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:ad4325528b7f2ebc",
+        "bodyHash": "sha256:e655c7f526d41593"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/richin-tech.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:5b30d91f02891029",
+        "bodyHash": "sha256:c2ad7a12ef28cffa"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/micro-star-international.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:0c781db1e67d16cb",
+        "bodyHash": "sha256:7eec2a4e7275911c"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/wiwynn.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:6be84e61f8f40efb",
+        "bodyHash": "sha256:329670d5384cb2a6"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/dongguan-xunling-new.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:127741c4d6bc6c87",
+        "bodyHash": "sha256:0695859218bd8d2e"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/palebluedot-ai.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:ff1463dbccb3d35f",
+        "bodyHash": "sha256:2be1eb21058dbeca"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/liverage.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:2c1f803059fbf582",
+        "bodyHash": "sha256:be9fc9834cd16a12"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/ezbond-chemical.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:1bb1a8d5c09049e6",
+        "bodyHash": "sha256:55d73487c35b0976"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/amazing-chip-semiconductor.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:3020a3299ecf4a98",
+        "bodyHash": "sha256:dc5129f875bb0326"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/altek.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:44a21290d8e635d9",
+        "bodyHash": "sha256:476166510c260a52"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/siemens.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:ac08ab3bab41f2e4",
+        "bodyHash": "sha256:0bc05249b4f96522"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/roboco.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:05a456b976ac2b88",
+        "bodyHash": "sha256:7097cfbf2aa1fbe1"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/enbik.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:05965c348da98716",
+        "bodyHash": "sha256:527442f64362ff23"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/auras.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:65c2848f83fa972e",
+        "bodyHash": "sha256:8f151a598e233dba"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/dynatron.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:3b92d92a63e9dc47",
+        "bodyHash": "sha256:e00ade118871e0d1"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/liteon.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:29d8d7a5ff5691d9",
+        "bodyHash": "sha256:959a5b3e8492d6d8"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/vav-cooling.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:9cdc356fdb9535ba",
+        "bodyHash": "sha256:3fbdf66e199b1a71"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/faytech-tech.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:943f111357c5e118",
+        "bodyHash": "sha256:8492b710c5ae45ea"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/c-y-intelligence.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:0fe06bdcb81627d7",
+        "bodyHash": "sha256:6685e33502b2690e"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/mitac-computing.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:81f33e33f87ba42d",
+        "bodyHash": "sha256:55b9f4a43f12b0a5"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/taiwan-cosmo-instruments.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:6742f371056718e8",
+        "bodyHash": "sha256:2e3ea399e551821f"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/guchii.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:3c5ae8e95440da2f",
+        "bodyHash": "sha256:69ee652b1760e265"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/shenzhen-gooxi-digital-intelligence.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:2721e550c4c96422",
+        "bodyHash": "sha256:d2b80555ecf262a7"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/innodisk.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:763d170ffc013bcb",
+        "bodyHash": "sha256:68bebafc685978de"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/xmems-labs.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:e55ac1577a5b0137",
+        "bodyHash": "sha256:00fae4aa3d6ec603"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/senao-networks.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:2366e3e05cb394a2",
+        "bodyHash": "sha256:e04d3521de368763"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/rayvatek.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:226eed9a89a27301",
+        "bodyHash": "sha256:7895254f0b372efc"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/amax-ky.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:2371d260fb73c66f",
+        "bodyHash": "sha256:5ce2b249b77265ea"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/fsp.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:509ac41540d4c35d",
+        "bodyHash": "sha256:a303118075804590"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/zoho.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:baf64e9e29d55cb7",
+        "bodyHash": "sha256:268c8b42f01519ab"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/flex.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:7f398517283cbd22",
+        "bodyHash": "sha256:efb2c8a7a22dd517"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/chenbro-micom.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:ba397fa371fdf436",
+        "bodyHash": "sha256:026a38700e94c5ab"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/kentec.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:440c42130fbea157",
+        "bodyHash": "sha256:251c952490ab1126"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/shenzhen-kstar-science-and.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:69ef62c4870ab026",
+        "bodyHash": "sha256:64c2014692159f01"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/latticework-taiwan.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:dc5df936d69726e4",
+        "bodyHash": "sha256:b7d66db3e87f5d93"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/elitegroup-computer-systems.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:1a32612fde31aff5",
+        "bodyHash": "sha256:cf7209d02e2ef9b0"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/continental.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:72ede6a724d63a23",
+        "bodyHash": "sha256:6bc466bb11f675db"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/delos-data.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:3097fae63ac0284a",
+        "bodyHash": "sha256:9653037948c774c1"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/minerva-innovation.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:a6e8f9fea6b19f2c",
+        "bodyHash": "sha256:645f5d4b75705fdb"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/leadtek-research.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:b25260ea5cd09ba6",
+        "bodyHash": "sha256:4300c2d143ce92df"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/jentech-precision-industrial.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:e1f58fad92fb7feb",
+        "bodyHash": "sha256:18369f8d75a0b734"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/comino.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:d03f1c65cc223caa",
+        "bodyHash": "sha256:7de62ea96f886c23"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/accordance-systems.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:b613825e12851fd2",
+        "bodyHash": "sha256:212cae7d72bc3bb3"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/powerchip-semiconductor-manufacturing.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:d9aa642973e04e2d",
+        "bodyHash": "sha256:09f833f8210304c1"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/vaidio.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:807e0bb4941b9217",
+        "bodyHash": "sha256:7db59cc0d97e4fe3"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/synology.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:7764eb9722321a5a",
+        "bodyHash": "sha256:de9e1eab3a14e64a"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/apaltek.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:bd13846c950ff1bb",
+        "bodyHash": "sha256:a8672f54f55ace21"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/rittal.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:7424160e660217d6",
+        "bodyHash": "sha256:e10494b0a49d2427"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/vertiv-taiwan.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:baa77a55fcfc8616",
+        "bodyHash": "sha256:2949295249058352"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/hetone-enterprise.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:d766b515613400aa",
+        "bodyHash": "sha256:3a296d4c90a6be79"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/infortrend.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:1875ee6dafcca2d6",
+        "bodyHash": "sha256:917763821646bd3f"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/c-media-electronics.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:61dc0e74786d3ab4",
+        "bodyHash": "sha256:37f6d8683384bc56"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/anxpert-advanced.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:d42f53afd80f55b5",
+        "bodyHash": "sha256:0c03ca2387f4b063"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/yonyou-taiwan.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:e9e96417d21209ba",
+        "bodyHash": "sha256:ceceec0856a5f261"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/axelera-ai.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:578e7b8bcd0e9ff6",
+        "bodyHash": "sha256:22b76390705dfdab"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/avermedia.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:1c884ac16b73ff66",
+        "bodyHash": "sha256:f6120bd1ccfae230"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/kaori-thermal.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:0951837215013948",
+        "bodyHash": "sha256:a84d582cdbb83b57"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/lengda-xiamen.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:8383ed84f2fb8abf",
+        "bodyHash": "sha256:8c11136ec5749ee4"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/carl-zeiss.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:a903f66e64dc0a92",
+        "bodyHash": "sha256:2c6d96cd2d490643"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/amphenol.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:ed2b437a3f507222",
+        "bodyHash": "sha256:7f6533cbb2e9df9a"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/egis.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:26e7095ac18e4ff0",
+        "bodyHash": "sha256:ad4b61a69d0032d9"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/jpc-connectivity.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:055ca3c5817b7091",
+        "bodyHash": "sha256:3bb891ea758bd1e8"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/formosa-plastics.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:886b8fae7d909d4c",
+        "bodyHash": "sha256:d29d2e9970b16606"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/hi-power-solution.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:3b34f7bfc602d06e",
+        "bodyHash": "sha256:b1e35dac5d432666"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/neousys.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:7c4902fd7d3d7e15",
+        "bodyHash": "sha256:a476e77b843c323e"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/kneron-taiwan.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:0fa06e742e26f007",
+        "bodyHash": "sha256:266c2c5833f25a68"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/quadrep-electronics-taiwan.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:9cc6cd6c55be5d94",
+        "bodyHash": "sha256:aa9545d07bab6be3"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/ecolab.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:65b6f24cd87985c9",
+        "bodyHash": "sha256:5d1547e01d7b55a3"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/voltronic-power.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:b4577b1447b0047b",
+        "bodyHash": "sha256:c5ebd88f2aa099da"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/danfoss-power-solutions.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:5e0f6a78315bc086",
+        "bodyHash": "sha256:20ca224cccaa1179"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/shuttle.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:1948bb39a3ec6bc0",
+        "bodyHash": "sha256:a3adcd3f3f877bab"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/skymizer-taiwan.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:41f272b74fb88651",
+        "bodyHash": "sha256:a04c48d39c9ca448"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/ambedded.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:d19748ce956b2c8c",
+        "bodyHash": "sha256:94bca684b7bcff8c"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/flotrend.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:ea53b0d23ff01653",
+        "bodyHash": "sha256:d86281c1d9a329cc"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/brinno-incorporated.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:699856b5ea67f2ad",
+        "bodyHash": "sha256:4a6b5b60f63e81c3"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/jwipc.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:1bc3fbea30ee6ce7",
+        "bodyHash": "sha256:199db5bc7ea1b86b"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/legend-innovation.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:cc55cff1b84cda82",
+        "bodyHash": "sha256:d1e98f5bf79772e9"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/cht-security.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:8a098c85aaae3a86",
+        "bodyHash": "sha256:4ab7c01f800a672f"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/aaeon.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:0ed93627b97a3d5c",
+        "bodyHash": "sha256:e77ee9b7aa556932"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Vendors/fs-tech.md": {
+      "zh": {
+        "lastCommit": "",
+        "lastModified": "",
+        "contentHash": "sha256:81145e795c079a1c",
+        "bodyHash": "sha256:200fa3b9c251770c"
+      },
+      "translations": {
+        "en": {
+          "status": "missing"
+        }
+      }
+    },
+    "Editions/computex-2027.md": {
+      "zh": {
+        "lastCommit": "48234f5f",
+        "lastModified": "2026-07-29T09:27:32+08:00",
+        "contentHash": "sha256:4bada9524f7f2d18",
+        "bodyHash": "sha256:17dbc41ad0f1fe3d"
       },
       "translations": {
         "en": {
@@ -34,8 +1152,8 @@
           "sourceContentHash": "",
           "sourceBodyHash": "",
           "translatedAt": "",
-          "translationLastCommit": "cd3fe19a",
-          "translationLastModified": "2026-07-29T01:33:22+08:00",
+          "translationLastCommit": "48234f5f",
+          "translationLastModified": "2026-07-29T09:27:32+08:00",
           "inferred": false,
           "footnoteDefs": 0,
           "status": "stale",

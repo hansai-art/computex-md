@@ -17,6 +17,7 @@ from __future__ import annotations
 import re
 from typing import Any, Iterator
 
+from ..config import option_for_category
 from ..types import FileTarget, Severity, Violation
 
 
@@ -63,9 +64,22 @@ def check(target: FileTarget, config: dict[str, Any]) -> Iterator[Violation]:
     else:  # F
         msg = "腳註等級 F：引用荒漠（零腳註、零 URL）"
 
+    # 等級照算、照報，只有嚴重度可以按文體調（2026-07-29 COMPUTEX.md 加）。
+    # 事實頁的引用長在表格的「出處」欄：每一列自帶連結 + 查證日期，比腳註更好稽核，
+    # 因為欄位缺了會被產生器擋下來，腳註漏了不會。把這種頁面判 C 是規則沒見過的
+    # 文體，不是頁面有問題。降級為 INFO 保留讀數，NEVER 整支關掉：長文型別（Topics /
+    # Editions）仍然吃 WARN，那裡腳註確實是對的引用形式。
+    sev_name = option_for_category(
+        config, target.category, "severity", DEFAULT_SEVERITY.value
+    )
+    try:
+        severity = Severity(str(sev_name).lower())
+    except ValueError:
+        severity = DEFAULT_SEVERITY
+
     yield Violation(
         check=CHECK_NAME,
-        severity=DEFAULT_SEVERITY,
+        severity=severity,
         message=msg,
         editorial_ref=EDITORIAL_REF,
         fix_suggestion=grade,  # surfaces grade letter for dashboard JSON
