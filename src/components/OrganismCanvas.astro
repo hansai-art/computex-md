@@ -181,8 +181,8 @@ const params = {
       uniform float uNoiseFreq;
       uniform float uGrow;
       // ── 互動（全部在物件座標系）─────────────────────────────────────────
-      // uPointer   游標打在球面上的方向。物體會轉，所以這條在 JS 端用
-      //            mesh.worldToLocal 轉進物件座標，shader 不需要知道旋轉。
+      // uPointer   游標打在球面上的方向。物體會轉，所以這條在 JS 端先用
+      //            mesh.quaternion 的反轉轉進物件座標，shader 不需要知道旋轉。
       // uPointerAmt 0 到 1。游標離開時不是瞬間歸零，是滑回去。
       // uRipple    距離上一次點擊過了幾秒；-1 = 沒有進行中的漣漪。
       // uRippleDir 那一次點擊打在球面上的方向。
