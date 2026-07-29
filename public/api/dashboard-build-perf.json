@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-29T02:28:00.646Z",
+  "generated_at": "2026-07-29T02:33:36.494Z",
   "status": "unavailable",
   "reason": "GitHub Actions API 無 auth 或暫不可用；gh CLI 是否 installed？",
   "runs": []

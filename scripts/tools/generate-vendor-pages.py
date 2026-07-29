@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 import sys
 import unicodedata
 from datetime import date
@@ -132,7 +133,11 @@ def render(rec: dict[str, Any], siblings: list[tuple[str, str]]) -> str:
     tags.append("AI 硬體")
     tags = list(dict.fromkeys(t for t in tags if t))
 
-    fm_tags = "\n".join(f"  - '{_yaml_escape(t)}'" for t in tags)
+    # flow array 一行，不是 block sequence。理由是冪等：pre-commit 的 prettier
+    # 會把 block list 收成 flow array，產生器若輸出 block list，每重跑一次就是
+    # 86 檔的純格式 diff，資料真的變了反而看不出來。產生器要輸出「格式化後的
+    # 樣子」，而不是輸出後等別人改。同理，frontmatter 收尾與 H1 之間不留空行。
+    fm_tags = "[" + ", ".join(f"'{_yaml_escape(t)}'" for t in tags) + "]"
 
     # ── 事實表 ────────────────────────────────────────────────────────────
     rows = [("公司名稱（官方名錄登錄）", name)]
@@ -270,22 +275,24 @@ def render(rec: dict[str, Any], siblings: list[tuple[str, str]]) -> str:
 > COMPUTEX.md is an independent open-data project. It is not the official website of COMPUTEX or TAITRA.
 """
 
+    # frontmatter 兩個欄位值得解釋，但解釋要留在這裡，NEVER 寫成 YAML 註解：
+    # 那會把「給產生器維護者看的話」複製 86 份進公開的內容檔。
+    #
+    #   lastHumanReview: false  機器抽的事實層，還沒有人逐頁核對過。prose-health
+    #       讀它，所以這 86 頁會一直在報表上叫。那是對的，不要為了讓報表安靜改 true。
+    #   status: 'published'     這些頁真的在線上被服務。站內目前沒有任何地方拿
+    #       status 過濾（schema 有 enum、消費端沒有），寫 'draft' 只是讓 frontmatter 說謊。
     frontmatter = f"""---
 title: '{_yaml_escape(title)}'
 description: '{_yaml_escape(description)}'
 date: {date.today().isoformat()}
 category: 'Vendors'
-tags:
-{fm_tags}
+tags: {fm_tags}
 subcategory: '{_yaml_escape(zh_area(area) if area else "參展廠商")}'
 author: 'COMPUTEX.md Editors'
 featured: false
 lastVerified: {checked}
-# false 是這裡唯一承載意義的欄位：機器抽的事實層，還沒有人逐頁核對過。
-# prose-health 讀它，所以它會一直在報表上叫，那是對的，不要為了讓報表安靜改成 true。
 lastHumanReview: false
-# 'published' 不是 'draft'：這些頁真的在線上被服務。status 目前站內沒有任何地方
-# 拿來過濾（schema 有 enum、消費端沒有），寫 draft 只會讓 frontmatter 說謊。
 status: 'published'
 difficulty: 'beginner'
 readingTime: 2
@@ -299,7 +306,6 @@ vendor:
 sources:
   - '{src}'
 ---
-
 """
     return frontmatter + body
 
@@ -308,6 +314,11 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("inputs", nargs="+", help="harvest-exhibitors.py 產出的 JSON")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument(
+        "--no-format",
+        action="store_true",
+        help="跳過 prettier（沒有 node 的環境用；輸出會跟 commit 後不一致）",
+    )
     args = ap.parse_args()
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -348,6 +359,27 @@ def main() -> int:
         f"{'would write' if args.dry_run else '寫入'} {written or len(records)} 個廠商頁",
         file=sys.stderr,
     )
+
+    if written and not args.no_format:
+        # 產完就跑 prettier，讓「產生器的輸出」就是「commit 進去的樣子」。
+        #
+        # 不這樣做的話：pre-commit 的 prettier 會重排 markdown 表格欄寬，於是
+        # 重跑一次產生器就是 86 檔的純格式 diff，資料真的變了反而看不出來。
+        # 在 Python 這邊手工複刻 prettier 的表格對齊是打不贏的仗（欄寬算的是
+        # 顯示寬度，CJK 全形要算 2），所以直接叫它本人。
+        try:
+            subprocess.run(
+                ["npx", "prettier", "--write", "--log-level", "warn", str(OUT_DIR)],
+                check=True,
+            )
+        except (OSError, subprocess.CalledProcessError) as e:
+            print(
+                f"  prettier 沒跑成（{e}）。檔案已寫入，但格式會跟 commit 後不一致，"
+                f"下次重跑會出現純格式 diff。手動補跑："
+                f"npx prettier --write {OUT_DIR}",
+                file=sys.stderr,
+            )
+            return 1
     return 0
 
 

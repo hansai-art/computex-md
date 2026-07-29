@@ -1,7 +1,31 @@
 {
-  "generatedAt": "2026-07-29T02:27:59.586Z",
+  "generatedAt": "2026-07-29T02:33:35.327Z",
   "source": "git",
   "commits": [
+    {
+      "hash": "23fa2125ee631ae6fbf019a48c86ca00e567a69a",
+      "date": "2026-07-29T10:29:34+08:00",
+      "author": "Hans",
+      "message": "feat(vendors): 86 家參展廠商事實層，全部機械抽取自官方名錄",
+      "articles": [
+        {
+          "url": "/editions/computex-2027",
+          "name": "computex-2027"
+        },
+        {
+          "url": "/vendors/aaeon",
+          "name": "aaeon"
+        },
+        {
+          "url": "/vendors/accordance-systems",
+          "name": "accordance-systems"
+        },
+        {
+          "url": "/vendors/altek",
+          "name": "altek"
+        }
+      ]
+    },
     {
       "hash": "03eb6a7bc2aaeae1b00202e5ff31d81f547b6415",
       "date": "2026-07-29T09:30:52+08:00",

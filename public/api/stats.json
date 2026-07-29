@@ -2,7 +2,7 @@
   "totalArticles": 88,
   "totalCategories": 3,
   "estimatedContributors": 0,
-  "totalTags": 0,
+  "totalTags": 5,
   "categories": [
     {
       "name": "Vendors",
@@ -17,12 +17,33 @@
       "count": 1
     }
   ],
-  "topTags": [],
+  "topTags": [
+    {
+      "name": "COMPUTEX",
+      "count": 57
+    },
+    {
+      "name": "COMPUTEX 2026",
+      "count": 57
+    },
+    {
+      "name": "參展廠商",
+      "count": 57
+    },
+    {
+      "name": "AI 運算與技術",
+      "count": 57
+    },
+    {
+      "name": "AI 硬體",
+      "count": 57
+    }
+  ],
   "languageDistribution": {
     "zh-TW": 88,
     "en": 0
   },
-  "lastUpdated": "2026-07-29T02:27:59.649Z",
+  "lastUpdated": "2026-07-29T02:33:35.366Z",
   "stars": 0,
   "forks": 0,
   "zhPages": 87,

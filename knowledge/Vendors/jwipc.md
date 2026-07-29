@@ -8,11 +8,7 @@ subcategory: 'AI 運算與技術（AI Computing & Tech）'
 author: 'COMPUTEX.md Editors'
 featured: false
 lastVerified: 2026-07-29
-# false 是這裡唯一承載意義的欄位：機器抽的事實層，還沒有人逐頁核對過。
-# prose-health 讀它，所以它會一直在報表上叫，那是對的，不要為了讓報表安靜改成 true。
 lastHumanReview: false
-# 'published' 不是 'draft'：這些頁真的在線上被服務。status 目前站內沒有任何地方
-# 拿來過濾（schema 有 enum、消費端沒有），寫 draft 只會讓 frontmatter 說謊。
 status: 'published'
 difficulty: 'beginner'
 readingTime: 2
@@ -26,6 +22,7 @@ vendor:
 sources:
   - 'https://www.computextaipei.com.tw/en/exhibitor/7CE2EB2877841D9DDCBF2F6CB1424377D0636733C6861689/info.html'
 ---
+
 # JWIPC Technology Co.,Ltd.：COMPUTEX 2026 參展資料
 
 > **30 秒概覽**：JWIPC Technology Co.,Ltd. 是 COMPUTEX 2026 的參展廠商，攤位在台北南港展覽館 1 館（TaiNEX 1） J0531，歸屬展區為AI 運算與技術（AI Computing & Tech），官方名錄記載它參展過 5 屆（2017 至 2026）。本頁只寫官方名錄查得到的事實，每一項附出處連結與查證日期；官方沒公布的欄位留白，不推測。

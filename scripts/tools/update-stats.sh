@@ -235,6 +235,13 @@ with open(stats_path, 'w') as f:
 print("✅ stats.json merged (preserved existing fields)")
 PYEOF
 
+# 4b. 讓輸出等於「commit 進去的樣子」
+# 這支寫的是未對齊的 markdown 表格，pre-commit 的 prettier 會補成對齊的。
+# 不在這裡先跑一次的話，每次 build 都會把 README 弄髒一次（純欄寬 diff），
+# 久了就沒有人在看 README 的 diff 了。同一個理由見 generate-vendor-pages.py。
+npx prettier --write --log-level warn README.md 2>/dev/null || \
+  echo "⚠️  prettier 沒跑成，README 的表格欄寬會跟 commit 後不一致"
+
 # 5. Generate content stats
 node scripts/tools/generate-content-stats.js 2>/dev/null || true
 

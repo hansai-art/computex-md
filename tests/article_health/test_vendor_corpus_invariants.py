@@ -42,11 +42,19 @@ def test_every_fact_row_carries_a_source_and_a_check_date(path: Path):
     section = re.search(r"## 官方名錄記載的事實\n(.*?)\n## ", body, re.S)
     assert section, "缺「官方名錄記載的事實」段"
 
-    rows = [
-        ln
-        for ln in section.group(1).splitlines()
-        if ln.startswith("|") and not ln.startswith("| ---") and "| 項目 |" not in ln
-    ]
+    # 欄寬要正規化再比對：prettier 會把表格補成對齊的樣子（`| 項目      | 內容 …`、
+    # 分隔列補成 `| ------ |`），所以任何靠 `"| 項目 |" in ln` 或 `startswith("| ---")`
+    # 的過濾在格式化前後會得到不同答案。這支測試守的是內容，不能被排版左右。
+    rows = []
+    for ln in section.group(1).splitlines():
+        cells = [c.strip() for c in ln.strip().strip("|").split("|")]
+        if not ln.strip().startswith("|"):
+            continue
+        if cells[0] == "項目":  # 表頭
+            continue
+        if all(set(c) <= {"-", ":"} and c for c in cells):  # 分隔列
+            continue
+        rows.append(ln)
     assert rows, "事實表是空的"
 
     for row in rows:

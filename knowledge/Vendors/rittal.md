@@ -3,16 +3,13 @@ title: 'Rittal Ltd.：COMPUTEX 2026 參展資料'
 description: 'Rittal Ltd. 在 COMPUTEX 2026 的官方參展資料，展區為AI 運算與系統整合方案（AI Computing & System Integration Solution），場館為台北南港展覽館 2 館（TaiNEX 2），攤位號 R0123，官方名錄記載的參展年份涵蓋 2025 至 2026，共 2 屆，本頁事實層每一項均附官方出處連結與查證日期，由程式從官方名錄機械抽取，不經語言模型改寫；官方名錄未提供的欄位一律留白，不從公司官網文案、新聞稿、往年慣例或第三方彙整站推測。'
 date: 2026-07-29
 category: 'Vendors'
-tags: ['COMPUTEX', 'COMPUTEX 2026', '參展廠商', 'AI 運算與系統整合方案', 'AI 硬體']
+tags:
+  ['COMPUTEX', 'COMPUTEX 2026', '參展廠商', 'AI 運算與系統整合方案', 'AI 硬體']
 subcategory: 'AI 運算與系統整合方案（AI Computing & System Integration Solution）'
 author: 'COMPUTEX.md Editors'
 featured: false
 lastVerified: 2026-07-29
-# false 是這裡唯一承載意義的欄位：機器抽的事實層，還沒有人逐頁核對過。
-# prose-health 讀它，所以它會一直在報表上叫，那是對的，不要為了讓報表安靜改成 true。
 lastHumanReview: false
-# 'published' 不是 'draft'：這些頁真的在線上被服務。status 目前站內沒有任何地方
-# 拿來過濾（schema 有 enum、消費端沒有），寫 draft 只會讓 frontmatter 說謊。
 status: 'published'
 difficulty: 'beginner'
 readingTime: 2
@@ -26,6 +23,7 @@ vendor:
 sources:
   - 'https://www.computextaipei.com.tw/en/exhibitor/62534B35573DCAAFD9292524493DC424/info.html'
 ---
+
 # Rittal Ltd.：COMPUTEX 2026 參展資料
 
 > **30 秒概覽**：Rittal Ltd. 是 COMPUTEX 2026 的參展廠商，攤位在台北南港展覽館 2 館（TaiNEX 2） R0123，歸屬展區為AI 運算與系統整合方案（AI Computing & System Integration Solution），官方名錄記載它參展過 2 屆（2025 至 2026）。本頁只寫官方名錄查得到的事實，每一項附出處連結與查證日期；官方沒公布的欄位留白，不推測。

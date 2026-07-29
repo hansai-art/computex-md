@@ -1,28 +1,28 @@
 {
   "version": "ssot-1.0",
-  "timestamp": "2026-07-29T02:28:00Z",
+  "timestamp": "2026-07-29T02:33:36Z",
   "total": 87,
   "flagged": 87,
   "files": [
     {
       "file": "vendors/mouser-electronics.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/quettaflow.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/aptobject.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/qnap-systems.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/taiwan-intelligence-research-and-development.md",
@@ -32,407 +32,407 @@
     {
       "file": "vendors/inventec.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/southco-asia.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/richin-tech.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/micro-star-international.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/wiwynn.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/dongguan-xunling-new.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/palebluedot-ai.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/liverage.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/ezbond-chemical.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌32%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/amazing-chip-semiconductor.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/altek.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/siemens.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/roboco.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/enbik.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/auras.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/dynatron.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/liteon.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/vav-cooling.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/faytech-tech.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/c-y-intelligence.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/mitac-computing.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/taiwan-cosmo-instruments.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/guchii.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/shenzhen-gooxi-digital-intelligence.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/innodisk.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/xmems-labs.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/senao-networks.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/rayvatek.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/amax-ky.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/fsp.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/zoho.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/flex.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/chenbro-micom.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/kentec.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/shenzhen-kstar-science-and.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/latticework-taiwan.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/elitegroup-computer-systems.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/continental.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/delos-data.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/minerva-innovation.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/leadtek-research.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/jentech-precision-industrial.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/comino.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/accordance-systems.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/powerchip-semiconductor-manufacturing.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/vaidio.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/synology.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/apaltek.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/rittal.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/vertiv-taiwan.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/hetone-enterprise.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/infortrend.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/c-media-electronics.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/anxpert-advanced.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/yonyou-taiwan.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/axelera-ai.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/avermedia.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/kaori-thermal.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/lengda-xiamen.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/carl-zeiss.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/amphenol.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/egis.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/jpc-connectivity.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/formosa-plastics.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/hi-power-solution.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/neousys.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/kneron-taiwan.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/quadrep-electronics-taiwan.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/ecolab.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/voltronic-power.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌32%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/danfoss-power-solutions.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/shuttle.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌34%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/skymizer-taiwan.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/ambedded.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/flotrend.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/brinno-incorporated.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌33%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/jwipc.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/legend-innovation.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/cht-security.md",
       "score": 5,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×1; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×1; 無腳註"
     },
     {
       "file": "vendors/aaeon.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌35%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌37%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "vendors/fs-tech.md",
       "score": 6,
-      "reasons": "未人工審核; 後段清單堆砌36%; 稀薄段落×2; 無腳註"
+      "reasons": "未人工審核; 後段清單堆砌39%; 稀薄段落×2; 無腳註"
     },
     {
       "file": "editions/computex-2027.md",
