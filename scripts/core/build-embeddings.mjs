@@ -28,22 +28,17 @@ import {
   ENABLED_LANGUAGE_CODES,
   DEFAULT_LANGUAGE,
 } from '../../src/config/languages.mjs';
+import { CATEGORY_MAPPING } from '../../src/config/categories.mjs';
 
-const CATEGORY_MAP = {
-  history: 'History',
-  geography: 'Geography',
-  culture: 'Culture',
-  food: 'Food',
-  art: 'Art',
-  music: 'Music',
-  technology: 'Technology',
-  nature: 'Nature',
-  people: 'People',
-  politics: 'Politics',
-  society: 'Society',
-  economy: 'Economy',
-  lifestyle: 'Lifestyle',
-};
+/**
+ * 分類表只准有一份：src/config/categories.mjs。
+ *
+ * 2026-07-29：這裡原本寫死母體的 13 個分類（history / geography / culture /
+ * food / …），一個都對不上本站的 Vendors / Products / Editions / Topics。
+ * 效果跟前面十二支一樣：掃出 0 篇，然後安靜地產出一份空的 related index，
+ * 沒有 exit code、沒有警告 —— `src/data/related/{lang}.json` 至今是 `{}`。
+ */
+const CATEGORY_MAP = CATEGORY_MAPPING;
 
 const EMBED_HOST = (process.env.EMBED_HOST || 'http://localhost:11434').replace(
   /\/$/,
@@ -198,6 +193,28 @@ async function run() {
         process.stdout.write(`\r  ${lang}: ${ok}/${docs.length} embedded`);
     }
     process.stdout.write('\n');
+
+    // 找得到文章、卻一個向量都沒產出 = 嵌入端點掛了（或位址沒設），不是內容問題。
+    //
+    // 這裡以前的行為是照樣往下寫一份空的 related index，印
+    //   ✅ zh-TW: 0 vecs (3 fail), related+shard written, 0s
+    // 然後 exit 0。有綠勾、有「written」、沒有 exit code —— 而且它會**覆蓋掉**
+    // 上一次成功產出的索引。這正是這個 repo 追了十三次的那個形狀：產出 0 筆，
+    // 但印成功訊息。所以在這裡硬擋，寧可整支失敗也不要留下一份空索引。
+    if (!vecs.length) {
+      console.error(
+        `\n❌ ${lang}: 掃到 ${docs.length} 篇文章，但 0 篇嵌入成功（${fail} 篇失敗）。\n` +
+          `   嵌入端點是 ${EMBED_HOST}（模型 ${EMBED_MODEL}）。先確認它活著：\n` +
+          `     curl -s ${EMBED_HOST}/api/tags\n` +
+          `   要指到別台：EMBED_HOST=http://<主機>:11434 node ${'scripts/core/build-embeddings.mjs'}\n` +
+          `   已存在的索引保持不動，沒有被這次失敗覆蓋。\n`,
+      );
+      // continue 而不是 return：多語言時要把每一種語言的狀況都報完，
+      // 不要因為第一種語言失敗就讓後面幾種看起來「沒跑到」。
+      process.exitCode = 1;
+      continue;
+    }
+
     // related-articles: top-K cosine per article (same-lang)
     const related = {};
     for (let i = 0; i < vecs.length; i++) {
