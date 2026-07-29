@@ -1,7 +1,14 @@
 {
-  "generatedAt": "2026-07-29T06:59:01.718Z",
+  "generatedAt": "2026-07-29T07:13:19.423Z",
   "source": "git",
   "commits": [
+    {
+      "hash": "fd036019cd3a5884f3f9493d03b6359d6d3ceafa",
+      "date": "2026-07-29T15:00:37+08:00",
+      "author": "Hans",
+      "message": "feat(content): 86 家廠商的英文頁，站上 115 → 201 頁",
+      "articles": []
+    },
     {
       "hash": "b9a4ec130db7fee8461a834ff72fc31f8d87550c",
       "date": "2026-07-29T14:42:11+08:00",

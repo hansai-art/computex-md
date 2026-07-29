@@ -11,7 +11,7 @@ public/og-images/
 # dependencies
 node_modules/
 
-# Python virtual envs（防禦性，實際 venv 在 ~/.config/taiwan-md/venv/ repo 外）
+# Python virtual envs（防禦性，實際 venv 在 ~/.config/computex-md/venv/ repo 外）
 venv/
 .venv/
 __pycache__/

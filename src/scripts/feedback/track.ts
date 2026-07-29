@@ -1,7 +1,9 @@
 /**
  * track.ts — feedback widget GA4 事件（safe gtag wrapper）。
  *
- * 對齊 Layout.astro 的 GA4 bootstrap（G-JGC5W00N7T）+ EventTracker 範式：
+ * 對齊 Layout.astro 的 GA4 bootstrap（資源 ID 從 PUBLIC_GA_MEASUREMENT_ID 讀，
+ * 沒設定就完全不載入 GA；原本寫死在那裡的 ID 是母體 taiwan.md 的，2026-07-29
+ * 移除）+ EventTracker 範式：
  * 所有事件 prefix `feedback_`，gtag 不在（ad blocker / private / 本機）→ silent no-op，
  * 全 try/catch 永不擋使用者動作。
  *

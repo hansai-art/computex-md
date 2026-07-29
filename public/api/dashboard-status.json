@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-29T06:59:07.633Z",
+  "generated_at": "2026-07-29T07:13:25.487Z",
   "routines": null,
   "babel": null,
   "incidents": [
@@ -30,6 +30,11 @@
   ],
   "deploys": [
     {
+      "ts": "2026-07-29T07:00:57Z",
+      "conclusion": "success",
+      "title": "Quality Gene Tests: feat(content): 86 家廠商的英文頁，站上 115 → 201 頁"
+    },
+    {
       "ts": "2026-07-29T05:48:39Z",
       "conclusion": "success",
       "title": "Quality Gene Tests: fix(content): cross-domain: 排行榜數錯人，官方名錄不是只有 COMPUTEX"
@@ -48,11 +53,6 @@
       "ts": "2026-07-29T01:17:12Z",
       "conclusion": "success",
       "title": "Quality Gene Tests: feat(quality): 品質基因在地化：新增 marketing-speak，並修好一直在空放的 terminology gate"
-    },
-    {
-      "ts": "2026-07-29T00:41:53Z",
-      "conclusion": "failure",
-      "title": "Deploy to GitHub Pages: fix(hooks): pre-push 在新 repo 第一次 push 時靜默炸掉"
     }
   ]
 }

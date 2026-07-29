@@ -277,38 +277,12 @@
     font-weight: 600;
   }
 
-  /* ------------------------------------------------------------------------
-   * Category-specific heading fonts (justfont webfont system).
-   * ------------------------------------------------------------------------ */
-
-  .jf-food h1 {
-    font-family: 'jf-kamabit', 'Noto Sans TC', sans-serif;
-    font-weight: 700;
-  }
-  .jf-history h1 {
-    font-family: 'rixingsong-semibold', 'Noto Serif TC', serif;
-    font-weight: 600;
-  }
-
-  /* FOUC prevention: hide body while justfont is loading (#401).
-     justfont SDK adds jf-loading to <html> synchronously before body
-     renders, switches to jf-active (or jf-inactive on timeout) when
-     fonts are ready. Hiding with opacity (not visibility) preserves
-     layout so there's no shift when content appears. */
-  html.jf-loading > body {
-    opacity: 0;
-  }
-  html.jf-active > body,
-  html.jf-inactive > body {
-    opacity: 1;
-    transition: opacity 0.25s ease-out;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    html.jf-active > body,
-    html.jf-inactive > body {
-      transition: none;
-    }
-  }
+  /* 2026-07-29 移除：分類專屬標題字體（.jf-food h1 / .jf-history h1）與
+     justfont 的 FOUC 遮罩（html.jf-loading/jf-active/jf-inactive > body）。
+     前者的分類（美食 / 歷史）是母體的，本站的分類是 Vendors / Products /
+     Editions / Topics；後者的三個 class 由 justfont SDK 加上，而 SDK 已經連同
+     母體的帳號一起移除（見 Layout.astro）。SDK 不在，class 就永遠不會出現，
+     那幾條規則從此不可能命中 —— 包括那條把 body 藏起來的 opacity: 0。 */
 
   /* ------------------------------------------------------------------------
    * Main element + category-specific padding adjustments.
@@ -428,10 +402,14 @@
    * Floating .md button (bottom-right corner of the site).
    * ------------------------------------------------------------------------ */
 
+  /* inset-inline-end 而不是 right：LTR 下 used value 一模一樣，RTL 下浮動鈕會
+     跟著跑到左下角（阿拉伯文讀者的「順手角落」在另一邊）。這兩處原本掛在
+     check-rtl-safe-css.sh 的 DEBT 清單上靠行號豁免，2026-07-29 改成邏輯屬性，
+     清單歸零。 */
   .floating-md {
     position: fixed;
     bottom: 2rem;
-    right: 2rem;
+    inset-inline-end: 2rem;
     width: 48px;
     height: 48px;
     background: var(--color-ink);
@@ -477,7 +455,7 @@
     }
     .floating-md {
       bottom: 1rem;
-      right: 1rem;
+      inset-inline-end: 1rem;
       width: 42px;
       height: 42px;
       font-size: 0.78rem;
@@ -486,29 +464,21 @@
 }
 
 /* ==========================================================================
- * .hero-title font-family override — must live OUTSIDE @layer base.
+ * .hero-title 字族 — 這條要留在 @layer base 之外。
  *
- * justfont SDK injects `.jf-active .hero-title { font-family:
- * rixingsong-semibold }` (single name, no fallback chain) into a runtime
- * `<style>` tag at end of <head>. CSS @layer cascade rule: any rule outside
- * a layer ALWAYS wins over rules inside layers, regardless of specificity
- * — so an `@layer base { ... }` declaration can never beat justfont's
- * unlayered injection.
+ * 原本的選擇器是 `html.jf-active .hero-title`，那個 `html.jf-active` 不是為了
+ * 選中什麼，是為了在 specificity 上贏過 justfont SDK 執行期注入的
+ * `.jf-active .hero-title`（單一字名、沒有 fallback 鏈）。2026-07-29 SDK 連同
+ * 母體的 justfont 帳號一起移除之後，`jf-active` 這個 class 永遠不會出現，
+ * 這條規則就再也不可能命中 —— 連帶它的 fallback 鏈也失效。
  *
- * Putting this rule outside @layer base lets it compete on specificity:
- *   - SDK rule:   `.jf-active .hero-title`           (0,0,2,0)
- *   - This rule:  `html.jf-active .hero-title`       (0,0,2,1)  ← wins
+ * 所以拿掉那個前綴，讓字族鏈無條件生效。仍然留在 layer 之外：unlayered 一律
+ * 贏過 layered，跟原本的意圖一致。
  *
- * Effect: hero titles try rixingsong first; if its woff fails to parse
- * (broken justfont CDN subset, e.g. titles containing `鴞`), browser
- * gracefully falls through to Noto Serif TC instead of UA-default serif.
- *
- * Food articles still get kamabit because `.jf-active .jf-food h1`
- * (0,0,2,1) ties this rule on specificity — both unlayered, source order
- * decides, and SDK's `<style>` is appended at runtime AFTER this static
- * link, so kamabit wins for food. (We tested: works.) 2026-05-04.
+ * rixingsong 現在解析不到（沒有 webfont 供應了），瀏覽器直接往後掉到
+ * Noto Serif TC。鏈本來就是為了這件事寫的。
  * ========================================================================== */
-html.jf-active .hero-title {
+.hero-title {
   font-family:
     'rixingsong-semibold', 'Noto Serif TC', 'Source Han Serif TC', serif;
 }
@@ -520,23 +490,16 @@ html.jf-active .hero-title {
  * 目的：article 內文標題（h2/h3/h4 from markdown）跟內文同一字族，避免兩
  * 種視覺族（lanyanghei 標題 + jinxuanlatte 內文）撕裂閱讀節奏。
  *
- * justfont SDK 注入 `.jf-active h2-h6` → `jf-lanyanghei`（site-wide nav /
- * hero / sidebar 用，OK 保留）。`.prose` 內的 h2-h6 用更高 specificity 覆蓋：
- *   - SDK rule `.jf-active h2`        : (0,0,1,1)
- *   - This rule `html.jf-active .prose :is(h1,…,h6)` : (0,0,2,1) ← wins
- * 同樣 placed OUTSIDE @layer base 才能蓋過 SDK 的 unlayered <style> 注入
- * (per CSS @layer cascade rule: layered < unlayered regardless of specificity).
+ * 原本的選擇器是 `html.jf-active .prose :is(h1,…,h6)`，`html.jf-active` 前綴是
+ * 用來在 specificity 上贏過 justfont SDK 注入的 `.jf-active h2`。SDK 已於
+ * 2026-07-29 移除（見 Layout.astro），`jf-active` 不會再出現，前綴一起拿掉。
+ * 仍然留在 @layer base 之外：unlayered 一律贏過 layered，跟原本的意圖一致。
  *
- * 註：weight 600 跟 SDK 對 h2-h6 的 lanyanghei extrabold (800) 不同 —— 因為
- * 金萱沒提供等粗的 extrabold variant；600 是 jinxuanlatte 視覺重量 baseline。
- * 2026-05-04 v2.0「四分糖」升級。
+ * jf-jinxuanlatte 現在解析不到，瀏覽器往後掉到 Noto Sans TC。
  * ========================================================================== */
-html.jf-active .prose :is(h1, h2, h3, h4, h5, h6) {
+.prose :is(h1, h2, h3, h4, h5, h6) {
   font-family:
     'jf-jinxuanlatte', 'Noto Sans TC', 'Source Han Sans TC', sans-serif;
-  /* Browser font-weight 600 matches the jinxuanlatte-semibold @font-face
-     registered in Layout.astro (alias 'jf-jinxuanlatte', weight 600).
-     Body 內文 keeps weight 400 (regular). 2026-05-04. */
   font-weight: 600;
 }
 

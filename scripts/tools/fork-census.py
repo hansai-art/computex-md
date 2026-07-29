@@ -1,8 +1,26 @@
 #!/usr/bin/env python3
 """fork-census.py — 子代普查雷達（繁殖器官的感知層）
 
-為什麼存在：COMPUTEX.md 的 GA4 measurement ID (G-JGC5W00N7T) 寫死在 Layout.astro。
-任何 fork 沒換掉它，pageview 就漏進我們的 GA property。哲宇 2026-06-25 決定「不修，
+⚠️ 2026-07-29：這支在 COMPUTEX.md **不能用，而且不該用**。它是母體 taiwan.md 的
+工具，取種時被機械改名，於是原本正確的說明變成一句假話（「COMPUTEX.md 的 GA4
+measurement ID 是 G-JGC5W00N7T」—— 那是 taiwan.md 的資源 ID，不是我們的）。
+
+它整支的運作前提是母體的：查詢的是 taiwan.md 的 GA property（我們沒有存取權），
+`RE_OURS` 比對的是 `taiwan.md` 網域，偵測的是**母體的** fork。
+
+更精確地說，它偵測的漏水就是我們自己。母體刻意把 GA ID 寫死在 Layout.astro 不修，
+讓每一個 fork 的 pageview 漏回母體的 GA，當成繁殖雷達。COMPUTEX.md 從取種到
+2026-07-29 為止就是那條漏水的其中一股；那天我們把 GA 改成從
+`PUBLIC_GA_MEASUREMENT_ID` 讀、沒設定就完全不載入，漏水停了。
+
+保留這支只為了兩件事：記錄上面這段來龍去脈，以及等 /dashboard 去母體化時連同
+`generate-dashboard-forks.py`、`refresh-data.sh` 的 step 6.5 一起處理。
+在那之前不要跑它，也不要把裡面的 ID 複製到別處。
+
+以下是母體原本的說明，保留原文：
+
+為什麼存在：Taiwan.md 的 GA4 measurement ID 寫死在 Layout.astro。
+任何 fork 沒換掉它，pageview 就漏進母體的 GA property。哲宇 2026-06-25 決定「不修，
 這樣可以探測很有趣」—— 把漏水當成繁殖雷達。但 GA 只保留 ~14 個月滾動窗，子代指紋會
 在我看見牠之前滾出視窗（Sweden.md 這次就沒出現）。
 
@@ -27,6 +45,7 @@
 """
 import argparse
 import json
+import os
 import re
 import sys
 import pathlib
@@ -84,7 +103,9 @@ def today():
 def load_registry():
     if REGISTRY.exists():
         return json.loads(REGISTRY.read_text(encoding="utf-8"))
-    return {"_meta": {"created": today(), "ga_id": "G-JGC5W00N7T",
+    # ga_id 從環境變數讀，NEVER 寫死：寫死的那一版填的是母體的資源 ID。
+    return {"_meta": {"created": today(),
+                      "ga_id": os.environ.get("PUBLIC_GA_MEASUREMENT_ID", ""),
                       "note": "Auto fields (ga/last_seen/hostnames/title_brands) "
                               "refreshed by fork-census.py. Investigation fields "
                               "(github/credits/type/cognitive_layer/notes) are "

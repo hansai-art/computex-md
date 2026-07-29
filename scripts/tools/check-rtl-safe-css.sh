@@ -43,6 +43,11 @@ SURFACE=(
   "src/components/TableOfContents.astro"
   "src/components/ArticleCard.astro"
   "src/components/Perspectives.astro"
+  # 2026-07-29 納入：這兩個是浮動層，跟 global.css 的 .floating-md 一起坐在畫面
+  # 四角。它們原本不在守護清單裡，所以 07-26 掛號的「三者要同批鏡像」這件事
+  # 沒有任何機器在追 —— 只剩 DEBT 註解裡的一句話，而註解不會擋 commit。
+  "src/components/ReaderSettings.astro"
+  "src/components/FeedbackWidget.astro"
   "src/styles/global.css"
   "src/styles/dark-polish.css"
 )
@@ -119,11 +124,15 @@ ALLOWLIST=(
 # 沒改」。DEBT 不算違反，但**每次都會印出來**並附掛號日期，不會靜默過夜變成
 # 「這裡本來就這樣」。還清就刪掉那一行。
 # 格式：<path>:<line>|<掛號日>|<理由>
-DEBT=(
-  "src/styles/global.css:434|2026-07-26|.floating-md 屬浮動層，要跟 ReaderSettings / FeedbackWidget 同批鏡像，否則 RTL 下三者疊在一起"
-  "src/styles/global.css:480|2026-07-26|同上（手機斷點）"
-  "src/styles/dark-polish.css:1433|2026-07-26|原因已變：resources.template.astro 在 2026-07-29 刪除（母體內容），這條 .resources-page 規則現在是沒有對應頁面的死 CSS。同一批孤兒在 07-29 首頁改寫後又長大：.hall-* / .pick-* / .topic-pill（四個展廳）、ReadingPath 場景色、SupporterGrid、.portaly-* 全部沒有 markup 掛得上。連同 .projects-page / .assets-page / .map-page / .taiwan-shape 一次清乾淨，不要單獨挑這一行改"
-)
+# 2026-07-29 清零。三筆全部還清：
+#   global.css:434 / :480  .floating-md 改 inset-inline-end，同一次把
+#                          ReaderSettings（6 行）與 FeedbackWidget（4 行）一起鏡像，
+#                          三個浮動層的相對位置在 RTL 下維持不變 —— 那正是這筆債
+#                          要求「同批處理」的原因，單獨改一個會讓它們在 RTL 疊起來。
+#   dark-polish.css:1433   該區塊連同 11 個沒有對應頁面的 page-scoped 段落一起刪除
+#                          （母體內容，931 行）。
+# 這份清單只准變短。NEVER 為了讓檢查過而往這裡加行號。
+DEBT=()
 
 is_allowlisted() {
   local f="$1" ln="$2"
@@ -136,7 +145,7 @@ is_allowlisted() {
 DEBT_SEEN=""
 is_debt() {
   local f="$1" ln="$2"
-  for entry in "${DEBT[@]}"; do
+  for entry in ${DEBT[@]+"${DEBT[@]}"}; do
     if [[ "${entry%%|*}" == "$f:$ln" ]]; then
       local rest="${entry#*|}"
       # ${ln} 要加大括號：變數後直接接全形字元，bash 會把全形字元讀進變數名。

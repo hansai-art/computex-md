@@ -550,7 +550,7 @@ const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
   .reader-settings-toggle {
     position: fixed;
     bottom: 2rem;
-    right: calc(2rem + 48px + 12px);
+    inset-inline-end: calc(2rem + 48px + 12px);
     width: 48px;
     height: 48px;
     background: var(--color-ink);
@@ -577,7 +577,7 @@ const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
   .back-to-top {
     position: fixed;
     bottom: calc(2rem + 48px + 12px);
-    right: calc(2rem + 48px + 12px);
+    inset-inline-end: calc(2rem + 48px + 12px);
     width: 48px;
     height: 48px;
     background: var(--color-ink);
@@ -619,7 +619,7 @@ const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
   .reader-settings-panel {
     position: fixed;
     bottom: calc(2rem + 48px + 12px);
-    right: 2rem;
+    inset-inline-end: 2rem;
     width: min(320px, calc(100vw - 4rem));
     background: var(--color-surface);
     color: var(--color-ink);
@@ -738,16 +738,16 @@ const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
   @media (max-width: 640px) {
     .reader-settings-toggle {
       bottom: 1.2rem;
-      right: calc(1.2rem + 48px + 10px);
+      inset-inline-end: calc(1.2rem + 48px + 10px);
     }
     .reader-settings-panel {
       bottom: calc(1.2rem + 48px + 10px);
-      right: 1.2rem;
+      inset-inline-end: 1.2rem;
     }
     /* Stack above the Aa toggle at the mobile offsets too. */
     .back-to-top {
       bottom: calc(1.2rem + 48px + 10px);
-      right: calc(1.2rem + 48px + 10px);
+      inset-inline-end: calc(1.2rem + 48px + 10px);
     }
   }
 </style>

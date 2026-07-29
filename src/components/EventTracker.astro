@@ -27,7 +27,9 @@
  *   data-ga-form="<id>"                              — form binding
  *   data-ga-view="<id>"                              — landmark, once on view
  *
- * gtag bootstrap is global in src/layouts/Layout.astro (G-JGC5W00N7T). Silent
+ * gtag bootstrap is global in src/layouts/Layout.astro, gated on
+ * PUBLIC_GA_MEASUREMENT_ID (unset = no GA at all; the ID that used to be
+ * hardcoded here belonged to taiwan.md, removed 2026-07-29). Silent
  * no-op when gtag is missing (ad blocker / private). All gtag calls best-effort
  * try/catch so a GA failure never blocks a user action.
  *

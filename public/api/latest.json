@@ -1,5 +1,5 @@
 {
-  "_generated": "2026-07-29T06:59:07.995Z",
+  "_generated": "2026-07-29T07:13:25.860Z",
   "perLang": 30,
   "byLang": {
     "zh-TW": [
@@ -276,12 +276,273 @@
     ],
     "en": [
       {
-        "title": "COMPUTEX 2027: June 1-4, 2027, across three Taipei venues",
-        "desc": "COMPUTEX 2027 runs June 1 to 4, 2027 in Taipei, across Nangang Exhibition Center Halls 1 and 2 plus TWTC Hall 1, organized by TAITRA and the Taipei Computer Association. This page carries only what the official site has published, each item with a source link and a checked date. The annual theme, exhibitor count, agenda and ticketing dates are left blank until announced rather than inferred.",
-        "category": "editions",
-        "href": "/en/editions/computex-2027",
-        "date": "2026-07-29T09:27:32+08:00",
-        "readingTime": 3,
+        "title": "AAEON Technology Inc.: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for AAEON Technology Inc., in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J1310. The official directory records COMPUTEX appearances from 2012 to 2026, 7 editions in total, plus 2 records from other TAITRA shows that this page reproduces but does not count toward the COMPUTEX total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/aaeon",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "Accordance Systems Inc.: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for Accordance Systems Inc., in the AI Computing & System Integration Solution show area, at Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2), booth R0134. The official directory records COMPUTEX appearances from 2011 to 2026, 15 editions in total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/accordance-systems",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "Altek Corporation: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for Altek Corporation, in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J0327a. The official directory records COMPUTEX appearances from 2024 to 2026, 3 editions in total, plus 2 records from other TAITRA shows that this page reproduces but does not count toward the COMPUTEX total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/altek",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "AMAX-KY: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for AMAX-KY, in the AI Computing & System Integration Solution show area, at Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2), booth R0233a. The official directory records COMPUTEX appearances from 2025 to 2026, 2 editions in total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/amax-ky",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "AMAZING CHIP SEMICONDUCTOR CORPORATION: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for AMAZING CHIP SEMICONDUCTOR CORPORATION, in the AI Computing & System Integration Solution show area, at Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2), booth R0931. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/amazing-chip-semiconductor",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "Ambedded Technology Co., Ltd: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for Ambedded Technology Co., Ltd, in the AI Computing & System Integration Solution show area, at Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2), booth R0834. The official directory records COMPUTEX appearances from 2018 to 2026, 6 editions in total, plus 1 record from other TAITRA shows that this page reproduces but does not count toward the COMPUTEX total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/ambedded",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "Amphenol: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for Amphenol, in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J0632. The official directory records COMPUTEX appearances from 2024 to 2026, 3 editions in total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/amphenol",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "AnXpert Advanced Co., Ltd.: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for AnXpert Advanced Co., Ltd., in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J1329. The official directory records COMPUTEX appearances from 2025 to 2026, 2 editions in total, plus 2 records from other TAITRA shows that this page reproduces but does not count toward the COMPUTEX total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/anxpert-advanced",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "APALTEK CO.,LTD.: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for APALTEK CO.,LTD., in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J0431. The official directory records COMPUTEX appearances from 2018 to 2026, 6 editions in total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/apaltek",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "AptObject Corporation: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for AptObject Corporation, in the AI Computing & System Integration Solution show area, at Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2), booth R0731. The official directory records COMPUTEX appearances from 2013 to 2026, 8 editions in total, plus 5 records from other TAITRA shows that this page reproduces but does not count toward the COMPUTEX total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/aptobject",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "AURAS Technology Co., Ltd.: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for AURAS Technology Co., Ltd., in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J0806. The official directory records COMPUTEX appearances from 2012 to 2026, 6 editions in total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/auras",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "AVerMedia Technologies, Inc.: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for AVerMedia Technologies, Inc., in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J0802. The official directory records COMPUTEX appearances from 2010 to 2026, 15 editions in total, plus 3 records from other TAITRA shows that this page reproduces but does not count toward the COMPUTEX total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/avermedia",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "Axelera AI: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for Axelera AI, in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth K0104. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/axelera-ai",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "Brinno Incorporated: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for Brinno Incorporated, in the AI Computing & System Integration Solution show area, at Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2), booth R0732. The official directory records COMPUTEX appearances from 2010 to 2026, 13 editions in total, plus 4 records from other TAITRA shows that this page reproduces but does not count toward the COMPUTEX total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/brinno-incorporated",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "C-Media Electronics Inc.: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for C-Media Electronics Inc., in the AI Computing & System Integration Solution show area, at Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2), booth R0120. The official directory records COMPUTEX appearances from 2010 to 2026, 13 editions in total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/c-media-electronics",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "C.Y. Intelligence Co., Ltd.: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for C.Y. Intelligence Co., Ltd., in the AI Computing & System Integration Solution show area, at Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2), booth R0832. The official directory records COMPUTEX appearances from 2024 to 2026, 3 editions in total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/c-y-intelligence",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "Carl Zeiss Co., Ltd.: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for Carl Zeiss Co., Ltd., in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J1109. The official directory records COMPUTEX appearances from 2025 to 2026, 2 editions in total, plus 1 record from other TAITRA shows that this page reproduces but does not count toward the COMPUTEX total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/carl-zeiss",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "Chenbro Micom Co., LTD.: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for Chenbro Micom Co., LTD., in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J0317a. The official directory records COMPUTEX appearances from 2010 to 2026, 15 editions in total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/chenbro-micom",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "CHT Security Co., Ltd.: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for CHT Security Co., Ltd., in the AI Computing & System Integration Solution show area, at Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2), booth R0632. The official directory records COMPUTEX appearances from 2020 to 2026, 5 editions in total, plus 2 records from other TAITRA shows that this page reproduces but does not count toward the COMPUTEX total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/cht-security",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "COMINO: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for COMINO, in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J0532. The official directory records COMPUTEX appearances from 2018 to 2026, 3 editions in total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/comino",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "Continental: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for Continental, in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J1327. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/continental",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "Danfoss Power Solutions: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for Danfoss Power Solutions, in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J1227a. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/danfoss-power-solutions",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "Delos Data: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for Delos Data, in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J1328. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/delos-data",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "Dongguan Xunling New Technology Co., LTD: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for Dongguan Xunling New Technology Co., LTD, in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J0234. The official directory records COMPUTEX appearances from 2020 to 2026, 5 editions in total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/dongguan-xunling-new",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "Dynatron Corporation: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for Dynatron Corporation, in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J1230. The official directory records COMPUTEX appearances from 2010 to 2026, 16 editions in total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/dynatron",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "Ecolab Limited: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for Ecolab Limited, in the AI Computing & System Integration Solution show area, at Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2), booth R0125. The directory also lists 4 records from other TAITRA shows, reproduced here but not counted toward the COMPUTEX total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/ecolab",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "Egis Technology Inc.: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for Egis Technology Inc., in the AI Computing & System Integration Solution show area, at Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2), booth R0826. The official directory records COMPUTEX appearances from 2010 to 2026, 4 editions in total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/egis",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "ELITEGROUP COMPUTER SYSTEMS CO., LTD.: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for ELITEGROUP COMPUTER SYSTEMS CO., LTD., in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J1317a. The official directory records COMPUTEX appearances from 2010 to 2026, 16 editions in total, plus 6 records from other TAITRA shows that this page reproduces but does not count toward the COMPUTEX total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/elitegroup-computer-systems",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "ENBIK TECHNOLOGY CO., LTD.: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for ENBIK TECHNOLOGY CO., LTD., in the AI Computing & Tech show area, at Taipei Nangang Exhibition Center, Hall 1 (TaiNEX 1), booth J1128. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/enbik",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
+        "image": ""
+      },
+      {
+        "title": "EZBOND CHEMICAL CO., LTD.: COMPUTEX 2026 exhibitor record",
+        "desc": "The official COMPUTEX 2026 exhibitor listing for EZBOND CHEMICAL CO., LTD., in the AI Computing & System Integration Solution show area, at Taipei Nangang Exhibition Center, Hall 2 (TaiNEX 2), booth R0331a. The official directory records COMPUTEX appearances from 2015 to 2026, 3 editions in total, plus 24 records from other TAITRA shows that this page reproduces but does not count toward the COMPUTEX total. Every fact on this page carries a source link and a checked date, extracted mechanically from the official directory without passing through a language model. Fields the directory does not publish are left blank rather than inferred from company marketing pages, press releases, past practice or third-party aggregators.",
+        "category": "vendors",
+        "href": "/en/vendors/ezbond-chemical",
+        "date": "2026-07-29T13:48:13+08:00",
+        "readingTime": 2,
         "image": ""
       }
     ]
