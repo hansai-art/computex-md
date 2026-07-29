@@ -1,7 +1,14 @@
 {
-  "generatedAt": "2026-07-29T06:03:03.864Z",
+  "generatedAt": "2026-07-29T06:37:35.468Z",
   "source": "git",
   "commits": [
+    {
+      "hash": "66220361e1fbb8767f136b32dbdce98b0683bf4b",
+      "date": "2026-07-29T14:04:08+08:00",
+      "author": "Hans",
+      "message": "fix(content): cross-domain: /mcp 教訪客安裝的是母體的 npm 套件",
+      "articles": []
+    },
     {
       "hash": "cae176806465297cf626ee11a33cfee36e13bf07",
       "date": "2026-07-29T13:48:13+08:00",
