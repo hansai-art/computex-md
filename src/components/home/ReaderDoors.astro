@@ -1,19 +1,17 @@
 ---
 /**
- * ReaderDoors.astro — Homepage Evolution Wave 1 / B1 (2026-05-26)
+ * ReaderDoors.astro — hero 底下的四道門，分流四種讀者。
  *
- * 4 doors right after Hero, addressing the four reader cohorts the original
- * single-narrative homepage assumed away:
+ *  1. 🚪 第一次來   → #how-it-works（這個檔案庫怎麼運作）
+ *  2. 🔍 找特定廠商 → /explore
+ *  3. 🎲 隨便看看   → #random-discovery
+ *  4. 📊 看數據     → /dashboard
  *
- *  1. 🚪 first-timer  → scroll to #cover-story (CoverStory)
- *  2. 🔍 searcher     → /explore (search-first UX, ship 2026-05-10)
- *  3. 🎲 explorer     → scroll to #random-discovery (RandomDiscovery)
- *  4. 🧬 researcher   → /semiont (organism ecosystem, ship 2026-05-25)
- *
- * Why this exists — see reports/homepage-evolution-2026-05-26.md §Gap 1
- * + §B1 proposal. GA4 28d: homepage 75.9s engagement vs /semiont 178.9s,
- * /dashboard 172.3s — readers who go deeper engage 2.0-2.4× longer, but
- * homepage has no signage telling them where to go.
+ * 2026-07-29：母體的第 1 道門指向 #cover-story、第 4 道門指向 /semiont。
+ * 前者的區塊已換成 HowItWorks，後者這個路由在本站根本不存在 —— 也就是說
+ * 首頁最顯眼的四張卡裡有一張從取種那天起就是 404，而既有的 dead-link 檢查
+ * 只驗 canonical / sitemap / hreflang，驗不到「使用者點得到的網址」。
+ * 補上 `scripts/tools/verify-internal-links.mjs` 掃全站 <a href> 就是為了這個。
  *
  * Layout: 4-col on desktop, 2×2 on tablet, single-col on mobile.
  */
@@ -41,7 +39,7 @@ interface Door {
 const doors: Door[] = [
   {
     icon: '🚪',
-    href: '#cover-story',
+    href: '#how-it-works',
     title: t('home.doors.first.title'),
     sub: t('home.doors.first.sub'),
     gaLabel: 'first',
@@ -64,11 +62,10 @@ const doors: Door[] = [
     tone: 'amber',
   },
   {
-    icon: '🧬',
-    // /semiont is zh-TW canonical (no per-lang routes yet — see semiont-landing
-    // template). Link straight to it regardless of current lang. The page itself
-    // i18ns via useTranslations.
-    href: '/semiont',
+    icon: '📊',
+    // /organism（重動畫的生命體觀測頁）還沒建，先指向 /dashboard。
+    // 建好之後改這一行就好 —— NEVER 先放一個「即將推出」的空頁佔位。
+    href: translatePath('/dashboard'),
     title: t('home.doors.organism.title'),
     sub: t('home.doors.organism.sub'),
     gaLabel: 'organism',

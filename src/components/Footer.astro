@@ -331,13 +331,13 @@ const HEAD_CLASS = 'mb-1 text-[0.85rem] uppercase tracking-[0.05em] text-white';
           href="https://github.com/hansai-art/computex-md/discussions"
           target="_blank">{t('footer.discuss')}</a
         >
-        <a href="https://x.com/computexmd" target="_blank">𝕏 @computexmd</a>
-        <a href="https://www.threads.com/@computexmd" target="_blank"
-          >Threads @computexmd</a
-        >
-        <a href="https://www.instagram.com/computexmd" target="_blank"
-          >IG @computexmd</a
-        >
+        {
+          /*
+    2026-07-29 拿掉 𝕏 / Threads / IG 三條 @computexmd 連結。取種時它們是
+    母體 @taiwanmd 被字串取代出來的，本站一個都沒註冊過，點下去不是 404
+    就是進到不相干的人的帳號。開了帳號再放回來。
+  */
+        }
         <a href="mailto:hans@groupg.org">hans@groupg.org</a>
       </div>
     </div>

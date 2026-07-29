@@ -1,0 +1,94 @@
+---
+/**
+ * VitalsStrip.astro — 首頁的生命徵象帶（零 JS）。
+ *
+ * 取代母體的 OrganismPreview：那支在首頁畫一個台灣島 SVG 當中心節點、八個
+ * 器官繞著轉，連到 /semiont。台灣島不能留（那是母體的國土符號），/semiont
+ * 這個路由在本站也不存在 — 它是首頁上第二條沒有人會發現的死連結。
+ *
+ * 首頁架構的既定決策是「乾淨首頁 + 獨立 /organism 放重動畫」，理由是
+ * Core Web Vitals 逐 URL 計算，重 WebGL 掛在首頁會拖垮整站被引用的那一頁。
+ * 所以這裡只留一條純文字徵象帶，/organism 建好之前指向 /dashboard。
+ *
+ * ⚠️ /organism 上線時要改的就是 `vitalsHref` 一個字串。NEVER 在這裡先寫
+ * 「即將推出」佔位 — 首頁掛一個點不到的承諾，比少一個入口糟。
+ */
+import {
+  useTranslations,
+  getLangFromUrl,
+  useTranslatedPath,
+} from '../../i18n/utils';
+import { getArchiveStats } from '../../lib/archive-stats';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+const stats = getArchiveStats(lang);
+
+const vitalsHref = translatePath('/dashboard');
+
+const vitals = [
+  { label: t('home.vitals.pages'), value: String(stats.totalPages) },
+  {
+    label: t('home.vitals.sources'),
+    value: t('home.vitals.sources.value'),
+  },
+  {
+    label: t('home.vitals.span'),
+    value: stats.earliestYear
+      ? `${stats.earliestYear}–${stats.latestYear}`
+      : '—',
+  },
+  {
+    label: t('home.vitals.booth'),
+    value: `${stats.withBooth}/${stats.vendors}`,
+  },
+];
+---
+
+<section
+  class="mx-auto mb-16 mt-12 max-w-[820px] px-8 max-[480px]:px-4"
+  aria-labelledby="vitals-heading"
+>
+  <div
+    class="rounded-2xl border border-[#2f2b31] bg-[linear-gradient(135deg,#141315_0%,#252126_100%)] p-10 max-[480px]:p-6"
+  >
+    <h2
+      id="vitals-heading"
+      class="mb-2 text-center text-[1.5rem] font-light leading-tight text-[#f4f0ea] max-[480px]:text-[1.2rem]"
+      style="font-family: 'jf-lanyangming', 'Noto Serif TC', serif;"
+    >
+      {t('home.vitals.heading')}
+    </h2>
+    <p
+      class="mx-auto mb-8 max-w-[520px] text-center text-[0.95rem] leading-[1.9] text-white/60"
+    >
+      {t('home.vitals.body')}
+    </p>
+
+    <dl class="m-0 grid grid-cols-4 gap-4 max-[640px]:grid-cols-2">
+      {
+        vitals.map((v) => (
+          <div class="text-center">
+            <dd class="m-0 text-[1.6rem] font-bold leading-tight text-white [font-variant-numeric:tabular-nums] max-[480px]:text-[1.3rem]">
+              {v.value}
+            </dd>
+            <dt class="mt-1 text-[0.78rem] tracking-[0.04em] text-white/50">
+              {v.label}
+            </dt>
+          </div>
+        ))
+      }
+    </dl>
+
+    <p class="mb-0 mt-8 text-center">
+      <a
+        href={vitalsHref}
+        data-ga-section="vitals_strip"
+        data-ga-label="dashboard"
+        class="inline-block border-b-2 border-[#E4007E] pb-1 text-[0.9rem] font-semibold text-white no-underline transition-colors duration-200 hover:text-[#E4007E]"
+        >{t('home.vitals.cta')}</a
+      >
+    </p>
+  </div>
+</section>

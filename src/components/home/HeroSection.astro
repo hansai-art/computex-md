@@ -6,46 +6,45 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 ---
 
-<!--
-  Phase 4 leaf migration #10: home/HeroSection.astro
-  ──────────────────────────────────────────────────
-  - Scoped <style> block removed entirely
-  - All classes → Tailwind atomic utilities
-  - The 6-radial-gradient "taiwan-mountains" background is preserved
-    verbatim as an arbitrary [background:...] value
-  - Responsive text sizes use md/lg/max-[...] arbitrary breakpoints to
-    match the original 4-tier responsive ladder (default / 1024px /
-    768px / 480px)
--->
+{
+  /*
+    HeroSection.astro
+    ─────────────────
+    取種自 taiwan-md 的 hero，2026-07-29 換掉母體視覺：
+    
+    - 底色從母體的深綠漸層（#0e2018 → #1a3c34，那是「島嶼山脈」的顏色）改成
+    COMPUTEX 字標黑 #252126。色值來自官方 logo PNG 逐像素抽取，不是估的，
+    正本記在 scratchpad/computex-brand/brand-spec.md。
+    - 母體在右上角放了一片台灣輪廓的葉子 SVG，直接移除。留著就是在別人的展會
+    網站上掛母體的國土符號。
+    - 換成極淡的等距網格：呼應 /organism 的線框生命體，純 CSS 零 JS，
+    首頁的 Core Web Vitals 不為它付任何代價。
+    - 洋紅 #E4007E 全站只出現在「現在式」的地方（見 brand-spec 用色紀律），
+    這裡唯一的一處是字標的 .md 後綴。
+  */
+}
 <section
-  class="relative -mt-8 flex w-full max-w-[100vw] items-center overflow-hidden bg-[linear-gradient(to_bottom,#0e2018_0%,#1a3c34_100%)] px-0 pb-20 pt-[calc(8rem+56px)] text-center text-white max-[768px]:min-h-0 max-[768px]:px-4 max-[768px]:pb-16 max-[768px]:pt-[calc(7rem+56px)] max-[480px]:px-2 max-[480px]:pb-12 max-[480px]:pt-[calc(6rem+56px)]"
+  class="relative -mt-8 flex w-full max-w-[100vw] items-center overflow-hidden bg-[linear-gradient(to_bottom,#141315_0%,#252126_100%)] px-0 pb-20 pt-[calc(8rem+56px)] text-center text-white max-[768px]:min-h-0 max-[768px]:px-4 max-[768px]:pb-16 max-[768px]:pt-[calc(7rem+56px)] max-[480px]:px-2 max-[480px]:pb-12 max-[480px]:pt-[calc(6rem+56px)]"
 >
-  <div class="absolute inset-0 z-[1]">
+  <div class="absolute inset-0 z-[1]" aria-hidden="true">
     <div
-      class="absolute bottom-0 left-0 right-0 h-2/5 [background:radial-gradient(ellipse_1000px_100px_at_5%_100%,rgba(0,77,64,0.15)_0%,transparent_80%),radial-gradient(ellipse_800px_120px_at_15%_100%,rgba(0,77,64,0.2)_0%,transparent_75%),radial-gradient(ellipse_700px_160px_at_35%_100%,rgba(0,99,82,0.25)_0%,transparent_70%),radial-gradient(ellipse_600px_180px_at_55%_100%,rgba(0,99,82,0.3)_0%,transparent_65%),radial-gradient(ellipse_500px_200px_at_70%_100%,rgba(79,209,176,0.2)_0%,transparent_60%),radial-gradient(ellipse_400px_220px_at_85%_100%,rgba(79,209,176,0.25)_0%,transparent_55%)] max-[768px]:h-[35%]"
+      class="absolute inset-0 opacity-[0.28] [background-image:linear-gradient(rgba(255,255,255,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:radial-gradient(ellipse_80%_70%_at_50%_40%,#000_10%,transparent_75%)]"
     >
     </div>
-    <svg
-      class="absolute right-[8%] top-[15%] h-[180px] w-[180px] opacity-[0.15] [filter:drop-shadow(0_0_10px_rgba(79,209,176,0.2))] max-lg:h-40 max-lg:w-40 max-[768px]:right-[5%] max-[768px]:top-[10%] max-[768px]:h-[120px] max-[768px]:w-[120px] max-[768px]:opacity-20 max-[480px]:h-[100px] max-[480px]:w-[100px] max-[480px]:opacity-[0.15]"
-      viewBox="0 0 100 100"
-      aria-hidden="true"
+    <div
+      class="absolute bottom-0 left-0 right-0 h-2/5 [background:radial-gradient(ellipse_900px_180px_at_50%_100%,rgba(228,0,126,0.10)_0%,transparent_70%)] max-[768px]:h-[35%]"
     >
-      <path
-        d="M30 20 C 35 18 40 20 42 25 C 44 30 46 35 48 40 C 50 45 52 50 50 55 C 48 60 46 65 44 70 C 42 75 40 80 35 82 C 30 84 25 82 22 78 C 19 74 20 69 21 64 C 22 59 24 54 26 49 C 28 44 29 39 30 34 C 31 29 30 24 30 20 Z"
-        fill="rgba(79, 209, 176, 0.08)"
-        stroke="rgba(79, 209, 176, 0.15)"
-        stroke-width="0.5"></path>
-    </svg>
+    </div>
   </div>
   <div
     class="relative z-10 mx-auto w-full max-w-[1200px] px-8 max-[768px]:px-4"
   >
     <h1
-      class="relative mb-6 max-w-full text-[clamp(2rem,11vw,6rem)] font-bold leading-none tracking-tight text-white !font-['jf-kamabit','Noto_Sans_TC','Source_Han_Sans_TC',sans-serif] max-[768px]:mb-[1.2rem]"
+      class="relative mb-6 max-w-full text-[clamp(1.9rem,8vw,4.75rem)] font-bold leading-none tracking-tight text-white !font-['jf-kamabit','Noto_Sans_TC','Source_Han_Sans_TC',sans-serif] max-[768px]:mb-[1.2rem]"
     >
       <span
         class="relative z-[2] block text-white [text-shadow:0_2px_8px_rgba(0,0,0,0.3)] !font-[inherit]"
-        >Taiwan<span class="text-[#4fd1b0]">.md</span></span
+        >COMPUTEX<span class="text-[#E4007E]">.md</span></span
       >
     </h1>
     <h2
@@ -68,7 +67,7 @@ const t = useTranslations(lang);
         href="#categories"
         data-ga-section="hero_cta"
         data-ga-label="explore"
-        class="group inline-flex items-center gap-2 rounded-md bg-white/95 px-8 py-[0.8rem] text-[0.95rem] font-semibold tracking-[0.02em] text-[#004d40] no-underline transition-all duration-300 hover:-translate-y-px hover:bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] max-[768px]:w-full max-[768px]:max-w-[300px] max-[768px]:justify-center max-[768px]:px-6 max-[768px]:py-[0.6rem] max-[480px]:px-8 max-[480px]:py-5 max-[480px]:text-base"
+        class="group inline-flex items-center gap-2 rounded-md bg-white/95 px-8 py-[0.8rem] text-[0.95rem] font-semibold tracking-[0.02em] text-[#252126] no-underline transition-all duration-300 hover:-translate-y-px hover:bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.35)] max-[768px]:w-full max-[768px]:max-w-[300px] max-[768px]:justify-center max-[768px]:px-6 max-[768px]:py-[0.6rem] max-[480px]:px-8 max-[480px]:py-5 max-[480px]:text-base"
       >
         <span>{t('home.hero.cta.explore')}</span>
         <svg
@@ -115,7 +114,7 @@ const t = useTranslations(lang);
             <a
               href="https://github.com/hansai-art/computex-md/issues"
               target="_blank"
-              class="text-[rgba(79,209,176,0.8)] underline"
+              class="text-white/85 underline decoration-[#E4007E] underline-offset-2"
             >
               {t('home.hero.transparency.link')}
             </a>

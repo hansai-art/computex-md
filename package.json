@@ -9,12 +9,11 @@
     "postinstall": "bash scripts/core/sync.sh",
     "twmd": "node scripts/twmd.mjs",
     "dev": "npm run prebuild:sync && npm run prebuild:gitinfo && (python3 scripts/core/generate-newsroom-data.py --quiet || true) && astro dev",
-    "prebuild": "npm run prebuild:sync && npm run prebuild:terms && npm run prebuild:status && npm run prebuild:aliases && run-p prebuild:api prebuild:map prebuild:search prebuild:dashboard prebuild:changelog prebuild:contributors prebuild:buildperf prebuild:langswitch prebuild:og prebuild:i18n prebuild:content-dates prebuild:gitinfo prebuild:content-stats prebuild:i18n-progress prebuild:llms prebuild:stats && npm run prebuild:latest && npm run prebuild:redirects",
+    "prebuild": "npm run prebuild:sync && npm run prebuild:terms && npm run prebuild:status && npm run prebuild:aliases && run-p prebuild:api prebuild:search prebuild:dashboard prebuild:changelog prebuild:contributors prebuild:buildperf prebuild:langswitch prebuild:og prebuild:i18n prebuild:content-dates prebuild:gitinfo prebuild:content-stats prebuild:i18n-progress prebuild:llms prebuild:stats && npm run prebuild:latest && npm run prebuild:redirects",
     "prebuild:sync": "bash scripts/core/sync.sh",
     "prebuild:terms": "python3 scripts/core/extract-china-terms.py --quiet",
     "prebuild:status": "python3 scripts/tools/lang-sync/status.py && python3 scripts/tools/sync-translations-json.py",
     "prebuild:api": "node scripts/core/generate-api.js",
-    "prebuild:map": "node scripts/core/generate-map-markers.js",
     "prebuild:search": "node scripts/core/build-search-index.mjs",
     "prebuild:dashboard": "python3 scripts/tools/article-health.py --baseline-out scripts/tools/.quality-baseline.json && python3 scripts/core/generate-dashboard-immune.py && node scripts/core/generate-dashboard-data.js && python3 scripts/core/generate-dashboard-forks.py && node scripts/core/generate-dashboard-alerts.mjs && python3 scripts/core/generate-newsroom-data.py --quiet && node scripts/core/generate-dashboard-status.mjs",
     "prebuild:changelog": "node scripts/core/generate-changelog-data.js",
@@ -33,7 +32,7 @@
     "build": "astro build",
     "test": "node scripts/core/test-frontmatter.mjs",
     "test:ci": "node scripts/core/test-frontmatter.mjs --ci",
-    "postbuild": "node scripts/tools/check-url-contract.mjs --strict && node scripts/tools/verify-nav-links.mjs",
+    "postbuild": "node scripts/tools/check-url-contract.mjs --strict && node scripts/tools/verify-nav-links.mjs && node scripts/tools/verify-internal-links.mjs",
     "postbuild:smoke": "node scripts/core/post-build-check.mjs",
     "postbuild:internal-links": "bash scripts/tools/verify-internal-links.sh",
     "preview": "astro preview",
@@ -62,7 +61,8 @@
     "prebuild:gitinfo": "node scripts/core/build-git-info.mjs",
     "prebuild:redirects": "node scripts/core/generate-redirects.mjs",
     "check:url-contract": "node scripts/tools/check-url-contract.mjs",
-    "verify:nav": "node scripts/tools/verify-nav-links.mjs"
+    "verify:nav": "node scripts/tools/verify-nav-links.mjs",
+    "verify:links": "node scripts/tools/verify-internal-links.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.17",

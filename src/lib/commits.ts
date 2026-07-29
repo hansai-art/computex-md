@@ -1,5 +1,6 @@
 import { execSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Lang } from '../types';
 
@@ -52,6 +53,12 @@ function filesToArticles(files: string[]): ChangelogArticle[] {
   for (const file of files) {
     const m = ARTICLE_RE.exec(file);
     if (!m) continue;
+    // 檔案還在嗎。commit 是歷史，路由是現在式：被改名或刪掉的文章仍然出現在
+    // 舊 commit 的 changed-files 裡，直接照抄就會在更新紀錄上長出 404。
+    // 2026-07-29 實際踩到：`knowledge/Editions/COMPUTEX 2027.md` 改名成
+    // `computex-2027.md`（slug-format gate 要求），舊 commit 的連結仍指向
+    // `/editions/COMPUTEX 2027`。
+    if (!existsSync(resolve(process.cwd(), file))) continue;
     const url = `/${m[1].toLowerCase()}/${m[2]}`;
     if (seen.has(url)) continue;
     seen.add(url);

@@ -1,8 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
-import ProticoScript from '../components/ProticoScript.astro';
-import SupporterGrid from '../components/SupporterGrid.astro';
 import { getLangFromUrl, useTranslations } from '../i18n/utils';
 // 2026-06-13 contributors SSOT：grid 改 data-driven，吃 public/api/contributors.json
 // 的完整名單（generate-contributors-data.js 從 GitHub /contributors API 每次
@@ -785,198 +783,15 @@ const siteGuideCards = [
       </div>
     </section>
 
-    <section class="bg-[linear-gradient(135deg,#fef9f0,#fdf4e8)] px-8 py-16">
-      <div class="sponsors-inner">
-        <h2 class="section-title">{t('about.sponsors.title')}</h2>
-        <p class="sponsors-desc" set:html={t('about.sponsors.desc.html')} />
-
-        <div class="sponsor-tiers">
-          <div class="tier">
-            <h3 class="tier-name gold">{t('about.sponsors.tier.core.name')}</h3>
-            <p class="tier-desc">{t('about.sponsors.tier.core.desc')}</p>
-            <p class="tier-perks">{t('about.sponsors.tier.core.perks')}</p>
-            <div class="tier-logos">
-              <div class="logo-placeholder">
-                {t('about.sponsors.tier.core.placeholder')}
-              </div>
-            </div>
-          </div>
-
-          <div class="tier">
-            <h3 class="tier-name curation">
-              {t('about.sponsors.tier.curation.name')}
-            </h3>
-            <p class="tier-desc">{t('about.sponsors.tier.curation.desc')}</p>
-            <p class="tier-perks">{t('about.sponsors.tier.curation.perks')}</p>
-            <div class="tier-logos">
-              <div class="sponsor-card">
-                <div class="sponsor-card-logo">
-                  <a
-                    href="https://www.nmth.gov.tw/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <img
-                      src="/images/nmth-logo.png"
-                      alt="國立臺灣歷史博物館 NMTH"
-                    />
-                  </a>
-                </div>
-                <div class="sponsor-card-content">
-                  <p class="sponsor-contribution-title">
-                    {t('about.sponsors.nmth.story.title')}
-                  </p>
-                  <p class="sponsor-contribution">
-                    {t('about.sponsors.nmth.story.desc')}
-                  </p>
-                </div>
-              </div>
-              <div class="sponsor-card">
-                <div class="sponsor-card-logo">
-                  <a
-                    href="https://pansci.asia/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <img src="/images/pansci-logo.png" alt="泛科學 PanSci" />
-                  </a>
-                </div>
-                <div class="sponsor-card-content">
-                  <p class="sponsor-contribution-title">
-                    {t('about.sponsors.pansci.story.title')}
-                  </p>
-                  <p class="sponsor-contribution">
-                    {t('about.sponsors.pansci.story.desc')}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="tier">
-            <h3 class="tier-name professional">
-              {t('about.sponsors.tier.professional.name')}
-            </h3>
-            <p class="tier-desc">
-              {t('about.sponsors.tier.professional.desc')}
-            </p>
-            <p class="tier-perks">
-              {t('about.sponsors.tier.professional.perks')}
-            </p>
-            <div class="tier-logos">
-              <div class="sponsor-card">
-                <div class="sponsor-card-logo">
-                  <a
-                    href="https://justfont.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <img src="/images/justfont-logo.svg" alt="justfont" />
-                  </a>
-                </div>
-                <div class="sponsor-card-content">
-                  <p class="sponsor-contribution-title">
-                    {t('about.sponsors.justfont.story.title')}
-                  </p>
-                  <p class="sponsor-contribution">
-                    {t('about.sponsors.justfont.story.desc')}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="tier">
-            <h3 class="tier-name bronze">
-              {t('about.sponsors.tier.community.name')}
-            </h3>
-            <p class="tier-desc">{t('about.sponsors.tier.community.desc')}</p>
-            <p class="tier-perks">{t('about.sponsors.tier.community.perks')}</p>
-            <div class="tier-logos">
-              <div class="sponsor-card">
-                <div class="sponsor-card-logo">
-                  <a
-                    href="https://protico.io"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <img src="/images/protico-logo.png" alt="Protico" />
-                  </a>
-                </div>
-                <div class="sponsor-card-content">
-                  <p class="sponsor-contribution-title">
-                    {t('about.sponsors.protico.story.title')}
-                  </p>
-                  <p
-                    class="sponsor-contribution"
-                    set:html={t('about.sponsors.protico.story.desc.html')}
-                  />
-                </div>
-              </div>
-              <div class="sponsor-card">
-                <div class="sponsor-card-logo">
-                  <a
-                    href="https://portaly.cc"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <img src="/images/portaly-logo.png" alt="Portaly" />
-                  </a>
-                </div>
-                <div class="sponsor-card-content">
-                  <p class="sponsor-contribution-title">
-                    {t('about.sponsors.portaly.story.title')}
-                  </p>
-                  <p class="sponsor-contribution">
-                    {t('about.sponsors.portaly.story.desc')}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="tier">
-            <h3 class="tier-name community">
-              {t('about.sponsors.tier.individual.name')}
-            </h3>
-            <p class="tier-desc">{t('about.sponsors.tier.individual.desc')}</p>
-            <p class="tier-perks">
-              {t('about.sponsors.tier.individual.perks')}
-            </p>
-            <SupporterGrid />
-          </div>
-        </div>
-
-        <div class="sponsor-cta">
-          <h3>{t('about.sponsors.cta.title')}</h3>
-          <div class="portaly-donate">
-            <p class="portaly-label">
-              {t('about.sponsors.portaly.label')}
-            </p>
-            <a
-              href="https://portaly.cc/taiwanmd/support?utm_source=computex.md&utm_medium=about_sponsors&utm_campaign=support"
-              target="_blank"
-              rel="noopener noreferrer"
-              data-ga-section="about_sponsors"
-              data-ga-label="sponsor"
-              class="portaly-link"
-            >
-              {t('about.sponsors.portaly.cta')} →
-            </a>
-            <p class="portaly-note">{t('about.sponsors.portaly.note')}</p>
-          </div>
-          <p set:html={t('about.sponsors.cta.desc.html')} />
-          <div class="sponsor-contact">
-            <a
-              href={`mailto:taiwanmd@monoame.com?subject=COMPUTEX.md 贊助合作詢問`}
-              class="btn btn-primary"
-            >
-              {t('about.sponsors.cta.contact')}
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
+    {
+      /*
+    2026-07-29 刪掉整段贊助商區。它列的是母體的真實贊助商（justfont、Protico、
+    Portaly）與母體的個人贊助者，還有 mailto:taiwanmd@monoame.com 的洽談信箱。
+    這些公司沒有贊助 COMPUTEX.md，把他們的 logo 掛在這裡是對真實公司的錯誤歸屬
+    （跟 README 貢獻者名單、首頁讀者留言同一類問題）。
+    本站真的有贊助商之後再重建，屆時每一個 logo 都要有實際的贊助關係。
+  */
+    }
 
     <!-- Section: FAQ -->
     <section class="mx-auto max-w-[var(--container-prose)] px-8 py-16" id="faq">
@@ -1107,9 +922,6 @@ const siteGuideCards = [
       </div>
     </section>
   </div>
-
-  <!-- Protico Community Chat Bubble — sponsored by Howie Young -->
-  <ProticoScript />
 </Layout>
 
 <style>

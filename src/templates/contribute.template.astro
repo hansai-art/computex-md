@@ -1,36 +1,10 @@
 ---
-import fs from 'node:fs';
-import path from 'node:path';
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
-import ProticoScript from '../components/ProticoScript.astro';
 import { getLangFromUrl, useTranslations } from '../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-
-// Read supporter stats for social-proof line in §金流支持.
-// 讀 prebuild 派生的 dashboard-supporters.json；若檔案缺失 fallback 到 0。
-let supporterStats = {
-  total_received_twd: 0,
-  supporter_count: 0,
-  transaction_count: 0,
-};
-try {
-  const raw = JSON.parse(
-    fs.readFileSync(
-      path.join(process.cwd(), 'public/api/dashboard-supporters.json'),
-      'utf8',
-    ),
-  );
-  supporterStats = {
-    total_received_twd: raw.totals?.total_received_twd || 0,
-    supporter_count: raw.totals?.supporter_count || 0,
-    transaction_count: raw.totals?.transaction_count || 0,
-  };
-} catch {
-  /* fallback already initialised */
-}
 ---
 
 <Layout
@@ -684,137 +658,14 @@ try {
   </section>
 
   <!-- Support Section (Portaly donation) - Position 8.5 -->
-  <section class="support-section" id="support">
-    <div class="support-inner">
-      <h2>
-        {lang === 'en' ? '💚 Support with a Donation' : '💚 金流支持'}
-      </h2>
-      <p class="support-desc">
-        {
-          lang === 'en'
-            ? 'If our writing helps you understand Taiwan a little better, consider backing the coral reef. Donations go to AI compute, translation, and community events — plus domain fees and the small miscellaneous IT costs that keep this alive (the servers mostly live on GitHub, so that line item stays low). Every amount helps this digital sovereignty project breathe another day.'
-            : '如果這裡的文字讓你對台灣多理解了一點，歡迎回頭灌溉這座珊瑚礁。贊助款項會用於購買 AI 算力、翻譯與社群活動，還有網域費用以及各種零星的資訊服務支出（伺服器大部分都架在 GitHub 上，這塊成本壓得很低）——每一份支持，都讓這座數位主權計畫多呼吸一天。'
-        }
-      </p>
-
-      {
-        supporterStats.transaction_count > 0 && (
-          <p class="support-social-proof">
-            {lang === 'en' ? (
-              <>
-                <strong>
-                  NT${supporterStats.total_received_twd.toLocaleString()}
-                </strong>{' '}
-                received from <strong>{supporterStats.supporter_count}</strong>{' '}
-                supporter
-                {supporterStats.supporter_count > 1 ? 's' : ''} ·{' '}
-                <a
-                  href={
-                    lang === 'en' ? '/en/about#sponsors' : '/about#sponsors'
-                  }
-                >
-                  see who →
-                </a>
-              </>
-            ) : (
-              <>
-                目前已收到{' '}
-                <strong>
-                  NT${supporterStats.total_received_twd.toLocaleString()}
-                </strong>{' '}
-                來自 <strong>{supporterStats.supporter_count}</strong> 位支持者
-                · <a href="/about#sponsors">看看他們是誰 →</a>
-              </>
-            )}
-          </p>
-        )
-      }
-
-      <div class="support-options">
-        <div class="support-card">
-          <div class="support-card-icon">♻️</div>
-          <h3>
-            {lang === 'en' ? 'Monthly Subscription' : '每月定額'}
-          </h3>
-          <p>
-            {
-              lang === 'en'
-                ? 'A recurring commitment. Turns into a growing tree (🌱→🌿→🌳) over time on the About page.'
-                : '持續的承諾。在 About 頁面會隨著累計金額從 🌱 新芽長成 🌿 小樹、🌳 大樹。'
-            }
-          </p>
-          <a
-            href="https://portaly.cc/taiwanmd/support?utm_source=computex.md&utm_medium=contribute_page&utm_campaign=support"
-            target="_blank"
-            rel="noopener noreferrer"
-            data-ga-section="contribute_support"
-            data-ga-label="monthly"
-            class="support-cta"
-          >
-            {lang === 'en' ? 'Support Monthly →' : '每月支持 →'}
-          </a>
-        </div>
-
-        <div class="support-card">
-          <div class="support-card-icon">💝</div>
-          <h3>
-            {lang === 'en' ? 'One-time' : '一次性贊助'}
-          </h3>
-          <p>
-            {
-              lang === 'en'
-                ? 'A single gesture of support. Leave a message — we read every one.'
-                : '一次的心意。可以留言給我們，每一則我們都會讀。'
-            }
-          </p>
-          <a
-            href="https://portaly.cc/taiwanmd/support?utm_source=computex.md&utm_medium=contribute_page&utm_campaign=support"
-            target="_blank"
-            rel="noopener noreferrer"
-            data-ga-section="contribute_support"
-            data-ga-label="onetime"
-            class="support-cta"
-          >
-            {lang === 'en' ? 'Support Once →' : '單次支持 →'}
-          </a>
-        </div>
-      </div>
-
-      <p class="support-note">
-        {
-          lang === 'en' ? (
-            <>
-              Processed by{' '}
-              <a
-                href="https://portaly.cc"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Portaly
-              </a>{' '}
-              · Your name and message appear on the About page (amounts never
-              shown publicly). Choose "anonymous" on the Portaly form if you
-              prefer.
-            </>
-          ) : (
-            <>
-              由{' '}
-              <a
-                href="https://portaly.cc"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Portaly
-              </a>{' '}
-              處理金流 · 您的名字與留言會顯示在 About
-              頁面（金額不會公開顯示）。如需匿名，在 Portaly
-              表單上選「匿名」即可。
-            </>
-          )
-        }
-      </p>
-    </div>
-  </section>
+  {
+    /*
+    2026-07-29 刪掉整段 support-section（💚 金流支持）。它是母體的贊助漏斗：
+    兩顆按鈕都連到 portaly.cc/taiwanmd/support（母體創辦人的個人收款頁），
+    文案寫的是「如果這裡的文字讓你對台灣多理解了一點」。本站沒有贊助管道，
+    留著就是在幫別人收錢。哪天要開，收款頁必須是本站自己的。
+  */
+  }
 
   <!-- CLI Section - Position 9 -->
   <section class="cli-section" id="cli">
@@ -950,9 +801,6 @@ try {
       </div>
     </div>
   </section>
-
-  <!-- Protico Community Chat Bubble — sponsored by Howie Young -->
-  <ProticoScript />
 </Layout>
 
 <script is:inline>

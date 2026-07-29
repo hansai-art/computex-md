@@ -1,57 +1,57 @@
 ---
+/**
+ * HeroStats.astro — 首頁 hero 底下的四格數字。
+ *
+ * 數字一律 build time 從事實層現算（`src/lib/archive-stats.ts`），標籤走 i18n。
+ * 母體這裡掛的是「400+ 年歷史 / 59,000+ 物種」這種寫死在 i18n 檔裡、永遠不會
+ * 過期也永遠無法驗證的常識數字。我們掛的四個數字每跑一次 harvester 就會變，
+ * 所以它們不能是字串常數 — 那是首頁說謊最便宜的方式。
+ */
 import { useTranslations, getLangFromUrl } from '../i18n/utils';
+import { getArchiveStats } from '../lib/archive-stats';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+const s = getArchiveStats(lang);
 
 const stats = [
   {
-    icon: '🏝️',
-    numberKey: 'hero.stat.history.number' as const,
-    labelKey: 'hero.stat.history.label' as const,
+    icon: '🏭',
+    number: String(s.vendors),
+    label: t('hero.stat.vendors.label'),
   },
   {
-    icon: '🌿',
-    numberKey: 'hero.stat.species.number' as const,
-    labelKey: 'hero.stat.species.label' as const,
+    icon: '🔁',
+    number: String(s.returning),
+    label: t('hero.stat.returning.label'),
   },
   {
-    icon: '🗳️',
-    numberKey: 'hero.stat.democracy.number' as const,
-    labelKey: 'hero.stat.democracy.label' as const,
+    icon: '🗓️',
+    number: String(s.editionsCovered),
+    label: t('hero.stat.editions.label'),
   },
   {
-    icon: '🔧',
-    numberKey: 'hero.stat.chips.number' as const,
-    labelKey: 'hero.stat.chips.label' as const,
+    icon: '🔗',
+    number: String(s.earliestYear || '—'),
+    label: t('hero.stat.earliest.label'),
   },
 ];
 ---
 
-<!--
-  Phase 4 leaf migration #4: HeroStats.astro
-  ──────────────────────────────────────────
-  - Scoped <style> block removed entirely
-  - All classes → Tailwind atomic utilities
-  - Semi-transparent white backgrounds (10% idle, 15% hover) use
-    bg-white/10 / hover:bg-white/15 shorthand
-  - Custom 380px breakpoint using arbitrary max-[380px]: variant
-  - 2-breakpoint responsive: 4-col → 2-col (md) with tighter spacing
--->
 <div
   class="mt-16 grid grid-cols-4 gap-6 max-[768px]:mt-8 max-[768px]:grid-cols-2 max-[768px]:gap-3 max-[380px]:gap-2"
 >
   {
     stats.map((stat) => (
-      <div class="flex flex-col items-center justify-center rounded-xl border border-white/20 bg-white/10 px-4 py-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-white/15 max-[768px]:gap-[0.15rem] max-[768px]:rounded-[10px] max-[768px]:px-3 max-[768px]:py-4 max-[380px]:px-2 max-[380px]:py-3">
+      <div class="flex flex-col items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-white/10 max-[768px]:gap-[0.15rem] max-[768px]:rounded-[10px] max-[768px]:px-3 max-[768px]:py-4 max-[380px]:px-2 max-[380px]:py-3">
         <span class="mb-[0.3rem] block text-[1.8rem] leading-[1.4] max-[768px]:mb-[0.1rem] max-[768px]:text-[1.3rem]">
           {stat.icon}
         </span>
-        <span class="mb-2 block whitespace-nowrap text-[2.2rem] font-bold leading-tight text-white max-[768px]:mb-[0.2rem] max-[768px]:text-[1.5rem] max-[380px]:text-[1.3rem]">
-          {t(stat.numberKey)}
+        <span class="mb-2 block whitespace-nowrap text-[2.2rem] font-bold leading-tight text-white [font-variant-numeric:tabular-nums] max-[768px]:mb-[0.2rem] max-[768px]:text-[1.5rem] max-[380px]:text-[1.3rem]">
+          {stat.number}
         </span>
-        <span class="text-base font-medium tracking-[0.02em] text-white/80 max-[768px]:text-[0.8rem] max-[380px]:text-[0.75rem]">
-          {t(stat.labelKey)}
+        <span class="text-base font-medium tracking-[0.02em] text-white/70 max-[768px]:text-[0.8rem] max-[380px]:text-[0.75rem]">
+          {stat.label}
         </span>
       </div>
     ))

@@ -64,8 +64,8 @@
 | 👥 Contributors                | 0     |
 | ⭐ GitHub Stars                | 0     |
 | 🍴 Forks                       | 0     |
-| 📅 Articles last 7 days        | 0     |
-| 📅 Articles last 30 days       | 0     |
+| 📅 Articles last 7 days        | 1     |
+| 📅 Articles last 30 days       | 1     |
 
 <!-- STATS:END -->
 

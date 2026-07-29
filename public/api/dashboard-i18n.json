@@ -1,12 +1,12 @@
 {
-  "generated": "2026-07-29T03:12:01Z",
-  "max_total": 823,
+  "generated": "2026-07-29T03:52:54Z",
+  "max_total": 787,
   "modules": [
     {
       "name": "home",
       "langs": {
-        "zh-TW": 108,
-        "en": 108
+        "zh-TW": 72,
+        "en": 72
       }
     },
     {
@@ -88,7 +88,7 @@
     }
   ],
   "lang_totals": {
-    "zh-TW": { "keys": 823, "coverage_pct": 100.0 },
-    "en": { "keys": 823, "coverage_pct": 100.0 }
+    "zh-TW": { "keys": 787, "coverage_pct": 100.0 },
+    "en": { "keys": 787, "coverage_pct": 100.0 }
   }
 }

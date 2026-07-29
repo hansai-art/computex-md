@@ -1,0 +1,122 @@
+---
+/**
+ * ArchiveShelf.astro — 首頁「這個檔案庫現在有什麼」。
+ *
+ * 取代母體的四個展廳（壹～肆，每廳三段台灣敘事 + A 級文章精選）。那個結構
+ * 撐得起來的前提有兩個，我們兩個都沒有：
+ *   1. 12 個分類各自有夠多文章可以挑「A 級精選」（門檻是 15 個腳註）。
+ *      我們的廠商頁是事實層，腳註數是 0，挑出來永遠是空的。
+ *   2. 每個展廳有一段人寫的策展敘事。硬寫就是在事實層網站的首頁編故事。
+ *
+ * 所以這裡改成清點：每個分類實際有幾頁、是什麼性質、現在能點進去看什麼。
+ * 空的分類就明白寫「還沒有」，不藏起來也不寫「即將推出」 — 檔案庫的完整度
+ * 本來就是公開資訊，藏起來只會讓第一個發現的人不再相信其他數字。
+ */
+import {
+  useTranslations,
+  getLangFromUrl,
+  useTranslatedPath,
+} from '../../i18n/utils';
+import { CATEGORY_LIST, CATEGORY_LABELS } from '../../config/categories';
+import { getArchiveStats, longestExhibitors } from '../../lib/archive-stats';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+const stats = getArchiveStats(lang);
+const isZh = lang === 'zh-TW';
+
+/** 廠商分類額外附「連續參展最久的五家」當實際樣本。 */
+const longest = longestExhibitors(lang, 5);
+
+const shelves = CATEGORY_LIST.map((slug) => ({
+  slug,
+  name:
+    CATEGORY_LABELS[slug]?.[lang] ?? CATEGORY_LABELS[slug]?.['zh-TW'] ?? slug,
+  count: stats.pagesByCategory[slug] ?? 0,
+  blurb: t(`home.shelf.${slug}.blurb` as never),
+}));
+---
+
+<section
+  class="mx-auto max-w-[var(--container-prose)] px-8 max-[768px]:px-6 max-[480px]:px-4"
+  aria-labelledby="archive-shelf-heading"
+>
+  <h2
+    id="archive-shelf-heading"
+    class="mb-3 text-center font-['jf-lanyangming','Noto_Serif_TC','Source_Han_Serif_TC',serif] text-[2rem] font-light text-[#1f2937] max-[480px]:text-[1.6rem]"
+  >
+    {t('home.shelf.heading')}
+  </h2>
+  <p class="mb-12 text-center text-[0.95rem] leading-[1.9] text-[#6b7280]">
+    {t('home.shelf.lead')}
+  </p>
+
+  <div class="flex flex-col gap-0">
+    {
+      shelves.map((s) => (
+        <div class="grid grid-cols-[7rem_1fr] gap-x-8 border-t border-[#e5e7eb] py-9 max-[640px]:grid-cols-1 max-[640px]:gap-y-3 max-[640px]:py-7">
+          <div class="max-[640px]:flex max-[640px]:items-baseline max-[640px]:gap-3">
+            <span class="block text-[2.4rem] font-bold leading-none text-[#1f2937] [font-variant-numeric:tabular-nums] max-[640px]:text-[1.8rem]">
+              {s.count}
+            </span>
+            <span class="mt-1 block text-[0.8rem] tracking-[0.08em] text-[#9ca3af] max-[640px]:mt-0">
+              {t('home.shelf.unit')}
+            </span>
+          </div>
+          <div>
+            <h3 class="m-0 mb-2 text-[1.2rem] font-bold text-[#1f2937]">
+              {s.count > 0 ? (
+                <a
+                  href={translatePath(`/${s.slug}`)}
+                  data-ga-section="archive_shelf"
+                  data-ga-label={s.slug}
+                  class="text-[#1f2937] no-underline transition-colors duration-200 hover:text-[#E4007E]"
+                >
+                  {s.name}
+                </a>
+              ) : (
+                <span class="text-[#6b7280]">{s.name}</span>
+              )}
+            </h3>
+            <p class="m-0 text-[1rem] leading-[1.9] text-[#4b5563]">
+              {s.count > 0 ? s.blurb : t('home.shelf.empty')}
+            </p>
+
+            {s.slug === 'vendors' && longest.length > 0 && (
+              <>
+                <p class="mb-2 mt-5 text-[0.82rem] tracking-[0.04em] text-[#9ca3af]">
+                  {t('home.shelf.vendors.longestLabel')}
+                </p>
+                <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
+                  {longest.map((v) => (
+                    <li>
+                      <a
+                        href={translatePath(`/vendors/${v.slug}`)}
+                        data-ga-section="archive_shelf"
+                        data-ga-label="longest_vendor"
+                        class="inline-flex items-baseline gap-2 rounded-md border border-[#e5e7eb] bg-white px-3 py-[0.35rem] text-[0.85rem] font-semibold text-[#374151] no-underline transition-all duration-200 hover:border-[#E4007E]/40 hover:text-[#E4007E]"
+                      >
+                        <span>{v.name}</span>
+                        <span class="text-[0.75rem] font-normal text-[#9ca3af] [font-variant-numeric:tabular-nums]">
+                          {isZh ? `${v.editions} 屆` : `${v.editions} editions`}
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+
+  <p
+    class="mt-10 border-t border-[#e5e7eb] pt-8 text-center text-[0.9rem] leading-[1.9] text-[#6b7280]"
+  >
+    {t('home.shelf.footnote')}
+  </p>
+</section>

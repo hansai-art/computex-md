@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-07-29T03:12:05.434Z",
+  "lastUpdated": "2026-07-29T03:52:58.392Z",
   "generator": "scripts/core/generate-dashboard-alerts.mjs",
   "note": "derived 警報層 — CONSCIOUSNESS §警報 的機械接管 (audit 2026-06-10 A-3)",
   "count": 5,
@@ -31,7 +31,7 @@
     {
       "id": "organ-translation",
       "severity": "red",
-      "message": "🌐 語言器官 器官分數 0 < 50，需要干預",
+      "message": "🌐 語言器官 器官分數 28 < 50，需要干預",
       "source": "dashboard-organism.json",
       "owner": "twmd-self-evolve-weekly",
       "firstSeen": "2026-07-28"

@@ -585,28 +585,13 @@ const encodedTitle = encodeURIComponent(title);
               >
               {t('article.signature.contribute')}
             </a>
-            <a
-              href="https://portaly.cc/taiwanmd/support?utm_source=computex.md&utm_medium=article_signature&utm_campaign=support"
-              target="_blank"
-              rel="noopener noreferrer"
-              data-ga-section="article_signature"
-              data-ga-label="sponsor"
-              class="inline-flex items-center gap-[0.4rem] rounded-full border border-[rgba(26,60,52,0.2)] bg-transparent px-[0.9rem] py-[0.45rem] font-['Inter',system-ui,sans-serif] text-[0.8rem] font-medium text-[#1a3c34] no-underline transition-all duration-200 hover:bg-[rgba(26,60,52,0.06)]"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                aria-hidden="true"
-                ><path
-                  d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"
-                ></path></svg
-              >
-              {t('article.signature.support')}
-            </a>
+            {
+              /*
+    2026-07-29 拿掉「贊助維護」按鈕。它連到 portaly.cc/taiwanmd/support
+    （母體創辦人的個人收款頁），而且掛在每一篇文章的署名列，等於 86 個
+    廠商頁全部都在幫別人導流收款。本站沒有贊助管道，就不放贊助按鈕。
+  */
+            }
           </div>
           <p
             class="m-0 mt-[0.9rem] font-['Inter',system-ui,sans-serif] text-[0.75rem] leading-[1.6] text-[#9aa89e]"

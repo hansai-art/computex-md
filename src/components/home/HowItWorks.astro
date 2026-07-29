@@ -1,0 +1,90 @@
+---
+/**
+ * HowItWorks.astro — 首頁「這個檔案庫怎麼運作」三條規則。
+ *
+ * 取代母體的 CoverStory（八段引言時間軸，從原住民族口傳文學排到當代海洋文學）。
+ * 那個結構對單一策展者的國家敘事成立，對展會檔案庫不成立：這裡的讀者第一個
+ * 問題不是「怎麼理解這座島」，是「憑什麼相信你寫的攤位號」。
+ *
+ * 所以首頁第一個要回答的就是編輯契約本身。事實層 / 策展層的切分不是文件裡的
+ * 一段話，它是這個專案能不能被 AI 引擎引用的全部理由 — 放在首頁明講，比放在
+ * /about 第三段有用。
+ */
+import {
+  useTranslations,
+  getLangFromUrl,
+  useTranslatedPath,
+} from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+const rules = [
+  {
+    n: '01',
+    accent: '#E4007E',
+    title: t('home.how.fact.title'),
+    body: t('home.how.fact.body'),
+  },
+  {
+    n: '02',
+    accent: '#5b6470',
+    title: t('home.how.curation.title'),
+    body: t('home.how.curation.body'),
+  },
+  {
+    n: '03',
+    accent: '#5b6470',
+    title: t('home.how.blank.title'),
+    body: t('home.how.blank.body'),
+  },
+];
+---
+
+<section class="bg-[#fafbfc] px-8 py-24 max-[480px]:px-4 max-[480px]:py-16">
+  <div class="mx-auto max-w-[820px]">
+    <h2
+      class="mb-4 text-center font-['jf-lanyangming','Noto_Serif_TC','Source_Han_Serif_TC',serif] text-[2rem] font-light tracking-normal text-[#1a1a2e] max-[480px]:text-[1.6rem]"
+    >
+      {t('home.how.heading')}
+    </h2>
+    <p
+      class="mx-auto mb-14 max-w-[600px] text-center text-[1.05rem] leading-[1.9] text-[#4b5563] max-[480px]:mb-10 max-[480px]:text-base"
+    >
+      {t('home.how.lead')}
+    </p>
+
+    <ol class="m-0 flex list-none flex-col gap-0 p-0">
+      {
+        rules.map((r) => (
+          <li class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 border-t border-[#e5e7eb] py-8 first:border-t-0 first:pt-0 max-[480px]:gap-x-4 max-[480px]:py-6">
+            <span
+              class="row-span-2 pt-1 text-[1.05rem] font-bold [font-variant-numeric:tabular-nums]"
+              style={`color:${r.accent}`}
+              aria-hidden="true"
+            >
+              {r.n}
+            </span>
+            <h3 class="m-0 text-[1.25rem] font-bold leading-snug text-[#1a1a2e] max-[480px]:text-[1.1rem]">
+              {r.title}
+            </h3>
+            <p class="m-0 text-[1rem] leading-[1.9] text-[#4b5563] max-[480px]:text-[0.95rem]">
+              {r.body}
+            </p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <p class="mt-12 text-center">
+      <a
+        href={translatePath('/about')}
+        data-ga-section="how_it_works"
+        data-ga-label="about"
+        class="inline-block border-b-2 border-[#E4007E] pb-1 text-[0.95rem] font-semibold text-[#1a1a2e] no-underline transition-colors duration-200 hover:text-[#E4007E]"
+        >{t('home.how.link')}</a
+      >
+    </p>
+  </div>
+</section>

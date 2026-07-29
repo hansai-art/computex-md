@@ -12,6 +12,7 @@ import https from 'https';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 import { LANGUAGES } from '../../src/config/languages.mjs';
+import { CATEGORY_FOLDERS } from '../../src/config/categories.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,7 +29,7 @@ function fetchRepoStats() {
       hostname: 'api.github.com',
       path: '/repos/hansai-art/computex-md',
       headers: {
-        'User-Agent': 'taiwan-md-dashboard/1.0',
+        'User-Agent': 'computex-md-dashboard/1.0',
         Accept: 'application/vnd.github+json',
       },
     };
@@ -75,23 +76,17 @@ const TRANSLATION_STATUS_PATH = path.join(
   '_translation-status.json',
 );
 
-// PascalCase category directories (zh-TW SSOT)
-const CATEGORIES = [
-  'About',
-  'Art',
-  'Culture',
-  'Economy',
-  'Food',
-  'Geography',
-  'History',
-  'Lifestyle',
-  'Music',
-  'Nature',
-  'People',
-  'Politics',
-  'Society',
-  'Technology',
-];
+// 分類資料夾一律吃 SSOT。
+//
+// 2026-07-29：這裡本來寫死母體的 14 個分類（Art / Culture / Geography …）。
+// 本站一個都沒有，所以整支 generator 掃出 0 篇文章，然後**照樣印成功**：
+// dashboard-vitals.json 的 totalArticles 是 0、8 個器官分數全部從 0 算、
+// 首頁的 heartbeat 帶會顯示「0 篇文章」。
+//
+// 這是同一形狀的第三份寫死副本（第七份在 build-content-dates.mjs、第八份在
+// generate-og-images.mjs）。凡是 build script 要列分類，一律 import
+// src/config/categories.mjs，NEVER 再抄一份陣列。
+const CATEGORIES = [...CATEGORY_FOLDERS];
 
 // Translation language directories — sourced from registry so adding a
 // language only requires editing src/config/languages.json.

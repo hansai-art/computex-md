@@ -10,13 +10,16 @@ const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
 ---
 
-<!--
-  Phase 7.6 — ContributeSection.astro (Tier 1 home component)
-  All scoped CSS inlined. The ::before dot-pattern overlay is
-  now an absolute inset-0 div with inline background-image.
-  Two buttons (.btn-primary / .btn-secondary) inlined directly
-  since each appears exactly once.
--->
+{
+  /*
+    ContributeSection.astro
+    
+    2026-07-29 拿掉第三顆「贊助維護」按鈕：它指向 portaly.cc/taiwanmd/support，
+    是母體創辦人的個人收款頁，而且 utm 參數還被改成 computex.md，等於用本站的
+    流量幫別人收錢又把來源標成自己。頁尾已經清過同一條連結，這裡是漏網的第二處。
+    本站現在沒有贊助管道，就不放贊助按鈕。
+  */
+}
 <section
   class="relative m-0 overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#f8fafc_0%,#e2e8f0_100%)] px-8 py-20 text-center"
   aria-labelledby="contribute-heading"
@@ -46,23 +49,15 @@ const translatePath = useTranslatedPath(lang);
         href={translatePath('/contribute')}
         data-ga-section="contribute"
         data-ga-label="guide"
-        class="rounded-lg bg-[#1e40af] px-10 py-4 text-[1.1rem] font-semibold text-white no-underline shadow-[0_4px_12px_rgba(30,64,175,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#1d4ed8] hover:shadow-[0_6px_16px_rgba(30,64,175,0.4)]"
+        class="rounded-lg bg-[#252126] px-10 py-4 text-[1.1rem] font-semibold text-white no-underline shadow-[0_4px_12px_rgba(37,33,38,0.25)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#E4007E] hover:shadow-[0_6px_16px_rgba(228,0,126,0.3)]"
         >{t('home.contribute.guide')}</a
       >
       <a
         href="https://github.com/hansai-art/computex-md"
         data-ga-section="contribute"
         data-ga-label="github"
-        class="rounded-lg border-2 border-[#1e40af] bg-white px-10 py-4 text-[1.1rem] font-semibold text-[#1e40af] no-underline transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#1e40af] hover:text-white"
+        class="rounded-lg border-2 border-[#252126] bg-white px-10 py-4 text-[1.1rem] font-semibold text-[#252126] no-underline transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#252126] hover:text-white"
         target="_blank">{t('home.contribute.github')}</a
-      >
-      <a
-        href="https://portaly.cc/taiwanmd/support?utm_source=computex.md&utm_medium=home_contribute&utm_campaign=support"
-        data-ga-section="contribute"
-        data-ga-label="sponsor"
-        class="rounded-lg border-2 border-[#94a3b8] bg-white px-10 py-4 text-[1.1rem] font-semibold text-[#475569] no-underline transition-all duration-300 hover:-translate-y-0.5 hover:border-[#475569] hover:bg-[#475569] hover:text-white"
-        target="_blank"
-        rel="noopener noreferrer">{t('home.contribute.sponsor')}</a
       >
     </div>
   </div>

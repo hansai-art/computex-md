@@ -23,7 +23,6 @@ scripts/
 | `sync.sh`                     | bash | 同步 knowledge/ → src/content/（SSOT 複製）                   |
 | `generate-api.js`             | node | 產生 `public/api/*.json`（文章列表、搜尋索引）                |
 | `generate-dashboard-data.js`  | node | 產生 Dashboard 4 支 JSON API                                  |
-| `generate-map-markers.js`     | node | 產生地圖標記資料                                              |
 | `generate-content-stats.js`\* | node | 被 generate-api 呼叫，統計各分類文章數                        |
 | `build-search-index.mjs`      | node | 建構全文搜尋索引                                              |
 | `post-build-check.mjs`        | node | Build 後煙霧測試（驗證頁面數量、分類健康）                    |

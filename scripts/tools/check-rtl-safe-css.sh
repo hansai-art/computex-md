@@ -119,7 +119,7 @@ ALLOWLIST=(
 DEBT=(
   "src/styles/global.css:434|2026-07-26|.floating-md 屬浮動層，要跟 ReaderSettings / FeedbackWidget 同批鏡像，否則 RTL 下三者疊在一起"
   "src/styles/global.css:480|2026-07-26|同上（手機斷點）"
-  "src/styles/dark-polish.css:1433|2026-07-26|原因已變：resources.template.astro 在 2026-07-29 刪除（母體內容），這條 .resources-page 規則現在是沒有對應頁面的死 CSS。連同 .projects-page / .assets-page / .map-page / .taiwan-shape 等約 143 條一起清，不要單獨挑這一行改"
+  "src/styles/dark-polish.css:1433|2026-07-26|原因已變：resources.template.astro 在 2026-07-29 刪除（母體內容），這條 .resources-page 規則現在是沒有對應頁面的死 CSS。同一批孤兒在 07-29 首頁改寫後又長大：.hall-* / .pick-* / .topic-pill（四個展廳）、ReadingPath 場景色、SupporterGrid、.portaly-* 全部沒有 markup 掛得上。連同 .projects-page / .assets-page / .map-page / .taiwan-shape 一次清乾淨，不要單獨挑這一行改"
 )
 
 is_allowlisted() {

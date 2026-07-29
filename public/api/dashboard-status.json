@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-29T03:12:06.730Z",
+  "generated_at": "2026-07-29T03:52:59.702Z",
   "routines": null,
   "babel": null,
   "incidents": [
@@ -24,7 +24,7 @@
     {
       "ts": "2026-07-28",
       "level": "red",
-      "text": "🌐 語言器官 器官分數 0 < 50，需要干預",
+      "text": "🌐 語言器官 器官分數 28 < 50，需要干預",
       "source": "dashboard-organism.json"
     },
     {

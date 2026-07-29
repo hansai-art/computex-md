@@ -258,11 +258,8 @@ const generateJSONLD = () => {
       },
       'query-input': 'required name=search_term_string',
     },
-    sameAs: [
-      'https://github.com/hansai-art/computex-md',
-      'https://x.com/computexmd',
-      'https://www.instagram.com/computexmd',
-    ],
+    // 同上：只列真的由本站控制的帳號。
+    sameAs: ['https://github.com/hansai-art/computex-md'],
   };
 };
 
@@ -303,15 +300,14 @@ const organizationLD = {
     'Edge AI computing',
     'Semiconductor industry',
   ],
-  sameAs: [
-    'https://github.com/hansai-art/computex-md',
-    'https://x.com/computexmd',
-    'https://www.instagram.com/computexmd',
-    'https://www.threads.com/@computexmd',
-  ],
+  // sameAs 只列真的由本站控制的帳號。取種時這裡有 x / instagram / threads
+  // 三個 @computexmd handle，那是把母體的 @taiwanmd 做字串取代得到的，
+  // 我們沒有註冊過任何一個 —— 對爬蟲宣告「這些帳號是我們」是可查證的假話，
+  // 而且那些 handle 可能真的屬於別人。開了帳號再加回來。
+  sameAs: ['https://github.com/hansai-art/computex-md'],
   contactPoint: {
     '@type': 'ContactPoint',
-    email: 'taiwanmd@monoame.com',
+    email: 'hans@groupg.org',
     contactType: 'Customer Support',
   },
 };

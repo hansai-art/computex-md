@@ -1,4 +1,5 @@
 ---
+import { CATEGORY_LIST } from '../config/categories';
 import Layout from '../layouts/Layout.astro';
 import fs from 'fs';
 import path from 'path';
@@ -50,16 +51,10 @@ const i18n: Record<string, Record<string, string>> = {
     'lang.en': 'English',
     'lang.ja': '日本語',
     'lang.ko': '한국어',
-    'cat.history': '📜 歷史',
-    'cat.culture': '🎭 文化',
-    'cat.food': '🧋 美食',
-    'cat.art': '🎨 藝術',
-    'cat.music': '🎵 音樂',
-    'cat.technology': '💻 科技',
-    'cat.nature': '🌿 自然',
-    'cat.people': '👥 人物',
-    'cat.economy': '📈 經濟',
-    'cat.society': '⚖️ 社會',
+    'cat.vendors': '🏭 廠商',
+    'cat.products': '🔧 產品與技術',
+    'cat.editions': '🗓️ 歷屆展會',
+    'cat.topics': '📊 產業觀察',
   },
   en: {
     'generic.title': 'Page Not Found',
@@ -82,16 +77,10 @@ const i18n: Record<string, Record<string, string>> = {
     'lang.en': 'English',
     'lang.ja': 'Japanese',
     'lang.ko': 'Korean',
-    'cat.history': '📜 History',
-    'cat.culture': '🎭 Culture',
-    'cat.food': '🧋 Food',
-    'cat.art': '🎨 Art',
-    'cat.music': '🎵 Music',
-    'cat.technology': '💻 Technology',
-    'cat.nature': '🌿 Nature',
-    'cat.people': '👥 People',
-    'cat.economy': '📈 Economy',
-    'cat.society': '⚖️ Society',
+    'cat.vendors': '🏭 Vendors',
+    'cat.products': '🔧 Products',
+    'cat.editions': '🗓️ Editions',
+    'cat.topics': '📊 Topics',
   },
   ja: {
     'generic.title': 'このページは存在しません',
@@ -114,16 +103,10 @@ const i18n: Record<string, Record<string, string>> = {
     'lang.en': 'English',
     'lang.ja': '日本語',
     'lang.ko': '한국어',
-    'cat.history': '📜 歴史',
-    'cat.culture': '🎭 文化',
-    'cat.food': '🧋 食',
-    'cat.art': '🎨 芸術',
-    'cat.music': '🎵 音楽',
-    'cat.technology': '💻 テクノロジー',
-    'cat.nature': '🌿 自然',
-    'cat.people': '👥 人物',
-    'cat.economy': '📈 経済',
-    'cat.society': '⚖️ 社会',
+    'cat.vendors': '🏭 出展社',
+    'cat.products': '🔧 製品と技術',
+    'cat.editions': '🗓️ 開催回',
+    'cat.topics': '📊 業界観察',
   },
   ko: {
     'generic.title': '이 페이지는 존재하지 않습니다',
@@ -146,31 +129,17 @@ const i18n: Record<string, Record<string, string>> = {
     'lang.en': 'English',
     'lang.ja': '일본어',
     'lang.ko': '한국어',
-    'cat.history': '📜 역사',
-    'cat.culture': '🎭 문화',
-    'cat.food': '🧋 음식',
-    'cat.art': '🎨 예술',
-    'cat.music': '🎵 음악',
-    'cat.technology': '💻 기술',
-    'cat.nature': '🌿 자연',
-    'cat.people': '👥 인물',
-    'cat.economy': '📈 경제',
-    'cat.society': '⚖️ 사회',
+    'cat.vendors': '🏭 참가업체',
+    'cat.products': '🔧 제품과 기술',
+    'cat.editions': '🗓️ 역대 전시',
+    'cat.topics': '📊 산업 관찰',
   },
 };
 
-const categories = [
-  'history',
-  'culture',
-  'food',
-  'art',
-  'music',
-  'technology',
-  'nature',
-  'people',
-  'economy',
-  'society',
-];
+// 2026-07-29：這裡本來是母體的 10 個分類（history / culture / food …），
+// 404 頁「或者探索這些主題」的每一顆按鈕都連到不存在的路由 —— 一個專門用來
+// 救回迷路使用者的頁面，把人再送去另一個 404。改吃 SSOT。
+const categories = [...CATEGORY_LIST];
 ---
 
 <!--

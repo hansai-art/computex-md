@@ -1,7 +1,14 @@
 {
-  "generatedAt": "2026-07-29T03:12:00.787Z",
+  "generatedAt": "2026-07-29T03:52:53.306Z",
   "source": "git",
   "commits": [
+    {
+      "hash": "74072d9d5fde342fc7b8e5ca53a43c52b644e030",
+      "date": "2026-07-29T11:16:06+08:00",
+      "author": "Hans",
+      "message": "fix(chrome): cross-domain: 導覽列 28 條死連結、母體站名、錯的授權與別人的收款連結",
+      "articles": []
+    },
     {
       "hash": "da670af5069bac0bd600cb1fa3d5211e01178508",
       "date": "2026-07-29T10:37:15+08:00",
