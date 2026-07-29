@@ -54,46 +54,48 @@ const url =
     --twmd-fb-accent: #1a3c34;
     --twmd-fb-accent2: #2563eb;
   }
+  /* 2026-07-30：這顆鈕的底色本來寫死 `#fff` + 母體的墨綠字（#1a3c34），跟主題
+     無關。深色頁面上它就是左下角一塊發亮的白，比它旁邊的內容還搶眼 —— 一個
+     隨時可用的入口不該是畫面上最亮的東西。改吃 --color-ink / --color-accent，
+     跟右下角三顆同一組 --fab-* 的靜止透明度，深淺色一起對。 */
   .twmd-fb-fab {
     position: fixed;
-    inset-inline-start: 1rem;
-    bottom: 1rem;
+    inset-inline-start: var(--fab-inset);
+    bottom: var(--fab-inset);
     z-index: 60;
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.55rem 0.9rem;
-    border: 1px solid rgba(26, 60, 52, 0.15);
+    gap: 0.3rem;
+    padding: 0 0.7rem;
+    block-size: var(--fab-size);
+    border: 1px solid color-mix(in srgb, var(--color-ink) 22%, transparent);
     border-radius: 999px;
-    background: #fff;
-    color: var(--twmd-fb-accent);
-    font-size: 0.85rem;
+    background: var(--color-ink);
+    color: var(--color-accent);
+    font-family: var(--font-display);
+    font-size: 0.72rem;
     font-weight: 600;
     line-height: 1;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-card);
     text-decoration: none;
+    opacity: var(--fab-idle-opacity);
     transition:
+      opacity var(--dur-1) var(--ease-out-expo),
       transform var(--dur-2) var(--ease-out-expo),
       box-shadow var(--dur-2) var(--ease-out-expo);
   }
-  .twmd-fb-fab:hover {
+  .twmd-fb-fab:hover,
+  .twmd-fb-fab:focus-visible {
+    opacity: 1;
     transform: translateY(-1px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
-  }
-  @media (max-width: 640px) {
-    .twmd-fb-fab {
-      inset-inline-start: 0.75rem;
-      bottom: 0.75rem;
-      padding: 0.5rem 0.75rem;
-      font-size: 0.8rem;
-    }
   }
 
   .twmd-fb-panel {
     position: fixed;
-    inset-inline-start: 1rem;
-    bottom: 4rem;
+    inset-inline-start: var(--fab-inset);
+    bottom: var(--fab-next);
     z-index: 61;
     width: min(360px, calc(100vw - 2rem));
     max-height: min(80vh, 560px);

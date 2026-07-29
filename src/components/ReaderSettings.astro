@@ -546,30 +546,45 @@ const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
 </script>
 
 <style>
+  /* 幾何全部吃 tokens.css 的 --fab-*。原本這裡寫死 `calc(2rem + 48px + 12px)`，
+     等於把 .floating-md 的尺寸抄一份進來手算偏移：只要那顆改大小，這顆就會
+     疊上去或飄開，而且沒有任何檢查會叫。 */
   .reader-settings-toggle {
     position: fixed;
-    bottom: 2rem;
-    inset-inline-end: calc(2rem + 48px + 12px);
-    width: 48px;
-    height: 48px;
+    bottom: var(--fab-inset);
+    inset-inline-end: var(--fab-next);
+    width: var(--fab-size);
+    height: var(--fab-size);
     background: var(--color-ink);
     color: var(--color-accent);
     border: 0;
-    border-radius: 12px;
+    border-radius: var(--fab-radius);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     box-shadow: var(--shadow-card);
+    opacity: var(--fab-idle-opacity);
     transition:
       all var(--dur-1) var(--ease-out-expo),
       transform var(--dur-2) var(--ease-out-expo);
     z-index: 40;
   }
-  .reader-settings-toggle:hover {
+  .reader-settings-toggle:hover,
+  .reader-settings-toggle:focus-visible,
+  .reader-settings-toggle[aria-expanded='true'] {
+    opacity: 1;
     transform: translateY(-2px);
     background: var(--color-accent);
     color: var(--color-bg);
+  }
+  /* 面板開著的時候不要位移，不然按鈕會跟面板錯開 */
+  .reader-settings-toggle[aria-expanded='true'] {
+    transform: none;
+  }
+  .reader-settings-toggle svg {
+    width: 62%;
+    height: 62%;
   }
   /* Back-to-top — same 48px chip + tokens as the Aa toggle, stacked one
      button-row above it (same right offset, bottom bumped by a row). Hidden
@@ -577,14 +592,14 @@ const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
      matches the sibling floating buttons. */
   .back-to-top {
     position: fixed;
-    bottom: calc(2rem + 48px + 12px);
-    inset-inline-end: calc(2rem + 48px + 12px);
-    width: 48px;
-    height: 48px;
+    bottom: var(--fab-next);
+    inset-inline-end: var(--fab-next);
+    width: var(--fab-size);
+    height: var(--fab-size);
     background: var(--color-ink);
     color: var(--color-accent);
     border: 0;
-    border-radius: 12px;
+    border-radius: var(--fab-radius);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -599,11 +614,18 @@ const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
       color var(--dur-1) var(--ease-out-expo);
     z-index: 40;
   }
+  .back-to-top svg {
+    width: 62%;
+    height: 62%;
+  }
+  /* 這顆的靜止值是「捲夠遠才淡入」，所以 is-visible 才是它的靜止態 */
   .back-to-top.is-visible {
-    opacity: 1;
+    opacity: var(--fab-idle-opacity);
     transform: translateY(0);
   }
-  .back-to-top:hover {
+  .back-to-top:hover,
+  .back-to-top:focus-visible {
+    opacity: 1;
     transform: translateY(-2px);
     background: var(--color-accent);
     color: var(--color-bg);
@@ -619,8 +641,8 @@ const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
   }
   .reader-settings-panel {
     position: fixed;
-    bottom: calc(2rem + 48px + 12px);
-    inset-inline-end: 2rem;
+    bottom: var(--fab-next);
+    inset-inline-end: var(--fab-inset);
     width: min(320px, calc(100vw - 4rem));
     background: var(--color-surface);
     color: var(--color-ink);
@@ -736,19 +758,8 @@ const t: Strings = STRINGS[lang] ?? STRINGS['zh-TW'];
   :root[data-shot='1'] .back-to-top {
     display: none !important;
   }
-  @media (max-width: 640px) {
-    .reader-settings-toggle {
-      bottom: 1.2rem;
-      inset-inline-end: calc(1.2rem + 48px + 10px);
-    }
-    .reader-settings-panel {
-      bottom: calc(1.2rem + 48px + 10px);
-      inset-inline-end: 1.2rem;
-    }
-    /* Stack above the Aa toggle at the mobile offsets too. */
-    .back-to-top {
-      bottom: calc(1.2rem + 48px + 10px);
-      inset-inline-end: calc(1.2rem + 48px + 10px);
-    }
-  }
+  /* 手機版偏移原本在這裡再算一次（1.2rem + 48px + 10px），跟 global.css 的
+     `.floating-md` 手機值（1rem / 42px）本來就對不起來 —— 兩邊各自寫死同一個
+     排版，斷點也不同（640 vs 768）。2026-07-30 整組刪掉：尺寸與間距的手機值在
+     tokens.css 的 @media (max-width: 768px) 覆寫一次，四顆鈕一起跟著走。 */
 </style>

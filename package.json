@@ -32,7 +32,7 @@
     "build": "astro build",
     "test": "node scripts/core/test-frontmatter.mjs",
     "test:ci": "node scripts/core/test-frontmatter.mjs --ci",
-    "postbuild": "node scripts/tools/check-url-contract.mjs --strict && node scripts/tools/verify-nav-links.mjs && node scripts/tools/verify-internal-links.mjs && node scripts/tools/verify-og-images.mjs && node scripts/tools/verify-machine-doors.mjs && node scripts/tools/verify-build-size.mjs && node scripts/tools/verify-no-inherited-accounts.mjs && node scripts/tools/verify-font-coverage.mjs",
+    "postbuild": "node scripts/tools/check-url-contract.mjs --strict && node scripts/tools/verify-nav-links.mjs && node scripts/tools/verify-internal-links.mjs && node scripts/tools/verify-og-images.mjs && node scripts/tools/verify-machine-doors.mjs && node scripts/tools/verify-build-size.mjs && node scripts/tools/verify-no-inherited-accounts.mjs && node scripts/tools/verify-font-coverage.mjs && node scripts/tools/verify-i18n-keys-rendered.mjs",
     "postbuild:smoke": "node scripts/core/post-build-check.mjs",
     "postbuild:internal-links": "bash scripts/tools/verify-internal-links.sh",
     "preview": "astro preview",

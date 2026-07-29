@@ -138,6 +138,26 @@
     overflow-x: clip;
   }
 
+  /* ------------------------------------------------------------------------
+   * 中日韓斷行：以詞組為單位，不是逐字。
+   *
+   * 中文沒有空白，瀏覽器預設在**任兩個字之間**都可以斷，於是「有人補進一項可
+   * 查證的事實」會被切成「…一項可」／「查證的事實」，把一個詞從中間剖開。英文
+   * 讀者不會遇到這件事（有空白當邊界），所以這個瑕疵在以英文為主的框架裡從來
+   * 沒被處理過，就這樣繼承下來。
+   *
+   * word-break: auto-phrase 讓瀏覽器用詞組模型決定斷點。Chrome / Edge 支援，
+   * Safari / Firefox 落回逐字斷 —— 也就是現況，不會更糟，所以不需要 @supports
+   * 包起來。實測（1440px，/organism 標題段）：斷點從詞中間移到「、」之後。
+   *
+   * 只給 CJK 語言：拉丁語系本來就照空白斷，套上去沒有意義。
+   * ------------------------------------------------------------------------ */
+  :root:lang(zh-TW),
+  :root:lang(ja),
+  :root:lang(ko) {
+    word-break: auto-phrase;
+  }
+
   /* Focus styles for keyboard accessibility */
   *:focus-visible {
     outline: 2px solid #3b82f6;
@@ -465,29 +485,34 @@
      跟著跑到左下角（阿拉伯文讀者的「順手角落」在另一邊）。這兩處原本掛在
      check-rtl-safe-css.sh 的 DEBT 清單上靠行號豁免，2026-07-29 改成邏輯屬性，
      清單歸零。 */
+  /* 幾何與靜止透明度都吃 tokens.css 的 --fab-* （右下三顆 + 左下意見回饋共用
+     同一組），理由與觸控 / 高對比的例外處理見那一段註解。 */
   .floating-md {
     position: fixed;
-    bottom: 2rem;
-    inset-inline-end: 2rem;
-    width: 48px;
-    height: 48px;
+    bottom: var(--fab-inset);
+    inset-inline-end: var(--fab-inset);
+    width: var(--fab-size);
+    height: var(--fab-size);
     background: var(--color-ink);
     color: var(--color-accent);
-    border-radius: 12px;
+    border-radius: var(--fab-radius);
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: var(--font-mono);
-    font-size: 0.85rem;
+    font-size: 0.72rem;
     font-weight: 700;
     text-decoration: none;
     box-shadow: var(--shadow-card);
+    opacity: var(--fab-idle-opacity);
     transition:
       all var(--dur-1) var(--ease-out-expo),
       transform var(--dur-2) var(--ease-out-expo);
     z-index: 40;
   }
-  .floating-md:hover {
+  .floating-md:hover,
+  .floating-md:focus-visible {
+    opacity: 1;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px
       color-mix(in srgb, var(--color-accent) 30%, transparent);
@@ -514,12 +539,10 @@
     body.page-default main.category-page {
       padding-top: 0;
     }
+    /* 尺寸 token 的手機覆寫在 tokens.css（那份是 unlayered，寫在這裡會被它
+       蓋掉且不報錯）。這裡只留跟著字級走的東西。 */
     .floating-md {
-      bottom: 1rem;
-      inset-inline-end: 1rem;
-      width: 42px;
-      height: 42px;
-      font-size: 0.78rem;
+      font-size: 0.66rem;
     }
   }
 }

@@ -8,6 +8,7 @@ import {
 } from '../i18n/utils';
 import { getLangSwitchPath } from '../utils/getLangSwitchPath';
 import { resolveStaticHref } from '../utils/staticRoutes';
+import { getHotSearchTerms } from '../lib/hot-terms';
 import {
   ENABLED_LANGUAGE_CODES,
   DEFAULT_LANGUAGE,
@@ -24,6 +25,12 @@ const translatePath = useTranslatedPath(lang);
 // translatePath 盲目加語言前綴，對該語言不存在的靜態頁（/semiont ja/ko/es/fr、
 // /bench es/fr…）每頁生死鏈；navHref 查 src/pages 樹，不存在就退回 zh 路徑。
 const navHref = (p: string) => resolveStaticHref(lang, p);
+
+// 搜尋 modal 的「試試」chip。母體那六個 `explore.hotSearches.termN` key 本站
+// 從來沒有，`t()` 找不到就把 key 本身當內容印出來，於是每一頁的搜尋框都掛著
+// 六顆寫著 `explore.hotSearches.term1` 的按鈕，點下去 0 筆。改吃 hot-terms.ts：
+// 詞從真實資料算，而且逐個對真實索引驗證過（見該檔檔頭）。
+const hotTerms = getHotSearchTerms(lang, 4);
 
 const { langs } = await getLangSwitchPath(currentPath);
 
@@ -505,21 +512,24 @@ const mobileSubLinks: Record<string, { href: string; label: string }[]> = {
       <div class="search-hint">
         {t('nav.search-modal.type-to-search')}
       </div>
-      <div class="search-hot">
-        <span class="search-hot-label"
-          >🔥 {t('explore.hotSearches.label' as any)}</span
-        >
-        {
-          [1, 2, 3, 4, 5, 6].map((n) => {
-            const term = t(`explore.hotSearches.term${n}` as any);
-            return (
-              <button type="button" class="search-hot-chip" data-term={term}>
-                {term}
+      {
+        hotTerms.length > 0 && (
+          <div class="search-hot">
+            <span class="search-hot-label">
+              🔥 {t('explore.hotSearches.label')}
+            </span>
+            {hotTerms.map((chip) => (
+              <button
+                type="button"
+                class="search-hot-chip"
+                data-term={chip.term}
+              >
+                {chip.label}
               </button>
-            );
-          })
-        }
-      </div>
+            ))}
+          </div>
+        )
+      }
     </div>
   </div>
 </div>

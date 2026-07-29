@@ -419,7 +419,14 @@ const description = zh
       inline-size: 100%;
       max-width: var(--container-wide);
       margin: 0 auto;
-      padding: 0 var(--space-page-x) clamp(2.5rem, 6vh, 4.5rem);
+      /* 底部留白要大於左下角那顆固定的意見回饋鈕，不然 hero 的最後一行（操作
+         提示）會被它壓在下面 —— 實測重疊 99×17px。用 --fab-* 算而不是填一個
+         魔術數字：鈕改大小時這裡自己跟著讓位。 */
+      padding: 0 var(--space-page-x)
+        max(
+          clamp(2.5rem, 6vh, 4.5rem),
+          calc(var(--fab-inset) + var(--fab-size) + 1rem)
+        );
     }
 
     /* ── lede ─────────────────────────────────────────────── */
@@ -446,10 +453,16 @@ const description = zh
       text-wrap: balance;
       margin: 0 0 1rem;
     }
+    /* 2026-07-30：原本 62ch + 1.1rem，在 1440px 上排成三行，而且斷在
+       「有人補進一項可 / 查證的事實」—— 把「可查證」從中間切開。字級降一階、
+       量測拉寬到 48em（中文一字約 1em，62ch 只有約 31 個字，右邊空掉一大半），
+       兩行收完。text-wrap: pretty 避免最後一行只剩兩三個字。
+       斷句本身交給 :root 的 word-break: auto-phrase（見 global.css）。 */
     .standfirst {
-      max-width: 62ch;
-      font-size: clamp(0.98rem, 1.6vw, 1.1rem);
-      line-height: 1.75;
+      max-width: 48em;
+      font-size: clamp(0.92rem, 1.35vw, 1rem);
+      line-height: 1.8;
+      text-wrap: pretty;
       color: var(--color-ink-soft);
       margin: 0;
     }

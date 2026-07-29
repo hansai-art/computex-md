@@ -23,7 +23,8 @@
  *      該推的三道門：關聯圖、llms.txt、/raw/ 的純 Markdown 分身。
  *
  * 熱門搜尋詞不手寫，從實際資料現算（展區 + 館別）。手寫的熱門詞很容易變成
- * 「點了搜出 0 筆」，那比沒有還糟。
+ * 「點了搜出 0 筆」，那比沒有還糟。2026-07-30 這段搬到 `src/lib/hot-terms.ts`
+ * 給 Header 的搜尋 modal 共用，並補上對真實索引的驗證。
  */
 import { withTrailingSlash } from '../utils/href';
 import Layout from '../layouts/Layout.astro';
@@ -33,11 +34,8 @@ import { useTranslations, getLangFromUrl } from '../i18n/utils';
 import { getLatestArticles } from '../utils/articles-index';
 import { getCategoryConfigs, categoryList } from '../utils/categoryConfig';
 import { getArchiveStats, longestExhibitors } from '../lib/archive-stats';
-import { CATEGORY_MAPPING } from '../config/categories';
+import { getHotSearchTerms } from '../lib/hot-terms';
 import { LANGUAGES, DEFAULT_LANGUAGE } from '../config/languages';
-import matter from 'gray-matter';
-import { readFileSync, readdirSync } from 'node:fs';
-import { resolve, join } from 'node:path';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -70,46 +68,10 @@ const heroFigures = [
   },
 ];
 
-/**
- * 熱門搜尋詞 = 實際資料裡出現最多次的展區與館別。
- *
- * 每一個詞都保證搜得到東西（它就是從頁面內容統計出來的），而且會跟著資料長。
- * 展區名很長，取括號前的中文段當 chip 文字，搜尋時仍送完整字串。
- */
-function deriveHotTerms(): Array<{ label: string; term: string }> {
-  const dir = resolve(
-    process.cwd(),
-    ...(isZh ? ['knowledge'] : ['knowledge', lang]),
-    CATEGORY_MAPPING.vendors,
-  );
-  const zoneCount = new Map<string, number>();
-  const hallCount = new Map<string, number>();
-  try {
-    for (const f of readdirSync(dir)) {
-      if (!f.endsWith('.md') || f.startsWith('_')) continue;
-      const raw = readFileSync(join(dir, f), 'utf-8');
-      const { data } = matter(raw);
-      const zone = data?.vendor?.show_area;
-      if (typeof zone === 'string' && zone.trim()) {
-        zoneCount.set(zone, (zoneCount.get(zone) || 0) + 1);
-      }
-      const hall = raw.match(/台北南港展覽館 \d 館|台北世貿[一二三]館/)?.[0];
-      if (hall) hallCount.set(hall, (hallCount.get(hall) || 0) + 1);
-    }
-  } catch {
-    // 資料夾不在（例如某語言還沒有內容）→ 沒有 chip，區塊自己收掉
-  }
-  const top = (m: Map<string, number>, n: number) =>
-    [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, n);
-  return [
-    ...top(zoneCount, 2).map(([term]) => ({
-      label: term.replace(/\s*[（(].*$/, ''),
-      term,
-    })),
-    ...top(hallCount, 2).map(([term]) => ({ label: term, term })),
-  ];
-}
-const hotSearchTerms = deriveHotTerms();
+// 熱門搜尋詞。2026-07-30 從這裡搬到 src/lib/hot-terms.ts：全站 Header 的搜尋
+// modal 需要同一份，而它原本吃的是母體那六個不存在的 i18n key。搬過去的同時
+// 補上「拿真實索引驗證過才印出來」，理由見該檔檔頭。
+const hotSearchTerms = getHotSearchTerms(lang, 4);
 
 // ── 參展屆數最多的廠商。取代母體那個「腳註數 ≥ 18」的深度精選。 ──
 const longest = longestExhibitors(lang, 6);

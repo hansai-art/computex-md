@@ -46,6 +46,27 @@
   --shadow-soft: 0 8px 30px rgba(15, 23, 42, 0.06);
   --shadow-card: 0 16px 40px rgba(15, 23, 42, 0.08);
 
+  /* === 浮動控制鈕（FAB）===
+   * 右下角三顆（.md / Aa 閱讀設定 / 回頂端）與左下角一顆（意見回饋）。
+   *
+   * 2026-07-30：這四顆本來各自在三個檔案裡寫死 48px + 實心底色，右下角那三顆
+   * 還互相用 `calc(2rem + 48px + 12px)` 手算彼此的位置 —— 改一顆的尺寸就要同步
+   * 改另外兩顆的偏移，這種算式遲早會漂。收成 token 之後，「再小一點 / 再淡一點」
+   * 只要動這一段。
+   *
+   * 靜止透明度是刻意的：它們是隨時可用的工具，不是內容，不該一直跟畫面搶注意
+   * 力。hover / focus-visible 會補回 100%。觸控裝置沒有 hover 可以把它叫回來，
+   * 所以 --fab-idle-opacity 在 (hover: none) 下調高（見 global.css）；
+   * prefers-contrast: more 直接回到不透明。 */
+  --fab-size: 38px;
+  --fab-gap: 10px;
+  --fab-inset: 1.5rem;
+  --fab-radius: 11px;
+  --fab-idle-opacity: 0.45;
+  /* 右下角是 L 形排法：.md 在角落，Aa 在它左邊（同列），回頂端在 Aa 上面
+     （同欄）。--fab-next 就是「往左一格 / 往上一格」的距離，三顆共用。 */
+  --fab-next: calc(var(--fab-inset) + var(--fab-size) + var(--fab-gap));
+
   /* === Typography ===
    * 2026-07-29 全站改黑體（Hans 指定），同時把繼承來的字體鏈修乾淨。
    *
@@ -344,4 +365,28 @@
 :root[data-text-size='xlarge'] {
   --reader-size-scale: 1.25;
   font-size: 147.5%; /* 118 × 1.25 */
+}
+
+/* === 浮動控制鈕的情境覆寫 ===
+ * 這三段 MUST 留在 tokens.css（unlayered）。寫進 global.css 的 @layer base
+ * 會被本檔的 :root 蓋掉，而且不會有任何錯誤訊息 —— 只會是「手機版鈕沒縮，
+ * 但你以為改好了」。 */
+@media (max-width: 768px) {
+  :root {
+    --fab-size: 34px;
+    --fab-inset: 0.85rem;
+    --fab-gap: 8px;
+  }
+}
+/* 觸控裝置沒有 hover 可以把鈕叫回不透明，靜止值不能壓到看不清 */
+@media (hover: none) {
+  :root {
+    --fab-idle-opacity: 0.72;
+  }
+}
+/* 使用者要求高對比時，工具鈕不參與「低調」這件事 */
+@media (prefers-contrast: more) {
+  :root {
+    --fab-idle-opacity: 1;
+  }
 }

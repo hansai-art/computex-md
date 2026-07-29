@@ -118,13 +118,19 @@ TW_PATTERNS=(
 #    754/801 變成 756/803。
 #    2026-07-29 第五次失準：動態 token 化把單行 transition 展成多行，prettier 跑完
 #    再多四行，756/803 變成 760/807。五次裡有兩次是 prettier 自己造成的。
-#    ⚠️ 根因未解：只要用行號釘豁免，任何在上方增刪行的改動都會讓它失準，而且失準
-#    的方向是「靜默放行不該放行的行」。建議改成用內容指紋（例如同一條規則裡必須
-#    同時出現 translateX(-50%)）釘豁免，行號只當提示。這需要動 gate 本身的邏輯，
-#    留給獨立一次修改，不要夾在其他工作裡順手改。
+#
+# 2026-07-30 第六次失準（搜尋 chip 改資料來源，Header.astro 上方多五行）之後，
+# 改掉釘法本身。行號釘豁免有一個更糟的性質：失準的方向是**靜默放行不該放行的
+# 行**，而不是誤擋。誤擋會有人來修，靜默放行不會。
+#
+# 現在的釘法是「內容 + 佐證」：
+#   <path>|<這一行必須包含的字串>|<±6 行內必須出現的佐證>|<理由>
+# 豁免只在「程式碼仍然長得像豁免所宣稱的樣子」時成立。搬家跟著走；如果有人把
+# translateX(-50%) 拿掉、只留一個真的有方向性的 left:50%，佐證消失，這條豁免
+# 自動失效、gate 照樣響。這比行號嚴格，不是比較鬆。
 ALLOWLIST=(
-  "src/components/Header.astro:760|nav-link 底線置中：left:50% + translateX(-50%)"
-  "src/components/Header.astro:807|dropdown 置中：left:50% + translateX(-50%)"
+  "src/components/Header.astro|left: 50%|translateX(-50%)|nav-link 底線置中"
+  "src/components/Header.astro|left: 50%|translateX(-50%)|dropdown 置中"
 )
 
 # ── 掛號中的債（受守護檔案裡「還沒還」的行）──────────────────────────────────
@@ -143,9 +149,22 @@ ALLOWLIST=(
 DEBT=()
 
 is_allowlisted() {
-  local f="$1" ln="$2"
+  local f="$1" ln="$2" content="$3"
+  local entry rest needle witness from to
   for entry in "${ALLOWLIST[@]}"; do
-    [[ "${entry%%|*}" == "$f:$ln" ]] && return 0
+    [[ "${entry%%|*}" == "$f" ]] || continue
+    rest="${entry#*|}"
+    needle="${rest%%|*}"
+    rest="${rest#*|}"
+    witness="${rest%%|*}"
+    [[ "$content" == *"$needle"* ]] || continue
+    # 佐證要在同一段規則裡（±6 行）。抓不到就代表這條豁免所描述的寫法已經不
+    # 存在，豁免隨之失效 —— 這正是行號釘法做不到的事。
+    from=$((ln > 6 ? ln - 6 : 1))
+    to=$((ln + 6))
+    if sed -n "${from},${to}p" "$f" | grep -qF -- "$witness"; then
+      return 0
+    fi
   done
   return 1
 }
@@ -197,7 +216,8 @@ scan_file() {
     while IFS= read -r line; do
       [[ -z "$line" ]] && continue
       local ln="${line%%:*}"
-      is_allowlisted "$f" "$ln" && continue
+      local content="${line#*:}"
+      is_allowlisted "$f" "$ln" "$content" && continue
       is_debt "$f" "$ln" && continue
       VIOLATIONS=$((VIOLATIONS + 1))
       VIOLATION_LIST+="\n  [$kind] $f:$line"
