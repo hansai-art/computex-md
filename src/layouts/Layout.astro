@@ -214,35 +214,39 @@ const skipLinkLabel = skipLinkLabels[lang] ?? skipLinkLabels['zh-TW'];
       rel="apple-touch-icon-precomposed"
       href="/apple-touch-icon-precomposed.png"
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     {
-      /* 字體：IBM Plex Sans（拉丁）+ IBM Plex Mono（數據）+ Noto Sans TC（繁中黑體）。
-        2026-07-29 全站改黑體並重寫字體鏈，理由與配對邏輯見 src/styles/tokens.css
-        的 Typography 段。這裡只講「載了什麼、為什麼不載別的」：
+      /* 字體：思源黑體（Noto Sans TC）一套，自己託管。2026-07-30 Hans 指定全站統一。
 
-        - Noto Serif TC 整組拿掉。全站已無明體，載了也沒人用，等於白付一次
-          字體下載。拿掉的重量正好抵掉新加的兩支 Plex。
-        - 沒有 justfont。原本的五支（金萱、蘭陽黑、蘭陽明體、鶴體、日星初號楷）
-          用的是母體的專案 65854，已整段移除（理由見本檔 frontmatter）。
-        - Noto Sans TC 保留 300-900 全段：中文標題要壓到 900，內文要 300/400，
-          中間的 500/600/700 UI 在用，沒有哪一段是備而不用的。
-        - Plex 只取實際用得到的字重（Sans 400/500/600/700、Mono 400/500），
-          不整組拉。 */
+        改之前是從 Google Fonts 拉三個家族（IBM Plex Sans 拉丁 + IBM Plex Mono
+        數據 + Noto Sans TC 繁中），設計是「拉丁與 CJK 分兩層配對」。那個設計本身
+        沒有錯，但它從來沒有被貫徹：站上的 wordmark 與導覽列各自寫死
+        `font-family: 'Noto Sans TC'`，直接繞過 --font-display，所以首頁看到的
+        其實是兩套字混用。要「全站統一」，與其把繞過的地方一個一個補回去，不如
+        承認思源黑體本來就內含完整拉丁字母（拉丁部分源自 Source Sans），一套字
+        統一兩種文字不是將就。
+
+        改成自己託管的三個理由：
+        1. 全站 201 頁只用到約 1000 個字符。子集化後一個檔 292 KB，比從 Google
+           拉三個家族少得多，而且是一次請求。
+        2. 不再需要 preconnect 兩個 Google 網域。每一位訪客的 IP 本來都會在載入
+           字體時送給 Google 一次，現在不會了。這跟本站先前移除母體 GA 的理由
+           是同一個。
+        3. 字體不再是外部相依。Google Fonts 掛掉或被牆，本站排版不受影響。
+
+        字體檔由 scripts/tools/subset-font.py 產生（來源 SIL OFL 授權的 Noto
+        Sans TC），@font-face 在 src/styles/global.css。內容長出新字時要重跑
+        那支腳本，postbuild 的 verify-font-coverage.mjs 會擋，不會靜默缺字。
+
+        這裡用 preload：字體是首屏就要的東西，讓它跟 CSS 平行下載，
+        不必等 CSS 解析完才發現要載字體。 */
     }
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;600;700;800;900&display=swap"
       rel="preload"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
+      href="/fonts/noto-sans-tc-subset.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
-    <!-- JS 關閉時的退路 -->
-    <noscript>
-      <link
-        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet"
-      />
-    </noscript>
     <title>{title} | COMPUTEX.md</title>
     <link
       rel="alternate"

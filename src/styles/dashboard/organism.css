@@ -93,7 +93,7 @@
   font-size: 0.75rem;
   color: #64748b;
   text-decoration: none;
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: var(--font-mono);
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;

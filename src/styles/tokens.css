@@ -55,22 +55,34 @@
    * 一直是靜默 fallback 到 Noto Sans/Serif TC。也就是說「現在看到的排版」不是
    * 任何人設計的結果，是一連串失敗的 fallback，這正是它看起來制式的原因。
    *
-   * 現在的配對（拉丁 + CJK 兩層，不是一套字硬撐兩種文字）：
-   *   拉丁 = IBM Plex Sans / IBM Plex Mono —— IBM 為技術產品與技術文件做的字體，
-   *          出身就是硬體公司的工程文件，跟本站的主題同一個世界；而且它不是
-   *          Inter / Space Grotesk 那種到處都是的預設臉。
-   *   CJK  = Noto Sans TC（黑體）—— Plex 沒有繁中，CJK 字符由 fallback 鏈接手。
+   * 2026-07-30 全站統一思源黑體（Hans 指定），並改成自己託管。
    *
-   * mono 不是裝飾：本站的事實層全部是機器從官方名錄抽出來的（攤位號、
-   * exhibitor_id、屆數、查證日期），這些一律走 --font-mono，人寫的散文走
-   * --font-body。字體本身就在標示「這一行是機器抽的還是人寫的」。
+   * 上一版把拉丁交給 'IBM Plex Sans'、CJK 交給 Noto Sans TC，兩支都從 Google
+   * Fonts 載。那個配對本身沒有錯，錯在它從來沒有被貫徹：BrandMark 與 Header
+   * 各自寫死 `font-family: 'Noto Sans TC'`，直接繞過本 token，所以首頁的
+   * wordmark 與導覽列是 Noto、內文是 Plex，同一個畫面上兩套字。
+   *
+   * 現在：拉丁與 CJK 都由思源黑體出。思源黑體本來就內含完整拉丁字母（它的
+   * 拉丁部分源自 Source Sans），所以「一套字統一兩種文字」不是將就，是這套
+   * 字體本來的設計。@font-face 在 global.css，字體檔自己託管。
+   *
+   * fallback 鏈的順序有意義：
+   *   Noto Sans TC Subset  自己託管的子集，所有人拿到的都是這一份
+   *   Noto Sans TC         使用者本機若裝了完整版，補子集萬一漏掉的字
+   *   PingFang TC          macOS 內建，字體還在下載時先頂著
+   *
+   * mono 保留，而且它不是裝飾：本站的事實層全部是機器從官方名錄抽出來的
+   * （攤位號、exhibitor_id、屆數、查證日期），這些一律走 --font-mono，人寫的
+   * 散文走 --font-body。字體本身就在標示「這一行是機器抽的還是人寫的」。
+   * 這是語意分工，不是字體不統一，所以「全站統一」不涵蓋它。
+   * 但 'IBM Plex Mono' 拿掉了：它本來是跟著那三個 Google Fonts 家族一起載的，
+   * 現在不載 Google 了，留著就會變成一個永遠命不中的名字。改用系統等寬。
    */
   --font-display:
-    'IBM Plex Sans', 'Noto Sans TC', 'PingFang TC', 'Source Han Sans TC',
+    'Noto Sans TC Subset', 'Noto Sans TC', 'PingFang TC', 'Source Han Sans TC',
     sans-serif;
   --font-body: var(--font-display);
-  --font-mono:
-    'IBM Plex Mono', 'SF Mono', 'Roboto Mono', ui-monospace, monospace;
+  --font-mono: 'SF Mono', ui-monospace, 'Roboto Mono', Menlo, monospace;
 
   /* --font-sans / --font-mono 同時是 Tailwind 自己的 theme token 名。
    * tokens.css 是 unlayered，Tailwind theme 在 @layer theme，unlayered 一律

@@ -605,9 +605,12 @@ const breadcrumbLD = generateBreadcrumbLD();
   href={`${siteUrl}/feed.xml`}
 />
 
-<!-- Preconnect to external resources -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+{
+  /* 2026-07-30：拿掉 fonts.googleapis.com / fonts.gstatic.com 兩條 preconnect。
+     字體改成自己託管（見 src/styles/global.css 的 @font-face），站上已經不再
+     跟 Google 要任何東西。preconnect 留著的話，每一位訪客每一頁都會白跟
+     Google 建一次 TLS 連線，順便把 IP 送過去，換不到任何東西。 */
+}
 
 <!-- DNS prefetch -->
 <link rel="dns-prefetch" href="//github.com" />

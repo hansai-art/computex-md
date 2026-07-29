@@ -61,6 +61,35 @@
  * THIS file (src/styles/global.css). */
 @source "../**/*.{astro,ts,tsx,js,jsx,mdx}";
 
+/* ==========================================================================
+ * 思源黑體（Noto Sans TC），自己託管的子集。2026-07-30。
+ *
+ * 為什麼要自己託管：在這之前是從 Google Fonts 拉三個家族（IBM Plex Sans +
+ * IBM Plex Mono + Noto Sans TC）。改成一套自託管的思源黑體之後，請求從三個
+ * 家族變成一個檔，訪客的 IP 也不再於每次載入時送給 Google 一次 —— 這跟本站
+ * 先前移除母體 GA 的理由是同一個。字體也不再是外部相依。
+ *
+ * 一個檔涵蓋 400 到 900：這是變數字體，字重由 wght 軸插值出來，不需要為
+ * 每個字重各下載一次。全站 201 頁只用到約 1000 個字符，子集化後 292 KB。
+ *
+ * 字體檔由 scripts/tools/subset-font.py 產生，來源是 SIL OFL 授權的
+ * Noto Sans TC。**內容長出新字時要重跑那支腳本**，build 有守門員會擋
+ * （font-subset check），不會讓缺字靜默掉回系統字。
+ *
+ * 家族名刻意加 Subset 尾綴：跟使用者本機可能安裝的完整版 Noto Sans TC 區分
+ * 開來，debug 時一眼看得出畫面上的是哪一份。完整版排在 fallback 鏈的下一位，
+ * 萬一子集真的漏字，補上來的是同一套字體的同一個字形，不會突兀。
+ * ========================================================================== */
+@font-face {
+  font-family: 'Noto Sans TC Subset';
+  src: url('/fonts/noto-sans-tc-subset.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: normal;
+  /* swap 而不是 optional：這是內容站，寧可先用系統字把字排出來再換成思源黑體，
+     也不要因為網路慢就整篇放棄改用系統字，那會讓不同人看到不同排版。 */
+  font-display: swap;
+}
+
 /* Phase 7 (2026-04-10): the `@theme` bridge block that mapped tokens →
  * Tailwind utilities (font-title, max-w-reading, rounded-card, etc.)
  * was removed because nothing in the markup actually used those
@@ -448,7 +477,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-family: var(--font-mono);
     font-size: 0.85rem;
     font-weight: 700;
     text-decoration: none;
