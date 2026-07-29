@@ -107,8 +107,8 @@ const description = zh
         <OrganismCanvas
           shape={shape}
           label={zh
-            ? `以 WebGL 繪製的生命體線框。它的體積、瓣數、心跳、線亮度、變形速度與殘影層數各自對應一項站台指標，完整數值列在下方「形狀是怎麼算出來的」表格，也可從 /api/organism.json 取得。`
-            : `A WebGL wireframe of the organism. Its volume, lobe count, pulse, wire brightness, morph speed and afterimage layers each map to one site metric. The full numbers are in the table below and in /api/organism.json.`}
+            ? `以 WebGL 繪製的生命體線框。它的體積、瓣數、心跳、線亮度、變形速度與殘影層數各自對應一項站台指標。它會回應滑鼠與觸控（移過去發亮、拖曳轉動、點擊擴散），但那只是回饋，沒有任何資訊只存在於這個畫面裡：完整數值列在下方「形狀是怎麼算出來的」表格，也可從 /organism.md 與 /api/organism.json 取得。`
+            : `A WebGL wireframe of the organism. Its volume, lobe count, pulse, wire brightness, morph speed and afterimage layers each map to one site metric. It responds to pointer and touch (glow on hover, drag to rotate, click to ripple), but that is feedback only: no information exists solely inside the canvas. The full numbers are in the table below, in /en/organism.md and in /api/organism.json.`}
         />
       </div>
       <div class="hero-veil" aria-hidden="true"></div>
@@ -120,6 +120,17 @@ const description = zh
             zh
               ? '上面那個東西不是插圖。它的形狀由六項站台指標決定：條目數撐開體積、Booth Score 決定線有多亮、七日編輯數決定它變形得多快。有人補進一項可查證的事實，它就長大一點。'
               : 'The shape above is not an illustration. Six site metrics drive it: entry count sets its volume, Booth Score sets how bright the wires burn, edits over the last seven days set how fast it morphs. Every verifiable fact someone adds makes it grow.'
+          }
+        </p>
+        {
+          /* 互動提示。沒有這一行，多數人只會看到一張會動的圖就往下捲，
+             不會知道它其實碰得到。 */
+        }
+        <p class="hero-hint">
+          {
+            zh
+              ? '滑鼠移過去它會亮起來，拖曳可以轉動它，點一下會從那裡擴散一圈。'
+              : 'Move your cursor across it to light it up, drag to turn it, click to send a ripple out from that point.'
           }
         </p>
       </div>
@@ -441,6 +452,22 @@ const description = zh
       line-height: 1.75;
       color: var(--color-ink-soft);
       margin: 0;
+    }
+    /* 操作提示：比正文再淡一階，是說明不是內容。 */
+    .hero-hint {
+      max-width: 62ch;
+      margin: 0.85rem 0 0;
+      font-size: 0.86rem;
+      line-height: 1.6;
+      letter-spacing: 0.01em;
+      color: var(--color-ink-faint, var(--color-ink-soft));
+      opacity: 0.72;
+    }
+    /* 靜止模式下沒有掛事件處理器，提示就不要留在畫面上騙人。 */
+    @media (prefers-reduced-motion: reduce) {
+      .hero-hint {
+        display: none;
+      }
     }
 
     /* ── 六條指標 → 形狀 ──────────────────────────────────────

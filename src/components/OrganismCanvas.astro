@@ -45,6 +45,17 @@
  * shader 的 time uniform 往回推 k × 0.62 秒，NEVER 用不同半徑畫同心殼
  * （同心殼是靜態的洋蔥，不是殘影）。層數上限壓在 3，detail 64 很貴。
  *
+ * ## 互動（2026-07-29 Hans：「要有活著的感覺」）
+ *
+ *   游標移過去 → 那一塊亮起來、鼓起來（uPointer / uPointerAmt）
+ *   點一下     → 從點到的地方沿著球面擴散一圈（uRipple / uRippleDir）
+ *   拖曳       → 轉動它，放手後慣性收回自轉
+ *   捲動頁面   → 跟著轉一點點
+ *
+ * 這四件事是**回饋**不是資料：它們不宣稱任何數字，所以不牴觸「每個視覺變數都
+ * 追得回一個真實欄位」那條硬規則。畫布裡也沒有任何獨有資訊，同一組數值在
+ * 頁面表格、/organism.md 與 /api/organism.json 各有一份。
+ *
  * ## 五條實作坑（每一條都真的踩過）
  *
  * 1. 位移幅度 MUST 是**相對半徑的比例**。寫成絕對值時，體積長大會讓尖刺穿過
@@ -169,7 +180,18 @@ const params = {
       uniform float uDisplace;
       uniform float uNoiseFreq;
       uniform float uGrow;
+      // ── 互動（全部在物件座標系）─────────────────────────────────────────
+      // uPointer   游標打在球面上的方向。物體會轉，所以這條在 JS 端用
+      //            mesh.worldToLocal 轉進物件座標，shader 不需要知道旋轉。
+      // uPointerAmt 0 到 1。游標離開時不是瞬間歸零，是滑回去。
+      // uRipple    距離上一次點擊過了幾秒；-1 = 沒有進行中的漣漪。
+      // uRippleDir 那一次點擊打在球面上的方向。
+      uniform vec3 uPointer;
+      uniform float uPointerAmt;
+      uniform float uRipple;
+      uniform vec3 uRippleDir;
       varying vec3 vNormal;
+      varying float vProx;
 
       // Ashima simplex noise（公有領域）
       vec3 mod289(vec3 x){ return x - floor(x * (1.0/289.0)) * 289.0; }
@@ -226,6 +248,24 @@ const params = {
         float displacement =
           snoise(position * uNoiseFreq + uTime) * uDisplace * uRadius;
 
+        vec3 dir = normalize(position);
+
+        // 互動 1：游標所在的那一塊會鼓起來。pow(prox, 8) 讓影響範圍很窄，
+        // 看起來是「被戳到的那一點」，不是整顆球膨脹。
+        float prox = max(0.0, dot(dir, uPointer));
+        vProx = prox;
+        displacement += pow(prox, 8.0) * uPointerAmt * uDisplace * uRadius * 1.15;
+
+        // 互動 2：點擊 = 一圈從點擊處往外擴散的漣漪。
+        // 用**球面角距離**而不是歐氏距離：波前才會沿著表面均勻擴散，
+        // 不會在背面那側擠成一團。exp(-uRipple * 1.9) 是振幅隨時間衰減。
+        if (uRipple >= 0.0) {
+          float ang = acos(clamp(dot(dir, uRippleDir), -1.0, 1.0));
+          float d = ang - uRipple * 3.4;
+          displacement +=
+            exp(-d * d * 24.0) * exp(-uRipple * 1.9) * uDisplace * uRadius * 1.7;
+        }
+
         // fresnel 用未變形的法線算（參照樣本也是）。這條法線在物件座標系，
         // 會跟著 mesh 一起轉，所以亮帶會在表面上緩慢掃過去。
         vNormal = normal;
@@ -238,7 +278,9 @@ const params = {
     const fragmentShader = /* glsl */ `
       uniform float uOpacity;
       uniform float uBrightness;
+      uniform float uPointerAmt;
       varying vec3 vNormal;
+      varying float vProx;
       void main() {
         // 要件 3：fresnel 邊緣光。正對鏡頭 → dot 接近 1 → fresnel 接近 0 → 暗；
         // 側面掠過 → dot 接近 0 → fresnel 接近 1 → 亮。所以中心是一團暗的密網、
@@ -249,8 +291,18 @@ const params = {
         // 那張大家看到的圖就是純 fresnel，所以這裡不抄那段死碼。
         float fresnel = 1.0 - dot(normalize(vNormal), vec3(0.0, 0.0, 1.0));
         fresnel = pow(fresnel, 2.0);
+
+        // 互動：游標所在那一塊也會亮起來。參照樣本本來就想做這件事（它把一顆
+        // point light 綁在游標上），只是 uniform 名字打錯，那盞燈從來沒亮過。
+        // 這裡不補那盞燈，直接把「離游標多近」當成一個亮度項：中心那團暗網被
+        // 游標掃過時會透出來，那一下才是「它感覺得到你」。
+        // ⚠️ 指數壓到 3 的時候，整個朝向鏡頭的半球都會亮起來，fresnel 的暗核心
+        // 被洗掉，看起來像「整顆變亮」而不是「被照到一塊」。要的是一個窄光斑。
+        float glow = pow(vProx, 7.0) * uPointerAmt * 0.55;
+
         // Booth Score → 線亮度。純黑白，洋紅一點都不准沾。
-        gl_FragColor = vec4(vec3(fresnel * uBrightness), uOpacity);
+        float shade = min(1.0, fresnel + glow) * uBrightness;
+        gl_FragColor = vec4(vec3(shade), uOpacity);
       }
     `;
 
@@ -264,6 +316,10 @@ const params = {
           uDisplace: { value: DISPLACE_RATIO },
           uNoiseFreq: { value: NOISE_FREQ },
           uGrow: { value: 0 },
+          uPointer: { value: new THREE.Vector3(0, 0, 1) },
+          uPointerAmt: { value: 0 },
+          uRipple: { value: -1 },
+          uRippleDir: { value: new THREE.Vector3(0, 0, 1) },
           uOpacity: { value: k === 0 ? 1 : 0.26 / k },
           uBrightness: { value: WIRE },
         },
@@ -317,6 +373,125 @@ const params = {
     const GROW_MS = 2200;
     let running = false;
 
+    // ── 互動 ─────────────────────────────────────────────────────────────
+    // 目標是「它感覺得到你」，不是「它有很多特效」。四件事：
+    //   游標移過去 → 那一塊亮起來、鼓起來
+    //   點一下     → 從點到的地方擴散一圈漣漪
+    //   拖曳       → 轉動它，放手後慣性慢慢收回自轉
+    //   捲動頁面   → 跟著轉一點點（Hans 要的「跟網頁互動」）
+    //
+    // 三條紀律：
+    // 1. 事件處理器只寫變數，NEVER 在事件裡呼叫 render。滑鼠一秒可以發上百個
+    //    pointermove，每個都畫一次等於把 rAF 的節流整個繞過去。
+    // 2. 游標方向要轉進**物件座標**（mesh.worldToLocal），因為 shader 拿到的
+    //    position 是沒有旋轉過的。少了這一步，物體一轉，亮點就會自己跑掉。
+    // 3. touch-action: pan-y 寫在 CSS（見下方 style）：手機上直向捲動要能穿過去，
+    //    否則使用者滑到這一段就被黏住，整頁捲不動。
+    const raycaster = new THREE.Raycaster();
+    const invRot = new THREE.Quaternion();
+    const ndc = new THREE.Vector2();
+    const hitSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), RADIUS);
+    const hitPoint = new THREE.Vector3();
+    const worldPoint = new THREE.Vector3();
+
+    let pointerAmt = 0; // 目前的影響強度
+    let pointerTarget = 0; // 要滑向的值（進 1、出 0）
+    let hasPointer = false;
+    let rippleStart = -1; // 上一次點擊的時間戳（秒），-1 = 沒有
+    let dragging = false;
+    let dragX = 0; // 拖曳累積的旋轉
+    let dragY = 0;
+    let velX = 0; // 放手後的慣性
+    let velY = 0;
+    let lastX = 0;
+    let lastY = 0;
+    let moved = 0; // 這次按下總共移動了多少 px，用來分辨點擊與拖曳
+    let scrollRot = 0;
+
+    /** 螢幕座標 → 球面上的方向（世界座標）。沒打中球就回 null。 */
+    function pickDirection(ev: PointerEvent): THREE.Vector3 | null {
+      const r = canvas.getBoundingClientRect();
+      if (!r.width || !r.height) return null;
+      ndc.x = ((ev.clientX - r.left) / r.width) * 2 - 1;
+      ndc.y = -((ev.clientY - r.top) / r.height) * 2 + 1;
+      raycaster.setFromCamera(ndc, camera);
+      // 打在球上就用交點；打空（游標在生命體外圍）就用最接近的方向，
+      // 這樣游標從旁邊掠過時亮點會沿著邊緣滑，不會忽然消失。
+      const hit = raycaster.ray.intersectSphere(hitSphere, hitPoint);
+      if (hit) return worldPoint.copy(hit).normalize().clone();
+      raycaster.ray.closestPointToPoint(hitSphere.center, worldPoint);
+      const len = worldPoint.length();
+      return len > 0.0001 ? worldPoint.divideScalar(len).clone() : null;
+    }
+
+    let pointerWorld: THREE.Vector3 | null = null;
+    let rippleWorld: THREE.Vector3 | null = null;
+
+    if (!reduce) {
+      stage.addEventListener('pointermove', (ev) => {
+        const d = pickDirection(ev);
+        if (d) pointerWorld = d;
+        hasPointer = true;
+        pointerTarget = 1;
+        if (dragging) {
+          const dx = ev.clientX - lastX;
+          const dy = ev.clientY - lastY;
+          lastX = ev.clientX;
+          lastY = ev.clientY;
+          moved += Math.abs(dx) + Math.abs(dy);
+          // 0.0055 rad/px：拖過整個視窗寬大約轉一圈半，手感跟得上但不會甩飛。
+          velY = dx * 0.0055;
+          velX = dy * 0.0055;
+          dragY += velY;
+          dragX += velX;
+        }
+      });
+
+      stage.addEventListener('pointerleave', () => {
+        hasPointer = false;
+        pointerTarget = 0;
+      });
+
+      stage.addEventListener('pointerdown', (ev) => {
+        dragging = true;
+        moved = 0;
+        lastX = ev.clientX;
+        lastY = ev.clientY;
+        velX = 0;
+        velY = 0;
+        stage.setPointerCapture?.(ev.pointerId);
+        stage.classList.add('is-grabbing');
+      });
+
+      const release = (ev: PointerEvent) => {
+        if (!dragging) return;
+        dragging = false;
+        stage.releasePointerCapture?.(ev.pointerId);
+        stage.classList.remove('is-grabbing');
+        // 移動不到 6px 才算「點一下」。少了這個門檻，每一次拖曳放手都會多噴
+        // 一圈漣漪，看起來像故障。
+        if (moved < 6) {
+          const d = pickDirection(ev);
+          if (d) {
+            rippleWorld = d;
+            rippleStart = (performance.now() - t0) / 1000;
+          }
+        }
+      };
+      stage.addEventListener('pointerup', release);
+      stage.addEventListener('pointercancel', release);
+
+      // 捲動：頁面往下捲，生命體跟著轉一點。用 passive listener 只寫變數，
+      // 捲動效能完全不受影響。
+      addEventListener(
+        'scroll',
+        () => {
+          scrollRot = window.scrollY * 0.0016;
+        },
+        { passive: true },
+      );
+    }
+
     function frame() {
       if (running && !visible) {
         running = false;
@@ -331,14 +506,58 @@ const params = {
       // AI 抓取 → 心跳：整體尺度上的一個緩慢脈動。
       const beat = 1 + Math.sin(elapsed * Math.PI * 2 * PULSE_HZ) * 0.022;
 
+      // 游標影響強度往目標值滑：進場 0.12、退場 0.06（離開比靠近慢，
+      // 亮點是「餘溫」不是開關）。
+      pointerAmt +=
+        (pointerTarget - pointerAmt) * (pointerTarget > 0 ? 0.12 : 0.06);
+      if (!hasPointer && pointerAmt < 0.002) pointerAmt = 0;
+
+      // 放手後的慣性。0.94 大約 1 秒收乾淨。
+      if (!dragging) {
+        velY *= 0.94;
+        velX *= 0.94;
+        if (Math.abs(velY) < 1e-5) velY = 0;
+        if (Math.abs(velX) < 1e-5) velX = 0;
+        dragY += velY;
+        dragX += velX;
+      }
+
+      // 漣漪：跑完 2.2 秒就熄掉，不要讓 shader 一直算一個看不見的波。
+      const rippleAge = rippleStart >= 0 ? elapsed - rippleStart : -1;
+      const rippleOn = rippleAge >= 0 && rippleAge < 2.2;
+      if (!rippleOn && rippleStart >= 0 && rippleAge >= 2.2) rippleStart = -1;
+
       for (const { mesh, mat, delay } of layers) {
         // 殘影 = 同一個東西的過去。時間往回推，其他參數完全一樣。
         // 參照樣本的變形速度換算成「每秒噪聲座標位移」= 0.15。MORPH 的中段
         // （七日 16 筆編輯 → 0.24）乘 0.62 剛好落在那裡，冷站慢、熱站快。
         mat.uniforms.uTime.value = Math.max(0, elapsed - delay) * MORPH * 0.62;
         mat.uniforms.uGrow.value = eased * beat;
-        mesh.rotation.y = (elapsed - delay) * SPIN;
-        mesh.rotation.x = (elapsed - delay) * SPIN * 0.42;
+        // 自轉 + 拖曳 + 捲動。三個都疊在同一條旋轉上，殘影層一樣往回延遲，
+        // 所以拖的時候殘影會拖在後面，那一下最像有實體。
+        mesh.rotation.y = (elapsed - delay) * SPIN + dragY;
+        mesh.rotation.x = (elapsed - delay) * SPIN * 0.42 + dragX + scrollRot;
+        mesh.updateMatrixWorld();
+
+        // 紀律 2：游標方向要轉進物件座標，否則物體一轉亮點就跑掉。
+        // 每一層的旋轉不同（殘影有延遲），所以每一層各轉一次。
+        // 用四元數的反轉而不是 matrixWorld.clone().invert()：方向向量不需要
+        // 平移，而且 clone 一個 Matrix4 是每層每幀一次配置，60fps 下就是垃圾。
+        invRot.copy(mesh.quaternion).invert();
+        mat.uniforms.uPointerAmt.value = pointerAmt;
+        if (pointerWorld && pointerAmt > 0) {
+          mat.uniforms.uPointer.value
+            .copy(pointerWorld)
+            .applyQuaternion(invRot)
+            .normalize();
+        }
+        mat.uniforms.uRipple.value = rippleOn ? rippleAge : -1;
+        if (rippleOn && rippleWorld) {
+          mat.uniforms.uRippleDir.value
+            .copy(rippleWorld)
+            .applyQuaternion(invRot)
+            .normalize();
+        }
       }
 
       renderer.render(scene, camera);
@@ -367,6 +586,20 @@ const params = {
     position: relative;
     inline-size: 100%;
     block-size: 100%;
+    /* 可以抓、可以轉。游標本身就是「這東西可以碰」的第一個提示。 */
+    cursor: grab;
+    /* 紀律 3：手機上直向捲動要能穿過這一層。少了 pan-y，使用者滑到這一段
+       整頁就被黏住，只剩橫向拖曳有反應，看起來像網頁壞掉。 */
+    touch-action: pan-y;
+  }
+  .organism-stage.is-grabbing {
+    cursor: grabbing;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    /* 靜止版沒有掛任何事件處理器，游標就不要騙人說可以抓。 */
+    .organism-stage {
+      cursor: default;
+    }
   }
   .organism-stage canvas {
     display: block;
