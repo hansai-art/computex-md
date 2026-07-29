@@ -116,6 +116,34 @@ def _parse_frontmatter_minimal(yaml_text: str) -> dict[str, Any]:
                 i = j
                 continue
 
+            # 換行後才開始的 flow array（`key:` 換行後接 `  [` … `  ]`）。
+            # 2026-07-29：這正是 Prettier 對長 tags 的折行結果，也就是說**每一篇
+            # tags 稍長的文章存檔後都會踩到**。之前沒發現是因為測試環境裝了
+            # PyYAML 走 fast path，而 article-health CLI 是純 stdlib 走這支 minimal
+            # parser —— 測試綠、真的跑會 hard fail。測試環境要跟生產環境同一條路。
+            j = i
+            while j < len(lines) and not lines[j].strip():
+                j += 1
+            if j < len(lines) and lines[j].strip().startswith("["):
+                buf: list[str] = []
+                depth = 0
+                closed = False
+                while j < len(lines):
+                    chunk = lines[j].strip()
+                    buf.append(chunk)
+                    depth += chunk.count("[") - chunk.count("]")
+                    j += 1
+                    if depth <= 0:
+                        closed = True
+                        break
+                if closed:
+                    inner = " ".join(buf).strip()
+                    inner = inner[inner.index("[") + 1 : inner.rindex("]")]
+                    items = [x.strip().strip("'\"") for x in inner.split(",")]
+                    out[key] = [x for x in items if x]
+                    i = j
+                    continue
+
             # Empty top-level value — peek ahead for nested mapping (1 level)
             # or block scalar (`|`/`>`). For nested mapping: indented `child: value`.
             nested: dict[str, Any] = {}
